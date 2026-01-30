@@ -1,0 +1,22 @@
+Site Identity
+- business_name
+- tagline (optional)
+- service_area
+
+Hero Section
+- hero_headline
+- hero_subheadline
+- primary_cta_text
+- primary_cta_link
+
+Services
+- service_description
+- starting_price
+- pricing_note
+
+Contact
+- contact_email
+- contact_phone (optional)
+
+Brand Feel
+- brand_tone (internal use, optional)
