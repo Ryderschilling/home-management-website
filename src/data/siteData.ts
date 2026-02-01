@@ -9,7 +9,7 @@ export type Service = {
     export const siteData = {
       businessName: "Coastal Home Management 30A",
       serviceArea: "Inlet Beach, 30A Florida",
-      startingPrice: "$200/month",
+      startingPrice: "~$200/month",
       contactEmail: "coastalhomemanagement30a@gmail.com",
     
       services: [
@@ -18,7 +18,7 @@ export type Service = {
           title: "Second Home Oversight",
           description:
             "Scheduled inspections ensuring your property is protected year-round.",
-          price: "Starting at $200/month",
+          price: "Starting at ~$200/month",
           image: "/service1.png",
         },
         {
