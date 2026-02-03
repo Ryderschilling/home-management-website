@@ -172,11 +172,11 @@ export default function TestimonialsSection() {
                   <span className="italic">“{t.quote}”</span>
                 </div>
 
-                <div className="mt-5 flex items-center justify-start gap-2 text-white/70 text-base">
-                    <span className="text-white/40">—</span>
-                    <span className="whitespace-nowrap text-white/70 font-medium">{t.name}</span>
-                    {t.meta ? <span className="text-white/40">· {t.meta}</span> : null}
-                </div>
+<div className="mt-5 flex items-center justify-start gap-2 text-white/70 text-base">
+  <span className="text-white/40">—</span>
+  <span className="tracking-wide whitespace-nowrap">{t.name}</span>
+  {t.meta ? <span className="text-white/40">· {t.meta}</span> : null}
+</div>
               </article>
             ))}
 

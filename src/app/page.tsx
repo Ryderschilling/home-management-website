@@ -122,75 +122,153 @@ export default function HomePage() {
 {/* Services */}
 <section
   id="services"
-  className="px-6 py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
+  className="px-4 md:px-6 py-20 md:py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
 >
-  <div className="max-w-6xl mx-auto grid grid-cols-3 gap-12">
-    {/* Service card 1 */}
-    <div className="relative group overflow-hidden border border-gray-200 p-6">
-      <div className="h-60 w-full mb-4 overflow-hidden">
-        <img
-          src="/img.png"
-          alt="Second Home Management"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+  <div className="max-w-6xl mx-auto">
+    <h2 className="text-3xl md:text-4xl font-serif mb-8">Services</h2>
+
+    {/* MOBILE: full-size swipe cards */}
+    <div className="md:hidden -mx-4 px-4">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4">
+        {/* Card 1 */}
+        <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+          <div className="h-64 w-full mb-5 overflow-hidden">
+            <img
+              src="/img.png"
+              alt="Second Home Management"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <h3 className="text-2xl font-serif mb-2">Second Home Management</h3>
+          <p className="text-base text-gray-700 mb-6">
+            Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
+            full property inspections, issue coordination, and proactive care to keep
+            your home in top condition.
+          </p>
+          <a
+            href={`mailto:${siteData.contactEmail}`}
+            className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+          >
+            Message to inquire
+          </a>
+        </div>
+
+        {/* Card 2 */}
+        <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+          <div className="h-64 w-full mb-5 overflow-hidden">
+            <img
+              src="/service2.png"
+              alt="Mail & Package Handling"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <h3 className="text-2xl font-serif mb-2">Mail &amp; Package Handling</h3>
+          <p className="text-base text-gray-700 mb-6">
+            Receive and manage all mail and deliveries while you’re away. Packages
+            are collected, secured, and handled according to your preferences so
+            nothing is missed.
+          </p>
+          <a
+            href={`mailto:${siteData.contactEmail}`}
+            className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+          >
+            Message to inquire
+          </a>
+        </div>
+
+        {/* Card 3 */}
+        <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+          <div className="h-64 w-full mb-5 overflow-hidden">
+            <img
+              src="/service3.png"
+              alt="Concierge Services"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <h3 className="text-2xl font-serif mb-2">Concierge Services</h3>
+          <p className="text-base text-gray-700 mb-6">
+            Anything you may need as a homeowner. From one-off requests to ongoing
+            assistance, we handle the details so you don’t have to.
+          </p>
+          <a
+            href={`mailto:${siteData.contactEmail}`}
+            className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+          >
+            Message to inquire
+          </a>
+        </div>
       </div>
-      <h3 className="text-xl font-serif mb-2">Second Home Management</h3>
-      <p className="text-sm text-gray-700 mb-4">
-        Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
-        full property inspections, issue coordination, and proactive care to keep
-        your home in top condition.
-      </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-      >
-        Inquire Now
-      </a>
     </div>
 
-    {/* Service card 2 */}
-    <div className="relative group overflow-hidden border border-gray-200 p-6">
-      <div className="h-60 w-full mb-4 overflow-hidden">
-        <img
-          src="/service2.png"
-          alt="Mail & Package Handling"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+    {/* DESKTOP: 3-column grid */}
+    <div className="hidden md:grid grid-cols-3 gap-12">
+      {/* Card 1 */}
+      <div className="relative group overflow-hidden border border-gray-200 p-6">
+        <div className="h-60 w-full mb-4 overflow-hidden">
+          <img
+            src="/img.png"
+            alt="Second Home Management"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <h3 className="text-xl font-serif mb-2">Second Home Management</h3>
+        <p className="text-sm text-gray-700 mb-5">
+          Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
+          full property inspections, issue coordination, and proactive care to keep
+          your home in top condition.
+        </p>
+        <a
+          href={`mailto:${siteData.contactEmail}`}
+          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
+        >
+          Message to inquire
+        </a>
       </div>
-      <h3 className="text-xl font-serif mb-2">Mail &amp; Package Handling</h3>
-      <p className="text-sm text-gray-700 mb-4">
-        Receive and manage all mail and deliveries while you’re away. Packages
-        are collected, secured, and handled according to your preferences so
-        nothing is missed.
-      </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-      >
-        Inquire Now
-      </a>
-    </div>
 
-    {/* Service card 3 */}
-    <div className="relative group overflow-hidden border border-gray-200 p-6">
-      <div className="h-60 w-full mb-4 overflow-hidden">
-        <img
-          src="/service3.png"
-          alt="Concierge Services"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+      {/* Card 2 */}
+      <div className="relative group overflow-hidden border border-gray-200 p-6">
+        <div className="h-60 w-full mb-4 overflow-hidden">
+          <img
+            src="/service2.png"
+            alt="Mail & Package Handling"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <h3 className="text-xl font-serif mb-2">Mail &amp; Package Handling</h3>
+        <p className="text-sm text-gray-700 mb-5">
+          Receive and manage all mail and deliveries while you’re away. Packages
+          are collected, secured, and handled according to your preferences so
+          nothing is missed.
+        </p>
+        <a
+          href={`mailto:${siteData.contactEmail}`}
+          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
+        >
+          Message to inquire
+        </a>
       </div>
-      <h3 className="text-xl font-serif mb-2">Concierge Services</h3>
-      <p className="text-sm text-gray-700 mb-4">
-        Anything you may need as a homeowner. From one-off requests to ongoing
-        assistance, we handle the details so you don’t have to.
-      </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-      >
-        Inquire Now
-      </a>
+
+      {/* Card 3 */}
+      <div className="relative group overflow-hidden border border-gray-200 p-6">
+        <div className="h-60 w-full mb-4 overflow-hidden">
+          <img
+            src="/service3.png"
+            alt="Concierge Services"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+        <h3 className="text-xl font-serif mb-2">Concierge Services</h3>
+        <p className="text-sm text-gray-700 mb-5">
+          Anything you may need as a homeowner. From one-off requests to ongoing
+          assistance, we handle the details so you don’t have to.
+        </p>
+        <a
+          href={`mailto:${siteData.contactEmail}`}
+          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
+        >
+          Message to inquire
+        </a>
+      </div>
     </div>
   </div>
 </section>
