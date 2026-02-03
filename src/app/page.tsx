@@ -119,7 +119,7 @@ export default function HomePage() {
         <TestimonialsSection />
       </div>
 
-      {/* Services */}
+{/* Services */}
 <section
   id="services"
   className="px-6 py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"

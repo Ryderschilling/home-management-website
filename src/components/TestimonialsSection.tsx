@@ -14,12 +14,12 @@ export default function TestimonialsSection() {
       {
         quote:
           "Ryder has helped us with our home for years and has always been reliable, professional, and great to work with. He consistently does an excellent job and is someone we truly trust.",
-        name: "Scott Clark",
+        name: "Scott C.",
       },
       {
         quote:
           "Ryder is one of the most responsible and reliable young men I have worked with to date. He has helped me with my property for over two years — and he might even share a couple of his favorite fishing honey holes if you ask.",
-        name: "Sandie Lamb",
+        name: "Sandie L.",
       },
     ],
     []
@@ -32,21 +32,22 @@ export default function TestimonialsSection() {
   const [x, setX] = useState(0);
   const [maxShift, setMaxShift] = useState(0);
   const [isInView, setIsInView] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-// Ensure mobile never keeps a translated position
-useEffect(() => {
-    const onResize = () => {
-      const isMobile =
-        typeof window !== "undefined" && window.innerWidth < 768;
-      if (isMobile) setX(0);
-    };
-  
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  // Track mobile breakpoint
+  useEffect(() => {
+    const onResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setX(0); // ensure no translated position on mobile
+    };
 
-  // Measure how far we can slide (track overflow)
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Measure how far we can slide (track overflow) - only relevant on desktop
   useEffect(() => {
     const measure = () => {
       const viewport = viewportRef.current;
@@ -76,22 +77,17 @@ useEffect(() => {
     return () => io.disconnect();
   }, []);
 
-  // Timed auto-drift (NOT scroll-based)
+  // Timed auto-drift (desktop only)
   useEffect(() => {
     if (!isInView) return;
+    if (isMobile) return;
     if (maxShift <= 0) return;
 
     const reduceMotion =
-      typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) return;
-
-const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-if (isMobile) {
-  return;
-}
 
     let raf = 0;
     let start = performance.now();
@@ -106,7 +102,6 @@ if (isMobile) {
     const tick = (now: number) => {
       const elapsed = now - start;
 
-      // drift 0 -> maxShift
       if (elapsed <= DURATION_MS) {
         const p = elapsed / DURATION_MS;
         setX(-maxShift * easeInOut(p));
@@ -114,76 +109,65 @@ if (isMobile) {
         return;
       }
 
-      // hold at end
       if (elapsed <= DURATION_MS + HOLD_MS) {
         setX(-maxShift);
         raf = requestAnimationFrame(tick);
         return;
       }
 
-      // reset to start
       if (elapsed <= DURATION_MS + HOLD_MS + RESET_MS) {
         setX(0);
         raf = requestAnimationFrame(tick);
         return;
       }
 
-      // loop
       start = now;
       raf = requestAnimationFrame(tick);
     };
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [isInView, maxShift]);
+  }, [isInView, isMobile, maxShift]);
 
   return (
-    // ✅ Matches your Contact section height model (px-6 py-32)
     <section
       ref={sectionRef}
-      className="relative w-full bg-black text-white px-6 py-32"
+      className="relative w-full bg-black text-white px-4 md:px-6 py-16 md:py-24"
       aria-label="Testimonials"
     >
       <div className="mx-auto max-w-6xl h-full flex flex-col justify-center">
         <div className="mb-10">
-          <h2 className="text-5xl md:text-6xl font-semibold tracking-tight">
+          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight">
             Testimonials
           </h2>
           <div className="mt-6 h-px w-20 bg-white/20" />
         </div>
 
-        {/* viewport mask */}
-        <div
-  ref={viewportRef}
-  className="relative overflow-x-auto md:overflow-x-hidden"
-  style={{
-    WebkitMaskImage:
-      "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
-    maskImage:
-      "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
-  }}
->
-
+        {/* viewport */}
+        <div
+          ref={viewportRef}
+          className="relative overflow-x-auto md:overflow-x-hidden"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          }}
+        >
           <div
             ref={trackRef}
             className="flex gap-10 will-change-transform"
-style={{
-    transform:
-      typeof window !== "undefined" && window.innerWidth < 768
-        ? "none"
-        : `translate3d(${x}px, 0, 0)`,
-    transition:
-      typeof window !== "undefined" && window.innerWidth < 768
-        ? undefined
-        : "transform 120ms linear",
-  }}
+            style={{
+              transform: isMobile ? "none" : `translate3d(${x}px, 0, 0)`,
+              transition: isMobile ? undefined : "transform 120ms linear",
+            }}
           >
             {testimonials.map((t, i) => (
               <article
                 key={i}
-className="min-w-[92%] sm:min-w-[85%] md:min-w-[60%] lg:min-w-[50%] pr-2"
+                className="min-w-[86%] sm:min-w-[70%] md:min-w-[60%] lg:min-w-[50%] pr-2"
               >
-<div className="text-[22px] sm:text-[26px] md:text-[34px] leading-[1.3] text-white/90">
+                <div className="text-[16px] sm:text-[20px] md:text-[28px] leading-[1.5] text-white/90">
                   <span className="text-white/50 mr-3">—</span>
                   <span className="italic">“{t.quote}”</span>
                 </div>
@@ -197,12 +181,9 @@ className="min-w-[92%] sm:min-w-[85%] md:min-w-[60%] lg:min-w-[50%] pr-2"
               </article>
             ))}
 
+            {/* small spacer at end */}
             <div className="min-w-[8%]" />
           </div>
-    </div>
-
-<div className="mt-10 text-white/40 text-sm tracking-wide">
-Slowly revealing…
         </div>
       </div>
     </section>
