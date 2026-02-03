@@ -120,81 +120,80 @@ export default function HomePage() {
       </div>
 
       {/* Services */}
-      <section
-        id="services"
-        className="px-6 py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
+<section
+  id="services"
+  className="px-6 py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
+>
+  <div className="max-w-6xl mx-auto grid grid-cols-3 gap-12">
+    {/* Service card 1 */}
+    <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="h-60 w-full mb-4 overflow-hidden">
+        <img
+          src="/img.png"
+          alt="Second Home Management"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <h3 className="text-xl font-serif mb-2">Second Home Management</h3>
+      <p className="text-sm text-gray-700 mb-4">
+        Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
+        full property inspections, issue coordination, and proactive care to keep
+        your home in top condition.
+      </p>
+      <a
+        href={`mailto:${siteData.contactEmail}`}
+        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
       >
-        <div className="max-w-6xl mx-auto grid grid-cols-3 gap-12">
-          {/* Service card 1 */}
-          <div className="relative group overflow-hidden border border-gray-200 p-6">
-            <div className="h-60 w-full mb-4 overflow-hidden">
-              <img
-                src="/img.png"
-                alt="Second Home Care"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-            <h3 className="text-xl font-serif mb-2">Second Home Care</h3>
-            <p className="text-sm text-gray-700 mb-2">
-              Weekly or monthly check-ins with full property oversight.
-            </p>
-            <p className="text-sm text-gray-500 mb-4">
-              {siteData.startingPrice}
-            </p>
-            <a
-              href={`mailto:${siteData.contactEmail}`}
-              className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-            >
-              Message Me
-            </a>
-          </div>
+        Inquire Now
+      </a>
+    </div>
 
-          {/* Service card 2 */}
-          <div className="relative group overflow-hidden border border-gray-200 p-6">
-            <div className="h-60 w-full mb-4 overflow-hidden">
-              <img
-                src="/service2.png"
-                alt="Mail & Package Handling"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-            <h3 className="text-xl font-serif mb-2">Mail & Package Handling</h3>
-            <p className="text-sm text-gray-700 mb-2">
-              Receive and manage all mail and deliveries while you're away.
-            </p>
-            <p className="text-sm text-gray-500 mb-4">Included in care plans</p>
-            <a
-              href={`mailto:${siteData.contactEmail}`}
-              className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-            >
-              Message Me
-            </a>
-          </div>
+    {/* Service card 2 */}
+    <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="h-60 w-full mb-4 overflow-hidden">
+        <img
+          src="/service2.png"
+          alt="Mail & Package Handling"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <h3 className="text-xl font-serif mb-2">Mail &amp; Package Handling</h3>
+      <p className="text-sm text-gray-700 mb-4">
+        Receive and manage all mail and deliveries while you’re away. Packages
+        are collected, secured, and handled according to your preferences so
+        nothing is missed.
+      </p>
+      <a
+        href={`mailto:${siteData.contactEmail}`}
+        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
+      >
+        Inquire Now
+      </a>
+    </div>
 
-          {/* Service card 3 */}
-          <div className="relative group overflow-hidden border border-gray-200 p-6">
-            <div className="h-60 w-full mb-4 overflow-hidden">
-              <img
-                src="/service3.png"
-                alt="Contractor Coordination"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-            </div>
-            <h3 className="text-xl font-serif mb-2">Contractor Coordination</h3>
-            <p className="text-sm text-gray-700 mb-2">
-              Schedule and supervise repairs or maintenance with trusted
-              professionals.
-            </p>
-            <p className="text-sm text-gray-500 mb-4">Included in care plans</p>
-            <a
-              href={`mailto:${siteData.contactEmail}`}
-              className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-            >
-              Message Me
-            </a>
-          </div>
-        </div>
-      </section>
+    {/* Service card 3 */}
+    <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="h-60 w-full mb-4 overflow-hidden">
+        <img
+          src="/service3.png"
+          alt="Concierge Services"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </div>
+      <h3 className="text-xl font-serif mb-2">Concierge Services</h3>
+      <p className="text-sm text-gray-700 mb-4">
+        Anything you may need as a homeowner. From one-off requests to ongoing
+        assistance, we handle the details so you don’t have to.
+      </p>
+      <a
+        href={`mailto:${siteData.contactEmail}`}
+        className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
+      >
+        Inquire Now
+      </a>
+    </div>
+  </div>
+</section>
 
       {/* Contact */}
       <section
