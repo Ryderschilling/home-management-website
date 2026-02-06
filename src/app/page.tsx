@@ -403,14 +403,22 @@ export default function HomePage() {
           font-weight: 600;
           line-height: 1.06;
           font-size: clamp(22px, 3vw, 42px);
-          white-space: nowrap;
           max-width: 92vw;
-          overflow: hidden;
           letter-spacing: clamp(3px, 1.4vw, 12px);
 
           animation: heroTextIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 720ms
             forwards;
         }
+
+        @media (max-width: 420px) {
+  .hero-title {
+    font-size: 20px;
+    line-height: 1.12;
+    letter-spacing: 6px;
+    white-space: normal;
+    max-width: 92vw;
+  }
+}
 
         .hero-divider {
           width: min(440px, 74vw);
