@@ -165,14 +165,14 @@ export default function TestimonialsSection() {
             {testimonials.map((t, i) => (
               <article
                 key={i}
-                className="min-w-[92%] sm:min-w-[70%] md:min-w-[60%] lg:min-w-[50%] pr-2 text-left"
+                className="min-w-[92%] sm:min-w-[70%] md:min-w-[60%] lg:min-w-[50%] px-2 text-center flex flex-col items-center"
               >
                 <div className="text-[16px] sm:text-[20px] md:text-[28px] leading-[1.5] text-white/90">
                   <span className="text-white/50 mr-3">—</span>
                   <span className="italic">“{t.quote}”</span>
                 </div>
 
-<div className="mt-5 flex items-center justify-start gap-2 text-white/70 text-base">
+<div className="mt-5 flex items-center justify-center gap-2 text-white/70 text-base">
   <span className="text-white/40">—</span>
   <span className="tracking-wide whitespace-nowrap">{t.name}</span>
   {t.meta ? <span className="text-white/40">· {t.meta}</span> : null}

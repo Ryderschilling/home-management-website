@@ -24,3 +24,55 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+@keyframes swipeNudge {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 0.9;
+  }
+}
+
+.swipe-chevron {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1;
+  animation: swipeNudge 1.2s ease-in-out infinite;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes swipeNudge {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 0.9;
+  }
+}
+
+.swipe-chevron {
+  display: inline-block;
+  font-size: 16px;
+  line-height: 1;
+  animation: swipeNudge 1.2s ease-in-out infinite;
+}
+
