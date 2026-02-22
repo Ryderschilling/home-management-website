@@ -1,139 +1,150 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  OWNER
-  ADMIN
-  MANAGER
-  EMPLOYEE
-  CLIENT
-}
-
 enum OrderStatus {
-  DRAFT
-  SCHEDULED
-  IN_PROGRESS
+  PENDING
+  CONFIRMED
   COMPLETED
   CANCELED
 }
 
+enum VisitStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+  MISSED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum EmailType {
+  ORDER_CONFIRMATION
+  PAYMENT_SUCCESS
+  ORDER_COMPLETION
+}
+
 model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String           @id @default(cuid())
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  orders          Order[]
+  recurrenceRules RecurrenceRule[]
+  emailLogs       EmailLog[]
 
-  users      User[]
-  clients    Client[]
-  properties Property[]
-  services   Service[]
-  orders     Order[]
-}
-
-model User {
-  id          String   @id @default(cuid())
-  clerkId     String   @unique
-  email       String
-  name        String?
-  role        Role     @default(MANAGER)
-  orgId       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  org Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  assignments Assignment[]
-}
-
-model Client {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?
-  phone     String?
-  orgId     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  properties Property[]
-  orders     Order[]
-}
-
-model Property {
-  id        String   @id @default(cuid())
-  name      String
-  address   String
-  city      String
-  state     String
-  zip       String
-  clientId  String
-  orgId     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  org    Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  orders Order[]
-}
-
-model Service {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  priceCents  Int
-  active      Boolean  @default(true)
-  orgId       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
+  @@index([createdAt])
 }
 
 model Order {
+  id          String           @id @default(cuid())
+  organizationId String
+  status      OrderStatus      @default(PENDING)
+  totalAmount Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  visits         Visit[]
+  recurrenceRule RecurrenceRule?
+  payments       Payment[]
+  emailLogs      EmailLog[]
+
+  @@index([organizationId, status])
+  @@index([createdAt])
+}
+
+model RecurrenceRule {
+  id             String        @id @default(cuid())
+  organizationId String
+  orderId         String        @unique
+  frequency       String
+  interval        Int           @default(1)
+  byDay           String[]
+  startDate       DateTime
+  endDate         DateTime?
+  active          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, active])
+  @@index([startDate, endDate])
+}
+
+model Visit {
   id            String      @id @default(cuid())
-  clientId      String
-  propertyId    String
-  orgId         String
-  status        OrderStatus @default(DRAFT)
-  preferredTime String?
-  scheduledFor  DateTime?
-  notes         String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  orderId        String
+  scheduledFor   DateTime
+  status         VisitStatus @default(SCHEDULED)
+  notes          String?
+  completedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
-  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  proofPhotos ProofPhoto[]
 
-  items      OrderItem[]
-  assignment Assignment?
+  @@unique([orderId, scheduledFor])
+  @@index([scheduledFor])
+  @@index([status])
 }
 
-model OrderItem {
-  id         String @id @default(cuid())
-  orderId    String
-  serviceId  String
-  quantity   Int    @default(1)
-  priceCents Int
+model ProofPhoto {
+  id         String   @id @default(cuid())
+  visitId    String
+  url        String
+  caption    String?
+  uploadedAt DateTime @default(now())
 
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  service Service @relation(fields: [serviceId], references: [id])
+  visit Visit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  @@index([visitId, uploadedAt])
 }
 
-model Assignment {
-  id         String @id @default(cuid())
-  orderId    String @unique
-  employeeId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Payment {
+  id             String        @id @default(cuid())
+  orderId         String
+  amount          Int
+  currency        String        @default("usd")
+  status          PaymentStatus @default(PENDING)
+  externalId      String?
+  idempotencyKey  String?       @unique
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
-  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  employee User  @relation(fields: [employeeId], references: [id])
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([orderId, status])
+  @@index([createdAt])
+}
+
+model EmailLog {
+  id             String    @id @default(cuid())
+  organizationId String
+  orderId         String?
+  type           EmailType
+  toEmail        String
+  subject        String
+  providerId     String?
+  sentAt         DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  order        Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, type, sentAt])
+  @@index([orderId])
 }
