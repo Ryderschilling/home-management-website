@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+enum VisitStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+  MISSED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum EmailType {
+  ORDER_CONFIRMATION
+  PAYMENT_SUCCESS
+  ORDER_COMPLETION
+}
+
+model Organization {
+  id              String           @id @default(cuid())
+  name            String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  orders          Order[]
+  recurrenceRules RecurrenceRule[]
+  emailLogs       EmailLog[]
+
+  @@index([createdAt])
+}
+
+model Order {
+  id          String           @id @default(cuid())
+  organizationId String
+  status      OrderStatus      @default(PENDING)
+  totalAmount Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  visits         Visit[]
+  recurrenceRule RecurrenceRule?
+  payments       Payment[]
+  emailLogs      EmailLog[]
+
+  @@index([organizationId, status])
+  @@index([createdAt])
+}
+
+model RecurrenceRule {
+  id             String        @id @default(cuid())
+  organizationId String
+  orderId         String        @unique
+  frequency       String
+  interval        Int           @default(1)
+  byDay           String[]
+  startDate       DateTime
+  endDate         DateTime?
+  active          Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, active])
+  @@index([startDate, endDate])
+}
+
+model Visit {
+  id            String      @id @default(cuid())
+  orderId        String
+  scheduledFor   DateTime
+  status         VisitStatus @default(SCHEDULED)
+  notes          String?
+  completedAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  proofPhotos ProofPhoto[]
+
+  @@unique([orderId, scheduledFor])
+  @@index([scheduledFor])
+  @@index([status])
+}
+
+model ProofPhoto {
+  id         String   @id @default(cuid())
+  visitId    String
+  url        String
+  caption    String?
+  uploadedAt DateTime @default(now())
+
+  visit Visit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+
+  @@index([visitId, uploadedAt])
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  orderId         String
+  amount          Int
+  currency        String        @default("usd")
+  status          PaymentStatus @default(PENDING)
+  externalId      String?
+  idempotencyKey  String?       @unique
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([orderId, status])
+  @@index([createdAt])
+}
+
+model EmailLog {
+  id             String    @id @default(cuid())
+  organizationId String
+  orderId         String?
+  type           EmailType
+  toEmail        String
+  subject        String
+  providerId     String?
+  sentAt         DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  order        Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, type, sentAt])
+  @@index([orderId])
+}
