@@ -1,4 +1,4 @@
-const requiredEnvVars = ["DATABASE_URL"] as const;
+const requiredEnvVars = ["DATABASE_URL", "DEFAULT_ORGANIZATION_ID", "ADMIN_PASSWORD"] as const;
 
 type RequiredEnvVar = (typeof requiredEnvVars)[number];
 
@@ -16,13 +16,13 @@ function loadServerEnv(): ServerEnv {
   }
 
   if (missing.length > 0) {
-    throw new Error(
-      `Missing required environment variable(s): ${missing.join(", ")}`
-    );
+    throw new Error(`Missing required environment variable(s): ${missing.join(", ")}`);
   }
 
   return {
     DATABASE_URL: process.env.DATABASE_URL as string,
+    DEFAULT_ORGANIZATION_ID: process.env.DEFAULT_ORGANIZATION_ID as string,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD as string,
   };
 }
 

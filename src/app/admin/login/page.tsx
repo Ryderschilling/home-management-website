@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
     });
 
     if (res.ok) {
-      router.push("/admin");
+      router.push("/portal");
     } else {
       setError("Incorrect password");
     }
