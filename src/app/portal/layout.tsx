@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/portal", label: "Calendar" },
   { href: "/portal/clients", label: "Clients" },
-  { href: "/portal/properties", label: "Properties" },
   { href: "/portal/services", label: "Services" },
   { href: "/portal/orders", label: "Orders" },
 ];
@@ -16,7 +15,7 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900">
+<div className="min-h-screen bg-stone-400 text-stone-900">
       <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-stone-50/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5">
           <div className="min-w-0">
