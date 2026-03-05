@@ -10,12 +10,18 @@ function labelClassName() {
   return "text-[11px] font-medium uppercase tracking-[0.22em] text-stone-500";
 }
 
+function money(cents: number) {
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
 export default function PortalServicesPage() {
   const [services, setServices] = useState<any[]>([]);
   const [error, setError] = useState("");
 
   const [name, setName] = useState("");
   const [unitPrice, setUnitPrice] = useState("");
+  const [cost, setCost] = useState("");
+  const [description, setDescription] = useState("");
 
   async function load() {
     const res = await fetch("/api/admin/services");
@@ -31,14 +37,21 @@ export default function PortalServicesPage() {
     setError("");
 
     const unitPriceCents = Math.round(Number(unitPrice) * 100);
+    const costCents =
+      cost.trim() === "" ? 0 : Math.round(Number(cost) * 100);
+
     if (Number.isNaN(unitPriceCents) || unitPriceCents <= 0) {
       return setError("Price must be a number > 0");
+    }
+
+    if (Number.isNaN(costCents) || costCents < 0) {
+      return setError("Cost must be a number >= 0");
     }
 
     const res = await fetch("/api/admin/services", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, unitPriceCents }),
+      body: JSON.stringify({ name, description, unitPriceCents, costCents }),
     });
 
     const json = await res.json();
@@ -48,6 +61,8 @@ export default function PortalServicesPage() {
 
     setName("");
     setUnitPrice("");
+    setCost("");
+    setDescription("");
     await load();
   }
 
@@ -63,8 +78,7 @@ export default function PortalServicesPage() {
               Service catalog
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">
-              Define your standard service line items so pricing and order history stay
-              organized.
+              Track sale price, actual cost, and gross profit by service.
             </p>
           </div>
 
@@ -89,7 +103,7 @@ export default function PortalServicesPage() {
         <div className="mb-6">
           <h2 className="font-serif text-2xl text-stone-900">Add service</h2>
           <p className="mt-1 text-sm text-stone-500">
-            Create a clean internal service list with standard pricing.
+            Set both sell price and actual cost so profit stays visible.
           </p>
         </div>
 
@@ -105,12 +119,32 @@ export default function PortalServicesPage() {
           </div>
 
           <div className="space-y-2">
-            <label className={labelClassName()}>Unit price (USD)</label>
+            <label className={labelClassName()}>Price (USD)</label>
             <input
               className={inputClassName()}
-              placeholder="Unit price (USD)"
+              placeholder="e.g. 250"
               value={unitPrice}
               onChange={(e) => setUnitPrice(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className={labelClassName()}>Total cost (USD)</label>
+            <input
+              className={inputClassName()}
+              placeholder="e.g. 120"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2 md:col-span-2">
+            <label className={labelClassName()}>Description</label>
+            <textarea
+              className={`${inputClassName()} min-h-[100px] resize-none`}
+              placeholder="Optional service notes"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
         </div>
@@ -145,10 +179,38 @@ export default function PortalServicesPage() {
               key={s.id}
               className="rounded-[24px] border border-stone-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="text-lg font-medium text-stone-900">{s.name}</div>
-                <div className="rounded-full border border-stone-300 bg-stone-50 px-3 py-1 text-xs text-stone-700">
-                  ${(s.unit_price_cents / 100).toFixed(2)}
+              <div className="text-lg font-medium text-stone-900">{s.name}</div>
+
+              {s.description ? (
+                <div className="mt-2 text-sm text-stone-600">{s.description}</div>
+              ) : null}
+
+              <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <div className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-2">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500">
+                    Price
+                  </div>
+                  <div className="mt-1 font-medium text-stone-900">
+                    {money(s.unit_price_cents)}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-2">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500">
+                    Cost
+                  </div>
+                  <div className="mt-1 font-medium text-stone-900">
+                    {money(s.cost_cents)}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-2">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-stone-500">
+                    Profit
+                  </div>
+                  <div className="mt-1 font-medium text-stone-900">
+                    {money(s.gross_profit_cents)}
+                  </div>
                 </div>
               </div>
             </div>
