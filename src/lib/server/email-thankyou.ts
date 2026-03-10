@@ -1,0 +1,1 @@
+export { sendCustomerThankYouEmail } from "./email";
