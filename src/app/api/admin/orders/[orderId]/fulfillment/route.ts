@@ -7,20 +7,9 @@ import { sendCustomerThankYouEmail } from "@/lib/server/email";
 
 export const runtime = "nodejs";
 
-const ALLOWED = new Set(["NEW", "ORDERED", "INSTALLED", "CANCELED"]);
-
-function pickStatus(body: any): string {
-  const raw =
-    body?.fulfillmentStatus ??
-    body?.fulfillment_status ??
-    body?.status ??
-    "";
-  return String(raw || "").trim().toUpperCase();
-}
-
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   if (!isAdminRequest(request)) {
     return NextResponse.json(
@@ -30,43 +19,76 @@ export async function PATCH(
   }
 
   try {
-    const { orderId } = params;
+    const { orderId } = await params;
     const organizationId = getOrganizationId(request);
     const body = await parseJsonBody(request);
 
-    const status = pickStatus(body);
-    if (!ALLOWED.has(status)) {
-      return NextResponse.json(
-        fail("INVALID_STATUS", "Invalid fulfillment status."),
-        { status: 400 }
-      );
+    const fulfillmentStatus = String(
+      body?.fulfillment_status ?? body?.status ?? ""
+    ) as "NEW" | "ORDERED" | "INSTALLED" | "CANCELED";
+
+    const sendThankYou =
+      body?.sendThankYou === true || body?.action === "SEND_THANK_YOU";
+
+    const existingOrder = await getOrderById(organizationId, orderId);
+
+    if (!existingOrder) {
+      return NextResponse.json(fail("NOT_FOUND", "Order not found."), {
+        status: 404,
+      });
     }
 
-    // Update first
     const updated = await updateOrderFulfillment(organizationId, orderId, {
-      fulfillmentStatus: status,
+      fulfillmentStatus: fulfillmentStatus || (existingOrder.fulfillment_status as
+        | "NEW"
+        | "ORDERED"
+        | "INSTALLED"
+        | "CANCELED"),
     });
 
     if (!updated) {
-      return NextResponse.json(fail("NOT_FOUND", "Order not found."), { status: 404 });
+      return NextResponse.json(fail("NOT_FOUND", "Order not found."), {
+        status: 404,
+      });
     }
 
-    // If newly INSTALLED, send thank-you email once
-    if (status === "INSTALLED") {
-      const full = await getOrderById(organizationId, orderId);
+    if (sendThankYou) {
+      const email =
+        typeof existingOrder.customer_email === "string" &&
+        existingOrder.customer_email.trim()
+          ? existingOrder.customer_email.trim()
+          : null;
 
-      // Only send if we have a customer email and haven’t sent already
-      if (full?.customer_email && !full?.thank_you_sent_at) {
-        await sendCustomerThankYouEmail({
-          to: full.customer_email,
-          name: full.customer_name ?? undefined,
-        });
-
-        // mark sent timestamp (re-using fulfillment updater so we don’t introduce a new API)
-        await updateOrderFulfillment(organizationId, orderId, {
-          thankYouSent: true,
-        });
+      if (!email) {
+        return NextResponse.json(
+          fail("BAD_REQUEST", "Order does not have a customer email."),
+          { status: 400 }
+        );
       }
+
+      await sendCustomerThankYouEmail({
+        to: email,
+        name:
+          typeof existingOrder.customer_name === "string"
+            ? existingOrder.customer_name
+            : undefined,
+      });
+
+      const updatedWithThankYou = await updateOrderFulfillment(
+        organizationId,
+        orderId,
+        {
+          fulfillmentStatus:
+            (updated.fulfillment_status as
+              | "NEW"
+              | "ORDERED"
+              | "INSTALLED"
+              | "CANCELED") ?? "NEW",
+          thankYouSent: true,
+        }
+      );
+
+      return NextResponse.json(ok(updatedWithThankYou));
     }
 
     return NextResponse.json(ok(updated));
@@ -74,9 +96,9 @@ export async function PATCH(
     return NextResponse.json(
       fail(
         "ORDER_FULFILLMENT_UPDATE_FAILED",
-        error instanceof Error ? error.message : "Failed to update fulfillment."
+        error instanceof Error ? error.message : "Failed to update fulfillment"
       ),
-      { status: 500 }
+      { status: 400 }
     );
   }
 }

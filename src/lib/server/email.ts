@@ -23,8 +23,10 @@ export async function sendPipePhotoEmail(opts: {
     to,
     subject: opts.subject,
     html: opts.html,
-    reply_to: process.env.REPLY_TO_EMAIL || undefined,
-    attachments: [{ filename: opts.attachmentName, content: opts.attachmentBase64 }],
+    replyTo: process.env.REPLY_TO_EMAIL || undefined,
+    attachments: [
+      { filename: opts.attachmentName, content: opts.attachmentBase64 },
+    ],
   });
 }
 
@@ -49,16 +51,24 @@ export async function sendCustomerThankYouEmail(opts: {
       <p>${greeting}</p>
       <p>Thanks again for choosing Coastal Home Management 30A. Your artificial rock installation is complete.</p>
 
-      ${gbp ? `
+      ${
+        gbp
+          ? `
         <p style="margin: 18px 0 8px;"><strong>Would you leave a quick review?</strong></p>
         <p><a href="${gbp}" target="_blank" rel="noreferrer">Leave a Google review</a></p>
-      ` : ""}
+      `
+          : ""
+      }
 
-      ${upsell ? `
+      ${
+        upsell
+          ? `
         <p style="margin: 18px 0 8px;"><strong>Want ongoing home care?</strong></p>
         <p>We offer recurring second-home check-ins and concierge services. Learn more here:</p>
         <p><a href="${upsell}" target="_blank" rel="noreferrer">View services</a></p>
-      ` : ""}
+      `
+          : ""
+      }
 
       <p style="margin-top: 18px;">If you have any questions, just reply to this email.</p>
       <p>— Coastal Home Management 30A</p>
@@ -66,11 +76,12 @@ export async function sendCustomerThankYouEmail(opts: {
   `;
 
   const resend = new Resend(key);
+
   await resend.emails.send({
     from,
     to: opts.to,
     subject,
     html,
-    reply_to: replyTo,
+    replyTo,
   });
 }
