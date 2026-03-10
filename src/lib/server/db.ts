@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 6;
+const ADMIN_SCHEMA_VERSION = 8;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -231,6 +231,32 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_interval INTEGER`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_end_date TIMESTAMPTZ`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS parent_job_id TEXT`;
+
+    await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_session_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS source TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS rock_color TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_name TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_email TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_phone TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS service_address TEXT`;
+
+await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS address_text TEXT`;
+await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
+await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_clients_org_email_uq
+  ON admin_clients (organization_id, lower(email))
+  WHERE email IS NOT NULL AND email <> ''`;
+  
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS product_key TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_stripe_session_idx ON admin_orders (organization_id, stripe_session_id)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_client_idx ON admin_orders (organization_id, client_id)`;
+
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS fulfillment_status TEXT NOT NULL DEFAULT 'NEW'`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS ordered_at TIMESTAMPTZ`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS installed_at TIMESTAMPTZ`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS thank_you_sent_at TIMESTAMPTZ`;
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_fulfillment_idx ON admin_orders (organization_id, fulfillment_status, created_at)`;
 
     await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
 
