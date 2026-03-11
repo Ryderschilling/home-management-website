@@ -3,13 +3,21 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Client = { id: string; name: string };
+type Client = {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  created_at?: string | null;
+};
+
 type Property = {
   id: string;
   name: string;
   client_id: string | null;
   address_line1: string | null;
 };
+
 type Job = {
   id: string;
   title: string;
@@ -21,11 +29,26 @@ type Job = {
   price_cents: number | null;
   hours_numeric: string | number | null;
   service_id?: string | null;
+  completed_at?: string | null;
 };
 
-function formatMoney(cents: number | null) {
-  if (cents === null || cents === undefined) return "—";
-  return `$${(cents / 100).toFixed(2)}`;
+type Order = {
+  id: string;
+  customer_name?: string | null;
+  customer_email?: string | null;
+  client_name?: string | null;
+  product_key?: string | null;
+  rock_color?: string | null;
+  total_amount_cents?: number | null;
+  fulfillment_status?: string | null;
+  created_at?: string | null;
+  ordered_at?: string | null;
+  installed_at?: string | null;
+};
+
+function formatMoney(cents: number | null | undefined) {
+  const n = typeof cents === "number" ? cents : 0;
+  return `$${(n / 100).toFixed(2)}`;
 }
 
 function toLocalDateKeyFromDate(d: Date) {
@@ -59,7 +82,7 @@ function daysInMonth(year: number, monthIndex: number) {
 }
 
 function startDayOfMonth(year: number, monthIndex: number) {
-  return new Date(year, monthIndex, 1).getDay(); // 0=Sun..6=Sat
+  return new Date(year, monthIndex, 1).getDay();
 }
 
 function toDatetimeLocalValue(d: Date) {
@@ -79,11 +102,30 @@ function labelClassName() {
   return "text-[11px] font-medium uppercase tracking-[0.22em] text-stone-500";
 }
 
-export default function PortalCalendarPage() {
+function cardClass() {
+  return "rounded-[28px] border border-stone-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
+}
+
+function statusPillClass(status: string) {
+  const s = status.toUpperCase();
+  if (s === "NEW") return "border-amber-200 bg-amber-50 text-amber-800";
+  if (s === "ORDERED") return "border-blue-200 bg-blue-50 text-blue-800";
+  if (s === "INSTALLED") return "border-green-200 bg-green-50 text-green-800";
+  if (s === "CANCELED") return "border-red-200 bg-red-50 text-red-800";
+  return "border-stone-200 bg-stone-50 text-stone-700";
+}
+
+function cleanProductLabel(value: string | null | undefined) {
+  if (!value) return "Order";
+  return value.replaceAll("_", " ");
+}
+
+export default function PortalDashboardPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
   const [services, setServices] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   const now = useMemo(() => new Date(), []);
@@ -95,7 +137,6 @@ export default function PortalCalendarPage() {
 
   const [showAddJob, setShowAddJob] = useState(false);
 
-  // Job form fields
   const [serviceId, setServiceId] = useState("");
   const [title, setTitle] = useState("");
   const [scheduledFor, setScheduledFor] = useState("");
@@ -105,7 +146,6 @@ export default function PortalCalendarPage() {
   const [price, setPrice] = useState("");
   const [hours, setHours] = useState("");
 
-  // Recurrence fields
   const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
   const [recurrenceFrequency, setRecurrenceFrequency] = useState("WEEKLY");
   const [recurrenceInterval, setRecurrenceInterval] = useState("1");
@@ -120,27 +160,31 @@ export default function PortalCalendarPage() {
     setLoading(true);
     setError("");
 
-    const [jobsRes, clientsRes, propsRes, servicesRes] = await Promise.all([
+    const [jobsRes, clientsRes, propsRes, servicesRes, ordersRes] = await Promise.all([
       fetch("/api/admin/jobs"),
       fetch("/api/admin/clients"),
       fetch("/api/admin/properties"),
       fetch("/api/admin/services"),
+      fetch("/api/admin/orders"),
     ]);
 
     if (!jobsRes.ok) throw new Error("Failed to load jobs");
     if (!clientsRes.ok) throw new Error("Failed to load clients");
     if (!propsRes.ok) throw new Error("Failed to load properties");
     if (!servicesRes.ok) throw new Error("Failed to load services");
+    if (!ordersRes.ok) throw new Error("Failed to load orders");
 
     const jobsJson = await jobsRes.json();
     const clientsJson = await clientsRes.json();
     const propsJson = await propsRes.json();
     const servicesJson = await servicesRes.json();
+    const ordersJson = await ordersRes.json();
 
     setJobs(jobsJson.data ?? []);
     setClients(clientsJson.data ?? []);
     setProperties(propsJson.data ?? []);
     setServices(servicesJson.data ?? []);
+    setOrders(ordersJson.data ?? []);
     setLoading(false);
   }
 
@@ -149,7 +193,6 @@ export default function PortalCalendarPage() {
       setError(e instanceof Error ? e.message : "Failed to load");
       setLoading(false);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const jobsByDay = useMemo(() => {
@@ -190,6 +233,68 @@ export default function PortalCalendarPage() {
     }, 0);
   }, [jobs]);
 
+  const todayKey = toLocalDateKeyFromDate(new Date());
+
+  const todayJobs = useMemo(() => {
+    return jobs
+      .filter((job) => toLocalDateKeyFromISO(job.scheduled_for) === todayKey)
+      .sort(
+        (a, b) =>
+          new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime()
+      );
+  }, [jobs, todayKey]);
+
+  const upcomingJobs = useMemo(() => {
+    const nowTs = Date.now();
+    return jobs
+      .filter((job) => new Date(job.scheduled_for).getTime() >= nowTs)
+      .sort(
+        (a, b) =>
+          new Date(a.scheduled_for).getTime() - new Date(b.scheduled_for).getTime()
+      )
+      .slice(0, 8);
+  }, [jobs]);
+
+  const actionOrders = useMemo(() => {
+    return orders
+      .filter((order) => {
+        const status = String(order.fulfillment_status ?? "NEW").toUpperCase();
+        return status === "NEW" || status === "ORDERED";
+      })
+      .sort((a, b) => {
+        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 8);
+  }, [orders]);
+
+  const recentClients = useMemo(() => {
+    return [...clients].slice(0, 8);
+  }, [clients]);
+
+  const dashboardStats = useMemo(() => {
+    const newOrders = orders.filter(
+      (o) => String(o.fulfillment_status ?? "NEW").toUpperCase() === "NEW"
+    ).length;
+    const ordered = orders.filter(
+      (o) => String(o.fulfillment_status ?? "NEW").toUpperCase() === "ORDERED"
+    ).length;
+    const installed = orders.filter(
+      (o) => String(o.fulfillment_status ?? "NEW").toUpperCase() === "INSTALLED"
+    ).length;
+
+    return {
+      clients: clients.length,
+      jobs: jobs.length,
+      revenue: orders.reduce((sum, order) => sum + (order.total_amount_cents ?? 0), 0),
+      newOrders,
+      ordered,
+      installed,
+      todayJobs: todayJobs.length,
+    };
+  }, [clients.length, jobs.length, orders, todayJobs.length]);
+
   const propertiesForClient = useMemo(() => {
     if (!clientId) return [];
     return properties.filter((p) => p.client_id === clientId);
@@ -213,7 +318,6 @@ export default function PortalCalendarPage() {
     return services.find((s: any) => s.id === serviceId) ?? null;
   }, [services, serviceId]);
 
-  // If a service is selected, fill title/price only when those fields are empty
   useEffect(() => {
     if (!selectedService) return;
 
@@ -221,8 +325,7 @@ export default function PortalCalendarPage() {
     if (!price.trim() && typeof selectedService.unit_price_cents === "number") {
       setPrice((selectedService.unit_price_cents / 100).toFixed(2));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedService]);
+  }, [selectedService, title, price]);
 
   function clientName(id: string | null) {
     if (!id) return "—";
@@ -305,7 +408,6 @@ export default function PortalCalendarPage() {
   async function createJob() {
     setError("");
 
-    // If no service selected, title required. If service selected, backend can default title.
     if (!serviceId && !title.trim()) return setError("Title is required");
     if (!scheduledFor) return setError("Scheduled date/time is required");
     if (!clientId) return setError("Client is required");
@@ -356,7 +458,6 @@ export default function PortalCalendarPage() {
       return;
     }
 
-    // reset form
     setServiceId("");
     setTitle("");
     setNotes("");
@@ -364,7 +465,6 @@ export default function PortalCalendarPage() {
     setHours("");
     setClientId("");
     setPropertyId("");
-
     setRecurrenceEnabled(false);
     setRecurrenceFrequency("WEEKLY");
     setRecurrenceInterval("1");
@@ -388,50 +488,72 @@ export default function PortalCalendarPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header / Metrics */}
-      <section className="rounded-[28px] border border-stone-200 bg-white px-7 py-7 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
+      <section className={`${cardClass()} px-7 py-7`}>
+        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-3xl">
             <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">
-              Calendar
+              Dashboard
             </div>
             <h1 className="mt-2 font-serif text-4xl leading-tight text-stone-900">
-              Operational schedule
+              Business command center
             </h1>
             <p className="mt-3 text-sm leading-6 text-stone-600">
-              Monthly calendar view. Click a day to see tasks. Click a task for
-              full details.
+              See today’s work, orders needing action, recent clients, and the live operating picture of the business.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[420px]">
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
-                Scheduled jobs
-              </div>
-              <div className="mt-2 text-2xl font-semibold text-stone-900">
-                {jobs.length}
-              </div>
-            </div>
+          <div className="flex flex-wrap gap-2">
+  <button
+    onClick={openAddJob}
+    className="rounded-full bg-stone-900 px-4 py-2 text-xs uppercase tracking-[0.22em] text-white transition hover:bg-stone-700"
+  >
+    Add job
+  </button>
+  <Link
+    href="/portal/orders"
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Orders
+  </Link>
+  <Link
+    href="/portal/clients"
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Clients
+  </Link>
+  <Link
+    href="/portal/services"
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Services
+  </Link>
+  <Link
+    href="/portal/jobs"
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Jobs
+  </Link>
+  <Link
+    href="/portal/contacts"
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Contacts
+  </Link>
 
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
-                Scheduled value
-              </div>
-              <div className="mt-2 text-2xl font-semibold text-stone-900">
-                {formatMoney(scheduledValue)}
-              </div>
-            </div>
+  <Link
+  href="/portal/retainers"
+  className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+>
+  Retainers
+</Link>
 
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-4">
-              <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
-                Scheduled hours
-              </div>
-              <div className="mt-2 text-2xl font-semibold text-stone-900">
-                {scheduledHours.toFixed(1)}h
-              </div>
-            </div>
-          </div>
+<Link
+  href="/portal/exports"
+  className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+>
+  Exports
+</Link>
+</div>
         </div>
 
         {error ? (
@@ -441,58 +563,299 @@ export default function PortalCalendarPage() {
         ) : null}
       </section>
 
-      {/* Calendar + Day Panel */}
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Calendar */}
-        <div className="lg:col-span-2 rounded-[28px] border border-stone-200 bg-white p-7 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            Revenue
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {formatMoney(dashboardStats.revenue)}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            Clients
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {dashboardStats.clients}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            Jobs
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {dashboardStats.jobs}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            New Orders
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {dashboardStats.newOrders}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            Ordered
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {dashboardStats.ordered}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-stone-200 bg-white px-5 py-4">
+          <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">
+            Today’s Jobs
+          </div>
+          <div className="mt-2 text-2xl font-semibold text-stone-900">
+            {dashboardStats.todayJobs}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className={`${cardClass()} p-7`}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
+                Today
+              </div>
+              <h2 className="mt-1 font-serif text-2xl text-stone-900">
+                Today’s tasks
+              </h2>
+            </div>
+            <Link
+              href="/portal"
+              className="text-xs uppercase tracking-[0.2em] text-stone-500"
+            >
+              Live
+            </Link>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {todayJobs.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
+                No jobs scheduled today.
+              </div>
+            ) : (
+              todayJobs.map((job) => (
+                <button
+                  key={job.id}
+                  onClick={() => setActiveJobId(job.id)}
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/70 p-4 text-left transition hover:bg-stone-100"
+                >
+                  <div className="text-sm font-medium text-stone-900">{job.title}</div>
+                  <div className="mt-1 text-xs text-stone-600">
+                    {new Date(job.scheduled_for).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    • {clientName(job.client_id)}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className={`${cardClass()} p-7`}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
+                Fulfillment
+              </div>
+              <h2 className="mt-1 font-serif text-2xl text-stone-900">
+                Orders needing action
+              </h2>
+            </div>
+            <Link
+              href="/portal/orders"
+              className="text-xs uppercase tracking-[0.2em] text-stone-500"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {actionOrders.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
+                No active orders need action.
+              </div>
+            ) : (
+              actionOrders.map((order) => {
+                const status = String(order.fulfillment_status ?? "NEW").toUpperCase();
+                return (
+                  <div
+                    key={order.id}
+                    className="rounded-2xl border border-stone-200 bg-stone-50/70 p-4"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-stone-900">
+                          {order.customer_name || order.client_name || "—"}
+                        </div>
+                        <div className="mt-1 text-xs text-stone-600">
+                          {cleanProductLabel(order.product_key)} • {order.rock_color || "—"}
+                        </div>
+                        <div className="mt-1 text-xs text-stone-600">
+                          {formatMoney(order.total_amount_cents)}
+                        </div>
+                      </div>
+
+                      <span
+                        className={`inline-flex rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.18em] ${statusPillClass(
+                          status
+                        )}`}
+                      >
+                        {status}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className={`${cardClass()} p-7`}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
+                Clients
+              </div>
+              <h2 className="mt-1 font-serif text-2xl text-stone-900">
+                Recent clients
+              </h2>
+            </div>
+            <Link
+              href="/portal/clients"
+              className="text-xs uppercase tracking-[0.2em] text-stone-500"
+            >
+              View all
+            </Link>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {recentClients.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
+                No clients saved yet.
+              </div>
+            ) : (
+              recentClients.map((client) => (
+                <div
+                  key={client.id}
+                  className="rounded-2xl border border-stone-200 bg-stone-50/70 p-4"
+                >
+                  <div className="text-sm font-medium text-stone-900">{client.name}</div>
+                  <div className="mt-1 text-xs text-stone-600">
+                    {client.email || "No email saved"}
+                  </div>
+                  <div className="mt-1 text-xs text-stone-600">
+                    {client.phone || "No phone saved"}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_1fr]">
+        <div className={`${cardClass()} p-7`}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">
-                Month
+                Upcoming
               </div>
-              <div className="mt-2 font-serif text-2xl text-stone-900">
-                {formatMonthLabel(viewYear, viewMonth)}
-              </div>
+              <h2 className="mt-2 font-serif text-2xl text-stone-900">
+                Upcoming jobs
+              </h2>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700">
+              Scheduled value {formatMoney(scheduledValue)} • {scheduledHours.toFixed(1)}h
+            </div>
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {upcomingJobs.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
+                No upcoming jobs scheduled.
+              </div>
+            ) : (
+              upcomingJobs.map((job) => (
+                <button
+                  key={job.id}
+                  onClick={() => setActiveJobId(job.id)}
+                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/70 p-4 text-left transition hover:bg-stone-100"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-stone-900">{job.title}</div>
+                      <div className="mt-1 text-xs text-stone-600">
+                        {new Date(job.scheduled_for).toLocaleString([], {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}{" "}
+                        • {clientName(job.client_id)} • {propertyName(job.property_id)}
+                      </div>
+                    </div>
+                    <div className="text-sm font-medium text-stone-900">
+                      {formatMoney(job.price_cents)}
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className={`${cardClass()} p-7`}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">
+                Calendar
+              </div>
+              <h2 className="mt-2 font-serif text-2xl text-stone-900">
+                Monthly view
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
                 onClick={jumpToday}
-                className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 px-3 py-2 text-xs uppercase tracking-[0.2em] text-stone-700 transition hover:bg-stone-100"
               >
                 Today
               </button>
               <button
                 onClick={goPrevMonth}
-                className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 px-3 py-2 text-xs uppercase tracking-[0.2em] text-stone-700 transition hover:bg-stone-100"
               >
                 Prev
               </button>
               <button
                 onClick={goNextMonth}
-                className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+                className="rounded-full border border-stone-300 px-3 py-2 text-xs uppercase tracking-[0.2em] text-stone-700 transition hover:bg-stone-100"
               >
                 Next
               </button>
-
-              <div className="w-px self-stretch bg-stone-200 mx-1 hidden sm:block" />
-
-              <button
-                onClick={openAddJob}
-                className="rounded-full bg-stone-900 px-4 py-2 text-xs uppercase tracking-[0.22em] text-white transition hover:bg-stone-700"
-              >
-                Add job
-              </button>
-              <Link
-                href="/portal/clients"
-                className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
-              >
-                Add client
-              </Link>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-7 gap-2">
+          <div className="mt-3 text-sm text-stone-600">
+            {formatMonthLabel(viewYear, viewMonth)}
+          </div>
+
+          <div className="mt-5 grid grid-cols-7 gap-2">
             {weekdayLabels.map((w) => (
               <div
                 key={w}
@@ -504,25 +867,21 @@ export default function PortalCalendarPage() {
 
             {monthGrid.map((cell, idx) => {
               if (cell.kind === "blank") {
-                return (
-                  <div key={`b-${idx}`} className="h-24 rounded-xl bg-transparent" />
-                );
+                return <div key={`b-${idx}`} className="h-16 rounded-xl bg-transparent" />;
               }
 
               const dayNum = cell.date.getDate();
               const dayKey = cell.key;
               const isSelected = dayKey === selectedDayKey;
-
               const isToday = dayKey === toLocalDateKeyFromDate(new Date());
-              const dayJobs = jobsByDay.get(dayKey) ?? [];
-              const count = dayJobs.length;
+              const count = (jobsByDay.get(dayKey) ?? []).length;
 
               return (
                 <button
                   key={dayKey}
                   onClick={() => onClickDay(dayKey)}
                   className={[
-                    "h-24 rounded-2xl border text-left p-3 transition",
+                    "h-16 rounded-2xl border text-left p-2 transition",
                     isSelected
                       ? "border-stone-900 bg-stone-900 text-white"
                       : "border-stone-200 bg-stone-50 hover:bg-stone-100 text-stone-900",
@@ -533,112 +892,62 @@ export default function PortalCalendarPage() {
                     {isToday ? (
                       <span
                         className={[
-                          "rounded-full px-2 py-1 text-[10px] uppercase tracking-[0.18em]",
-                          isSelected
-                            ? "bg-white/15 text-white"
-                            : "bg-white text-stone-700 border border-stone-200",
+                          "rounded-full px-1.5 py-0.5 text-[9px] uppercase tracking-[0.18em]",
+                          isSelected ? "bg-white/15 text-white" : "bg-white text-stone-700",
                         ].join(" ")}
                       >
-                        Today
+                        T
                       </span>
                     ) : null}
                   </div>
 
-                  <div className="mt-3">
-                    {count > 0 ? (
-                      <div
-                        className={[
-                          "inline-flex items-center rounded-full px-2.5 py-1 text-[10px] uppercase tracking-[0.2em]",
-                          isSelected
-                            ? "bg-white/15 text-white"
-                            : "bg-white text-stone-700 border border-stone-200",
-                        ].join(" ")}
-                      >
-                        {count} task{count === 1 ? "" : "s"}
-                      </div>
-                    ) : (
-                      <div
-                        className={[
-                          "text-[11px] tracking-wide",
-                          isSelected ? "text-white/70" : "text-stone-500",
-                        ].join(" ")}
-                      >
-                        —
-                      </div>
-                    )}
+                  <div className="mt-2 text-[10px]">
+                    {count > 0 ? `${count}` : "—"}
                   </div>
                 </button>
               );
             })}
           </div>
 
-          {loading ? <div className="mt-5 text-sm text-stone-500">Loading…</div> : null}
-        </div>
+          <div className="mt-5">
+            <div className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
+              Selected day
+            </div>
+            <div className="mt-1 text-sm font-medium text-stone-900">
+              {formatDayLabel(selectedDayKey)}
+            </div>
 
-        {/* Day Panel */}
-        <div className="rounded-[28px] border border-stone-200 bg-white p-7 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-          <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">
-            Selected day
-          </div>
-          <div className="mt-2 font-serif text-2xl text-stone-900">
-            {formatDayLabel(selectedDayKey)}
-          </div>
-
-          <div className="mt-4 text-sm text-stone-500">
-            {selectedDayJobs.length} task{selectedDayJobs.length === 1 ? "" : "s"}
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {selectedDayJobs.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
-                No tasks scheduled for this day.
-              </div>
-            ) : (
-              selectedDayJobs.map((job) => (
-                <button
-                  key={job.id}
-                  onClick={() => setActiveJobId(job.id)}
-                  className="w-full rounded-2xl border border-stone-200 bg-stone-50/70 p-4 text-left transition hover:bg-stone-100"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-stone-900 truncate">
-                        {job.title}
-                      </div>
-                      <div className="mt-1 text-xs text-stone-600">
-                        {new Date(job.scheduled_for).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}{" "}
-                        • {clientName(job.client_id)} • {propertyName(job.property_id)}
-                      </div>
+            <div className="mt-3 space-y-2">
+              {selectedDayJobs.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-4 text-sm text-stone-500">
+                  No tasks scheduled.
+                </div>
+              ) : (
+                selectedDayJobs.slice(0, 4).map((job) => (
+                  <button
+                    key={job.id}
+                    onClick={() => setActiveJobId(job.id)}
+                    className="w-full rounded-2xl border border-stone-200 bg-stone-50/70 p-3 text-left transition hover:bg-stone-100"
+                  >
+                    <div className="text-sm font-medium text-stone-900">{job.title}</div>
+                    <div className="mt-1 text-xs text-stone-600">
+                      {new Date(job.scheduled_for).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </div>
-
-                    <div className="shrink-0 rounded-full border border-stone-200 bg-white px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-stone-600">
-                      {job.status}
-                    </div>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-
-          <div className="mt-6">
-            <button
-              onClick={openAddJob}
-              className="w-full rounded-full bg-stone-900 px-4 py-3 text-xs uppercase tracking-[0.22em] text-white transition hover:bg-stone-700"
-            >
-              Add task to this day
-            </button>
+                  </button>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Add Job (toggle) */}
       {showAddJob ? (
         <section
           ref={addJobRef}
-          className="rounded-[28px] border border-stone-200 bg-white p-7 shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+          className={`${cardClass()} p-7`}
         >
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
@@ -657,7 +966,6 @@ export default function PortalCalendarPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {/* Service */}
             <div className="space-y-2 md:col-span-2">
               <label className={labelClassName()}>Service</label>
               <select
@@ -674,7 +982,6 @@ export default function PortalCalendarPage() {
               </select>
             </div>
 
-            {/* Title */}
             <div className="space-y-2">
               <label className={labelClassName()}>Title</label>
               <input
@@ -685,7 +992,6 @@ export default function PortalCalendarPage() {
               />
             </div>
 
-            {/* Scheduled For */}
             <div className="space-y-2">
               <label className={labelClassName()}>Scheduled for</label>
               <input
@@ -696,7 +1002,6 @@ export default function PortalCalendarPage() {
               />
             </div>
 
-            {/* Client */}
             <div className="space-y-2">
               <label className={labelClassName()}>Client</label>
               <select
@@ -713,7 +1018,6 @@ export default function PortalCalendarPage() {
               </select>
             </div>
 
-            {/* Property */}
             <div className="space-y-2">
               <label className={labelClassName()}>Property</label>
               <select
@@ -738,7 +1042,6 @@ export default function PortalCalendarPage() {
               </select>
             </div>
 
-            {/* Price */}
             <div className="space-y-2">
               <label className={labelClassName()}>Price (USD)</label>
               <input
@@ -749,7 +1052,6 @@ export default function PortalCalendarPage() {
               />
             </div>
 
-            {/* Hours */}
             <div className="space-y-2">
               <label className={labelClassName()}>Hours</label>
               <input
@@ -760,7 +1062,6 @@ export default function PortalCalendarPage() {
               />
             </div>
 
-            {/* Recurrence */}
             <div className="space-y-3 md:col-span-2 rounded-2xl border border-stone-200 bg-stone-50 p-4">
               <div className="flex items-center justify-between gap-4">
                 <div>
@@ -821,7 +1122,6 @@ export default function PortalCalendarPage() {
             </div>
           </div>
 
-          {/* Notes */}
           <div className="mt-5 space-y-2">
             <label className={labelClassName()}>Notes</label>
             <textarea
@@ -850,7 +1150,6 @@ export default function PortalCalendarPage() {
         </section>
       ) : null}
 
-      {/* Job Detail Modal */}
       {activeJob ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8"

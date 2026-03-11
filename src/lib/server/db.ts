@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 8;
+const ADMIN_SCHEMA_VERSION = 11;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -123,6 +123,9 @@ export async function ensureAdminTables(): Promise<void> {
       billing_frequency TEXT NOT NULL,
       billing_interval INTEGER NOT NULL DEFAULT 1,
       billing_anchor_date DATE,
+      service_frequency TEXT NOT NULL DEFAULT 'WEEKLY',
+      service_interval INTEGER NOT NULL DEFAULT 1,
+      service_anchor_date DATE,
       status TEXT NOT NULL DEFAULT 'ACTIVE',
       notes TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -138,6 +141,11 @@ export async function ensureAdminTables(): Promise<void> {
     )`;
     await tx`CREATE INDEX IF NOT EXISTS admin_retainers_org_idx ON admin_retainers (organization_id, client_id)`;
     await tx`CREATE INDEX IF NOT EXISTS admin_retainers_status_idx ON admin_retainers (organization_id, status)`;
+
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS service_frequency TEXT NOT NULL DEFAULT 'WEEKLY'`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS service_interval INTEGER NOT NULL DEFAULT 1`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS service_anchor_date DATE`;
+
 
     await tx`CREATE TABLE IF NOT EXISTS admin_jobs (
       id TEXT PRIMARY KEY,
@@ -201,6 +209,23 @@ export async function ensureAdminTables(): Promise<void> {
         REFERENCES admin_jobs(id)
         ON DELETE CASCADE
     )`;
+
+    await tx`CREATE TABLE IF NOT EXISTS admin_order_photos (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      order_id TEXT NOT NULL,
+      url TEXT NOT NULL,
+      caption TEXT,
+      uploaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_order_photos_order_fk
+        FOREIGN KEY (order_id)
+        REFERENCES admin_orders(id)
+        ON DELETE CASCADE
+    )`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_order_photos_order_idx
+      ON admin_order_photos (organization_id, order_id, uploaded_at)`;
+
+
     await tx`CREATE INDEX IF NOT EXISTS admin_job_photos_job_idx ON admin_job_photos (job_id, uploaded_at)`;
 
     // Safe adds (existing DBs)
@@ -245,7 +270,7 @@ await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS stripe_customer_id T
 await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_clients_org_email_uq
   ON admin_clients (organization_id, lower(email))
   WHERE email IS NOT NULL AND email <> ''`;
-  
+
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS product_key TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
@@ -257,6 +282,16 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS ordered_at TIMESTAMPT
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS installed_at TIMESTAMPTZ`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS thank_you_sent_at TIMESTAMPTZ`;
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_fulfillment_idx ON admin_orders (organization_id, fulfillment_status, created_at)`;
+
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_version TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_url TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_accepted_at TIMESTAMPTZ`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_ip TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_user_agent TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_text_hash TEXT`;
+
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_tos_idx
+  ON admin_orders (organization_id, tos_accepted_at)`;
 
     await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
 
