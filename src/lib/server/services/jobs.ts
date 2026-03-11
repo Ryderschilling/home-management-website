@@ -37,11 +37,83 @@ export async function listJobs(organizationId: string) {
       j.recurrence_end_date,
       j.parent_job_id,
       j.created_at,
-      j.updated_at
+      j.updated_at,
+      COALESCE(photo_summary.photo_count, 0) AS photo_count,
+      COALESCE(photo_summary.photos, '[]'::json) AS photos
     FROM admin_jobs j
+    LEFT JOIN (
+      SELECT
+        jp.job_id,
+        COUNT(*)::int AS photo_count,
+        json_agg(
+          json_build_object(
+            'id', jp.id,
+            'url', jp.url,
+            'caption', jp.caption,
+            'uploaded_at', jp.uploaded_at
+          )
+          ORDER BY jp.uploaded_at DESC
+        ) AS photos
+      FROM admin_job_photos jp
+      GROUP BY jp.job_id
+    ) AS photo_summary
+      ON photo_summary.job_id = j.id
     WHERE j.organization_id = ${organizationId}
     ORDER BY j.scheduled_for ASC
   `;
+}
+
+export async function getJobById(organizationId: string, jobId: string) {
+  await ensureAdminTables();
+
+  const rows = await sql`
+    SELECT
+      j.id,
+      j.organization_id,
+      j.client_id,
+      j.property_id,
+      j.service_id,
+      j.order_id,
+      j.title,
+      j.notes,
+      j.status,
+      j.scheduled_for,
+      j.duration_minutes,
+      j.hours_numeric,
+      j.price_cents,
+      j.completed_at,
+      j.recurrence_enabled,
+      j.recurrence_frequency,
+      j.recurrence_interval,
+      j.recurrence_end_date,
+      j.parent_job_id,
+      j.created_at,
+      j.updated_at,
+      COALESCE(photo_summary.photo_count, 0) AS photo_count,
+      COALESCE(photo_summary.photos, '[]'::json) AS photos
+    FROM admin_jobs j
+    LEFT JOIN (
+      SELECT
+        jp.job_id,
+        COUNT(*)::int AS photo_count,
+        json_agg(
+          json_build_object(
+            'id', jp.id,
+            'url', jp.url,
+            'caption', jp.caption,
+            'uploaded_at', jp.uploaded_at
+          )
+          ORDER BY jp.uploaded_at DESC
+        ) AS photos
+      FROM admin_job_photos jp
+      GROUP BY jp.job_id
+    ) AS photo_summary
+      ON photo_summary.job_id = j.id
+    WHERE j.organization_id = ${organizationId} AND j.id = ${jobId}
+    LIMIT 1
+  `;
+
+  return rows[0] ?? null;
 }
 
 export async function createJob(
@@ -210,4 +282,96 @@ export async function createJob(
   }
 
   return parent;
+}
+
+export async function updateJob(
+  organizationId: string,
+  jobId: string,
+  body: Record<string, unknown>
+) {
+  await ensureAdminTables();
+
+  const existingRows = await sql`
+    SELECT *
+    FROM admin_jobs
+    WHERE organization_id = ${organizationId} AND id = ${jobId}
+    LIMIT 1
+  `;
+
+  const existing = existingRows[0];
+  if (!existing) return null;
+
+  const nextStatus =
+    typeof body.status === "string" && body.status.trim()
+      ? body.status.trim().toUpperCase()
+      : existing.status;
+
+  const nextNotes =
+    body.notes === undefined
+      ? existing.notes
+      : typeof body.notes === "string"
+      ? body.notes.trim() || null
+      : null;
+
+  const nextTitle =
+    body.title === undefined
+      ? existing.title
+      : typeof body.title === "string" && body.title.trim()
+      ? body.title.trim()
+      : existing.title;
+
+  const nextScheduledFor =
+    body.scheduledFor === undefined || body.scheduledFor === null || body.scheduledFor === ""
+      ? existing.scheduled_for
+      : new Date(String(body.scheduledFor)).toISOString();
+
+  const nextPriceCents =
+    body.priceCents === undefined || body.priceCents === null || body.priceCents === ""
+      ? existing.price_cents
+      : Number(body.priceCents);
+
+  if (
+    nextPriceCents !== null &&
+    nextPriceCents !== undefined &&
+    (!Number.isFinite(nextPriceCents) || nextPriceCents < 0)
+  ) {
+    throw new Error("Invalid priceCents");
+  }
+
+  const nextHours =
+    body.hours === undefined || body.hours === null || body.hours === ""
+      ? existing.hours_numeric
+      : Number(body.hours);
+
+  if (
+    nextHours !== null &&
+    nextHours !== undefined &&
+    (!Number.isFinite(nextHours) || nextHours < 0)
+  ) {
+    throw new Error("Invalid hours");
+  }
+
+  const completedAt =
+    nextStatus === "COMPLETED"
+      ? existing.completed_at ?? new Date().toISOString()
+      : nextStatus === "CANCELED"
+      ? null
+      : existing.completed_at;
+
+  const updatedRows = await sql`
+    UPDATE admin_jobs
+    SET
+      title = ${nextTitle},
+      notes = ${nextNotes},
+      status = ${nextStatus},
+      scheduled_for = ${nextScheduledFor},
+      hours_numeric = ${nextHours},
+      price_cents = ${nextPriceCents},
+      completed_at = ${completedAt},
+      updated_at = NOW()
+    WHERE organization_id = ${organizationId} AND id = ${jobId}
+    RETURNING *
+  `;
+
+  return updatedRows[0] ?? null;
 }

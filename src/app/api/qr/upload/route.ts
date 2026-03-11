@@ -36,10 +36,8 @@ export async function POST(req: NextRequest) {
     const emailRaw = safe(form.get("email"));
     const phoneRaw = safe(form.get("phone"));
 
-    // Back-compat (old single-field address)
     const serviceAddressRaw = safe(form.get("serviceAddress"));
 
-    // ✅ New structured address fields
     const address1 = safe(form.get("address1"));
     const address2 = safe(form.get("address2"));
     const city = safe(form.get("city"));
@@ -54,6 +52,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
     if (!(file instanceof File)) {
       return NextResponse.json(
         { ok: false, error: { message: "Missing photo" } },
@@ -67,12 +66,14 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
     if (!emailRaw) {
       return NextResponse.json(
         { ok: false, error: { message: "Missing email" } },
         { status: 400 }
       );
     }
+
     if (!phoneRaw) {
       return NextResponse.json(
         { ok: false, error: { message: "Missing phone" } },
@@ -96,7 +97,8 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const maxBytes = 7 * 1024 * 1024; // 7MB
+
+    const maxBytes = 7 * 1024 * 1024;
     if (file.size > maxBytes) {
       return NextResponse.json(
         { ok: false, error: { message: "Photo too large (max 7MB)" } },
@@ -104,7 +106,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify payment
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.payment_status !== "paid") {
       return NextResponse.json(
@@ -115,9 +116,14 @@ export async function POST(req: NextRequest) {
 
     const orgId = env.DEFAULT_ORGANIZATION_ID;
 
-    // Pull color/product metadata from Stripe
     const rockColor = safe(session.metadata?.rock_color || session.metadata?.color || "unknown");
     const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
+
+    const tosVersion = safe(session.metadata?.tos_version);
+    const tosUrl = safe(session.metadata?.tos_url);
+    const tosAcceptedAt = safe(session.metadata?.tos_accepted_at);
+    const tosIp = safe(session.metadata?.tos_ip);
+    const tosUserAgent = safe(session.metadata?.tos_user_agent);
 
     const stripeEmail = session.customer_details?.email ?? "";
     const stripePhone = session.customer_details?.phone ?? "";
@@ -143,7 +149,6 @@ export async function POST(req: NextRequest) {
 
     const totalCents = typeof session.amount_total === "number" ? session.amount_total : 0;
 
-    // ✅ Upsert Client by email (master record)
     const existingClient = await sql`
       SELECT id, name, email, phone, address_text, stripe_customer_id
       FROM admin_clients
@@ -185,7 +190,6 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    // ✅ Create/Update Order linked to that Client
     const existingOrder = await sql`
       SELECT id
       FROM admin_orders
@@ -193,7 +197,11 @@ export async function POST(req: NextRequest) {
       LIMIT 1
     `;
 
+    let orderId: string;
+
     if (existingOrder.length === 0) {
+      orderId = crypto.randomUUID();
+
       await sql`
         INSERT INTO admin_orders (
           id,
@@ -214,7 +222,7 @@ export async function POST(req: NextRequest) {
           service_address
         )
         VALUES (
-          ${crypto.randomUUID()},
+          ${orderId},
           ${orgId},
           ${clientId},
           ${"PAID"},
@@ -233,6 +241,8 @@ export async function POST(req: NextRequest) {
         )
       `;
     } else {
+      orderId = existingOrder[0].id;
+
       await sql`
         UPDATE admin_orders
         SET
@@ -254,9 +264,26 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    // ✅ Email you the photo + details (already your desired behavior)
     const buf = Buffer.from(await file.arrayBuffer());
     const base64 = buf.toString("base64");
+    const dataUrl = `data:${file.type};base64,${base64}`;
+
+    await sql`
+      INSERT INTO admin_order_photos (
+        id,
+        organization_id,
+        order_id,
+        url,
+        caption
+      )
+      VALUES (
+        ${crypto.randomUUID()},
+        ${orgId},
+        ${orderId},
+        ${dataUrl},
+        ${notes || file.name || "Uploaded order photo"}
+      )
+    `;
 
     await sendPipePhotoEmail({
       subject: `New Rock Order — ${rockColor.toUpperCase()}`,
@@ -276,7 +303,7 @@ export async function POST(req: NextRequest) {
       attachmentBase64: base64,
     });
 
-    return NextResponse.json({ ok: true, data: { clientId } });
+    return NextResponse.json({ ok: true, data: { clientId, orderId } });
   } catch (e) {
     return NextResponse.json(
       {

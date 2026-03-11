@@ -1,5 +1,15 @@
 // src/lib/server/services/orders.ts
 import { ensureAdminTables, sql } from "@/lib/server/db";
+import { sendThankYouEmail } from "@/lib/server/email-thankyou";
+
+export type FulfillmentStatus = "NEW" | "ORDERED" | "INSTALLED" | "CANCELED";
+
+function normalizeFulfillment(v: unknown): FulfillmentStatus | null {
+  const s = String(v ?? "").trim().toUpperCase();
+  if (!s) return null;
+  if (s === "NEW" || s === "ORDERED" || s === "INSTALLED" || s === "CANCELED") return s;
+  return null;
+}
 
 export async function listOrders(organizationId: string) {
   await ensureAdminTables();
@@ -16,7 +26,6 @@ export async function listOrders(organizationId: string) {
       o.created_at,
       o.updated_at,
 
-      -- QR/Stripe fields
       o.stripe_session_id,
       o.stripe_customer_id,
       o.stripe_payment_intent_id,
@@ -28,13 +37,11 @@ export async function listOrders(organizationId: string) {
       o.customer_phone,
       o.service_address,
 
-      -- fulfillment
       o.fulfillment_status,
       o.ordered_at,
       o.installed_at,
       o.thank_you_sent_at,
 
-      -- joined client fields
       c.name as client_name,
       c.email as client_email,
       c.phone as client_phone,
@@ -52,12 +59,19 @@ export async function getOrderById(organizationId: string, orderId: string) {
   await ensureAdminTables();
 
   const rows = await sql`
-    SELECT *
-    FROM admin_orders
-    WHERE organization_id = ${organizationId} AND id = ${orderId}
+    SELECT
+      o.*,
+      c.name as client_name,
+      c.email as client_email,
+      c.phone as client_phone,
+      c.address_text as client_address
+    FROM admin_orders o
+    LEFT JOIN admin_clients c
+      ON c.id = o.client_id
+      AND c.organization_id = o.organization_id
+    WHERE o.organization_id = ${organizationId} AND o.id = ${orderId}
     LIMIT 1
   `;
-
   return rows[0] ?? null;
 }
 
@@ -84,51 +98,94 @@ export async function createOrder(organizationId: string, body: Record<string, u
   return rows[0];
 }
 
-type FulfillmentUpdate = {
-  fulfillmentStatus?: "NEW" | "ORDERED" | "INSTALLED" | "CANCELED";
-  thankYouSent?: boolean;
-};
-
-export async function updateOrderFulfillment(
+export async function updateOrder(
   organizationId: string,
   orderId: string,
-  update: FulfillmentUpdate
+  body: Record<string, unknown>
 ) {
   await ensureAdminTables();
 
-  // Fetch current state (for timestamps)
-  const existing = await sql`
-    SELECT id, fulfillment_status, ordered_at, installed_at, thank_you_sent_at
-    FROM admin_orders
-    WHERE organization_id = ${organizationId} AND id = ${orderId}
-    LIMIT 1
-  `;
+  const existing = await getOrderById(organizationId, orderId);
+  if (!existing) return null;
 
-  const row = existing[0];
-  if (!row) return null;
+  const nextFulfillment = normalizeFulfillment(body.fulfillment_status);
 
-  const nextStatus = update.fulfillmentStatus ?? (row.fulfillment_status as string);
+  // Never pass undefined to postgres() template: use null explicitly.
+  let fulfillmentStatus: FulfillmentStatus = (existing.fulfillment_status as FulfillmentStatus) || "NEW";
+  if (nextFulfillment) fulfillmentStatus = nextFulfillment;
 
+  const nowIso = new Date().toISOString();
+
+  // Auto timestamps when transitioning forward.
   const orderedAt =
-    nextStatus === "ORDERED" && !row.ordered_at ? new Date().toISOString() : row.ordered_at;
+    fulfillmentStatus === "ORDERED"
+      ? (existing.ordered_at ?? nowIso)
+      : existing.ordered_at ?? null;
 
   const installedAt =
-    nextStatus === "INSTALLED" && !row.installed_at ? new Date().toISOString() : row.installed_at;
+    fulfillmentStatus === "INSTALLED"
+      ? (existing.installed_at ?? nowIso)
+      : existing.installed_at ?? null;
 
-  const thankYouSentAt =
-    update.thankYouSent && !row.thank_you_sent_at ? new Date().toISOString() : row.thank_you_sent_at;
-
-  const updated = await sql`
+  const rows = await sql`
     UPDATE admin_orders
     SET
-      fulfillment_status = ${nextStatus},
+      fulfillment_status = ${fulfillmentStatus},
       ordered_at = ${orderedAt},
       installed_at = ${installedAt},
-      thank_you_sent_at = ${thankYouSentAt},
       updated_at = NOW()
     WHERE organization_id = ${organizationId} AND id = ${orderId}
     RETURNING *
   `;
 
-  return updated[0] ?? null;
+  return rows[0] ?? null;
+}
+
+export async function deleteOrder(organizationId: string, orderId: string) {
+  await ensureAdminTables();
+
+  const deleted = await sql`
+    DELETE FROM admin_orders
+    WHERE organization_id = ${organizationId} AND id = ${orderId}
+  `;
+
+  return deleted.count > 0;
+}
+
+export async function sendThankYouEmailAndMarkSent(organizationId: string, orderId: string) {
+  await ensureAdminTables();
+
+  const order = await getOrderById(organizationId, orderId);
+  if (!order) return null;
+
+  const to = (order.customer_email || order.client_email || "").toString().trim();
+  const name = (order.customer_name || order.client_name || "there").toString().trim();
+
+  if (!to) {
+    throw new Error("Order has no customer email to send thank-you.");
+  }
+
+  // Prevent duplicates
+  if (order.thank_you_sent_at) {
+    return { ok: true, alreadySent: true };
+  }
+
+  const productLabel =
+    order.product_key
+      ? String(order.product_key).replaceAll("_", " ")
+      : "artificial rock installation";
+
+  await sendThankYouEmail({
+    to,
+    customerName: name,
+    productLabel,
+  });
+
+  await sql`
+    UPDATE admin_orders
+    SET thank_you_sent_at = NOW(), updated_at = NOW()
+    WHERE organization_id = ${organizationId} AND id = ${orderId}
+  `;
+
+  return { ok: true, alreadySent: false };
 }
