@@ -42,14 +42,43 @@ export async function listOrders(organizationId: string) {
       o.installed_at,
       o.thank_you_sent_at,
 
+      o.tos_version,
+      o.tos_url,
+      o.tos_text_hash,
+      o.tos_accepted_at,
+      o.tos_ip,
+      o.tos_user_agent,
+
       c.name as client_name,
       c.email as client_email,
       c.phone as client_phone,
-      c.address_text as client_address
+      c.address_text as client_address,
+
+      COALESCE(p.photos, 0) as photo_count,
+      p.latest_url as latest_photo_url
+
     FROM admin_orders o
     LEFT JOIN admin_clients c
       ON c.id = o.client_id
       AND c.organization_id = o.organization_id
+
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(*)::int AS photos,
+        MAX(uploaded_at) AS latest_uploaded_at,
+        (
+          SELECT url
+          FROM admin_order_photos op2
+          WHERE op2.organization_id = o.organization_id
+            AND op2.order_id = o.id
+          ORDER BY op2.uploaded_at DESC
+          LIMIT 1
+        ) AS latest_url
+      FROM admin_order_photos op
+      WHERE op.organization_id = o.organization_id
+        AND op.order_id = o.id
+    ) p ON true
+
     WHERE o.organization_id = ${organizationId}
     ORDER BY o.created_at DESC
   `;
@@ -61,6 +90,11 @@ export async function getOrderById(organizationId: string, orderId: string) {
   const rows = await sql`
     SELECT
       o.*,
+
+      -- order photos (from admin_order_photos)
+      COALESCE(p.photo_count, 0) as photo_count,
+      p.latest_photo_url as latest_photo_url,
+
       c.name as client_name,
       c.email as client_email,
       c.phone as client_phone,
@@ -69,7 +103,20 @@ export async function getOrderById(organizationId: string, orderId: string) {
     LEFT JOIN admin_clients c
       ON c.id = o.client_id
       AND c.organization_id = o.organization_id
-    WHERE o.organization_id = ${organizationId} AND o.id = ${orderId}
+    LEFT JOIN (
+      SELECT
+        organization_id,
+        order_id,
+        COUNT(*)::int AS photo_count,
+        (ARRAY_AGG(url ORDER BY uploaded_at DESC))[1] AS latest_photo_url
+      FROM admin_order_photos
+      WHERE organization_id = ${organizationId}
+      GROUP BY organization_id, order_id
+    ) p
+      ON p.organization_id = o.organization_id
+      AND p.order_id = o.id
+    WHERE o.organization_id = ${organizationId}
+      AND o.id = ${orderId}
     LIMIT 1
   `;
   return rows[0] ?? null;
@@ -110,13 +157,12 @@ export async function updateOrder(
 
   const nextFulfillment = normalizeFulfillment(body.fulfillment_status);
 
-  // Never pass undefined to postgres() template: use null explicitly.
-  let fulfillmentStatus: FulfillmentStatus = (existing.fulfillment_status as FulfillmentStatus) || "NEW";
+  let fulfillmentStatus: FulfillmentStatus =
+    (existing.fulfillment_status as FulfillmentStatus) || "NEW";
   if (nextFulfillment) fulfillmentStatus = nextFulfillment;
 
   const nowIso = new Date().toISOString();
 
-  // Auto timestamps when transitioning forward.
   const orderedAt =
     fulfillmentStatus === "ORDERED"
       ? (existing.ordered_at ?? nowIso)
@@ -161,19 +207,14 @@ export async function sendThankYouEmailAndMarkSent(organizationId: string, order
   const to = (order.customer_email || order.client_email || "").toString().trim();
   const name = (order.customer_name || order.client_name || "there").toString().trim();
 
-  if (!to) {
-    throw new Error("Order has no customer email to send thank-you.");
-  }
+  if (!to) throw new Error("Order has no customer email to send thank-you.");
 
-  // Prevent duplicates
   if (order.thank_you_sent_at) {
     return { ok: true, alreadySent: true };
   }
 
   const productLabel =
-    order.product_key
-      ? String(order.product_key).replaceAll("_", " ")
-      : "artificial rock installation";
+    order.product_key ? String(order.product_key).replaceAll("_", " ") : "artificial rock installation";
 
   await sendThankYouEmail({
     to,

@@ -269,10 +269,6 @@ export default function PortalDashboardPage() {
       .slice(0, 8);
   }, [orders]);
 
-  const recentClients = useMemo(() => {
-    return [...clients].slice(0, 8);
-  }, [clients]);
-
   const dashboardStats = useMemo(() => {
     const newOrders = orders.filter(
       (o) => String(o.fulfillment_status ?? "NEW").toUpperCase() === "NEW"
@@ -403,6 +399,32 @@ export default function PortalDashboardPage() {
     setTimeout(() => {
       addJobRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
+  }
+
+  async function deleteActiveJob() {
+    if (!activeJobId) return;
+  
+    const confirmed = window.confirm("Delete this task permanently?");
+    if (!confirmed) return;
+  
+    try {
+      setError("");
+  
+      const res = await fetch(`/api/admin/jobs/${activeJobId}`, {
+        method: "DELETE",
+      });
+  
+      const json = await res.json().catch(() => ({}));
+  
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to delete task");
+      }
+  
+      setActiveJobId(null);
+      await loadAll();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete task");
+    }
   }
 
   async function createJob() {
@@ -619,7 +641,7 @@ export default function PortalDashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className={`${cardClass()} p-7`}>
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -719,48 +741,6 @@ export default function PortalDashboardPage() {
                   </div>
                 );
               })
-            )}
-          </div>
-        </div>
-
-        <div className={`${cardClass()} p-7`}>
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-stone-500">
-                Clients
-              </div>
-              <h2 className="mt-1 font-serif text-2xl text-stone-900">
-                Recent clients
-              </h2>
-            </div>
-            <Link
-              href="/portal/clients"
-              className="text-xs uppercase tracking-[0.2em] text-stone-500"
-            >
-              View all
-            </Link>
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {recentClients.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-4 py-6 text-sm text-stone-500">
-                No clients saved yet.
-              </div>
-            ) : (
-              recentClients.map((client) => (
-                <div
-                  key={client.id}
-                  className="rounded-2xl border border-stone-200 bg-stone-50/70 p-4"
-                >
-                  <div className="text-sm font-medium text-stone-900">{client.name}</div>
-                  <div className="mt-1 text-xs text-stone-600">
-                    {client.email || "No email saved"}
-                  </div>
-                  <div className="mt-1 text-xs text-stone-600">
-                    {client.phone || "No phone saved"}
-                  </div>
-                </div>
-              ))
             )}
           </div>
         </div>
@@ -1179,12 +1159,21 @@ export default function PortalDashboardPage() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setActiveJobId(null)}
-                className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
-              >
-                Close
-              </button>
+              <div className="flex items-center gap-2">
+  <button
+    onClick={deleteActiveJob}
+    className="rounded-full border border-red-300 bg-red-50 px-4 py-2 text-xs uppercase tracking-[0.22em] text-red-700 transition hover:bg-red-100"
+  >
+    Delete
+  </button>
+
+  <button
+    onClick={() => setActiveJobId(null)}
+    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+  >
+    Close
+  </button>
+</div>
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">

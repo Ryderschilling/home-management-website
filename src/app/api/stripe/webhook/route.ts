@@ -13,29 +13,74 @@ function safe(v: unknown) {
 
 function addressToString(addr: any): string {
   if (!addr) return "";
-  const parts = [
-    addr.line1,
-    addr.line2,
-    addr.city,
-    addr.state,
-    addr.postal_code,
-    addr.country,
-  ].filter(Boolean);
+  const parts = [addr.line1, addr.line2, addr.city, addr.state, addr.postal_code, addr.country].filter(Boolean);
   return parts.join(", ");
+}
+
+async function ensureReferralColumns() {
+  // Adds columns only if missing (safe to run every webhook)
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_code TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promotion_code_id TEXT`;
+}
+
+function makeReferralCode() {
+  // CHM-XXXXXX (A-Z + 0-9) length 6
+  const alphabet = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // avoids confusing 0/O, 1/I
+  let s = "";
+  for (let i = 0; i < 6; i++) {
+    s += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return `CHM-${s}`;
+}
+
+async function createOneTime20OffPromotionCode() {
+  // Create a fresh "once" coupon per referral code.
+  const coupon = await stripe.coupons.create({
+    percent_off: 20,
+    duration: "once",
+    name: "CHM 20% Off (Referral)",
+  });
+
+  // Retry a few times in case of a rare code collision
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = makeReferralCode();
+
+    try {
+      const promo = await stripe.promotionCodes.create({
+        promotion: { type: "coupon", coupon: coupon.id }, // ✅ Stripe v20+
+        code,
+        max_redemptions: 1,
+      });
+
+      return { code: promo.code ?? code, promotionCodeId: promo.id };
+    } catch (e) {
+      const msg = (e instanceof Error ? e.message : String(e)).toLowerCase();
+
+      // Only retry on actual "code already exists" style errors
+      if (msg.includes("already exists") || msg.includes("promotion code already exists")) {
+        continue;
+      }
+
+      // Anything else is real — throw it
+      throw e;
+    }
+  }
+
+  throw new Error("Failed to create a unique referral code. Try again.");
 }
 
 async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session) {
   await ensureAdminTables();
+  await ensureReferralColumns();
 
   const orgId = env.DEFAULT_ORGANIZATION_ID;
 
-  const rockColor = safe(session.metadata?.rock_color || session.metadata?.color || "unknown");
+  const rockColor = safe(session.metadata?.rock_color || (session.metadata as any)?.color || "unknown");
   const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
 
   const email = safe(session.customer_details?.email).toLowerCase();
   const phone = safe(session.customer_details?.phone);
 
-  // prefer shipping if present, else customer_details.address
   const shippingAddr = addressToString((session as any).shipping_details?.address);
   const billingAddr = addressToString(session.customer_details?.address);
   const serviceAddress = safe(shippingAddr || billingAddr);
@@ -48,13 +93,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
 
   const totalCents = typeof session.amount_total === "number" ? session.amount_total : 0;
 
-  // If Stripe didn’t collect email (shouldn’t happen if you set it), bail safely.
-  if (!email) {
-    // Still store order by session id so you don’t lose it.
-    // But cannot build an email list without an email.
-  }
-
-  // ✅ Upsert client by email (best identifier)
+  // ✅ Upsert client by email
   let clientId: string | null = null;
 
   if (email) {
@@ -99,7 +138,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
 
   // ✅ Upsert order by stripe_session_id
   const existingOrder = await sql`
-    SELECT id
+    SELECT id, referral_code, referral_promotion_code_id
     FROM admin_orders
     WHERE organization_id = ${orgId} AND stripe_session_id = ${stripeSessionId}
     LIMIT 1
@@ -107,10 +146,14 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
 
   const baseOrderFields = {
     status: "PAID",
-    fulfillment_status: "NEW", // NEW -> ORDERED -> INSTALLED -> THANKED (later)
+    fulfillment_status: "NEW",
   };
 
+  let orderId: string;
+
   if (existingOrder.length === 0) {
+    orderId = crypto.randomUUID();
+
     await sql`
       INSERT INTO admin_orders (
         id,
@@ -132,7 +175,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         notes
       )
       VALUES (
-        ${crypto.randomUUID()},
+        ${orderId},
         ${orgId},
         ${clientId},
         ${baseOrderFields.status},
@@ -152,6 +195,8 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
       )
     `;
   } else {
+    orderId = existingOrder[0].id;
+
     await sql`
       UPDATE admin_orders
       SET
@@ -173,6 +218,23 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
     `;
   }
 
+  // ✅ Create referral code ONLY if not already created for this order
+  const existingReferral = existingOrder.length ? safe(existingOrder[0].referral_code) : "";
+  const existingPromoId = existingOrder.length ? safe(existingOrder[0].referral_promotion_code_id) : "";
+
+  if (!existingReferral || !existingPromoId) {
+    const { code, promotionCodeId } = await createOneTime20OffPromotionCode();
+
+    await sql`
+      UPDATE admin_orders
+      SET
+        referral_code = ${code},
+        referral_promotion_code_id = ${promotionCodeId},
+        updated_at = NOW()
+      WHERE organization_id = ${orgId} AND id = ${orderId}
+    `;
+  }
+
   // ✅ Email you immediately that a paid order came in
   await sendPipePhotoEmail({
     subject: `NEW PAID ORDER — ${rockColor.toUpperCase()}`,
@@ -190,8 +252,6 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
       <p><strong>Stripe session:</strong> ${stripeSessionId}</p>
       <p><strong>Payment intent:</strong> ${stripePaymentIntentId || "—"}</p>
     `,
-    // no attachment here — reuse function with empty attachment
-    // (if you want a cleaner email function split later, we can do that)
     attachmentName: "no-attachment.txt",
     attachmentBase64: Buffer.from("Paid order received.").toString("base64"),
   });
@@ -200,18 +260,12 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) {
-    return NextResponse.json(
-      { ok: false, error: { message: "Missing STRIPE_WEBHOOK_SECRET" } },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: { message: "Missing STRIPE_WEBHOOK_SECRET" } }, { status: 500 });
   }
 
   const signature = req.headers.get("stripe-signature");
   if (!signature) {
-    return NextResponse.json(
-      { ok: false, error: { message: "Missing stripe-signature header" } },
-      { status: 400 }
-    );
+    return NextResponse.json({ ok: false, error: { message: "Missing stripe-signature header" } }, { status: 400 });
   }
 
   const rawBody = await req.text();
@@ -227,12 +281,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // Only handle the event you care about right now
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
-
-      // Only act if payment actually succeeded
-      // (Stripe usually sends completed for successful payments, but safe guard)
       if ((session.payment_status ?? "") === "paid") {
         await upsertClientAndOrderFromSession(session);
       }
