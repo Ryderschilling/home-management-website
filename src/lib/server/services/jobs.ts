@@ -375,3 +375,14 @@ export async function updateJob(
 
   return updatedRows[0] ?? null;
 }
+
+export async function deleteJob(organizationId: string, jobId: string) {
+  await ensureAdminTables();
+
+  const res = await sql`
+    DELETE FROM admin_jobs
+    WHERE organization_id = ${organizationId} AND id = ${jobId}
+  `;
+
+  return res.count > 0;
+}

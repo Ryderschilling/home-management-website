@@ -189,9 +189,7 @@ export default function PortalOrdersPage() {
       base.totalRevenue += amount;
     }
 
-    // placeholder estimate, replace later once you store costs in DB
     base.estimatedProfit = Math.round(base.totalRevenue * 0.55);
-
     return base;
   }, [orders]);
 
@@ -208,7 +206,6 @@ export default function PortalOrdersPage() {
 
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to update order");
-
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to update order");
@@ -217,20 +214,20 @@ export default function PortalOrdersPage() {
     }
   }
 
-  // ✅ Send thank-you via POST (matches the API route I gave you)
   async function sendThankYou(orderId: string) {
     setError("");
-    setBusyId(orderId);
 
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, { method: "POST" });
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "POST",
+      });
+
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to send thank-you");
+
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to send thank-you");
-    } finally {
-      setBusyId(null);
     }
   }
 
@@ -259,9 +256,7 @@ export default function PortalOrdersPage() {
       <section className={`${cardClass()} px-7 py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">
-              Orders
-            </div>
+            <div className="text-[11px] uppercase tracking-[0.28em] text-stone-500">Orders</div>
             <h1 className="mt-2 font-serif text-4xl leading-tight text-stone-900">
               Fulfillment dashboard
             </h1>
@@ -439,10 +434,8 @@ export default function PortalOrdersPage() {
                         )}
                       </td>
 
-                      <td className="px-5 py-5 text-sm text-stone-700">
-                        {fmtShortDate(o.created_at)}
-                        <div className="mt-2 text-xs text-stone-500">{o.stripe_session_id ? `Stripe: ${o.stripe_session_id}` : ""}</div>
-                      </td>
+                      {/* ✅ Removed the Stripe session text line so the column stays compact */}
+                      <td className="px-5 py-5 text-sm text-stone-700">{fmtShortDate(o.created_at)}</td>
 
                       <td className="px-5 py-5">
                         <div className="max-w-[280px]">
@@ -460,9 +453,7 @@ export default function PortalOrdersPage() {
                           {cleanProductLabel(o.product_key)}
                         </div>
                         {o.notes ? (
-                          <div className="mt-2 max-w-[260px] text-sm text-stone-500">
-                            {o.notes}
-                          </div>
+                          <div className="mt-2 max-w-[260px] text-sm text-stone-500">{o.notes}</div>
                         ) : null}
                       </td>
 
@@ -474,7 +465,9 @@ export default function PortalOrdersPage() {
 
                       <td className="px-5 py-5">
                         <span
-                          className={`inline-flex rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] ${statusPillClass(status)}`}
+                          className={`inline-flex rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] ${statusPillClass(
+                            status
+                          )}`}
                         >
                           {status}
                         </span>
