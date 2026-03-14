@@ -1,9 +1,7 @@
-// src/app/qr/page.tsx
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const COLOR_OPTIONS = [
   { id: "beige", label: "Beige", img: "/rocks/beige.JPG" },
@@ -11,13 +9,58 @@ const COLOR_OPTIONS = [
   { id: "grey", label: "Grey", img: "/rocks/grey.JPG" },
 ];
 
+const TESTIMONIALS = [
+  {
+    quote:
+      "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
+    name: "Beth Tedesco",
+    meta: "Google review",
+  },
+  {
+    quote:
+      "Ryder gives us peace of mind if we’re out of town and need the house checked on. Very reliable. Would highly recommend using his services!",
+    name: "Barbara Reed",
+    meta: "Google review",
+  },
+  {
+    quote:
+      "Ryder has helped us with our home for years and has always been reliable, professional, and great to work with. He consistently does an excellent job and is someone we truly trust.",
+    name: "Scott Clark",
+    meta: "Homeowner testimonial",
+  },
+];
+
+function safe(v: unknown) {
+  return String(v ?? "").trim();
+}
+
+function getOrCreateBrowserSessionKey() {
+  const key = "chm_campaign_session_key";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+
+  const created = crypto.randomUUID();
+  localStorage.setItem(key, created);
+  return created;
+}
+
 export default function QrPage() {
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [agree, setAgree] = useState(false);
   const [compactHeader, setCompactHeader] = useState(false);
+  const [campaignCode, setCampaignCode] = useState("");
+  const [sessionKey, setSessionKey] = useState("");
+
+  const [leadFirstName, setLeadFirstName] = useState("");
+  const [leadEmail, setLeadEmail] = useState("");
+  const [leadConsent, setLeadConsent] = useState(false);
+  const [leadLoading, setLeadLoading] = useState(false);
+  const [leadError, setLeadError] = useState("");
+  const [leadSuccess, setLeadSuccess] = useState("");
+
+  const landingPath = useMemo(() => "/qr", []);
 
   useEffect(() => {
     const onScroll = () => setCompactHeader(window.scrollY > 40);
@@ -26,18 +69,46 @@ export default function QrPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Clear the error when user changes checkbox (prevents “stuck” error UX)
   useEffect(() => {
     if (error) setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [agree]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = safe(params.get("c"));
+    const stored = safe(localStorage.getItem("chm_campaign_code"));
+    const resolved = fromQuery || stored;
+
+    if (fromQuery) {
+      localStorage.setItem("chm_campaign_code", fromQuery);
+    }
+
+    setCampaignCode(resolved);
+    setSessionKey(getOrCreateBrowserSessionKey());
+
+    if (resolved) {
+      fetch("/api/marketing/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventType: "page_view",
+          campaignCode: resolved,
+          sessionKey: getOrCreateBrowserSessionKey(),
+          pagePath: "/qr",
+          metadata: {
+            referrer: document.referrer || "",
+          },
+        }),
+      }).catch(() => {});
+    }
+  }, []);
 
   const disabled = loading || !agree;
 
   async function startCheckout() {
     setError("");
 
-    // UI guard
     if (!agree) {
       setError("You must accept the Terms to continue.");
       return;
@@ -49,10 +120,12 @@ export default function QrPage() {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // ✅ THIS is the missing piece (your curl proved it)
         body: JSON.stringify({
           color: selectedColor.id,
-          tosAccepted: true, // or: tosAccepted: agree
+          tosAccepted: true,
+          campaignCode,
+          sessionKey,
+          landingPath,
         }),
       });
 
@@ -69,9 +142,59 @@ export default function QrPage() {
     }
   }
 
+  async function submitLead() {
+    setLeadError("");
+    setLeadSuccess("");
+
+    if (!leadEmail.trim()) {
+      setLeadError("Enter your email.");
+      return;
+    }
+
+    if (!leadConsent) {
+      setLeadError("You must agree to receive offers and updates.");
+      return;
+    }
+
+    setLeadLoading(true);
+
+    try {
+      const res = await fetch("/api/marketing/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: leadFirstName,
+          email: leadEmail,
+          consent: true,
+          campaignCode,
+          sessionKey,
+          sourcePage: "/qr",
+        }),
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Lead capture failed");
+      }
+
+      setLeadSuccess(
+        json?.data?.alreadyExists
+          ? "You’re already on the list."
+          : "You’re in. We’ll send offers and updates."
+      );
+      setLeadFirstName("");
+      setLeadEmail("");
+      setLeadConsent(false);
+    } catch (e) {
+      setLeadError(e instanceof Error ? e.message : "Lead capture failed");
+    } finally {
+      setLeadLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
-      {/* Smaller header + shrinks further on scroll */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur">
         <div
           className={[
@@ -99,7 +222,6 @@ export default function QrPage() {
       </header>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
-        {/* Video */}
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
           <video
             className="h-auto w-full"
@@ -113,9 +235,7 @@ export default function QrPage() {
           </video>
         </section>
 
-        {/* Product layout: image LEFT, details RIGHT */}
         <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* LEFT: preview + color selector */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="text-[11px] uppercase tracking-[0.22em] text-white/60">
               Preview
@@ -166,12 +286,10 @@ export default function QrPage() {
             </div>
 
             <div className="mt-2 text-xs text-white/60">
-              Selected:{" "}
-              <span className="text-white/85">{selectedColor.label}</span>
+              Selected: <span className="text-white/85">{selectedColor.label}</span>
             </div>
           </div>
 
-          {/* RIGHT: details + order */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="text-[11px] uppercase tracking-[0.22em] text-white/60">
               Coastal Home Management 30A
@@ -181,7 +299,7 @@ export default function QrPage() {
               Artificial Rock Installation
             </h1>
 
-            <p className="mt-3 text-sm text-white/70 leading-6">
+            <p className="mt-3 text-sm leading-6 text-white/70">
               Hide exposed pipes and fixtures with a realistic, durable artificial
               rock. We’ll verify fit from your photo and schedule installation.
             </p>
@@ -192,7 +310,6 @@ export default function QrPage() {
               <li>• Designed to blend into coastal landscaping</li>
             </ul>
 
-            {/* Required TOS checkbox */}
             <label className="mt-5 flex items-start gap-3 text-xs text-white/70">
               <input
                 type="checkbox"
@@ -217,10 +334,8 @@ export default function QrPage() {
               disabled={disabled}
               className={[
                 "mt-5 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-black transition",
-                "hover:bg-white/90 disabled:opacity-60 disabled:cursor-not-allowed",
-                !disabled
-                  ? "motion-safe:animate-[pulse_2.2s_ease-in-out_infinite]"
-                  : "",
+                "hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60",
+                !disabled ? "motion-safe:animate-[pulse_2.2s_ease-in-out_infinite]" : "",
               ].join(" ")}
             >
               {loading ? "Redirecting…" : "Order"}
@@ -243,30 +358,95 @@ export default function QrPage() {
           </h2>
 
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/80">
-              “Fast, professional, and the process was simple.”
-              <div className="mt-4 text-xs uppercase tracking-[0.22em] text-white/50">
-                30A homeowner
+            {TESTIMONIALS.map((item) => (
+              <div
+                key={item.name}
+                className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-6 text-white/80"
+              >
+                <div>“{item.quote}”</div>
+                <div className="mt-4 text-xs uppercase tracking-[0.22em] text-white/50">
+                  {item.name} • {item.meta}
+                </div>
               </div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/80">
-              “Clear communication and high-quality work.”
-              <div className="mt-4 text-xs uppercase tracking-[0.22em] text-white/50">
-                Inlet Beach
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/80">
-              “The rock looks great and blends perfectly.”
-              <div className="mt-4 text-xs uppercase tracking-[0.22em] text-white/50">
-                Watersound
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
+        <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="text-[11px] uppercase tracking-[0.28em] text-white/60">
+            Not ready yet?
+          </div>
+          <h3 className="mt-2 text-2xl font-semibold tracking-tight">
+            Get exclusive offers and updates
+          </h3>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/70">
+            Join the list for discounts, special offers, and updates from Coastal Home
+            Management 30A.
+          </p>
+
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-white/60">
+                First name (optional)
+              </div>
+              <input
+                value={leadFirstName}
+                onChange={(e) => setLeadFirstName(e.target.value)}
+                placeholder="First name"
+                className="w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-3 text-sm text-white outline-none placeholder:text-white/35 transition focus:border-white/25 focus:bg-black/55"
+              />
+            </div>
+
+            <div>
+              <div className="mb-2 text-[11px] uppercase tracking-[0.22em] text-white/60">
+                Email
+              </div>
+              <input
+                value={leadEmail}
+                onChange={(e) => setLeadEmail(e.target.value)}
+                placeholder="you@email.com"
+                inputMode="email"
+                className="w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-3 text-sm text-white outline-none placeholder:text-white/35 transition focus:border-white/25 focus:bg-black/55"
+              />
+            </div>
+          </div>
+
+          <label className="mt-5 flex items-start gap-3 text-xs text-white/70">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 rounded border-white/30 bg-black/40"
+              checked={leadConsent}
+              onChange={(e) => setLeadConsent(e.target.checked)}
+            />
+            <span>
+              I agree to receive marketing emails, offers, and updates from Coastal
+              Home Management 30A.
+            </span>
+          </label>
+
+          <button
+            onClick={submitLead}
+            disabled={leadLoading}
+            className="mt-5 inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-white transition hover:bg-white/10 disabled:opacity-60"
+          >
+            {leadLoading ? "Submitting…" : "Sign up"}
+          </button>
+
+          {leadError ? (
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {leadError}
+            </div>
+          ) : null}
+
+          {leadSuccess ? (
+            <div className="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+              {leadSuccess}
+            </div>
+          ) : null}
+        </section>
+
         <footer className="mt-12 pb-6 text-center text-xs text-white/40">
-          © {new Date().getFullYear()} Coastal Home Management • Secure payments by
-          Stripe
+          © {new Date().getFullYear()} Coastal Home Management • Secure payments by Stripe
         </footer>
       </div>
     </main>

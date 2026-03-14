@@ -1,4 +1,3 @@
-// src/app/api/qr/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/server/stripe";
 import { sendPipePhotoEmail } from "@/lib/server/email";
@@ -33,7 +32,6 @@ function parseIsoToTimestamptz(value: string): string | null {
 }
 
 function getClientIp(req: NextRequest): string | null {
-  // Vercel / proxies commonly use x-forwarded-for (can be a list)
   const xff = req.headers.get("x-forwarded-for");
   if (xff) return xff.split(",")[0]?.trim() || null;
 
@@ -65,32 +63,77 @@ export async function POST(req: NextRequest) {
     const file = form.get("photo");
 
     if (!sessionId) {
-      return NextResponse.json({ ok: false, error: { message: "Missing sessionId" } }, { status: 400 });
-    }
-    if (!(file instanceof File)) {
-      return NextResponse.json({ ok: false, error: { message: "Missing photo" } }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing sessionId" } },
+        { status: 400 }
+      );
     }
 
-    if (!fullName) return NextResponse.json({ ok: false, error: { message: "Missing full name" } }, { status: 400 });
-    if (!emailRaw) return NextResponse.json({ ok: false, error: { message: "Missing email" } }, { status: 400 });
-    if (!phoneRaw) return NextResponse.json({ ok: false, error: { message: "Missing phone" } }, { status: 400 });
+    if (!(file instanceof File)) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing photo" } },
+        { status: 400 }
+      );
+    }
+
+    if (!fullName) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing full name" } },
+        { status: 400 }
+      );
+    }
+
+    if (!emailRaw) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing email" } },
+        { status: 400 }
+      );
+    }
+
+    if (!phoneRaw) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing phone" } },
+        { status: 400 }
+      );
+    }
 
     if (!address1 || !city || !stateRegion || !postalCode) {
-      return NextResponse.json({ ok: false, error: { message: "Missing service address" } }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing service address" } },
+        { status: 400 }
+      );
     }
 
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ ok: false, error: { message: "Photo must be an image" } }, { status: 400 });
-    }
-    const maxBytes = 7 * 1024 * 1024;
-    if (file.size > maxBytes) {
-      return NextResponse.json({ ok: false, error: { message: "Photo too large (max 7MB)" } }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: { message: "Photo must be an image" } },
+        { status: 400 }
+      );
     }
 
-    // Verify payment
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const maxBytes = 7 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Photo too large (max 7MB)" } },
+        { status: 400 }
+      );
+    }
+
+    let session;
+    try {
+      session = await stripe.checkout.sessions.retrieve(sessionId);
+    } catch {
+      return NextResponse.json(
+        { ok: false, error: { message: "Invalid or expired sessionId" } },
+        { status: 400 }
+      );
+    }
+
     if (session.payment_status !== "paid") {
-      return NextResponse.json({ ok: false, error: { message: "Payment not verified" } }, { status: 403 });
+      return NextResponse.json(
+        { ok: false, error: { message: "Payment not verified" } },
+        { status: 403 }
+      );
     }
 
     const orgId = env.DEFAULT_ORGANIZATION_ID;
@@ -98,8 +141,6 @@ export async function POST(req: NextRequest) {
     const rockColor = safe(session.metadata?.rock_color || session.metadata?.color || "unknown");
     const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
 
-    // ✅ TOS evidence (from Stripe metadata + request headers)
-    // IMPORTANT: This assumes your checkout route writes tos_* keys.
     const tosVersion = safe(session.metadata?.tos_version);
     const tosUrl = safe(session.metadata?.tos_url);
     const tosAcceptedAtIso = parseIsoToTimestamptz(String(session.metadata?.tos_accepted_at ?? ""));
@@ -116,14 +157,21 @@ export async function POST(req: NextRequest) {
     const email = (emailRaw || stripeEmail).trim().toLowerCase();
     const phone = (phoneRaw || stripePhone).trim();
 
-    const serviceAddressFromParts = [address1, address2, city, stateRegion, postalCode].filter(Boolean).join(", ");
+    const serviceAddressFromParts = [address1, address2, city, stateRegion, postalCode]
+      .filter(Boolean)
+      .join(", ");
+
     const serviceAddress = (serviceAddressFromParts || shipAddr || stripeAddr).trim();
 
     const stripeCustomerId = (session.customer as string | null) ?? null;
     const stripePaymentIntentId = (session.payment_intent as string | null) ?? null;
     const totalCents = typeof session.amount_total === "number" ? session.amount_total : 0;
 
-    // Upsert client by email
+    const campaignId = safe(session.metadata?.campaign_id);
+    const campaignCode = safe(session.metadata?.campaign_code);
+    const landingPath = safe(session.metadata?.landing_path || "/qr");
+    const browserSessionKey = safe(session.metadata?.browser_session_key);
+
     const existingClient = await sql`
       SELECT id, name, email, phone, address_text, stripe_customer_id
       FROM admin_clients
@@ -164,7 +212,6 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    // Create/update order by stripe_session_id
     const existingOrder = await sql`
       SELECT id
       FROM admin_orders
@@ -175,7 +222,7 @@ export async function POST(req: NextRequest) {
     const orderId = existingOrder.length ? existingOrder[0].id : crypto.randomUUID();
 
     if (existingOrder.length === 0) {
-      await sql`
+        await sql`
         INSERT INTO admin_orders (
           id,
           organization_id,
@@ -193,7 +240,11 @@ export async function POST(req: NextRequest) {
           customer_email,
           customer_phone,
           service_address,
-
+          campaign_id,
+          campaign_code,
+          landing_path,
+          browser_session_key,
+          paid_at,
           tos_version,
           tos_url,
           tos_accepted_at,
@@ -218,7 +269,11 @@ export async function POST(req: NextRequest) {
           ${email},
           ${phone},
           ${serviceAddress},
-
+          ${campaignId || null},
+          ${campaignCode || null},
+          ${landingPath || null},
+          ${browserSessionKey || null},
+          NOW(),
           ${tosVersion || null},
           ${tosUrl || null},
           ${tosAcceptedAtIso},
@@ -228,7 +283,7 @@ export async function POST(req: NextRequest) {
         )
       `;
     } else {
-      await sql`
+        await sql`
         UPDATE admin_orders
         SET
           client_id = ${clientId},
@@ -244,43 +299,62 @@ export async function POST(req: NextRequest) {
           customer_email = ${email},
           customer_phone = ${phone},
           service_address = ${serviceAddress},
-
+          campaign_id = COALESCE(${campaignId || null}, campaign_id),
+          campaign_code = COALESCE(${campaignCode || null}, campaign_code),
+          landing_path = COALESCE(${landingPath || null}, landing_path),
+          browser_session_key = COALESCE(${browserSessionKey || null}, browser_session_key),
+          paid_at = COALESCE(paid_at, NOW()),
           tos_version = ${tosVersion || null},
           tos_url = ${tosUrl || null},
           tos_accepted_at = ${tosAcceptedAtIso},
           tos_ip = ${tosIp},
           tos_user_agent = ${tosUserAgent},
           tos_text_hash = ${tosTextHash || null},
-
           updated_at = NOW()
         WHERE organization_id = ${orgId} AND stripe_session_id = ${sessionId}
       `;
     }
 
-    // Email you the photo + details
+    const existingPhotos = await sql`
+      SELECT COUNT(*)::int AS photo_count
+      FROM admin_order_photos
+      WHERE organization_id = ${orgId}
+        AND order_id = ${orderId}
+    `;
+
+    const alreadySubmitted = Number(existingPhotos[0]?.photo_count ?? 0) > 0;
+
+    if (alreadySubmitted) {
+      return NextResponse.json({
+        ok: true,
+        data: {
+          clientId,
+          orderId,
+          alreadySubmitted: true,
+        },
+      });
+    }
+
     const buf = Buffer.from(await file.arrayBuffer());
     const base64 = buf.toString("base64");
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    // ✅ Save the uploaded photo to admin_order_photos so the Portal can show it.
-// NOTE: this stores a data URL in Postgres. Works now; later we can move to S3/Blob.
-const dataUrl = `data:${file.type};base64,${base64}`;
-
-await sql`
-  INSERT INTO admin_order_photos (
-    id,
-    organization_id,
-    order_id,
-    url,
-    caption
-  )
-  VALUES (
-    ${crypto.randomUUID()},
-    ${orgId},
-    ${orderId},
-    ${dataUrl},
-    ${"QR upload"}
-  )
-`;
+    await sql`
+      INSERT INTO admin_order_photos (
+        id,
+        organization_id,
+        order_id,
+        url,
+        caption
+      )
+      VALUES (
+        ${crypto.randomUUID()},
+        ${orgId},
+        ${orderId},
+        ${dataUrl},
+        ${"QR upload"}
+      )
+    `;
 
     await sendPipePhotoEmail({
       subject: `New Rock Order — ${rockColor.toUpperCase()}`,
@@ -305,7 +379,72 @@ await sql`
       attachmentBase64: base64,
     });
 
-    return NextResponse.json({ ok: true, data: { clientId, orderId } });
+       await sql`
+      UPDATE admin_orders
+      SET
+        upload_completed_at = NOW(),
+        updated_at = NOW()
+      WHERE organization_id = ${orgId}
+        AND id = ${orderId}
+    `;
+
+    const campaignRows = await sql`
+      SELECT campaign_id, campaign_code, browser_session_key, landing_path
+      FROM admin_orders
+      WHERE organization_id = ${orgId}
+        AND id = ${orderId}
+      LIMIT 1
+    `;
+
+    const alreadyHasUploadEvent = await sql`
+  SELECT id
+  FROM marketing_campaign_events
+  WHERE organization_id = ${orgId}
+    AND order_id = ${orderId}
+    AND event_type = ${"upload_completed"}
+  LIMIT 1
+`;
+
+    const campaignOrder = campaignRows[0];
+
+    if (
+        (campaignOrder?.campaign_id || campaignOrder?.campaign_code) &&
+        !alreadyHasUploadEvent[0]
+      ) {
+      await sql`
+        INSERT INTO marketing_campaign_events (
+          id,
+          organization_id,
+          campaign_id,
+          campaign_code,
+          session_key,
+          event_type,
+          page_path,
+          order_id,
+          metadata_json
+        )
+        VALUES (
+          ${crypto.randomUUID()},
+          ${orgId},
+          ${campaignOrder.campaign_id || null},
+          ${campaignOrder.campaign_code || null},
+          ${campaignOrder.browser_session_key || null},
+          ${"upload_completed"},
+          ${campaignOrder.landing_path || "/qr"},
+          ${orderId},
+          ${JSON.stringify({ fullName, email })}
+        )
+      `;
+    }
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        clientId,
+        orderId,
+        alreadySubmitted: false,
+      },
+    });
   } catch (e) {
     return NextResponse.json(
       { ok: false, error: { message: e instanceof Error ? e.message : "Upload failed" } },

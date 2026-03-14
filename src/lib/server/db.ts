@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 11;
+const ADMIN_SCHEMA_VERSION = 13;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -292,6 +292,96 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_text_hash TEXT`;
 
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_tos_idx
   ON admin_orders (organization_id, tos_accepted_at)`;
+
+  await tx`CREATE TABLE IF NOT EXISTS marketing_campaigns (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    campaign_code TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT 'flyer',
+    landing_path TEXT NOT NULL DEFAULT '/qr',
+    flyers_sent INTEGER NOT NULL DEFAULT 0,
+    print_cost_cents INTEGER NOT NULL DEFAULT 0,
+    distribution_cost_cents INTEGER NOT NULL DEFAULT 0,
+    notes TEXT,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`;
+  
+  await tx`CREATE UNIQUE INDEX IF NOT EXISTS marketing_campaigns_org_code_uq
+    ON marketing_campaigns (organization_id, campaign_code)`;
+  
+  await tx`CREATE INDEX IF NOT EXISTS marketing_campaigns_org_created_idx
+    ON marketing_campaigns (organization_id, created_at DESC)`;
+  
+  await tx`CREATE TABLE IF NOT EXISTS marketing_campaign_events (
+    id TEXT PRIMARY KEY,
+    organization_id TEXT NOT NULL,
+    campaign_id TEXT,
+    campaign_code TEXT,
+    session_key TEXT,
+    event_type TEXT NOT NULL,
+    page_path TEXT,
+    order_id TEXT,
+    metadata_json JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`;
+  
+  await tx`CREATE INDEX IF NOT EXISTS marketing_campaign_events_org_type_idx
+    ON marketing_campaign_events (organization_id, event_type, created_at DESC)`;
+  
+  await tx`CREATE INDEX IF NOT EXISTS marketing_campaign_events_campaign_idx
+    ON marketing_campaign_events (organization_id, campaign_id, created_at DESC)`;
+
+    await tx`CREATE TABLE IF NOT EXISTS marketing_email_leads (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      campaign_id TEXT,
+      campaign_code TEXT,
+      session_key TEXT,
+      first_name TEXT,
+      email TEXT NOT NULL,
+      consent_text TEXT,
+      consent_at TIMESTAMPTZ,
+      source_page TEXT,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`;
+    
+    await tx`CREATE UNIQUE INDEX IF NOT EXISTS marketing_email_leads_org_email_uq
+      ON marketing_email_leads (organization_id, lower(email))`;
+    
+    await tx`CREATE INDEX IF NOT EXISTS marketing_email_leads_campaign_idx
+      ON marketing_email_leads (organization_id, campaign_id, created_at DESC)`;
+  
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_id TEXT`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_code TEXT`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS landing_path TEXT`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS browser_session_key TEXT`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS first_touch_at TIMESTAMPTZ`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS checkout_started_at TIMESTAMPTZ`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS upload_completed_at TIMESTAMPTZ`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS used_promotion_code BOOLEAN NOT NULL DEFAULT FALSE`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS promotion_code TEXT`;
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS discount_amount_cents INTEGER NOT NULL DEFAULT 0`;
+  
+  await tx`CREATE INDEX IF NOT EXISTS admin_orders_campaign_idx
+    ON admin_orders (organization_id, campaign_id, created_at DESC)`;
+  
+  await tx`CREATE INDEX IF NOT EXISTS admin_orders_campaign_code_idx
+    ON admin_orders (organization_id, campaign_code, created_at DESC)`;
+
+  await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_code TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_coupon_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promotion_code_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promo_code_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_created_at TIMESTAMPTZ`;
+
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_referral_code_idx
+  ON admin_orders (organization_id, referral_code)`;
 
     await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
 

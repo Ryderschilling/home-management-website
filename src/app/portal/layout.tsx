@@ -9,6 +9,7 @@ const navItems = [
   { href: "/portal/clients", label: "Clients" },
   { href: "/portal/services", label: "Services" },
   { href: "/portal/orders", label: "Orders" },
+  { href: "/portal/campaigns", label: "Campaigns" },
 ];
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
