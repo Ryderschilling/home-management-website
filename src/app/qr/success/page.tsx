@@ -200,25 +200,27 @@ const [notes, setNotes] = useState("");
           </Link>
 
           <Link
-            href="/"
-            className={[
-              "inline-flex items-center justify-center rounded-full border border-white/20 px-4 text-xs font-medium uppercase tracking-[0.22em] text-white/85 transition hover:bg-white/10",
-              scrolled ? "py-2" : "py-2.5",
-            ].join(" ")}
-          >
-            Home
-          </Link>
+  href="/"
+  className={[
+    "inline-flex items-center justify-center rounded-full border border-white/20 px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-white/85 transition hover:bg-white/10 sm:px-4 sm:text-xs sm:tracking-[0.22em]",
+    scrolled ? "py-2" : "py-2.5",
+  ].join(" ")}
+>
+  Home
+</Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-3xl px-5 pb-16 pt-10">
-        <div className="mx-auto max-w-xl">
+      <div className="mx-auto max-w-3xl px-4 pb-14 pt-8 sm:px-5 sm:pb-16 sm:pt-10">
+      <div className="mx-auto max-w-2xl">
           <div className="text-center">
-            <h1 className="text-3xl font-semibold tracking-tight">Payment received</h1>
-            <p className="mx-auto mt-3 max-w-[46ch] text-sm leading-6 text-white/70">
-              Enter your contact info and installation address, then upload a photo so
-              we can confirm fit and schedule installation.
-            </p>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+  Payment received
+</h1>
+<p className="mx-auto mt-3 max-w-[46ch] text-sm leading-6 text-white/70 sm:text-[15px]">
+  Upload a photo and dimensions of your backflow pipe, then confirm your contact
+  and installation details so we can verify fit and schedule installation.
+</p>
             {prefillLoading ? (
               <p className="mt-3 text-xs uppercase tracking-[0.22em] text-white/45">
                 Loading your checkout details…
@@ -226,100 +228,111 @@ const [notes, setNotes] = useState("");
             ) : null}
           </div>
 
-          <section className="mt-8 rounded-[26px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_18px_60px_rgba(0,0,0,0.45)]">
-            {!sessionId ? (
+          <section className="mt-8 rounded-[24px] border border-white/10 bg-white/[0.04] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:rounded-[26px] sm:p-6">
+          {!sessionId ? (
               <div className="mb-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                 Missing session_id. Please return to the checkout confirmation link.
               </div>
             ) : null}
 
 <div className="space-y-7">
-  <div>
-    <div className={sectionTitle()}>Photo</div>
-    <div className="mt-3">
-      <div className={labelClass()}>Upload photo (required)</div>
+<div>
+  <div className={sectionTitle()}>Required fit details</div>
+
+  <div className="mt-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
+    <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
+      Please upload a photo and dimensions of your backflow pipe
+    </h2>
+
+    <p className="mt-2 text-sm leading-6 text-white/80">
+      This is required so we can verify the correct fit and order the right rock
+      size for your installation.
+    </p>
+
+    <div className="mt-5">
+      <div className={labelClass()}>Upload pipe photo (required)</div>
       <input
         className={[
           inputClass(),
-          "file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white hover:file:bg-white/15",
+          "mt-2 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white hover:file:bg-white/15",
         ].join(" ")}
         type="file"
         accept="image/*"
         onChange={(e) => setFile(e.target.files?.[0] ?? null)}
       />
-      <p className="mt-3 text-xs leading-5 text-white/45">
-        This photo is the most important step. We use it to confirm fit and order
-        the correct rock for your setup.
-      </p>
-
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-  <div>
-    <div className={labelClass()}>Pipe height (inches)</div>
-    <input
-      className={inputClass()}
-      value={pipeHeight}
-      onChange={(e) => setPipeHeight(e.target.value)}
-      placeholder="Example: 12"
-      inputMode="decimal"
-    />
-  </div>
-
-  <div>
-    <div className={labelClass()}>Pipe width (inches)</div>
-    <input
-      className={inputClass()}
-      value={pipeWidth}
-      onChange={(e) => setPipeWidth(e.target.value)}
-      placeholder="Example: 8"
-      inputMode="decimal"
-    />
-  </div>
-</div>
-
     </div>
-  </div>
 
-  <div>
-    <div className={sectionTitle()}>Contact</div>
-    <div className="mt-3 grid grid-cols-1 gap-4">
+    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div>
-        <div className={labelClass()}>Full name</div>
+        <div className={labelClass()}>Backflow pipe height (inches)</div>
         <input
-          className={inputClass()}
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="First and last name"
-          autoComplete="name"
+          className={`${inputClass()} mt-2`}
+          value={pipeHeight}
+          onChange={(e) => setPipeHeight(e.target.value)}
+          placeholder="Example: 12"
+          inputMode="decimal"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <div className={labelClass()}>Email</div>
-          <input
-            className={inputClass()}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@email.com"
-            inputMode="email"
-            autoComplete="email"
-          />
-        </div>
+      <div>
+        <div className={labelClass()}>Backflow pipe width (inches)</div>
+        <input
+          className={`${inputClass()} mt-2`}
+          value={pipeWidth}
+          onChange={(e) => setPipeWidth(e.target.value)}
+          placeholder="Example: 8"
+          inputMode="decimal"
+        />
+      </div>
+    </div>
 
-        <div>
-          <div className={labelClass()}>Phone</div>
-          <input
-            className={inputClass()}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="(555) 555-5555"
-            inputMode="tel"
-            autoComplete="tel"
-          />
-        </div>
+    <p className="mt-4 text-xs leading-5 text-white/60">
+      Measure the tallest point and widest point you want covered.
+    </p>
+  </div>
+</div>
+
+<div>
+  <div className={sectionTitle()}>Contact</div>
+  <div className="mt-3 grid grid-cols-1 gap-4">
+    <div>
+      <div className={labelClass()}>Full name</div>
+      <input
+        className={inputClass()}
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+        placeholder="First and last name"
+        autoComplete="name"
+      />
+    </div>
+
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div>
+        <div className={labelClass()}>Email</div>
+        <input
+          className={inputClass()}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@email.com"
+          inputMode="email"
+          autoComplete="email"
+        />
+      </div>
+
+      <div>
+        <div className={labelClass()}>Phone</div>
+        <input
+          className={inputClass()}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="(555) 555-5555"
+          inputMode="tel"
+          autoComplete="tel"
+        />
       </div>
     </div>
   </div>
+</div>
 
   <div>
     <div className={sectionTitle()}>Installation address</div>
@@ -347,7 +360,7 @@ const [notes, setNotes] = useState("");
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div>
           <div className={labelClass()}>City</div>
           <input
