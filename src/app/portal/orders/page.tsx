@@ -14,7 +14,9 @@ type Order = {
   client_phone?: string | null;
   client_address?: string | null;
   service_address?: string | null;
-  product_key?: string | null;
+pipe_height_inches?: string | null;
+pipe_width_inches?: string | null;
+product_key?: string | null;
   rock_color?: string | null;
   stripe_session_id?: string | null;
   notes?: string | null;
@@ -172,7 +174,6 @@ export default function PortalOrdersPage() {
       canceledCount: 0,
       needsAttention: 0,
       totalRevenue: 0,
-      estimatedProfit: 0,
     };
 
     for (const o of orders) {
@@ -189,7 +190,6 @@ export default function PortalOrdersPage() {
       base.totalRevenue += amount;
     }
 
-    base.estimatedProfit = Math.round(base.totalRevenue * 0.55);
     return base;
   }, [orders]);
 
@@ -319,11 +319,6 @@ export default function PortalOrdersPage() {
             <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">Revenue</div>
             <div className="mt-2 text-2xl font-semibold text-stone-900">{money(stats.totalRevenue)}</div>
           </div>
-
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 px-5 py-4">
-            <div className="text-[11px] uppercase tracking-[0.22em] text-stone-500">Est. Profit</div>
-            <div className="mt-2 text-2xl font-semibold text-stone-900">{money(stats.estimatedProfit)}</div>
-          </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-3 lg:grid-cols-[180px_minmax(0,1fr)]">
@@ -443,8 +438,12 @@ export default function PortalOrdersPage() {
                           <div className="mt-1 text-sm text-stone-600">{customerEmail}</div>
                           <div className="mt-1 text-sm text-stone-600">{customerPhone}</div>
                           <div className="mt-2 text-sm text-stone-500">
-                            {o.service_address || o.client_address || "—"}
-                          </div>
+  {o.service_address || o.client_address || "—"}
+</div>
+
+<div className="mt-2 text-sm text-stone-500">
+  Pipe: {o.pipe_height_inches || "—"} in × {o.pipe_width_inches || "—"} in
+</div>
                         </div>
                       </td>
 

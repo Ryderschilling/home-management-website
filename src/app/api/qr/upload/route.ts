@@ -55,12 +55,15 @@ export async function POST(req: NextRequest) {
     const phoneRaw = safe(form.get("phone"));
 
     const address1 = safe(form.get("address1"));
-    const address2 = safe(form.get("address2"));
-    const city = safe(form.get("city"));
-    const stateRegion = safe(form.get("state"));
-    const postalCode = safe(form.get("postalCode"));
+const address2 = safe(form.get("address2"));
+const city = safe(form.get("city"));
+const stateRegion = safe(form.get("state"));
+const postalCode = safe(form.get("postalCode"));
 
-    const file = form.get("photo");
+const pipeHeight = safe(form.get("pipeHeight"));
+const pipeWidth = safe(form.get("pipeWidth"));
+
+const file = form.get("photo");
 
     if (!sessionId) {
       return NextResponse.json(
@@ -98,11 +101,19 @@ export async function POST(req: NextRequest) {
     }
 
     if (!address1 || !city || !stateRegion || !postalCode) {
-      return NextResponse.json(
-        { ok: false, error: { message: "Missing service address" } },
-        { status: 400 }
-      );
-    }
+        return NextResponse.json(
+          { ok: false, error: { message: "Missing service address" } },
+          { status: 400 }
+        );
+      }
+
+
+    if (!pipeHeight || !pipeWidth) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Missing pipe height or width" } },
+          { status: 400 }
+        );
+      }
 
     if (!file.type.startsWith("image/")) {
       return NextResponse.json(
@@ -237,10 +248,12 @@ export async function POST(req: NextRequest) {
           product_key,
           rock_color,
           customer_name,
-          customer_email,
-          customer_phone,
-          service_address,
-          campaign_id,
+customer_email,
+customer_phone,
+service_address,
+pipe_height_inches,
+pipe_width_inches,
+campaign_id,
           campaign_code,
           landing_path,
           browser_session_key,
@@ -269,6 +282,8 @@ export async function POST(req: NextRequest) {
           ${email},
           ${phone},
           ${serviceAddress},
+          ${pipeHeight},
+          ${pipeWidth},
           ${campaignId || null},
           ${campaignCode || null},
           ${landingPath || null},
@@ -296,10 +311,12 @@ export async function POST(req: NextRequest) {
           product_key = ${productKey},
           rock_color = ${rockColor},
           customer_name = ${fullName},
-          customer_email = ${email},
-          customer_phone = ${phone},
-          service_address = ${serviceAddress},
-          campaign_id = COALESCE(${campaignId || null}, campaign_id),
+customer_email = ${email},
+customer_phone = ${phone},
+service_address = ${serviceAddress},
+pipe_height_inches = ${pipeHeight},
+pipe_width_inches = ${pipeWidth},
+campaign_id = COALESCE(${campaignId || null}, campaign_id),
           campaign_code = COALESCE(${campaignCode || null}, campaign_code),
           landing_path = COALESCE(${landingPath || null}, landing_path),
           browser_session_key = COALESCE(${browserSessionKey || null}, browser_session_key),
@@ -363,9 +380,11 @@ export async function POST(req: NextRequest) {
         <p><strong>Color:</strong> ${rockColor}</p>
         <p><strong>Name:</strong> ${fullName}</p>
         <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Service address:</strong><br/>${serviceAddress.replaceAll(", ", "<br/>")}</p>
-        <p><strong>Stripe session:</strong> ${sessionId}</p>
+<p><strong>Phone:</strong> ${phone}</p>
+<p><strong>Pipe height:</strong> ${pipeHeight} in</p>
+<p><strong>Pipe width:</strong> ${pipeWidth} in</p>
+<p><strong>Service address:</strong><br/>${serviceAddress.replaceAll(", ", "<br/>")}</p>
+<p><strong>Stripe session:</strong> ${sessionId}</p>
         <p><strong>Order id:</strong> ${orderId}</p>
         <p><strong>Notes:</strong><br/>${notes ? notes.replaceAll("\n", "<br/>") : "—"}</p>
         <hr/>

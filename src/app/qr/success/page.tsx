@@ -54,7 +54,9 @@ function QrSuccessPageInner() {
   const [postalCode, setPostalCode] = useState("");
 
   const [file, setFile] = useState<File | null>(null);
-  const [notes, setNotes] = useState("");
+const [pipeHeight, setPipeHeight] = useState("");
+const [pipeWidth, setPipeWidth] = useState("");
+const [notes, setNotes] = useState("");
 
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [error, setError] = useState("");
@@ -110,6 +112,8 @@ function QrSuccessPageInner() {
   const disabled = useMemo(() => {
     if (!sessionId) return true;
     if (!file) return true;
+    if (!pipeHeight.trim()) return true;
+    if (!pipeWidth.trim()) return true;
     if (!fullName.trim()) return true;
     if (!email.trim()) return true;
     if (!phone.trim()) return true;
@@ -121,6 +125,8 @@ function QrSuccessPageInner() {
   }, [
     sessionId,
     file,
+    pipeHeight,
+    pipeWidth,
     fullName,
     email,
     phone,
@@ -137,21 +143,26 @@ function QrSuccessPageInner() {
     setError("");
     setStatus("uploading");
 
+
+    
     try {
-      const fd = new FormData();
-      fd.append("sessionId", sessionId);
-      fd.append("photo", file as File);
-      fd.append("notes", notes);
-
-      fd.append("fullName", fullName.trim());
-      fd.append("email", email.trim());
-      fd.append("phone", phone.trim());
-
-      fd.append("address1", address1.trim());
-      fd.append("address2", address2.trim());
-      fd.append("city", city.trim());
-      fd.append("state", stateRegion.trim());
-      fd.append("postalCode", postalCode.trim());
+        const fd = new FormData();
+        fd.append("sessionId", sessionId);
+        fd.append("photo", file as File);
+        fd.append("notes", notes);
+        
+        fd.append("pipeHeight", pipeHeight.trim());
+        fd.append("pipeWidth", pipeWidth.trim());
+        
+        fd.append("fullName", fullName.trim());
+        fd.append("email", email.trim());
+        fd.append("phone", phone.trim());
+        
+        fd.append("address1", address1.trim());
+        fd.append("address2", address2.trim());
+        fd.append("city", city.trim());
+        fd.append("state", stateRegion.trim());
+        fd.append("postalCode", postalCode.trim());
 
       const res = await fetch("/api/qr/upload", { method: "POST", body: fd });
       const json = await res.json();
@@ -240,6 +251,31 @@ function QrSuccessPageInner() {
         This photo is the most important step. We use it to confirm fit and order
         the correct rock for your setup.
       </p>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+  <div>
+    <div className={labelClass()}>Pipe height (inches)</div>
+    <input
+      className={inputClass()}
+      value={pipeHeight}
+      onChange={(e) => setPipeHeight(e.target.value)}
+      placeholder="Example: 12"
+      inputMode="decimal"
+    />
+  </div>
+
+  <div>
+    <div className={labelClass()}>Pipe width (inches)</div>
+    <input
+      className={inputClass()}
+      value={pipeWidth}
+      onChange={(e) => setPipeWidth(e.target.value)}
+      placeholder="Example: 8"
+      inputMode="decimal"
+    />
+  </div>
+</div>
+
     </div>
   </div>
 

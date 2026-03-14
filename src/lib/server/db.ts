@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 13;
+const ADMIN_SCHEMA_VERSION = 14;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -264,6 +264,8 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_name TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_email TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS customer_phone TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS service_address TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS pipe_height_inches TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS pipe_width_inches TEXT`;
 
 await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS address_text TEXT`;
 await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
