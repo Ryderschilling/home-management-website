@@ -184,7 +184,7 @@ const [notes, setNotes] = useState("");
       <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur">
         <div
           className={[
-            "mx-auto flex max-w-5xl items-center justify-between px-5 transition-all",
+"mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-5 transition-all",
             scrolled ? "py-2" : "py-4",
           ].join(" ")}
         >
