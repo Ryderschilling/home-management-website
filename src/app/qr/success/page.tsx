@@ -54,9 +54,9 @@ function QrSuccessPageInner() {
   const [postalCode, setPostalCode] = useState("");
 
   const [file, setFile] = useState<File | null>(null);
-const [pipeHeight, setPipeHeight] = useState("");
-const [pipeWidth, setPipeWidth] = useState("");
-const [notes, setNotes] = useState("");
+  const [pipeHeight, setPipeHeight] = useState("");
+  const [pipeWidth, setPipeWidth] = useState("");
+  const [notes, setNotes] = useState("");
 
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [error, setError] = useState("");
@@ -111,58 +111,66 @@ const [notes, setNotes] = useState("");
 
   const disabled = useMemo(() => {
     if (!sessionId) return true;
-    if (!file) return true;
-    if (!pipeHeight.trim()) return true;
-    if (!pipeWidth.trim()) return true;
-    if (!fullName.trim()) return true;
-    if (!email.trim()) return true;
-    if (!phone.trim()) return true;
-    if (!address1.trim()) return true;
-    if (!city.trim()) return true;
-    if (!stateRegion.trim()) return true;
-    if (!postalCode.trim()) return true;
     return status === "uploading";
-  }, [
-    sessionId,
-    file,
-    pipeHeight,
-    pipeWidth,
-    fullName,
-    email,
-    phone,
-    address1,
-    city,
-    stateRegion,
-    postalCode,
-    status,
-  ]);
+  }, [sessionId, status]);
 
   async function submit() {
-    if (disabled) return;
-
     setError("");
+
+    if (!sessionId) return;
+
+    if (!file) {
+      setError("Please upload a photo of your backflow pipe before continuing.");
+      setStatus("error");
+      document.getElementById("fit-details")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+
+    if (!pipeHeight.trim() || !pipeWidth.trim()) {
+      setError("Please enter the height and width of your backflow pipe.");
+      setStatus("error");
+      document.getElementById("fit-details")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+
+    if (!fullName.trim() || !email.trim() || !phone.trim()) {
+      setError("Please confirm your contact information before continuing.");
+      setStatus("error");
+      return;
+    }
+
+    if (!address1.trim() || !city.trim() || !stateRegion.trim() || !postalCode.trim()) {
+      setError("Please confirm your installation address before continuing.");
+      setStatus("error");
+      return;
+    }
+
     setStatus("uploading");
 
-
-    
     try {
-        const fd = new FormData();
-        fd.append("sessionId", sessionId);
-        fd.append("photo", file as File);
-        fd.append("notes", notes);
-        
-        fd.append("pipeHeight", pipeHeight.trim());
-        fd.append("pipeWidth", pipeWidth.trim());
-        
-        fd.append("fullName", fullName.trim());
-        fd.append("email", email.trim());
-        fd.append("phone", phone.trim());
-        
-        fd.append("address1", address1.trim());
-        fd.append("address2", address2.trim());
-        fd.append("city", city.trim());
-        fd.append("state", stateRegion.trim());
-        fd.append("postalCode", postalCode.trim());
+      const fd = new FormData();
+      fd.append("sessionId", sessionId);
+      fd.append("photo", file as File);
+      fd.append("notes", notes);
+
+      fd.append("pipeHeight", pipeHeight.trim());
+      fd.append("pipeWidth", pipeWidth.trim());
+
+      fd.append("fullName", fullName.trim());
+      fd.append("email", email.trim());
+      fd.append("phone", phone.trim());
+
+      fd.append("address1", address1.trim());
+      fd.append("address2", address2.trim());
+      fd.append("city", city.trim());
+      fd.append("state", stateRegion.trim());
+      fd.append("postalCode", postalCode.trim());
 
       const res = await fetch("/api/qr/upload", { method: "POST", body: fd });
       const json = await res.json();
@@ -184,7 +192,7 @@ const [notes, setNotes] = useState("");
       <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur">
         <div
           className={[
-"mx-auto flex max-w-5xl items-center justify-between px-4 sm:px-5 transition-all",
+            "mx-auto flex max-w-5xl items-center justify-between px-4 transition-all sm:px-5",
             scrolled ? "py-2" : "py-4",
           ].join(" ")}
         >
@@ -200,27 +208,28 @@ const [notes, setNotes] = useState("");
           </Link>
 
           <Link
-  href="/"
-  className={[
-    "inline-flex items-center justify-center rounded-full border border-white/20 px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-white/85 transition hover:bg-white/10 sm:px-4 sm:text-xs sm:tracking-[0.22em]",
-    scrolled ? "py-2" : "py-2.5",
-  ].join(" ")}
->
-  Home
-</Link>
+            href="/"
+            className={[
+              "inline-flex items-center justify-center rounded-full border border-white/20 px-3 text-[10px] font-medium uppercase tracking-[0.18em] text-white/85 transition hover:bg-white/10 sm:px-4 sm:text-xs sm:tracking-[0.22em]",
+              scrolled ? "py-2" : "py-2.5",
+            ].join(" ")}
+          >
+            Home
+          </Link>
         </div>
       </header>
 
       <div className="mx-auto max-w-3xl px-4 pb-14 pt-8 sm:px-5 sm:pb-16 sm:pt-10">
-      <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-  Payment received
-</h1>
-<p className="mx-auto mt-3 max-w-[46ch] text-sm leading-6 text-white/70 sm:text-[15px]">
-  Upload a photo and dimensions of your backflow pipe, then confirm your contact
-  and installation details so we can verify fit and schedule installation.
-</p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Payment received
+            </h1>
+            <p className="mx-auto mt-3 max-w-[46ch] text-sm leading-6 text-white/70 sm:text-[15px]">
+              Upload a photo and dimensions of your backflow pipe, then confirm your
+              contact and installation details so we can verify fit and schedule
+              installation.
+            </p>
             {prefillLoading ? (
               <p className="mt-3 text-xs uppercase tracking-[0.22em] text-white/45">
                 Loading your checkout details…
@@ -229,204 +238,223 @@ const [notes, setNotes] = useState("");
           </div>
 
           <section className="mt-8 rounded-[24px] border border-white/10 bg-white/[0.04] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:rounded-[26px] sm:p-6">
-          {!sessionId ? (
+            {!sessionId ? (
               <div className="mb-5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                 Missing session_id. Please return to the checkout confirmation link.
               </div>
             ) : null}
 
-<div className="space-y-7">
-<div>
-  <div className={sectionTitle()}>Required fit details</div>
+            <div className="space-y-7">
+              <div id="fit-details">
+                <div className={sectionTitle()}>Required fit details</div>
 
-  <div className="mt-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
-    <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
-      Please upload a photo and dimensions of your backflow pipe
-    </h2>
+                <div className="mt-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
+                  <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
+                    Please upload a photo and dimensions of your backflow pipe
+                  </h2>
 
-    <p className="mt-2 text-sm leading-6 text-white/80">
-      This is required so we can verify the correct fit and order the right rock
-      size for your installation.
-    </p>
+                  <p className="mt-2 text-sm leading-6 text-white/80">
+                    This is required so we can verify the correct fit and order the
+                    right rock size for your installation.
+                  </p>
 
-    <div className="mt-5">
-      <div className={labelClass()}>Upload pipe photo (required)</div>
-      <input
-        className={[
-          inputClass(),
-          "mt-2 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white hover:file:bg-white/15",
-        ].join(" ")}
-        type="file"
-        accept="image/*"
-        onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-      />
-    </div>
+                  <div className="mt-5">
+                    <div className={labelClass()}>Upload pipe photo (required)</div>
+                    <input
+                      className={[
+                        inputClass(),
+                        "mt-2 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white hover:file:bg-white/15",
+                      ].join(" ")}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                    />
+                  </div>
 
-    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <div className={labelClass()}>Backflow pipe height (inches)</div>
-        <input
-          className={`${inputClass()} mt-2`}
-          value={pipeHeight}
-          onChange={(e) => setPipeHeight(e.target.value)}
-          placeholder="Example: 12"
-          inputMode="decimal"
-        />
-      </div>
+                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <div className={labelClass()}>Backflow pipe height (inches)</div>
+                      <input
+                        className={`${inputClass()} mt-2`}
+                        value={pipeHeight}
+                        onChange={(e) => setPipeHeight(e.target.value)}
+                        placeholder="Example: 12"
+                        inputMode="decimal"
+                      />
+                    </div>
 
-      <div>
-        <div className={labelClass()}>Backflow pipe width (inches)</div>
-        <input
-          className={`${inputClass()} mt-2`}
-          value={pipeWidth}
-          onChange={(e) => setPipeWidth(e.target.value)}
-          placeholder="Example: 8"
-          inputMode="decimal"
-        />
-      </div>
-    </div>
+                    <div>
+                      <div className={labelClass()}>Backflow pipe width (inches)</div>
+                      <input
+                        className={`${inputClass()} mt-2`}
+                        value={pipeWidth}
+                        onChange={(e) => setPipeWidth(e.target.value)}
+                        placeholder="Example: 8"
+                        inputMode="decimal"
+                      />
+                    </div>
+                  </div>
 
-    <p className="mt-4 text-xs leading-5 text-white/60">
-      Measure the tallest point and widest point you want covered.
-    </p>
-  </div>
-</div>
+                  <p className="mt-4 text-xs leading-5 text-white/60">
+                    Measure the tallest point and widest point you want covered.
+                  </p>
+                </div>
+              </div>
 
-<div>
-  <div className={sectionTitle()}>Contact</div>
-  <div className="mt-3 grid grid-cols-1 gap-4">
-    <div>
-      <div className={labelClass()}>Full name</div>
-      <input
-        className={inputClass()}
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        placeholder="First and last name"
-        autoComplete="name"
-      />
-    </div>
+              {status === "error" && error ? (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {error}
+                </div>
+              ) : null}
 
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div>
-        <div className={labelClass()}>Email</div>
-        <input
-          className={inputClass()}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@email.com"
-          inputMode="email"
-          autoComplete="email"
-        />
-      </div>
+              <details className="rounded-2xl border border-white/10 bg-white/[0.03]">
+                <summary className="cursor-pointer list-none px-4 py-4 sm:px-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <div className={sectionTitle()}>Saved contact & address</div>
+                      <p className="mt-2 text-sm text-white/65">
+                        Your checkout details are already filled in. Open this section
+                        only if you need to edit them.
+                      </p>
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/45">
+                      Edit
+                    </div>
+                  </div>
+                </summary>
 
-      <div>
-        <div className={labelClass()}>Phone</div>
-        <input
-          className={inputClass()}
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="(555) 555-5555"
-          inputMode="tel"
-          autoComplete="tel"
-        />
-      </div>
-    </div>
-  </div>
-</div>
+                <div className="border-t border-white/10 px-4 py-5 sm:px-5">
+                  <div>
+                    <div className={sectionTitle()}>Contact</div>
+                    <div className="mt-3 grid grid-cols-1 gap-4">
+                      <div>
+                        <div className={labelClass()}>Full name</div>
+                        <input
+                          className={inputClass()}
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="First and last name"
+                          autoComplete="name"
+                        />
+                      </div>
 
-  <div>
-    <div className={sectionTitle()}>Installation address</div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                          <div className={labelClass()}>Email</div>
+                          <input
+                            className={inputClass()}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@email.com"
+                            inputMode="email"
+                            autoComplete="email"
+                          />
+                        </div>
 
-    <div className="mt-3 grid grid-cols-1 gap-4">
-      <div>
-        <div className={labelClass()}>Address line 1</div>
-        <input
-          className={inputClass()}
-          value={address1}
-          onChange={(e) => setAddress1(e.target.value)}
-          placeholder="Street address"
-          autoComplete="address-line1"
-        />
-      </div>
+                        <div>
+                          <div className={labelClass()}>Phone</div>
+                          <input
+                            className={inputClass()}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="(555) 555-5555"
+                            inputMode="tel"
+                            autoComplete="tel"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-      <div>
-        <div className={labelClass()}>Address line 2 (optional)</div>
-        <input
-          className={inputClass()}
-          value={address2}
-          onChange={(e) => setAddress2(e.target.value)}
-          placeholder="Unit, building, gate code, etc."
-          autoComplete="address-line2"
-        />
-      </div>
+                  <div className="mt-6">
+                    <div className={sectionTitle()}>Installation address</div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div>
-          <div className={labelClass()}>City</div>
-          <input
-            className={inputClass()}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-            autoComplete="address-level2"
-          />
-        </div>
+                    <div className="mt-3 grid grid-cols-1 gap-4">
+                      <div>
+                        <div className={labelClass()}>Address line 1</div>
+                        <input
+                          className={inputClass()}
+                          value={address1}
+                          onChange={(e) => setAddress1(e.target.value)}
+                          placeholder="Street address"
+                          autoComplete="address-line1"
+                        />
+                      </div>
 
-        <div>
-          <div className={labelClass()}>State</div>
-          <input
-            className={inputClass()}
-            value={stateRegion}
-            onChange={(e) => setStateRegion(e.target.value)}
-            placeholder="State"
-            autoComplete="address-level1"
-          />
-        </div>
+                      <div>
+                        <div className={labelClass()}>Address line 2 (optional)</div>
+                        <input
+                          className={inputClass()}
+                          value={address2}
+                          onChange={(e) => setAddress2(e.target.value)}
+                          placeholder="Unit, building, gate code, etc."
+                          autoComplete="address-line2"
+                        />
+                      </div>
 
-        <div>
-          <div className={labelClass()}>ZIP</div>
-          <input
-            className={inputClass()}
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-            placeholder="ZIP"
-            inputMode="numeric"
-            autoComplete="postal-code"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div>
+                          <div className={labelClass()}>City</div>
+                          <input
+                            className={inputClass()}
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="City"
+                            autoComplete="address-level2"
+                          />
+                        </div>
 
-  <div>
-    <div className={sectionTitle()}>Notes</div>
-    <div className="mt-3">
-      <div className={labelClass()}>Optional</div>
-      <textarea
-        className={`${inputClass()} min-h-[110px] resize-none`}
-        placeholder="Access notes, best time to call, anything we should know…"
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
-    </div>
-  </div>
+                        <div>
+                          <div className={labelClass()}>State</div>
+                          <input
+                            className={inputClass()}
+                            value={stateRegion}
+                            onChange={(e) => setStateRegion(e.target.value)}
+                            placeholder="State"
+                            autoComplete="address-level1"
+                          />
+                        </div>
 
-  <div className="pt-1">
-    <button
-      onClick={submit}
-      disabled={disabled}
-      className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-black transition hover:bg-white/90 disabled:opacity-60"
-    >
-      {status === "uploading" ? "Sending…" : "Send & continue"}
-    </button>
+                        <div>
+                          <div className={labelClass()}>ZIP</div>
+                          <input
+                            className={inputClass()}
+                            value={postalCode}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                            placeholder="ZIP"
+                            inputMode="numeric"
+                            autoComplete="postal-code"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </details>
 
-    {status === "error" ? (
-      <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-        {error}
-      </div>
-    ) : null}
-  </div>
-</div>
+              <div>
+                <div className={sectionTitle()}>Notes</div>
+                <div className="mt-3">
+                  <div className={labelClass()}>Optional</div>
+                  <textarea
+                    className={`${inputClass()} min-h-[110px] resize-none`}
+                    placeholder="Access notes, best time to call, anything we should know…"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <button
+                  onClick={submit}
+                  disabled={disabled}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-black transition hover:bg-white/90 disabled:opacity-60"
+                >
+                  {status === "uploading" ? "Sending…" : "Send & continue"}
+                </button>
+              </div>
+            </div>
           </section>
 
           <p className="mx-auto mt-6 max-w-[52ch] text-center text-xs leading-5 text-white/50">

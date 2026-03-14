@@ -98,21 +98,34 @@ function ThanksPageInner() {
                 {error}
               </div>
             ) : (
-              <div className="mt-5 flex flex-col gap-3 md:flex-row">
-                <div className="flex-1 rounded-xl border border-white/10 bg-black/30 px-4 py-4 text-lg font-semibold tracking-wide text-white">
+              <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-4">
+                <div className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-2xl font-semibold tracking-wide text-white">
                   {code || "—"}
                 </div>
 
                 <button
+                  type="button"
                   onClick={copyCode}
-                  className={[
-                    "inline-flex min-w-[140px] items-center justify-center rounded-full px-6 py-4 text-xs font-semibold uppercase tracking-[0.22em] transition",
-                    copied
-                      ? "scale-[1.03] bg-emerald-400 text-black"
-                      : "bg-white text-black hover:bg-white/90",
-                  ].join(" ")}
+                  aria-label="Copy code"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition hover:bg-white/10 active:scale-95"
                 >
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? (
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.16em]">
+                      Done
+                    </span>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      className="h-5 w-5"
+                    >
+                      <rect x="9" y="9" width="10" height="10" rx="2"></rect>
+                      <path d="M5 15V7a2 2 0 0 1 2-2h8"></path>
+                    </svg>
+                  )}
                 </button>
               </div>
             )}
