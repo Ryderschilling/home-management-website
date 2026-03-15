@@ -475,6 +475,39 @@ export default function PortalClientsPage() {
     setError("");
   }
 
+  async function deleteSelectedClient() {
+    if (!selectedClient) return;
+
+    const confirmed = window.confirm(
+      `Delete client "${selectedClient.name}"?\n\nThis cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setError("");
+
+    try {
+      const res = await fetch(`/api/admin/clients/${selectedClient.id}`, {
+        method: "DELETE",
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to delete client");
+      }
+
+      setSelectedClientId(null);
+
+      if (editingClientId === selectedClient.id) {
+        resetForm();
+      }
+
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete client");
+    }
+  }
+
   async function saveClient() {
     setError("");
 
@@ -1014,12 +1047,21 @@ export default function PortalClientsPage() {
               </div>
 
               {selectedClient ? (
-                <button
-                  onClick={() => startEditClient(selectedClient)}
-                  className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
-                >
-                  Edit client
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => startEditClient(selectedClient)}
+                    className="rounded-full border border-stone-300 px-4 py-2 text-xs uppercase tracking-[0.22em] text-stone-700 transition hover:bg-stone-100"
+                  >
+                    Edit client
+                  </button>
+
+                  <button
+                    onClick={deleteSelectedClient}
+                    className="rounded-full border border-red-200 px-4 py-2 text-xs uppercase tracking-[0.22em] text-red-700 transition hover:bg-red-50"
+                  >
+                    Delete client
+                  </button>
+                </div>
               ) : null}
             </div>
 
