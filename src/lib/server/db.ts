@@ -14,6 +14,7 @@ export const sql =
 if (!globalForDb.sql) globalForDb.sql = sql;
 
 export async function ensureAdminTables(): Promise<void> {
+  if (process.env.VERCEL_ENV === "production") return;
   if (globalForDb.adminSchemaVersion === ADMIN_SCHEMA_VERSION) return;
 
   await sql.begin(async (tx) => {

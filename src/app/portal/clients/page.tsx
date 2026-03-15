@@ -378,29 +378,42 @@ export default function PortalClientsPage() {
     URL.revokeObjectURL(url);
   }
 
-  async function deleteClientRecord(clientId: string, clientName?: string | null) {
+  async function deleteClientRecord(emailToDelete: string, clientName?: string | null) {
+    const normalized = normalizeEmail(emailToDelete);
+  
+    const matchingClients = clients.filter(
+      (client) => normalizeEmail(client.email) === normalized
+    );
+  
+    if (matchingClients.length === 0) {
+      setError("No matching client record found for this email.");
+      return;
+    }
+  
     const confirmed = window.confirm(
-      `Delete client "${clientName || "this client"}"? This cannot be undone.`
+      `Delete ${matchingClients.length} client record(s) for "${clientName || normalized}"?\n\nThis cannot be undone.`
     );
     if (!confirmed) return;
-
+  
     setError("");
-
+  
     try {
-      const res = await fetch(`/api/admin/clients/${clientId}`, {
-        method: "DELETE",
-      });
-
-      const json = await res.json().catch(() => ({}));
-
-      if (!res.ok || !json.ok) {
-        throw new Error(json?.error?.message ?? "Failed to delete client");
+      for (const client of matchingClients) {
+        const res = await fetch(`/api/admin/clients/${client.id}`, {
+          method: "DELETE",
+        });
+  
+        const json = await res.json().catch(() => ({}));
+  
+        if (!res.ok || !json.ok) {
+          throw new Error(json?.error?.message ?? "Failed to delete client");
+        }
+  
+        if (selectedClientId === client.id) {
+          setSelectedClientId(null);
+        }
       }
-
-      if (selectedClientId === clientId) {
-        setSelectedClientId(null);
-      }
-
+  
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to delete client");
@@ -693,7 +706,7 @@ export default function PortalClientsPage() {
                         <td className="px-4 py-3 text-right">
                           {record.clientId ? (
                             <button
-                              onClick={() => deleteClientRecord(record.clientId as string, record.name)}
+                            onClick={() => deleteClientRecord(record.clientId as string, record.name)}
                               className="rounded-full border border-red-200 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-red-700 transition hover:bg-red-50"
                             >
                               Delete
