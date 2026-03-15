@@ -72,6 +72,7 @@ type EmailRecord = {
   email: string;
   name: string;
   source: string;
+  clientId?: string | null;
 };
 
 const emptyProperty = (): Property => ({
@@ -294,6 +295,7 @@ export default function PortalClientsPage() {
           email: normalized,
           name: client.name || "—",
           source: "client",
+          clientId: client.id,
         });
       }
     }
@@ -374,6 +376,35 @@ export default function PortalClientsPage() {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  }
+
+  async function deleteClientRecord(clientId: string, clientName?: string | null) {
+    const confirmed = window.confirm(
+      `Delete client "${clientName || "this client"}"? This cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setError("");
+
+    try {
+      const res = await fetch(`/api/admin/clients/${clientId}`, {
+        method: "DELETE",
+      });
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to delete client");
+      }
+
+      if (selectedClientId === clientId) {
+        setSelectedClientId(null);
+      }
+
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete client");
+    }
   }
 
   function resetForm() {
@@ -646,18 +677,31 @@ export default function PortalClientsPage() {
               <div className="mt-4 max-h-[320px] overflow-y-auto rounded-2xl border border-stone-200 bg-white">
                 <table className="min-w-full text-left">
                   <thead className="border-b border-stone-200 bg-stone-50">
-                    <tr className="text-[11px] uppercase tracking-[0.18em] text-stone-500">
+                  <tr className="text-[11px] uppercase tracking-[0.18em] text-stone-500">
                       <th className="px-4 py-3 font-medium">Email</th>
                       <th className="px-4 py-3 font-medium">Name</th>
                       <th className="px-4 py-3 font-medium">Source</th>
+                      <th className="px-4 py-3 font-medium text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {emailRecords.map((record) => (
+                  {emailRecords.map((record) => (
                       <tr key={record.email} className="border-b border-stone-100">
                         <td className="px-4 py-3 text-sm text-stone-900">{record.email}</td>
                         <td className="px-4 py-3 text-sm text-stone-700">{record.name}</td>
                         <td className="px-4 py-3 text-sm text-stone-600">{record.source}</td>
+                        <td className="px-4 py-3 text-right">
+                          {record.clientId ? (
+                            <button
+                              onClick={() => deleteClientRecord(record.clientId as string, record.name)}
+                              className="rounded-full border border-red-200 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-red-700 transition hover:bg-red-50"
+                            >
+                              Delete
+                            </button>
+                          ) : (
+                            <span className="text-xs text-stone-400">—</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
