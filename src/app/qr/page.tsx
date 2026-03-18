@@ -223,16 +223,16 @@ export default function QrPage() {
 
       <div className="mx-auto max-w-6xl px-6 py-10">
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-          <video
-            className="h-auto w-full"
-            controls
-            playsInline
-            preload="metadata"
-            poster="/qr-poster.jpg"
-          >
-            <source src="/qr-video.mp4" type="video/mp4" />
-            Your browser does not support video playback.
-          </video>
+        <video
+  className="h-auto w-full"
+  controls
+  playsInline
+  preload="metadata"
+  poster="/qr-poster.jpg"
+>
+  <source src="/videos/qr-hero.mov" type="video/quicktime" />
+  Your browser does not support video playback.
+</video>
         </section>
 
         <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
