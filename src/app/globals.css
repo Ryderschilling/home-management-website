@@ -1,8 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0e0e0f;
+  --foreground: #f0f0f0;
+
+  --surface:   #161618;
+  --surface-2: #1c1c1f;
+  --surface-3: #222226;
+
+  --border:       rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+
+  --text-primary:   #f0f0f0;
+  --text-secondary: #8a8a8a;
+  --text-muted:     #4a4a4a;
+
+  --accent:      #e8e0d0;
+  --accent-warm: #c9b89a;
+
+  --radius:    12px;
+  --radius-sm: 8px;
 }
 
 @theme inline {
@@ -10,63 +28,27 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: 'Instrument Serif', Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-@keyframes swipeNudge {
-  0%,
-  100% {
-    transform: translateX(0);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translateX(6px);
-    opacity: 0.9;
-  }
+  font-family: var(--font-sans), 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.swipe-chevron {
-  display: inline-block;
-  font-size: 16px;
-  line-height: 1;
-  animation: swipeNudge 1.2s ease-in-out infinite;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 2px; }
 
 @keyframes swipeNudge {
-  0%,
-  100% {
-    transform: translateX(0);
-    opacity: 0.4;
-  }
-  50% {
-    transform: translateX(6px);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translateX(0); opacity: 0.4; }
+  50%       { transform: translateX(6px); opacity: 0.9; }
 }
 
 .swipe-chevron {
@@ -76,3 +58,10 @@ body {
   animation: swipeNudge 1.2s ease-in-out infinite;
 }
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}

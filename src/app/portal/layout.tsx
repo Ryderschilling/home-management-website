@@ -16,19 +16,43 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
-<div className="min-h-screen bg-stone-400 text-stone-900">
-      <header className="sticky top-0 z-30 border-b border-stone-200/80 bg-stone-50/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5">
-          <div className="min-w-0">
-            <div className="text-[11px] uppercase tracking-[0.32em] text-stone-500">
+    <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+      <header
+        className="sticky top-0 z-30"
+        style={{
+          borderBottom: "1px solid var(--border)",
+          background: "rgba(14,14,15,0.88)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+        }}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3.5">
+          <div className="min-w-0 flex flex-col gap-0.5">
+            <div
+              style={{
+                fontFamily: "var(--font-mono), monospace",
+                fontSize: "9px",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--text-muted)",
+              }}
+            >
               Coastal OS
             </div>
-            <div className="font-serif text-[28px] leading-none text-stone-900">
+            <div
+              style={{
+                fontFamily: "var(--font-serif), 'Instrument Serif', serif",
+                fontSize: "17px",
+                lineHeight: 1,
+                color: "var(--text-primary)",
+                letterSpacing: "0.01em",
+              }}
+            >
               Operations Portal
             </div>
           </div>
 
-          <nav className="flex flex-wrap items-center justify-end gap-2">
+          <nav className="flex flex-wrap items-center justify-end gap-1">
             {navItems.map((item) => {
               const isActive =
                 item.href === "/portal"
@@ -39,12 +63,17 @@ export default function PortalLayout({ children }: { children: ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={[
-                    "rounded-full px-4 py-2 text-sm transition",
-                    isActive
-                      ? "bg-stone-900 text-white shadow-sm"
-                      : "text-stone-600 hover:bg-white hover:text-stone-900",
-                  ].join(" ")}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    fontWeight: isActive ? 500 : 400,
+                    color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
+                    background: isActive ? "var(--surface-3)" : "transparent",
+                    transition: "all 0.15s ease",
+                    textDecoration: "none",
+                    letterSpacing: "0.01em",
+                  }}
                 >
                   {item.label}
                 </Link>
