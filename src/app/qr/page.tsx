@@ -358,17 +358,17 @@ export default function QrPage() {
           </h2>
 
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((item) => (
-              <div
-                key={item.name}
-                className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-6 text-white/80"
-              >
-                <div>“{item.quote}”</div>
-                <div className="mt-4 text-xs uppercase tracking-[0.22em] text-white/50">
-                  {item.name} • {item.meta}
-                </div>
-              </div>
-            ))}
+          {TESTIMONIALS.map((item) => (
+  <div
+    key={item.name}
+    className="flex min-h-[220px] flex-col rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-6 text-white/80"
+  >
+    <div>“{item.quote}”</div>
+    <div className="mt-auto pt-6 text-xs uppercase tracking-[0.22em] text-white/50">
+      {item.name} • {item.meta}
+    </div>
+  </div>
+))}
           </div>
         </section>
 

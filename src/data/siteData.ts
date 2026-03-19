@@ -16,7 +16,7 @@ export const siteData = {
   startingPrice: "",
 
   // IMPORTANT: replace this with your real email
-  contactEmail: "YOUR_EMAIL_HERE",
+  contactEmail: "coastalhomemanagement30a@gmail.com",
 
   services: [
     {

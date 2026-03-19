@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -15,17 +14,18 @@ if (!url) {
 function getPrisma() {
   if (global.__prisma) return global.__prisma;
 
-  const pool = new Pool({
+  const adapter = new PrismaPg({
     connectionString: url,
-    // Neon needs SSL; sslmode=require in URL is usually enough.
-    // This extra ssl block is harmless and stabilizes local dev.
-    ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 5_000,
+    idleTimeoutMillis: 300_000,
   });
 
-  const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
 
-  if (process.env.NODE_ENV !== "production") global.__prisma = prisma;
+  if (process.env.NODE_ENV !== "production") {
+    global.__prisma = prisma;
+  }
+
   return prisma;
 }
 

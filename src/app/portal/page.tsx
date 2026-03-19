@@ -568,11 +568,24 @@ export default function PortalDashboardPage() {
             {upcomingJobs.length === 0 ? (
               <div style={{ padding: "32px 24px", textAlign: "center", fontSize: "13px", color: "var(--text-muted)" }}>No upcoming jobs scheduled.</div>
             ) : upcomingJobs.map((job) => (
-              <button key={job.id} onClick={() => setActiveJobId(job.id)}
-                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", borderBottom: "1px solid var(--border)", textAlign: "left", cursor: "pointer", background: "transparent", border: "none", borderBottom: "1px solid var(--border)", width: "100%" } as React.CSSProperties}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--surface-2)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
-              >
+<button
+  key={job.id}
+  onClick={() => setActiveJobId(job.id)}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "14px 24px",
+    textAlign: "left",
+    cursor: "pointer",
+    background: "transparent",
+    border: "none",
+    borderBottom: "1px solid var(--border)",
+    width: "100%",
+  } as React.CSSProperties}
+  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "var(--surface-2)")}
+  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: "13px", fontWeight: 500, color: "var(--text-primary)" }}>{job.title}</div>
                   <div style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "3px", fontFamily: "var(--font-mono), monospace", letterSpacing: "0.02em" }}>

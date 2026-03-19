@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { siteData } from "@/data/siteData";
 import { useEffect } from "react";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -24,9 +25,9 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen font-sans bg-white text-black">
+    <main className="min-h-screen font-sans bg-black text-black">
       {/* Sticky nav */}
-      <nav className="fixed top-0 w-full z-50 bg-transparent backdrop-blur-[2px] px-4 md:px-6 py-2 flex justify-between items-center pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+      <nav className="fixed top-0 w-full z-50 bg-transparent px-4 md:px-6 py-2 flex justify-between items-center">
         <div className="flex items-center space-x-3">
           {/* Smaller logo */}
           <img
@@ -92,15 +93,15 @@ export default function HomePage() {
 
         {/* Bottom row */}
         <div className="hero-bottom relative z-10">
-          <div className="hero-bottom-inner">
-            <span>ESTATE CARE</span>
-            <span className="pipe">|</span>
-            <span>MAINTENENCE</span>
-            <span className="pipe">|</span>
-            <span>CONCIERGE</span>
-            <span className="pipe">|</span>
-            <span>LOCALLY OWNED</span>
-          </div>
+        <div className="hero-bottom-inner">
+  <span>SECOND HOME MANAGEMENT</span>
+  <span className="pipe">|</span>
+  <span>CONCIERGE</span>
+  <span className="pipe">|</span>
+  <span>LOCAL</span>
+  <span className="pipe">|</span>
+  <span>INSURED</span>
+</div>
         </div>
 
         {/* Scroll cue (bottom-center, subtle, looping) */}
@@ -122,7 +123,7 @@ export default function HomePage() {
 {/* Services */}
 <section
   id="services"
-  className="px-4 md:px-6 py-20 md:py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
+  className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
 >
   <div className="max-w-6xl mx-auto">
     <h2 className="text-3xl md:text-4xl font-serif mb-8">Services</h2>
@@ -132,7 +133,7 @@ export default function HomePage() {
 <div className="md:hidden -mx-4 px-4">
   <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 no-scrollbar">
     {/* Card 1 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
       <div className="h-64 w-full mb-5 overflow-hidden">
         <img
           src="/img.png"
@@ -146,16 +147,18 @@ export default function HomePage() {
         full property inspections, issue coordination, and proactive care to keep
         your home in top condition.
       </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-      >
-        Message to inquire
-      </a>
+      <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
     </div>
 
     {/* Card 2 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
       <div className="h-64 w-full mb-5 overflow-hidden">
         <img
           src="/service2.png"
@@ -169,16 +172,18 @@ export default function HomePage() {
         are collected, secured, and handled according to your preferences so
         nothing is missed.
       </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-      >
-        Message to inquire
-      </a>
+      <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
     </div>
 
     {/* Card 3 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6">
+    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
       <div className="h-64 w-full mb-5 overflow-hidden">
         <img
           src="/service3.png"
@@ -191,12 +196,14 @@ export default function HomePage() {
         Anything you may need as a homeowner. From one-off requests to ongoing
         assistance, we handle the details so you don’t have to.
       </p>
-      <a
-        href={`mailto:${siteData.contactEmail}`}
-        className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-      >
-        Message to inquire
-      </a>
+      <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
     </div>
   </div>
 
@@ -210,7 +217,7 @@ export default function HomePage() {
     {/* DESKTOP: 3-column grid */}
     <div className="hidden md:grid grid-cols-3 gap-12">
       {/* Card 1 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
         <div className="h-60 w-full mb-4 overflow-hidden">
           <img
             src="/img.png"
@@ -224,16 +231,18 @@ export default function HomePage() {
           full property inspections, issue coordination, and proactive care to keep
           your home in top condition.
         </p>
-        <a
-          href={`mailto:${siteData.contactEmail}`}
-          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-        >
-          Message to inquire
-        </a>
+        <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
       </div>
 
       {/* Card 2 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
         <div className="h-60 w-full mb-4 overflow-hidden">
           <img
             src="/service2.png"
@@ -247,16 +256,18 @@ export default function HomePage() {
           are collected, secured, and handled according to your preferences so
           nothing is missed.
         </p>
-        <a
-          href={`mailto:${siteData.contactEmail}`}
-          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-        >
-          Message to inquire
-        </a>
+        <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
       </div>
 
       {/* Card 3 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6">
+      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
         <div className="h-60 w-full mb-4 overflow-hidden">
           <img
             src="/service3.png"
@@ -269,12 +280,14 @@ export default function HomePage() {
           Anything you may need as a homeowner. From one-off requests to ongoing
           assistance, we handle the details so you don’t have to.
         </p>
-        <a
-          href={`mailto:${siteData.contactEmail}`}
-          className="border border-black px-4 py-2 text-xs uppercase hover:bg-black hover:text-white transition"
-        >
-          Message to inquire
-        </a>
+        <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Learn more
+  </a>
+</div>
       </div>
     </div>
   </div>
@@ -292,12 +305,14 @@ export default function HomePage() {
           <p className="text-gray-300">
             Reach out for availability and customized service plans.
           </p>
-          <a
-            href={`mailto:${siteData.contactEmail}`}
-            className="border border-white px-8 py-3 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition"
-          >
-            Contact
-          </a>
+          <div className="mt-auto pt-2">
+  <a
+    href={`mailto:${siteData.contactEmail}`}
+    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
+  >
+    Message to inquire
+  </a>
+</div>
         </div>
       </section>
 
@@ -345,12 +360,92 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="px-6 py-12 text-center text-xs uppercase tracking-widest text-gray-400">
-        <a href="/admin/login" className="hover:text-white transition">
-          Admin
-        </a>
-      </footer>
+{/* Footer */}
+<footer className="border-t border-gray-200 bg-white">
+  <div className="mx-auto max-w-6xl px-6 py-14">
+    <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
+    <div>
+  <div className="text-xs uppercase tracking-[0.22em] text-gray-500">
+    Services
+  </div>
+  <ul className="mt-4 space-y-3 text-sm text-gray-700">
+    <li>
+      <Link
+        href="/second-home-management-inlet-beach"
+        className="transition hover:text-black"
+      >
+        Second Home Management
+      </Link>
+    </li>
+    <li>
+      <Link
+        href="/concierge-services-inlet-beach"
+        className="transition hover:text-black"
+      >
+        Concierge Services
+      </Link>
+    </li>
+    <li>
+      <Link
+        href="/mail-package-handling-inlet-beach"
+        className="transition hover:text-black"
+      >
+        Mail &amp; Package Handling
+      </Link>
+    </li>
+    <li>
+      <Link
+        href="/home-check-services-30a"
+        className="transition hover:text-black"
+      >
+        Home Checks
+      </Link>
+    </li>
+  </ul>
+</div>
+
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-gray-500">
+          Company
+        </div>
+        <ul className="mt-4 space-y-3 text-sm text-gray-700">
+          <li>Local</li>
+          <li>Insured</li>
+          <li>Serving Inlet Beach &amp; 30A</li>
+          <li>Reliable, high-trust service</li>
+        </ul>
+      </div>
+
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-gray-500">
+          Contact
+        </div>
+        <div className="mt-4 space-y-3 text-sm text-gray-700">
+          <div>Inlet Beach, Florida</div>
+          <a
+            href={`mailto:${siteData.contactEmail}`}
+            className="inline-block transition hover:text-black"
+          >
+            {siteData.contactEmail}
+          </a>
+          <div>
+            <a
+              href="/admin/login"
+              className="text-gray-500 transition hover:text-black"
+            >
+              Admin
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="mt-10 border-t border-gray-200 pt-6 text-xs text-gray-500">
+      © {new Date().getFullYear()} Coastal Home Management 30A. All rights
+      reserved.
+    </div>
+  </div>
+</footer>
 
       <style jsx>{`
         .fade-in {
