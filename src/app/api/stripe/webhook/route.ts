@@ -24,12 +24,13 @@ function addressToString(addr: any): string {
   return parts.join(", ");
 }
 
-async function ensureReferralColumns() {
+async function ensureOrderWebhookColumns() {
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_code TEXT`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_coupon_id TEXT`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promotion_code_id TEXT`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promo_code_id TEXT`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_created_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS paid_notification_sent_at TIMESTAMPTZ`;
 }
 
 function makeReferralCode() {
@@ -39,12 +40,12 @@ function makeReferralCode() {
   return `CHM-${s}`;
 }
 
-async function createOneTime20OffPromotionCode() {
-    const coupon = await stripe.coupons.create({
-        percent_off: 15,
-        duration: "once",
-        name: "CHM 15% Off (Referral)",
-      });
+async function createOneTimeReferralPromotionCode(percentOff = 15) {
+  const coupon = await stripe.coupons.create({
+    percent_off: percentOff,
+    duration: "once",
+    name: `CHM ${percentOff}% Off (Referral)`,
+  });
 
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = makeReferralCode();
@@ -71,13 +72,51 @@ async function createOneTime20OffPromotionCode() {
   throw new Error("Failed to create a unique referral code.");
 }
 
+async function getDiscountDetailsFromSession(sessionId: string) {
+  const hydrated = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ["total_details.breakdown.discounts.discount"],
+  });
+
+  const discountEntry = (hydrated as any).total_details?.breakdown?.discounts?.[0];
+  const discountObj =
+    discountEntry?.discount && typeof discountEntry.discount === "object"
+      ? (discountEntry.discount as any)
+      : null;
+
+  const discountAmountCents =
+    typeof (hydrated as any).total_details?.amount_discount === "number"
+      ? (hydrated as any).total_details.amount_discount
+      : 0;
+
+  let promotionCode: string | null = null;
+  const promotionCodeRef = discountObj?.promotion_code;
+
+  if (typeof promotionCodeRef === "string" && promotionCodeRef.trim()) {
+    try {
+      const promo = await stripe.promotionCodes.retrieve(promotionCodeRef.trim());
+      promotionCode = safe(promo.code) || null;
+    } catch (err) {
+      console.error("Failed to retrieve Stripe promotion code:", err);
+    }
+  } else if (promotionCodeRef && typeof promotionCodeRef === "object") {
+    promotionCode = safe((promotionCodeRef as any).code) || null;
+  }
+
+  return {
+    discountAmountCents,
+    promotionCode,
+  };
+}
+
 async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session) {
   await ensureAdminTables();
-  await ensureReferralColumns();
+  await ensureOrderWebhookColumns();
 
   const orgId = env.DEFAULT_ORGANIZATION_ID;
 
-  const rockColor = safe(session.metadata?.rock_color || (session.metadata as any)?.color || "unknown");
+  const rockColor = safe(
+    session.metadata?.rock_color || (session.metadata as any)?.color || "unknown"
+  );
   const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
 
   const email = safe(session.customer_details?.email).toLowerCase();
@@ -100,16 +139,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
   const landingPath = safe(session.metadata?.landing_path || "/qr");
   const browserSessionKey = safe(session.metadata?.browser_session_key);
 
-  const hydrated = await stripe.checkout.sessions.retrieve(session.id, {
-    expand: ["total_details.breakdown.discounts.discount.promotion_code"],
-  });
-
-  const discountEntry = (hydrated as any).total_details?.breakdown?.discounts?.[0];
-  const promotionCode = safe(discountEntry?.discount?.promotion_code?.code);
-  const discountAmountCents =
-    typeof (hydrated as any).total_details?.amount_discount === "number"
-      ? (hydrated as any).total_details.amount_discount
-      : 0;
+  const { discountAmountCents, promotionCode } = await getDiscountDetailsFromSession(session.id);
 
   let clientId: string | null = null;
 
@@ -123,6 +153,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
 
     if (existingClient.length === 0) {
       clientId = crypto.randomUUID();
+
       await sql`
         INSERT INTO admin_clients (
           id, organization_id, name, email, phone, notes, address_text, stripe_customer_id
@@ -140,6 +171,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
       `;
     } else {
       clientId = existingClient[0].id;
+
       await sql`
         UPDATE admin_clients
         SET
@@ -159,7 +191,8 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
       referral_code,
       referral_coupon_id,
       referral_promotion_code_id,
-      referral_promo_code_id
+      referral_promo_code_id,
+      paid_notification_sent_at
     FROM admin_orders
     WHERE organization_id = ${orgId} AND stripe_session_id = ${stripeSessionId}
     LIMIT 1
@@ -262,35 +295,46 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
   }
 
   if (campaignId || campaignCode) {
-    await sql`
-      INSERT INTO marketing_campaign_events (
-        id,
-        organization_id,
-        campaign_id,
-        campaign_code,
-        session_key,
-        event_type,
-        page_path,
-        order_id,
-        metadata_json
-      )
-      VALUES (
-        ${crypto.randomUUID()},
-        ${orgId},
-        ${campaignId || null},
-        ${campaignCode || null},
-        ${browserSessionKey || null},
-        ${"order_paid"},
-        ${landingPath || "/qr"},
-        ${orderId},
-        ${JSON.stringify({
-          totalCents,
-          rockColor,
-          usedPromotionCode: discountAmountCents > 0,
-          promotionCode: promotionCode || null,
-        })}
-      )
+    const existingPaidEvent = await sql`
+      SELECT id
+      FROM marketing_campaign_events
+      WHERE organization_id = ${orgId}
+        AND order_id = ${orderId}
+        AND event_type = ${"order_paid"}
+      LIMIT 1
     `;
+
+    if (existingPaidEvent.length === 0) {
+      await sql`
+        INSERT INTO marketing_campaign_events (
+          id,
+          organization_id,
+          campaign_id,
+          campaign_code,
+          session_key,
+          event_type,
+          page_path,
+          order_id,
+          metadata_json
+        )
+        VALUES (
+          ${crypto.randomUUID()},
+          ${orgId},
+          ${campaignId || null},
+          ${campaignCode || null},
+          ${browserSessionKey || null},
+          ${"order_paid"},
+          ${landingPath || "/qr"},
+          ${orderId},
+          ${JSON.stringify({
+            totalCents,
+            rockColor,
+            usedPromotionCode: discountAmountCents > 0,
+            promotionCode: promotionCode || null,
+          })}
+        )
+      `;
+    }
   }
 
   const existingReferral = existingOrder.length ? safe(existingOrder[0].referral_code) : "";
@@ -300,7 +344,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
     : "";
 
   if (!existingReferral || !existingCouponId || !existingPromoId) {
-    const { code, couponId, promotionCodeId } = await createOneTime20OffPromotionCode();
+    const { code, couponId, promotionCodeId } = await createOneTimeReferralPromotionCode(15);
 
     await sql`
       UPDATE admin_orders
@@ -315,27 +359,41 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
     `;
   }
 
-  await sendPipePhotoEmail({
-    subject: `NEW PAID ORDER — ${rockColor.toUpperCase()}`,
-    html: `
-      <p><strong>Status:</strong> PAID (NEW)</p>
-      <p><strong>Product:</strong> ${productKey.replaceAll("_", " ")}</p>
-      <p><strong>Color:</strong> ${rockColor}</p>
-      <p><strong>Name:</strong> ${fullName || "—"}</p>
-      <p><strong>Email:</strong> ${email || "—"}</p>
-      <p><strong>Phone:</strong> ${phone || "—"}</p>
-      <p><strong>Campaign:</strong> ${campaignCode || "—"}</p>
-      <p><strong>Discount used:</strong> ${discountAmountCents > 0 ? "Yes" : "No"}</p>
-      <p><strong>Service address:</strong><br/>${(serviceAddress || "—")
-        .replaceAll("\n", "<br/>")
-        .replaceAll(", ", "<br/>")}</p>
-      <p><strong>Total:</strong> $${(totalCents / 100).toFixed(2)}</p>
-      <p><strong>Stripe session:</strong> ${stripeSessionId}</p>
-      <p><strong>Payment intent:</strong> ${stripePaymentIntentId || "—"}</p>
-    `,
-    attachmentName: "no-attachment.txt",
-    attachmentBase64: Buffer.from("Paid order received.").toString("base64"),
-  });
+  const alreadySentPaidNotification =
+    existingOrder.length > 0 && !!existingOrder[0].paid_notification_sent_at;
+
+  if (!alreadySentPaidNotification) {
+    await sendPipePhotoEmail({
+      subject: `NEW PAID ORDER — ${rockColor.toUpperCase()}`,
+      html: `
+        <p><strong>Status:</strong> PAID (NEW)</p>
+        <p><strong>Product:</strong> ${productKey.replaceAll("_", " ")}</p>
+        <p><strong>Color:</strong> ${rockColor}</p>
+        <p><strong>Name:</strong> ${fullName || "—"}</p>
+        <p><strong>Email:</strong> ${email || "—"}</p>
+        <p><strong>Phone:</strong> ${phone || "—"}</p>
+        <p><strong>Campaign:</strong> ${campaignCode || "—"}</p>
+        <p><strong>Discount used:</strong> ${discountAmountCents > 0 ? "Yes" : "No"}</p>
+        <p><strong>Promotion code:</strong> ${promotionCode || "—"}</p>
+        <p><strong>Service address:</strong><br/>${(serviceAddress || "—")
+          .replaceAll("\n", "<br/>")
+          .replaceAll(", ", "<br/>")}</p>
+        <p><strong>Total:</strong> $${(totalCents / 100).toFixed(2)}</p>
+        <p><strong>Stripe session:</strong> ${stripeSessionId}</p>
+        <p><strong>Payment intent:</strong> ${stripePaymentIntentId || "—"}</p>
+      `,
+      attachmentName: "no-attachment.txt",
+      attachmentBase64: Buffer.from("Paid order received.").toString("base64"),
+    });
+
+    await sql`
+      UPDATE admin_orders
+      SET
+        paid_notification_sent_at = NOW(),
+        updated_at = NOW()
+      WHERE organization_id = ${orgId} AND id = ${orderId}
+    `;
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -371,6 +429,7 @@ export async function POST(req: NextRequest) {
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
+
       if ((session.payment_status ?? "") === "paid") {
         await upsertClientAndOrderFromSession(session);
       }
