@@ -84,7 +84,7 @@ export default function PortalServicesPage() {
 
   return (
     <div className="space-y-6">
-      <section className={`${S.card} px-7 py-7`}>
+      <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Services</div>
@@ -108,7 +108,7 @@ export default function PortalServicesPage() {
       </section>
 
       {showForm && (
-        <section className={`${S.card} p-7`}>
+        <section className={`${S.card} p-5 sm:p-7`}>
           <div className="mb-6">
             <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>Create service</h2>
             <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4, fontWeight: 300 }}>Set the sale price and true cost so margin stays visible.</p>
@@ -119,7 +119,7 @@ export default function PortalServicesPage() {
             <div className="space-y-2"><label className={S.label}>Cost (USD)</label><input className={S.input} placeholder="e.g. 120" value={cost} onChange={(e) => setCost(e.target.value)} /></div>
             <div className="space-y-2 md:col-span-2"><label className={S.label}>Description</label><textarea className={`${S.input} min-h-[100px] resize-none`} placeholder="Optional notes about what is included" value={description} onChange={(e) => setDescription(e.target.value)} /></div>
           </div>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button onClick={createService} className={S.btnPrimary}>Save service</button>
             <button onClick={() => setShowForm(false)} className={S.btnGhostLg}>Cancel</button>
           </div>
@@ -132,10 +132,10 @@ export default function PortalServicesPage() {
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredServices.length} visible services`}</div>
         </div>
         {filteredServices.length === 0 ? (
-          <div className="px-7 py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading services..." : "No services found."}</div>
+          <div className="px-5 py-8 sm:px-7 sm:py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading services..." : "No services found."}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[900px] w-full text-left">
+          <div className="portal-table-scroll">
+            <table className="min-w-[760px] w-full text-left md:min-w-[900px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
                 <tr>{["Service", "Description", "Price", "Cost", "Margin", "Status"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>

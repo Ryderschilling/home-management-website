@@ -41,7 +41,7 @@ export default function PortalPropertiesPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-7 py-7">
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-5 py-6 sm:px-7 sm:py-7">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Properties</div>
@@ -56,7 +56,7 @@ export default function PortalPropertiesPage() {
         {error && <div className="mt-6 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>}
       </section>
 
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7">
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-7">
         <div className="mb-6">
           <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>Add property</h2>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4, fontWeight: 300 }}>Save the home name, address, and optional client assignment.</p>

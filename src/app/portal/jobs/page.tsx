@@ -132,14 +132,14 @@ export default function PortalJobsPage() {
 
   return (
     <div className="space-y-6">
-      <section className={`${S.card} px-7 py-7`}>
+      <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Jobs</div>
             <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Job execution</h1>
             <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 480 }}>Manage scheduled work, update status, log notes, and attach completion photos.</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
             {[{ label: "Total", value: stats.total }, { label: "Scheduled", value: stats.scheduled }, { label: "In progress", value: stats.inProgress }, { label: "Completed", value: stats.completed }].map((s) => (
               <div key={s.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
                 <div className={S.label}>{s.label}</div>
@@ -168,7 +168,7 @@ export default function PortalJobsPage() {
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredJobs.length} visible jobs`}</div>
           </div>
           {filteredJobs.length === 0 ? (
-            <div className="px-6 py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading jobs..." : "No jobs found."}</div>
+            <div className="px-5 py-8 sm:px-6 sm:py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading jobs..." : "No jobs found."}</div>
           ) : (
             <div className="max-h-[860px] overflow-y-auto">
               {filteredJobs.map((job) => {
@@ -176,7 +176,7 @@ export default function PortalJobsPage() {
                 return (
                   <button key={job.id} onClick={() => setSelectedJobId(job.id)} className="block w-full text-left transition"
                     style={{ borderBottom: "1px solid var(--border)", padding: "18px 24px", background: isActive ? "var(--surface-2)" : "transparent" }}>
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{job.title}</div>
                         <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{clientName(job.client_id)}</div>
@@ -192,8 +192,8 @@ export default function PortalJobsPage() {
         </div>
 
         <div>
-          <section className={`${S.card} p-7`}>
-            <div className="flex items-center justify-between gap-4">
+          <section className={`${S.card} p-5 sm:p-7`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className={S.label} style={{ marginBottom: 4 }}>Job detail</div>
                 <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>{selectedJob ? selectedJob.title : "No job selected"}</h2>
@@ -225,7 +225,7 @@ export default function PortalJobsPage() {
                   <div className="space-y-2"><label className={S.label}>Hours</label><input className={S.input} value={editHours} onChange={(e) => setEditHours(e.target.value)} /></div>
                   <div className="space-y-2 md:col-span-2"><label className={S.label}>Notes</label><textarea className={`${S.input} min-h-[140px] resize-none`} value={editNotes} onChange={(e) => setEditNotes(e.target.value)} /></div>
                 </div>
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button onClick={saveJobChanges} className={S.btnPrimary}>Save job changes</button>
                   <button onClick={() => setEditStatus("COMPLETED")} className={S.btnSuccess}>Mark completed</button>
                   <button onClick={() => setEditStatus("IN_PROGRESS")} className={S.btnWarn}>Mark in progress</button>
@@ -245,7 +245,7 @@ export default function PortalJobsPage() {
                   <div className={S.label} style={{ marginBottom: 4 }}>Completion photos</div>
                   <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginBottom: 16 }}>Proof of work</h3>
                   {Array.isArray(selectedJob.photos) && selectedJob.photos.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
                       {selectedJob.photos.map((photo) => (
                         <a key={photo.id} href={photo.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-[var(--border)]">
                           <img src={photo.url} alt={photo.caption || "Job photo"} className="h-32 w-full object-cover" />

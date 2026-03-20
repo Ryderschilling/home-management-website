@@ -163,7 +163,7 @@ export default function PortalOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <section className={`${S.card} px-7 py-7`}>
+      <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Orders</div>
@@ -181,7 +181,7 @@ export default function PortalOrdersPage() {
             ))}
           </div>
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {[{ label: "Needs Action", value: stats.needsAttention }, { label: "New", value: stats.newCount }, { label: "Ordered", value: stats.orderedCount }, { label: "Installed", value: stats.installedCount }, { label: "Total Orders", value: stats.totalOrders }, { label: "Revenue", value: money(stats.totalRevenue), accent: true }].map((s) => (
             <div key={s.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)]" style={{ padding: "14px 16px" }}>
               <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>{s.label}</div>
@@ -199,7 +199,7 @@ export default function PortalOrdersPage() {
       </section>
 
       <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 28px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16 }}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between" style={{ borderBottom: "1px solid var(--border)", padding: "20px 28px" }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text-primary)" }}>Orders</div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredOrders.length} visible orders`}</div>
@@ -207,10 +207,10 @@ export default function PortalOrdersPage() {
           <button onClick={load} className={S.btnGhost}>Refresh</button>
         </div>
         {filteredOrders.length === 0 ? (
-          <div className="px-7 py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading orders..." : "No orders found."}</div>
+          <div className="px-5 py-8 sm:px-7 sm:py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading orders..." : "No orders found."}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1600px] w-full text-left">
+          <div className="portal-table-scroll">
+            <table className="min-w-[1280px] w-full text-left md:min-w-[1600px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
                 <tr>{["Photo", "Created", "Customer", "Product", "Color", "Amount", "Status", "Ordered", "Installed", "Thank You", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>

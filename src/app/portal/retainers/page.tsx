@@ -109,7 +109,7 @@ export default function PortalRetainersPage() {
 
   return (
     <div className="space-y-6">
-      <section className={`${S.card} px-7 py-7`}>
+      <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Retainers</div>
@@ -131,7 +131,7 @@ export default function PortalRetainersPage() {
       </section>
 
       {showForm && (
-        <section className={`${S.card} p-7`}>
+        <section className={`${S.card} p-5 sm:p-7`}>
           <div className="mb-6">
             <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>Create recurring plan</h2>
             <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4, fontWeight: 300 }}>Set the client, property, billing cadence, and plan amount.</p>
@@ -171,7 +171,7 @@ export default function PortalRetainersPage() {
             <div className="space-y-2"><label className={S.label}>Service anchor date</label><input type="date" className={S.input} value={serviceAnchorDate} onChange={(e) => setServiceAnchorDate(e.target.value)} /></div>
             <div className="space-y-2 md:col-span-2"><label className={S.label}>Notes</label><textarea className={`${S.input} min-h-[110px] resize-none`} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="What is included, service expectations, exclusions, homeowner notes..." /></div>
           </div>
-          <div className="mt-6 flex gap-3">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button onClick={createRetainer} className={S.btnPrimary}>Save plan</button>
             <button onClick={() => setShowForm(false)} className={S.btnGhostLg}>Cancel</button>
           </div>
@@ -184,10 +184,10 @@ export default function PortalRetainersPage() {
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredRetainers.length} visible retainers`}</div>
         </div>
         {filteredRetainers.length === 0 ? (
-          <div className="px-7 py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading plans..." : "No recurring plans found."}</div>
+          <div className="px-5 py-8 sm:px-7 sm:py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading plans..." : "No recurring plans found."}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1200px] w-full text-left">
+          <div className="portal-table-scroll">
+            <table className="min-w-[960px] w-full text-left md:min-w-[1200px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
                 <tr>{["Plan", "Client", "Property", "Amount", "Billing", "Billing Anchor", "Service", "Service Anchor", "Status", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>

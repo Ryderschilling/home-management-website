@@ -109,12 +109,12 @@ export default function PortalCampaignsPage() {
   return (
     <div className="space-y-6">
       <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "24px 28px" }}>
+        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
           <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Marketing</div>
           <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Campaigns</h1>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Create a flyer campaign, use its code in your QR URL, and track visits, checkout starts, paid orders, discount usage, revenue, CAC, and customer value.</p>
         </div>
-        <div className="grid grid-cols-2 gap-4 px-7 py-6 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-7 md:grid-cols-4">
           {[{ label: "Flyers sent", value: summary.flyers }, { label: "Visits", value: summary.visits }, { label: "Paid orders", value: summary.orders }, { label: "Revenue", value: money(summary.revenue), accent: true }].map((s) => (
             <div key={s.label}>
               <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>{s.label}</div>
@@ -125,10 +125,10 @@ export default function PortalCampaignsPage() {
       </section>
 
       <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 28px" }}>
+        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
           <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 20, color: "var(--text-primary)" }}>Create flyer campaign</h2>
         </div>
-        <div className="grid grid-cols-1 gap-4 px-7 py-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 px-5 py-6 sm:px-7 md:grid-cols-2">
           {[{ label: "Campaign name", val: name, set: setName, placeholder: "Watersound Origins Flyer Drop" }, { label: "Campaign code", val: campaignCode, set: (v: string) => setCampaignCode(v.toLowerCase()), placeholder: "watersound-flyer-001" }, { label: "Flyers sent", val: flyersSent, set: setFlyersSent, placeholder: "500" }, { label: "Print cost ($)", val: printCost, set: setPrintCost, placeholder: "95" }, { label: "Distribution cost ($)", val: distributionCost, set: setDistributionCost, placeholder: "0" }].map((f) => (
             <div key={f.label}>
               <div className={S.label} style={{ marginBottom: 6 }}>{f.label}</div>
@@ -146,10 +146,10 @@ export default function PortalCampaignsPage() {
       </section>
 
       <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 28px" }}>
+        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
           <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 20, color: "var(--text-primary)" }}>Live campaign performance</h2>
         </div>
-        <div className="px-7 py-6">
+        <div className="px-5 py-6 sm:px-7">
           {error && <div className="mb-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>}
           {loading ? <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Loading campaigns…</div>
           : campaigns.length === 0 ? <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No campaigns yet.</div>
@@ -175,7 +175,7 @@ export default function PortalCampaignsPage() {
                         <button onClick={() => deleteCampaign(campaign)} className={S.btnDanger}>Delete</button>
                       </div>
                     </div>
-                    <div className="mt-5 grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-6">
+                    <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6">
                       {[{ label: "Flyers", value: campaign.flyers_sent }, { label: "Unique visitors", value: campaign.unique_visitors }, { label: "Checkout starts", value: campaign.checkout_starts }, { label: "Paid orders", value: campaign.paid_orders }, { label: "Discount uses", value: campaign.discount_uses }, { label: "Email leads", value: campaign.email_leads }, { label: "Customer value", value: campaign.paid_orders > 0 ? money(customerValueCents) : "—" }, { label: "Revenue", value: money(campaign.revenue_cents), accent: true }, { label: "Total cost", value: money(totalCostCents) }, { label: "CAC", value: campaign.paid_orders > 0 ? money(cacCents) : "—" }, { label: "Flyer → visit", value: `${flyerToVisit}%` }, { label: "Visit → order", value: `${visitToOrder}%` }].map((m) => (
                         <div key={m.label}>
                           <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>{m.label}</div>

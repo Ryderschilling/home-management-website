@@ -78,7 +78,7 @@ export default function PortalContactsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-7 py-7">
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-5 py-6 sm:px-7 sm:py-7">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Contacts</div>
@@ -107,10 +107,10 @@ export default function PortalContactsPage() {
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredContacts.length} visible contacts`}</div>
         </div>
         {filteredContacts.length === 0 ? (
-          <div className="px-7 py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading contacts..." : "No contacts found."}</div>
+          <div className="px-5 py-8 sm:px-7 sm:py-10" style={{ fontSize: 13, color: "var(--text-muted)" }}>{loading ? "Loading contacts..." : "No contacts found."}</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-[1100px] w-full text-left">
+          <div className="portal-table-scroll">
+            <table className="min-w-[860px] w-full text-left md:min-w-[1100px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
                 <tr>{["Name", "Email", "Phone", "Source", "Orders", "Total Spend", "Last Order"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>

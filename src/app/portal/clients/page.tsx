@@ -374,7 +374,7 @@ export default function PortalClientsPage() {
 
   return (
     <div className="space-y-6">
-      <section className={`${S.card} px-7 py-7`}>
+      <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Clients</div>
@@ -396,7 +396,7 @@ export default function PortalClientsPage() {
           <input className={S.input} placeholder="Search clients, email, phone, notes, property name, or address..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         {showEmails && (
-          <div className={`mt-6 ${S.cardInner} p-5`}>
+          <div className={`mt-6 ${S.cardInner} p-4 sm:p-5`}>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className={S.label}>Email list</div>
@@ -408,8 +408,8 @@ export default function PortalClientsPage() {
             {emailRecords.length === 0 ? (
               <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>No emails saved yet.</div>
             ) : (
-              <div className="mt-4 max-h-[320px] overflow-y-auto rounded-xl border border-[var(--border)]">
-                <table className="min-w-full text-left">
+              <div className="portal-table-scroll mt-4 max-h-[320px] overflow-y-auto rounded-xl border border-[var(--border)]">
+                <table className="min-w-[720px] text-left md:min-w-full">
                   <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-3)" }}>
                     <tr>
                       {["Email", "Name", "Source", "Action"].map((h) => (
@@ -453,7 +453,7 @@ export default function PortalClientsPage() {
                 return (
                   <button key={client.id} onClick={() => setSelectedClientId(client.id)} className="block w-full text-left transition"
                     style={{ borderBottom: "1px solid var(--border)", padding: "18px 24px", background: isActive ? "var(--surface-2)" : "transparent" }}>
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{client.name}</div>
                         <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{client.email || "No email saved"}</div>
@@ -472,8 +472,8 @@ export default function PortalClientsPage() {
 
         <div className="space-y-6">
           {showForm && (
-            <section className={`${S.card} p-7`}>
-              <div className="mb-6 flex items-center justify-between gap-4">
+            <section className={`${S.card} p-5 sm:p-7`}>
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>{editingClientId ? "Edit client" : "Create client"}</h2>
                   <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4, fontWeight: 300 }}>Save the homeowner first, then attach one or more managed properties.</p>
@@ -513,7 +513,7 @@ export default function PortalClientsPage() {
                           <input className={S.input} value={property[f.key] as string} onChange={(e) => updatePropertyBlock(index, f.key, e.target.value)} placeholder={f.placeholder} />
                         </div>
                       ))}
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {[{ label: "State", key: "state" as keyof Property }, { label: "ZIP", key: "postalCode" as keyof Property }].map((f) => (
                           <div key={f.key} className="space-y-2">
                             <label className={S.label}>{f.label}</label>
@@ -535,15 +535,15 @@ export default function PortalClientsPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-6 flex gap-3">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <button onClick={saveClient} className={S.btnPrimary}>{editingClientId ? "Save client changes" : "Save client"}</button>
                 <button onClick={resetForm} className={S.btnGhostLg}>Cancel</button>
               </div>
             </section>
           )}
 
-          <section className={`${S.card} p-7`}>
-            <div className="flex items-center justify-between gap-4">
+          <section className={`${S.card} p-5 sm:p-7`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className={S.label} style={{ marginBottom: 4 }}>Client detail</div>
                 <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>{selectedClient ? selectedClient.name : "No client selected"}</h2>
@@ -559,7 +559,7 @@ export default function PortalClientsPage() {
               <div style={{ marginTop: 24, fontSize: 13, color: "var(--text-muted)" }}>Select a client to view details.</div>
             ) : (
               <>
-                <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
                   {[{ label: "Email", value: selectedClient.email || "No email saved" }, { label: "Phone", value: selectedClient.phone || "No phone saved" }, { label: "Properties", value: selectedClientProperties.length }, { label: "Revenue to Date", value: money(selectedClientRevenue) }].map((f) => (
                     <div key={f.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
                       <div className={S.label}>{f.label}</div>
@@ -596,8 +596,8 @@ export default function PortalClientsPage() {
                   {selectedClientOrders.length === 0 ? (
                     <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No purchases saved for this client yet.</div>
                   ) : (
-                    <div className="overflow-x-auto rounded-xl border border-[var(--border)]">
-                      <table className="min-w-full text-left">
+                    <div className="portal-table-scroll rounded-xl border border-[var(--border)]">
+                      <table className="min-w-[760px] text-left md:min-w-full">
                         <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
                           <tr>
                             {["Date", "Product", "Color", "Amount", "Status", "Installed", "Notes"].map((h) => (
@@ -647,7 +647,7 @@ export default function PortalClientsPage() {
                                 </div>
                                 <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 8 }}>Photos attached: {photoCount}</div>
                                 {photos.length > 0 && (
-                                  <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+                                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
                                     {photos.map((photo) => (
                                       <a key={photo.id} href={photo.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-[var(--border)]">
                                         <img src={photo.url} alt={photo.caption || "Job photo"} className="h-32 w-full object-cover" />

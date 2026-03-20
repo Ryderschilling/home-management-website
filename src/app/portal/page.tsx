@@ -129,8 +129,8 @@ const S = {
     background: "var(--surface-2)",
     border: "1px solid var(--border)",
     borderRadius: "8px",
-    padding: "10px 14px",
-    fontSize: "13px",
+    padding: "12px 14px",
+    fontSize: "14px",
     color: "var(--text-primary)",
     outline: "none",
     transition: "border-color 0.15s",
@@ -139,7 +139,7 @@ const S = {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
-    padding: "8px 18px",
+    padding: "10px 18px",
     background: "var(--accent)",
     color: "#0e0e0f",
     border: "none",
@@ -154,7 +154,7 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    padding: "7px 14px",
+    padding: "9px 14px",
     background: "transparent",
     color: "var(--text-secondary)",
     border: "1px solid var(--border)",
@@ -167,7 +167,7 @@ const S = {
     textDecoration: "none",
   },
   btnSmall: {
-    padding: "5px 12px",
+    padding: "8px 12px",
     background: "var(--surface-2)",
     border: "1px solid var(--border)",
     borderRadius: "6px",
@@ -179,6 +179,9 @@ const S = {
     transition: "all 0.15s ease",
   },
 };
+
+const shellPadding = "clamp(20px, 4vw, 32px)";
+const shellPaddingCompact = "clamp(18px, 3vw, 24px)";
 
 function statusPillStyle(status: string): React.CSSProperties {
   const s = status.toUpperCase();
@@ -433,11 +436,11 @@ export default function PortalDashboardPage() {
   const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div className="flex flex-col gap-5 sm:gap-6">
 
       {/* Command Center */}
-      <section style={{ ...S.card, padding: "28px 32px" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: "20px" }}>
+      <section style={{ ...S.card, padding: shellPadding }}>
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div style={{ maxWidth: "520px" }}>
             <div style={S.label}>Dashboard</div>
             <h1 style={{ ...S.heading, fontSize: "32px", lineHeight: 1.1, marginTop: "8px", letterSpacing: "-0.01em" }}>
@@ -447,7 +450,7 @@ export default function PortalDashboardPage() {
               See today&apos;s work, orders needing action, recent clients, and the live operating picture of the business.
             </p>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+          <div className="flex flex-wrap gap-2">
             <button onClick={openAddJob} style={S.btnPrimary}>+ Add job</button>
             {[
               { href: "/portal/orders", label: "Orders" },
@@ -470,7 +473,7 @@ export default function PortalDashboardPage() {
       </section>
 
       {/* Stats */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px" }}>
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {[
           { label: "Revenue", value: formatMoney(dashboardStats.revenue), accent: true },
           { label: "Clients", value: dashboardStats.clients },
@@ -479,7 +482,7 @@ export default function PortalDashboardPage() {
           { label: "Ordered", value: dashboardStats.ordered },
           { label: "Today's Jobs", value: dashboardStats.todayJobs },
         ].map((stat) => (
-          <div key={stat.label} style={{ ...S.card, padding: "18px 20px", ...(stat.accent ? { borderColor: "rgba(201,184,154,0.2)", background: "linear-gradient(135deg, var(--surface) 0%, rgba(201,184,154,0.04) 100%)" } : {}) }}>
+          <div key={stat.label} style={{ ...S.card, padding: shellPaddingCompact, ...(stat.accent ? { borderColor: "rgba(201,184,154,0.2)", background: "linear-gradient(135deg, var(--surface) 0%, rgba(201,184,154,0.04) 100%)" } : {}) }}>
             <div style={S.label}>{stat.label}</div>
             <div style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: "26px", letterSpacing: "-0.02em", lineHeight: 1, marginTop: "10px", color: stat.accent ? "var(--accent-warm)" : "var(--text-primary)" }}>
               {stat.value}
@@ -489,9 +492,9 @@ export default function PortalDashboardPage() {
       </section>
 
       {/* Today + Orders */}
-      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div style={{ ...S.card }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ padding: `${shellPaddingCompact} ${shellPaddingCompact} 16px`, borderBottom: "1px solid var(--border)" }}>
             <div>
               <div style={S.label}>Today</div>
               <div style={{ ...S.heading, fontSize: "18px", marginTop: "2px" }}>Today&apos;s tasks</div>
@@ -501,7 +504,7 @@ export default function PortalDashboardPage() {
               Live
             </div>
           </div>
-          <div style={{ padding: "16px 24px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ padding: `16px ${shellPaddingCompact}`, display: "flex", flexDirection: "column", gap: "8px" }}>
             {todayJobs.length === 0 ? (
               <div style={{ padding: "32px 20px", textAlign: "center", fontSize: "13px", color: "var(--text-muted)", border: "1px dashed var(--border)", borderRadius: "10px" }}>
                 No jobs scheduled today
@@ -519,7 +522,7 @@ export default function PortalDashboardPage() {
         </div>
 
         <div style={{ ...S.card }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ padding: `${shellPaddingCompact} ${shellPaddingCompact} 16px`, borderBottom: "1px solid var(--border)" }}>
             <div>
               <div style={S.label}>Fulfillment</div>
               <div style={{ ...S.heading, fontSize: "18px", marginTop: "2px" }}>Orders needing action</div>
@@ -528,7 +531,7 @@ export default function PortalDashboardPage() {
               View all
             </Link>
           </div>
-          <div style={{ padding: "16px 24px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ padding: `16px ${shellPaddingCompact}`, display: "flex", flexDirection: "column", gap: "8px" }}>
             {actionOrders.length === 0 ? (
               <div style={{ padding: "32px 20px", textAlign: "center", fontSize: "13px", color: "var(--text-muted)", border: "1px dashed var(--border)", borderRadius: "10px" }}>
                 No active orders need action
@@ -553,9 +556,9 @@ export default function PortalDashboardPage() {
       </section>
 
       {/* Upcoming + Calendar */}
-      <section style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "16px" }}>
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div style={{ ...S.card }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ padding: `${shellPaddingCompact} ${shellPaddingCompact} 16px`, borderBottom: "1px solid var(--border)" }}>
             <div>
               <div style={S.label}>Upcoming</div>
               <div style={{ ...S.heading, fontSize: "18px", marginTop: "2px" }}>Upcoming jobs</div>
@@ -566,17 +569,14 @@ export default function PortalDashboardPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {upcomingJobs.length === 0 ? (
-              <div style={{ padding: "32px 24px", textAlign: "center", fontSize: "13px", color: "var(--text-muted)" }}>No upcoming jobs scheduled.</div>
+              <div style={{ padding: `32px ${shellPaddingCompact}`, textAlign: "center", fontSize: "13px", color: "var(--text-muted)" }}>No upcoming jobs scheduled.</div>
             ) : upcomingJobs.map((job) => (
 <button
   key={job.id}
   onClick={() => setActiveJobId(job.id)}
+  className="flex w-full flex-col items-start gap-3 text-left transition sm:flex-row sm:items-center sm:justify-between"
   style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "14px 24px",
-    textAlign: "left",
+    padding: `14px ${shellPaddingCompact}`,
     cursor: "pointer",
     background: "transparent",
     border: "none",
@@ -601,18 +601,18 @@ export default function PortalDashboardPage() {
         </div>
 
         <div style={{ ...S.card }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px 16px", borderBottom: "1px solid var(--border)" }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ padding: `${shellPaddingCompact} ${shellPaddingCompact} 16px`, borderBottom: "1px solid var(--border)" }}>
             <div>
               <div style={S.label}>Calendar</div>
               <div style={{ ...S.heading, fontSize: "18px", marginTop: "2px" }}>Monthly view</div>
             </div>
-            <div style={{ display: "flex", gap: "4px" }}>
+            <div className="flex flex-wrap gap-2">
               <button onClick={jumpToday} style={S.btnSmall}>Today</button>
               <button onClick={goPrevMonth} style={S.btnSmall}>‹</button>
               <button onClick={goNextMonth} style={S.btnSmall}>›</button>
             </div>
           </div>
-          <div style={{ padding: "20px 24px" }}>
+          <div style={{ padding: shellPaddingCompact }}>
             <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginBottom: "16px", fontWeight: 300 }}>
               {formatMonthLabel(viewYear, viewMonth)}
             </div>
@@ -663,16 +663,16 @@ export default function PortalDashboardPage() {
 
       {/* Add Job Form */}
       {showAddJob ? (
-        <section ref={addJobRef} style={{ ...S.card, padding: "28px 32px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px", marginBottom: "24px" }}>
+        <section ref={addJobRef} style={{ ...S.card, padding: shellPadding }}>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div style={{ ...S.heading, fontSize: "22px" }}>Add job</div>
               <p style={{ ...S.subtext, marginTop: "4px" }}>Choose a service or create a custom job. Set a recurring schedule if needed.</p>
             </div>
             <button onClick={() => setShowAddJob(false)} style={S.btnGhost}>Close</button>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-            <div style={{ gridColumn: "span 2" }}>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="md:col-span-2">
               <div style={{ ...S.label, marginBottom: "6px" }}>Service</div>
               <select style={{ ...S.input, fontFamily: "inherit" }} value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
                 <option value="">Custom job / no predefined service</option>
@@ -709,8 +709,8 @@ export default function PortalDashboardPage() {
               <div style={{ ...S.label, marginBottom: "6px" }}>Hours</div>
               <input style={S.input} placeholder="e.g. 1.5" value={hours} onChange={(e) => setHours(e.target.value)} />
             </div>
-            <div style={{ gridColumn: "span 2", ...S.cardInner, padding: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
+            <div className="md:col-span-2" style={{ ...S.cardInner, padding: "16px" }}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <div style={S.label}>Recurring schedule</div>
                   <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>Repeat this job on a schedule.</div>
@@ -721,7 +721,7 @@ export default function PortalDashboardPage() {
                 </label>
               </div>
               {recurrenceEnabled ? (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginTop: "16px" }}>
+                <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div>
                     <div style={{ ...S.label, marginBottom: "6px" }}>Frequency</div>
                     <select style={{ ...S.input, fontFamily: "inherit" }} value={recurrenceFrequency} onChange={(e) => setRecurrenceFrequency(e.target.value)}>
@@ -755,22 +755,22 @@ export default function PortalDashboardPage() {
 
       {/* Job Detail Modal */}
       {activeJob ? (
-        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", padding: "32px 16px" }} onClick={() => setActiveJobId(null)}>
-          <div style={{ width: "100%", maxWidth: "560px", ...S.card, padding: "28px", boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "16px" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.6)", padding: "max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))" }} onClick={() => setActiveJobId(null)}>
+          <div style={{ width: "100%", maxWidth: "560px", ...S.card, padding: shellPadding, boxShadow: "0 24px 64px rgba(0,0,0,0.5)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div style={{ minWidth: 0 }}>
                 <div style={S.label}>Task details</div>
-                <div style={{ ...S.heading, fontSize: "26px", marginTop: "6px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{activeJob.title}</div>
+                <div style={{ ...S.heading, fontSize: "26px", marginTop: "6px", overflowWrap: "anywhere" }}>{activeJob.title}</div>
                 <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "6px", fontFamily: "var(--font-mono), monospace", letterSpacing: "0.02em" }}>
                   {new Date(activeJob.scheduled_for).toLocaleString([], { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+              <div className="flex flex-wrap gap-2 sm:justify-end" style={{ flexShrink: 0 }}>
                 <button onClick={deleteActiveJob} style={{ padding: "7px 14px", borderRadius: "8px", border: "1px solid rgba(248,113,113,0.3)", background: "rgba(248,113,113,0.08)", color: "#f87171", fontSize: "11px", letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer" }}>Delete</button>
                 <button onClick={() => setActiveJobId(null)} style={S.btnGhost}>Close</button>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "20px" }}>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
                 { label: "Client", value: clientName(activeJob.client_id) },
                 { label: "Property", value: propertyName(activeJob.property_id), sub: propertyAddress(activeJob.property_id) || undefined },
