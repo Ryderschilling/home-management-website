@@ -13,6 +13,7 @@ type NavItem = {
 const primaryNav: NavItem[] = [
   { href: "/portal", label: "Dashboard" },
   { href: "/portal/jobs", label: "Jobs" },
+  { href: "/portal/invoices", label: "Invoices" },
   { href: "/portal/orders", label: "Orders" },
   { href: "/portal/clients", label: "Clients" },
   { href: "/portal/services", label: "Services" },
@@ -22,7 +23,7 @@ const secondaryNav: NavItem[] = [
   { href: "/portal/properties", label: "Properties" },
   { href: "/portal/campaigns", label: "Campaigns" },
   { href: "/portal/contacts", label: "Contacts" },
-  { href: "/portal/retainers", label: "Retainers" },
+  { href: "/portal/retainers", label: "Plans" },
   { href: "/portal/exports", label: "Exports" },
 ];
 

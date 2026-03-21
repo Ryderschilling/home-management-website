@@ -68,6 +68,46 @@ type Job = {
   photos?: JobPhoto[] | null;
 };
 
+type Retainer = {
+  id: string;
+  client_id?: string | null;
+  property_id?: string | null;
+  name: string;
+  amount_cents: number;
+  billing_frequency: string;
+  billing_interval: number;
+  service_frequency: string;
+  service_interval: number;
+  status: string;
+  next_visit_at?: string | null;
+  future_visit_count?: number | null;
+};
+
+type InvoiceLineItem = {
+  id: string;
+  description: string;
+  quantity: number | string;
+  unit_price_cents: number;
+  line_total_cents: number;
+  line_type: string;
+};
+
+type Invoice = {
+  id: string;
+  client_id?: string | null;
+  property_id?: string | null;
+  retainer_id?: string | null;
+  invoice_number: string;
+  status: string;
+  period_start?: string | null;
+  period_end?: string | null;
+  issue_date?: string | null;
+  due_date?: string | null;
+  total_cents?: number | null;
+  notes?: string | null;
+  line_items?: InvoiceLineItem[] | null;
+};
+
 type EmailRecord = {
   email: string;
   name: string;
@@ -178,6 +218,8 @@ export default function PortalClientsPage() {
   const [properties, setProperties] = useState<any[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [retainers, setRetainers] = useState<Retainer[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -195,25 +237,33 @@ export default function PortalClientsPage() {
     setLoading(true);
     setError("");
     try {
-      const [clientsRes, propertiesRes, ordersRes, jobsRes] = await Promise.all([
+      const [clientsRes, propertiesRes, ordersRes, jobsRes, retainersRes, invoicesRes] = await Promise.all([
         fetch("/api/admin/clients"),
         fetch("/api/admin/properties"),
         fetch("/api/admin/orders"),
-        fetch("/api/admin/jobs"),
+        fetch(`/api/admin/jobs?includeCompleted=true&start=${encodeURIComponent(new Date(Date.now() - 1000 * 60 * 60 * 24 * 180).toISOString())}&end=${encodeURIComponent(new Date(Date.now() + 1000 * 60 * 60 * 24 * 120).toISOString())}`),
+        fetch("/api/admin/retainers"),
+        fetch("/api/admin/invoices"),
       ]);
       const clientsJson = await clientsRes.json();
       const propertiesJson = await propertiesRes.json();
       const ordersJson = await ordersRes.json();
       const jobsJson = await jobsRes.json();
+      const retainersJson = await retainersRes.json();
+      const invoicesJson = await invoicesRes.json();
       if (!clientsRes.ok || !clientsJson.ok) throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
       if (!propertiesRes.ok || !propertiesJson.ok) throw new Error(propertiesJson?.error?.message ?? "Failed to load properties");
       if (!ordersRes.ok || !ordersJson.ok) throw new Error(ordersJson?.error?.message ?? "Failed to load orders");
       if (!jobsRes.ok || !jobsJson.ok) throw new Error(jobsJson?.error?.message ?? "Failed to load jobs");
+      if (!retainersRes.ok || !retainersJson.ok) throw new Error(retainersJson?.error?.message ?? "Failed to load plans");
+      if (!invoicesRes.ok || !invoicesJson.ok) throw new Error(invoicesJson?.error?.message ?? "Failed to load invoices");
       const nextClients = clientsJson.data ?? [];
       setClients(nextClients);
       setProperties(propertiesJson.data ?? []);
       setOrders(ordersJson.data ?? []);
       setJobs(jobsJson.data ?? []);
+      setRetainers(retainersJson.data ?? []);
+      setInvoices(invoicesJson.data ?? []);
       if (!selectedClientId && nextClients.length > 0) setSelectedClientId(nextClients[0].id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load clients");
@@ -274,6 +324,31 @@ export default function PortalClientsPage() {
     if (!selectedClient) return [];
     return jobs.filter((j) => j.client_id === selectedClient.id).sort((a, b) => new Date(b.scheduled_for ?? 0).getTime() - new Date(a.scheduled_for ?? 0).getTime());
   }, [jobs, selectedClient]);
+
+  const selectedClientPlans = useMemo(() => {
+    if (!selectedClient) return [];
+    return retainers.filter((retainer) => retainer.client_id === selectedClient.id);
+  }, [retainers, selectedClient]);
+
+  const selectedClientInvoices = useMemo(() => {
+    if (!selectedClient) return [];
+    return invoices
+      .filter((invoice) => invoice.client_id === selectedClient.id)
+      .sort((a, b) => new Date(b.issue_date ?? b.period_end ?? 0).getTime() - new Date(a.issue_date ?? a.period_end ?? 0).getTime());
+  }, [invoices, selectedClient]);
+
+  const selectedClientUpcomingJobs = useMemo(() => {
+    const now = Date.now();
+    return selectedClientJobs
+      .filter((job) => new Date(job.scheduled_for ?? 0).getTime() >= now && String(job.status ?? "").toUpperCase() !== "CANCELED")
+      .sort((a, b) => new Date(a.scheduled_for ?? 0).getTime() - new Date(b.scheduled_for ?? 0).getTime());
+  }, [selectedClientJobs]);
+
+  const selectedClientCompletedJobs = useMemo(() => {
+    return selectedClientJobs
+      .filter((job) => String(job.status ?? "").toUpperCase() === "COMPLETED" || Boolean(job.completed_at))
+      .sort((a, b) => new Date(b.completed_at ?? b.scheduled_for ?? 0).getTime() - new Date(a.completed_at ?? a.scheduled_for ?? 0).getTime());
+  }, [selectedClientJobs]);
 
   const totalProperties = properties.length;
   const selectedClientRevenue = selectedClientOrders.reduce((sum, o) => sum + (typeof o.total_amount_cents === "number" ? o.total_amount_cents : 0), 0);
@@ -424,7 +499,7 @@ export default function PortalClientsPage() {
                         <td className="px-4 py-3" style={{ fontSize: 13, color: "var(--text-secondary)" }}>{r.name}</td>
                         <td className="px-4 py-3" style={{ fontSize: 13, color: "var(--text-secondary)" }}>{r.source}</td>
                         <td className="px-4 py-3 text-right">
-                          {r.clientId ? <button onClick={() => deleteClientRecord(r.clientId as string, r.name)} className={S.btnDanger}>Delete</button> : <span style={{ fontSize: 12, color: "var(--text-muted)" }}>—</span>}
+                          {r.clientId ? <button onClick={() => deleteClientRecord(r.email, r.name)} className={S.btnDanger}>Delete</button> : <span style={{ fontSize: 12, color: "var(--text-muted)" }}>—</span>}
                         </td>
                       </tr>
                     ))}
@@ -559,8 +634,8 @@ export default function PortalClientsPage() {
               <div style={{ marginTop: 24, fontSize: 13, color: "var(--text-muted)" }}>Select a client to view details.</div>
             ) : (
               <>
-                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-                  {[{ label: "Email", value: selectedClient.email || "No email saved" }, { label: "Phone", value: selectedClient.phone || "No phone saved" }, { label: "Properties", value: selectedClientProperties.length }, { label: "Revenue to Date", value: money(selectedClientRevenue) }].map((f) => (
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
+                  {[{ label: "Email", value: selectedClient.email || "No email saved" }, { label: "Phone", value: selectedClient.phone || "No phone saved" }, { label: "Properties", value: selectedClientProperties.length }, { label: "Active plans", value: selectedClientPlans.filter((plan) => plan.status === "ACTIVE").length }, { label: "Upcoming jobs", value: selectedClientUpcomingJobs.length }, { label: "Revenue to Date", value: money(selectedClientRevenue) }].map((f) => (
                     <div key={f.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
                       <div className={S.label}>{f.label}</div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginTop: 4 }}>{f.value}</div>
@@ -585,6 +660,57 @@ export default function PortalClientsPage() {
                           {[{ label: "Entry", value: p.entry || p.gate_code || p.door_code || p.garage_code || p.alarm_code || "—" }, { label: "Access notes", value: p.access_notes || "—" }, { label: "Irrigation notes", value: p.irrigation_notes || "—" }, { label: "Property notes", value: p.notes || "—" }].map((f) => (
                             <div key={f.label} style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 6 }}><span style={{ fontWeight: 500, color: "var(--text-primary)" }}>{f.label}:</span> {f.value}</div>
                           ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-8">
+                  <div className={S.label}>Service plans</div>
+                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Recurring agreements</h3>
+                  {selectedClientPlans.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No active or historical plans saved for this client yet.</div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                      {selectedClientPlans.map((plan) => (
+                        <div key={plan.id} className={S.cardInner} style={{ padding: 16 }}>
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{plan.name}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{money(plan.amount_cents)} billed every {plan.billing_interval} {plan.billing_frequency.toLowerCase()}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>Visits every {plan.service_interval} {plan.service_frequency.toLowerCase()}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Next visit: {fmtDate(plan.next_visit_at)}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Future visits in horizon: {plan.future_visit_count ?? 0}</div>
+                            </div>
+                            <span style={plan.status === "ACTIVE" ? { background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", color: "#4ade80", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" } : statusPillStyle(plan.status)}>
+                              {plan.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-8">
+                  <div className={S.label}>Recent invoices</div>
+                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Billing history</h3>
+                  {selectedClientInvoices.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No invoices have been created for this client yet.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {selectedClientInvoices.slice(0, 6).map((invoice) => (
+                        <div key={invoice.id} className={S.cardInner} style={{ padding: 16 }}>
+                          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{invoice.invoice_number}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>Issue {fmtDate(invoice.issue_date)} • Due {fmtDate(invoice.due_date)}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{invoice.notes || "No notes"}</div>
+                            </div>
+                            <div className="flex flex-col items-start gap-2 md:items-end">
+                              <span style={statusPillStyle(invoice.status)}>{invoice.status}</span>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{money(invoice.total_cents)}</div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -623,13 +749,13 @@ export default function PortalClientsPage() {
                   )}
                 </div>
                 <div className="mt-8">
-                  <div className={S.label}>Service history</div>
-                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Jobs, visits, notes, and photos</h3>
-                  {selectedClientJobs.length === 0 ? (
-                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No jobs or service history saved for this client yet.</div>
+                  <div className={S.label}>Upcoming visits</div>
+                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Scheduled jobs and execution queue</h3>
+                  {selectedClientUpcomingJobs.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No upcoming jobs scheduled for this client.</div>
                   ) : (
                     <div className="space-y-4">
-                      {selectedClientJobs.map((job) => {
+                      {selectedClientUpcomingJobs.map((job) => {
                         const photos = Array.isArray(job.photos) ? job.photos : [];
                         const photoCount = typeof job.photo_count === "number" ? job.photo_count : photos.length;
                         return (
@@ -659,6 +785,48 @@ export default function PortalClientsPage() {
                               </div>
                               <div className="flex flex-col gap-2">
                                 {job.order_id && <span style={{ flexShrink: 0, border: "1px solid var(--border)", borderRadius: 999, padding: "2px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Linked to order</span>}
+                                {photoCount > 0 && <span style={{ flexShrink: 0, border: "1px solid rgba(74,222,128,0.25)", borderRadius: 999, padding: "2px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#4ade80", background: "rgba(74,222,128,0.1)" }}>{photoCount} photo{photoCount === 1 ? "" : "s"}</span>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-8">
+                  <div className={S.label}>Recent completed visits</div>
+                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Completed service history and proof of work</h3>
+                  {selectedClientCompletedJobs.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No completed jobs saved for this client yet.</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {selectedClientCompletedJobs.slice(0, 8).map((job) => {
+                        const photos = Array.isArray(job.photos) ? job.photos : [];
+                        const photoCount = typeof job.photo_count === "number" ? job.photo_count : photos.length;
+                        return (
+                          <div key={job.id} className={S.cardInner} style={{ padding: 16 }}>
+                            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                              <div className="min-w-0">
+                                <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{job.title || "Untitled job"}</div>
+                                <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>Completed: {fmtDate(job.completed_at || job.scheduled_for)}</div>
+                                <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>Price: {money(job.price_cents)}</div>
+                                <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3" style={{ fontSize: 13, lineHeight: 1.6, color: "var(--text-secondary)" }}>
+                                  <span style={{ fontWeight: 500, color: "var(--text-primary)" }}>Service notes:</span> {job.notes || "No notes saved for this service."}
+                                </div>
+                                {photos.length > 0 && (
+                                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+                                    {photos.map((photo) => (
+                                      <a key={photo.id} href={photo.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-xl border border-[var(--border)]">
+                                        <img src={photo.url} alt={photo.caption || "Job photo"} className="h-32 w-full object-cover" />
+                                        <div className="px-3 py-2" style={{ fontSize: 11, color: "var(--text-muted)" }}>{photo.caption || "View photo"}</div>
+                                      </a>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <span style={statusPillStyle(job.status || "COMPLETED")}>{job.status || "COMPLETED"}</span>
                                 {photoCount > 0 && <span style={{ flexShrink: 0, border: "1px solid rgba(74,222,128,0.25)", borderRadius: 999, padding: "2px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#4ade80", background: "rgba(74,222,128,0.1)" }}>{photoCount} photo{photoCount === 1 ? "" : "s"}</span>}
                               </div>
                             </div>

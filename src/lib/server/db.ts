@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 15;
+const ADMIN_SCHEMA_VERSION = 16;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -208,6 +208,17 @@ export async function ensureAdminTables(): Promise<void> {
     )`;
     await tx`CREATE INDEX IF NOT EXISTS admin_jobs_org_idx ON admin_jobs (organization_id, scheduled_for)`;
     await tx`CREATE INDEX IF NOT EXISTS admin_jobs_status_idx ON admin_jobs (organization_id, status)`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_type TEXT NOT NULL DEFAULT 'MANUAL'`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_key TEXT`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_plan_occurrence_date DATE`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS plan_visit_modified BOOLEAN NOT NULL DEFAULT FALSE`;
+    await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_jobs_source_key_uq
+      ON admin_jobs (organization_id, source_key)
+      WHERE source_key IS NOT NULL`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_jobs_source_type_idx
+      ON admin_jobs (organization_id, source_type, scheduled_for)`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_jobs_plan_occurrence_idx
+      ON admin_jobs (organization_id, retainer_id, source_plan_occurrence_date)`;
 
     await tx`CREATE TABLE IF NOT EXISTS admin_job_photos (
       id TEXT PRIMARY KEY,
@@ -239,6 +250,71 @@ export async function ensureAdminTables(): Promise<void> {
 
     await tx`CREATE INDEX IF NOT EXISTS admin_job_photos_job_idx ON admin_job_photos (job_id, uploaded_at)`;
 
+    await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      client_id TEXT,
+      property_id TEXT,
+      retainer_id TEXT,
+      invoice_number TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'DRAFT',
+      period_start DATE,
+      period_end DATE,
+      issue_date DATE,
+      due_date DATE,
+      subtotal_cents INTEGER NOT NULL DEFAULT 0,
+      total_cents INTEGER NOT NULL DEFAULT 0,
+      notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_invoices_client_fk
+        FOREIGN KEY (client_id)
+        REFERENCES admin_clients(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoices_property_fk
+        FOREIGN KEY (property_id)
+        REFERENCES admin_properties(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoices_retainer_fk
+        FOREIGN KEY (retainer_id)
+        REFERENCES admin_retainers(id)
+        ON DELETE SET NULL
+    )`;
+    await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_number_uq
+      ON admin_invoices (organization_id, invoice_number)`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_invoices_org_status_idx
+      ON admin_invoices (organization_id, status, issue_date DESC, created_at DESC)`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_invoices_client_idx
+      ON admin_invoices (organization_id, client_id, created_at DESC)`;
+
+    await tx`CREATE TABLE IF NOT EXISTS admin_invoice_line_items (
+      id TEXT PRIMARY KEY,
+      invoice_id TEXT NOT NULL,
+      organization_id TEXT NOT NULL,
+      job_id TEXT,
+      retainer_id TEXT,
+      description TEXT NOT NULL,
+      quantity NUMERIC NOT NULL DEFAULT 1,
+      unit_price_cents INTEGER NOT NULL DEFAULT 0,
+      line_total_cents INTEGER NOT NULL DEFAULT 0,
+      line_type TEXT NOT NULL DEFAULT 'MANUAL',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_invoice_line_items_invoice_fk
+        FOREIGN KEY (invoice_id)
+        REFERENCES admin_invoices(id)
+        ON DELETE CASCADE,
+      CONSTRAINT admin_invoice_line_items_job_fk
+        FOREIGN KEY (job_id)
+        REFERENCES admin_jobs(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoice_line_items_retainer_fk
+        FOREIGN KEY (retainer_id)
+        REFERENCES admin_retainers(id)
+        ON DELETE SET NULL
+    )`;
+    await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
+      ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
+
     // Safe adds (existing DBs)
     await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS notes TEXT`;
 
@@ -267,6 +343,10 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_interval INTEGER`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_end_date TIMESTAMPTZ`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS parent_job_id TEXT`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_type TEXT NOT NULL DEFAULT 'MANUAL'`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_key TEXT`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_plan_occurrence_date DATE`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS plan_visit_modified BOOLEAN NOT NULL DEFAULT FALSE`;
 
     await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_session_id TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS source TEXT`;
@@ -403,7 +483,77 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_created_at T
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_referral_code_idx
   ON admin_orders (organization_id, referral_code)`;
 
-    await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
+await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_jobs_source_key_uq
+  ON admin_jobs (organization_id, source_key)
+  WHERE source_key IS NOT NULL`;
+await tx`CREATE INDEX IF NOT EXISTS admin_jobs_source_type_idx
+  ON admin_jobs (organization_id, source_type, scheduled_for)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_jobs_plan_occurrence_idx
+  ON admin_jobs (organization_id, retainer_id, source_plan_occurrence_date)`;
+await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
+  id TEXT PRIMARY KEY,
+  organization_id TEXT NOT NULL,
+  client_id TEXT,
+  property_id TEXT,
+  retainer_id TEXT,
+  invoice_number TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'DRAFT',
+  period_start DATE,
+  period_end DATE,
+  issue_date DATE,
+  due_date DATE,
+  subtotal_cents INTEGER NOT NULL DEFAULT 0,
+  total_cents INTEGER NOT NULL DEFAULT 0,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS client_id TEXT`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS property_id TEXT`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS invoice_number TEXT`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'DRAFT'`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_start DATE`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_end DATE`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS issue_date DATE`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS due_date DATE`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS subtotal_cents INTEGER NOT NULL DEFAULT 0`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS total_cents INTEGER NOT NULL DEFAULT 0`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS notes TEXT`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_number_uq
+  ON admin_invoices (organization_id, invoice_number)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_invoices_org_status_idx
+  ON admin_invoices (organization_id, status, issue_date DESC, created_at DESC)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_invoices_client_idx
+  ON admin_invoices (organization_id, client_id, created_at DESC)`;
+await tx`CREATE TABLE IF NOT EXISTS admin_invoice_line_items (
+  id TEXT PRIMARY KEY,
+  invoice_id TEXT NOT NULL,
+  organization_id TEXT NOT NULL,
+  job_id TEXT,
+  retainer_id TEXT,
+  description TEXT NOT NULL,
+  quantity NUMERIC NOT NULL DEFAULT 1,
+  unit_price_cents INTEGER NOT NULL DEFAULT 0,
+  line_total_cents INTEGER NOT NULL DEFAULT 0,
+  line_type TEXT NOT NULL DEFAULT 'MANUAL',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+)`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS invoice_id TEXT`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS organization_id TEXT`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS job_id TEXT`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS description TEXT`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS quantity NUMERIC NOT NULL DEFAULT 1`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS unit_price_cents INTEGER NOT NULL DEFAULT 0`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_total_cents INTEGER NOT NULL DEFAULT 0`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_type TEXT NOT NULL DEFAULT 'MANUAL'`;
+await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
+  ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
 
     // FK for retainer_id if missing (older DB)
     await tx`

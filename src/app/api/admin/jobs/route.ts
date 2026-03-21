@@ -15,7 +15,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const organizationId = getOrganizationId(request);
-    const data = await listJobs(organizationId);
+    const { searchParams } = new URL(request.url);
+    const data = await listJobs(organizationId, {
+      start: searchParams.get("start"),
+      end: searchParams.get("end"),
+      status: searchParams.get("status"),
+      clientId: searchParams.get("clientId"),
+      propertyId: searchParams.get("propertyId"),
+      includeCompleted:
+        searchParams.get("includeCompleted") === "true" ||
+        searchParams.get("includeCompleted") === "1",
+    });
     return NextResponse.json(ok(data));
   } catch (error) {
     return NextResponse.json(

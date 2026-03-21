@@ -59,17 +59,31 @@ export async function PATCH(
     const { retainerId } = await params;
     const organizationId = getOrganizationId(request);
     const body = await parseJsonBody(request);
+    if (body.action === "REGENERATE_FUTURE_VISITS") {
+      const data = await syncRetainerJobs(organizationId, retainerId, {
+        regenerate: true,
+      });
+
+      if (!data) {
+        return NextResponse.json(fail("NOT_FOUND", "Retainer not found."), {
+          status: 404,
+        });
+      }
+
+      return NextResponse.json(ok(data));
+    }
+
     const data = await updateRetainer(organizationId, retainerId, body);
 
-if (!data) {
-  return NextResponse.json(fail("NOT_FOUND", "Retainer not found."), {
-    status: 404,
-  });
-}
+    if (!data) {
+      return NextResponse.json(fail("NOT_FOUND", "Retainer not found."), {
+        status: 404,
+      });
+    }
 
-await syncRetainerJobs(organizationId, retainerId);
+    await syncRetainerJobs(organizationId, retainerId);
 
-return NextResponse.json(ok(data));
+    return NextResponse.json(ok(data));
   } catch (error) {
     return NextResponse.json(
       fail(

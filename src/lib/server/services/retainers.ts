@@ -4,42 +4,101 @@ import { asNonEmptyString, asOptionalString } from "@/lib/server/validation";
 type RetainerStatus = "ACTIVE" | "PAUSED" | "CANCELED";
 type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
 
+const VALID_FREQUENCIES = new Set<Frequency>(["DAILY", "WEEKLY", "MONTHLY"]);
+const VALID_STATUSES = new Set<RetainerStatus>(["ACTIVE", "PAUSED", "CANCELED"]);
+
 function addFrequency(date: Date, frequency: Frequency, interval: number) {
-    const d = new Date(date);
-  
-    if (frequency === "DAILY") {
-      d.setDate(d.getDate() + interval);
-    } else if (frequency === "WEEKLY") {
-      d.setDate(d.getDate() + interval * 7);
-    } else if (frequency === "MONTHLY") {
-      d.setMonth(d.getMonth() + interval);
-    } else {
-      throw new Error("Invalid service frequency");
-    }
-  
-    return d;
-  }
-  
-  function normalizeAnchorDate(value: string | null | undefined) {
-    if (!value) return new Date();
-  
-    const d = new Date(`${value}T09:00:00`);
-    if (Number.isNaN(d.getTime())) return new Date();
-  
-    return d;
-  }
+  const next = new Date(date);
 
-export async function listRetainers(organizationId: string) {
-  await ensureAdminTables();
+  if (frequency === "DAILY") next.setDate(next.getDate() + interval);
+  else if (frequency === "WEEKLY") next.setDate(next.getDate() + interval * 7);
+  else if (frequency === "MONTHLY") next.setMonth(next.getMonth() + interval);
+  else throw new Error("Invalid service frequency");
 
-  return sql`
+  return next;
+}
+
+function normalizeAnchorDate(value: string | null | undefined) {
+  if (!value) return new Date();
+
+  const date = new Date(`${value}T09:00:00`);
+  if (Number.isNaN(date.getTime())) return new Date();
+  return date;
+}
+
+function normalizeFrequency(value: unknown, label: string, fallback?: Frequency) {
+  const frequency = String(value ?? fallback ?? "").trim().toUpperCase() as Frequency;
+  if (!VALID_FREQUENCIES.has(frequency)) {
+    throw new Error(`${label} must be DAILY, WEEKLY, or MONTHLY`);
+  }
+  return frequency;
+}
+
+function normalizeStatus(value: unknown, fallback: RetainerStatus = "ACTIVE") {
+  const status = String(value ?? fallback).trim().toUpperCase() as RetainerStatus;
+  if (!VALID_STATUSES.has(status)) {
+    throw new Error("status must be ACTIVE, PAUSED, or CANCELED");
+  }
+  return status;
+}
+
+function parsePositiveInteger(value: unknown, label: string, fallback = 1) {
+  const parsed = Math.max(1, Number(value ?? fallback));
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    throw new Error(`${label} must be at least 1`);
+  }
+  return parsed;
+}
+
+function formatDateOnly(date: Date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function formatSourceKey(retainerId: string, occurrence: Date) {
+  return `plan:${retainerId}:${occurrence.toISOString().slice(0, 16)}`;
+}
+
+async function assertClientExists(organizationId: string, clientId: string) {
+  const rows = await sql`
+    SELECT id
+    FROM admin_clients
+    WHERE id = ${clientId} AND organization_id = ${organizationId}
+    LIMIT 1
+  `;
+
+  if (!rows[0]) throw new Error("Selected client not found");
+}
+
+async function assertPropertyExists(
+  organizationId: string,
+  propertyId: string | null,
+  clientId: string
+) {
+  if (!propertyId) return;
+
+  const rows = await sql`
+    SELECT id, client_id
+    FROM admin_properties
+    WHERE id = ${propertyId} AND organization_id = ${organizationId}
+    LIMIT 1
+  `;
+
+  const property = rows[0];
+  if (!property) throw new Error("Selected property not found");
+  if (property.client_id && property.client_id !== clientId) {
+    throw new Error("Selected property does not belong to the selected client");
+  }
+}
+
+async function fetchRetainerRecord(organizationId: string, retainerId: string) {
+  const rows = await sql`
     SELECT
       r.id,
       r.organization_id,
       r.client_id,
       r.property_id,
       r.name,
-            r.amount_cents,
+      r.amount_cents,
       r.billing_frequency,
       r.billing_interval,
       r.billing_anchor_date,
@@ -54,7 +113,10 @@ export async function listRetainers(organizationId: string) {
       c.email AS client_email,
       c.phone AS client_phone,
       p.name AS property_name,
-      p.address_line1 AS property_address_line1
+      p.address_line1 AS property_address_line1,
+      COALESCE(job_summary.future_visit_count, 0) AS future_visit_count,
+      job_summary.next_visit_at,
+      COALESCE(invoice_summary.invoice_count, 0) AS invoice_count
     FROM admin_retainers r
     LEFT JOIN admin_clients c
       ON c.id = r.client_id
@@ -62,6 +124,81 @@ export async function listRetainers(organizationId: string) {
     LEFT JOIN admin_properties p
       ON p.id = r.property_id
       AND p.organization_id = r.organization_id
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(*)::int AS future_visit_count,
+        MIN(j.scheduled_for) AS next_visit_at
+      FROM admin_jobs j
+      WHERE j.organization_id = r.organization_id
+        AND j.retainer_id = r.id
+        AND j.scheduled_for >= NOW()
+        AND UPPER(j.status) <> 'CANCELED'
+    ) AS job_summary ON true
+    LEFT JOIN LATERAL (
+      SELECT COUNT(*)::int AS invoice_count
+      FROM admin_invoices i
+      WHERE i.organization_id = r.organization_id
+        AND i.retainer_id = r.id
+    ) AS invoice_summary ON true
+    WHERE r.organization_id = ${organizationId} AND r.id = ${retainerId}
+    LIMIT 1
+  `;
+
+  return rows[0] ?? null;
+}
+
+export async function listRetainers(organizationId: string) {
+  await ensureAdminTables();
+
+  return sql`
+    SELECT
+      r.id,
+      r.organization_id,
+      r.client_id,
+      r.property_id,
+      r.name,
+      r.amount_cents,
+      r.billing_frequency,
+      r.billing_interval,
+      r.billing_anchor_date,
+      r.service_frequency,
+      r.service_interval,
+      r.service_anchor_date,
+      r.status,
+      r.notes,
+      r.created_at,
+      r.updated_at,
+      c.name AS client_name,
+      c.email AS client_email,
+      c.phone AS client_phone,
+      p.name AS property_name,
+      p.address_line1 AS property_address_line1,
+      COALESCE(job_summary.future_visit_count, 0) AS future_visit_count,
+      job_summary.next_visit_at,
+      COALESCE(invoice_summary.invoice_count, 0) AS invoice_count
+    FROM admin_retainers r
+    LEFT JOIN admin_clients c
+      ON c.id = r.client_id
+      AND c.organization_id = r.organization_id
+    LEFT JOIN admin_properties p
+      ON p.id = r.property_id
+      AND p.organization_id = r.organization_id
+    LEFT JOIN LATERAL (
+      SELECT
+        COUNT(*)::int AS future_visit_count,
+        MIN(j.scheduled_for) AS next_visit_at
+      FROM admin_jobs j
+      WHERE j.organization_id = r.organization_id
+        AND j.retainer_id = r.id
+        AND j.scheduled_for >= NOW()
+        AND UPPER(j.status) <> 'CANCELED'
+    ) AS job_summary ON true
+    LEFT JOIN LATERAL (
+      SELECT COUNT(*)::int AS invoice_count
+      FROM admin_invoices i
+      WHERE i.organization_id = r.organization_id
+        AND i.retainer_id = r.id
+    ) AS invoice_summary ON true
     WHERE r.organization_id = ${organizationId}
     ORDER BY r.created_at DESC
   `;
@@ -69,304 +206,236 @@ export async function listRetainers(organizationId: string) {
 
 export async function getRetainerById(organizationId: string, id: string) {
   await ensureAdminTables();
-
-  const rows = await sql`
-    SELECT *
-    FROM admin_retainers
-    WHERE id = ${id} AND organization_id = ${organizationId}
-    LIMIT 1
-  `;
-
-  return rows[0] ?? null;
+  return fetchRetainerRecord(organizationId, id);
 }
 
 export async function createRetainer(
-    organizationId: string,
-    body: Record<string, unknown>
-  ) {
-    await ensureAdminTables();
-  
-    const id = crypto.randomUUID();
-    const clientId = asNonEmptyString(body.clientId, "clientId");
-    const propertyId = asOptionalString(body.propertyId);
-    const name = asNonEmptyString(body.name, "name");
-    const notes = asOptionalString(body.notes);
-  
-    const amountCents = Number(body.amountCents);
-    if (!Number.isFinite(amountCents) || amountCents <= 0) {
-      throw new Error("amountCents must be greater than 0");
-    }
-  
-    const billingFrequency = asNonEmptyString(
-      body.billingFrequency,
-      "billingFrequency"
-    ).toUpperCase() as Frequency;
-  
-    if (!["DAILY", "WEEKLY", "MONTHLY"].includes(billingFrequency)) {
-      throw new Error("billingFrequency must be DAILY, WEEKLY, or MONTHLY");
-    }
-  
-    const billingInterval = Math.max(1, Number(body.billingInterval ?? 1));
-    if (!Number.isFinite(billingInterval) || billingInterval < 1) {
-      throw new Error("billingInterval must be at least 1");
-    }
-  
-    const billingAnchorDate = asOptionalString(body.billingAnchorDate);
-  
-    const serviceFrequency = (
-      asOptionalString(body.serviceFrequency)?.toUpperCase() || "WEEKLY"
-    ) as Frequency;
-  
-    if (!["DAILY", "WEEKLY", "MONTHLY"].includes(serviceFrequency)) {
-      throw new Error("serviceFrequency must be DAILY, WEEKLY, or MONTHLY");
-    }
-  
-    const serviceInterval = Math.max(1, Number(body.serviceInterval ?? 1));
-    if (!Number.isFinite(serviceInterval) || serviceInterval < 1) {
-      throw new Error("serviceInterval must be at least 1");
-    }
-  
-    const serviceAnchorDate =
-      asOptionalString(body.serviceAnchorDate) || billingAnchorDate;
-  
-    const status = (
-      asOptionalString(body.status)?.toUpperCase() || "ACTIVE"
-    ) as RetainerStatus;
-  
-    if (!["ACTIVE", "PAUSED", "CANCELED"].includes(status)) {
-      throw new Error("status must be ACTIVE, PAUSED, or CANCELED");
-    }
-  
-    const clientRows = await sql`
-      SELECT id
-      FROM admin_clients
-      WHERE id = ${clientId} AND organization_id = ${organizationId}
-      LIMIT 1
-    `;
-    if (!clientRows[0]) throw new Error("Selected client not found");
-  
-    if (propertyId) {
-      const propertyRows = await sql`
-        SELECT id
-        FROM admin_properties
-        WHERE id = ${propertyId} AND organization_id = ${organizationId}
-        LIMIT 1
-      `;
-      if (!propertyRows[0]) throw new Error("Selected property not found");
-    }
-  
-    const rows = await sql`
-      INSERT INTO admin_retainers (
-        id,
-        organization_id,
-        client_id,
-        property_id,
-        name,
-        amount_cents,
-        billing_frequency,
-        billing_interval,
-        billing_anchor_date,
-        service_frequency,
-        service_interval,
-        service_anchor_date,
-        status,
-        notes
-      )
-      VALUES (
-        ${id},
-        ${organizationId},
-        ${clientId},
-        ${propertyId},
-        ${name},
-        ${amountCents},
-        ${billingFrequency},
-        ${billingInterval},
-        ${billingAnchorDate},
-        ${serviceFrequency},
-        ${serviceInterval},
-        ${serviceAnchorDate},
-        ${status},
-        ${notes}
-      )
-      RETURNING *
-    `;
-  
-    return rows[0];
+  organizationId: string,
+  body: Record<string, unknown>
+) {
+  await ensureAdminTables();
+
+  const id = crypto.randomUUID();
+  const clientId = asNonEmptyString(body.clientId, "clientId");
+  const propertyId = asOptionalString(body.propertyId);
+  const name = asNonEmptyString(body.name, "name");
+  const notes = asOptionalString(body.notes);
+  const amountCents = Number(body.amountCents);
+
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    throw new Error("amountCents must be greater than 0");
   }
 
-  export async function updateRetainer(
-    organizationId: string,
-    id: string,
-    body: Record<string, unknown>
-  ) {
-    await ensureAdminTables();
-  
-    const existing = await sql`
-      SELECT *
-      FROM admin_retainers
-      WHERE id = ${id} AND organization_id = ${organizationId}
-      LIMIT 1
-    `;
-  
-    if (!existing[0]) return null;
-    const current = existing[0];
-  
-    const clientId =
-      body.clientId !== undefined
-        ? asNonEmptyString(body.clientId, "clientId")
-        : current.client_id;
-  
-    const propertyId =
-      body.propertyId !== undefined
-        ? asOptionalString(body.propertyId)
-        : current.property_id;
-  
-    const name =
-      body.name !== undefined
-        ? asNonEmptyString(body.name, "name")
-        : current.name;
-  
-    const notes =
-      body.notes !== undefined
-        ? asOptionalString(body.notes)
-        : current.notes;
-  
-    const amountCents =
-      body.amountCents !== undefined ? Number(body.amountCents) : current.amount_cents;
-    if (!Number.isFinite(amountCents) || amountCents <= 0) {
-      throw new Error("amountCents must be greater than 0");
-    }
-  
-    const billingFrequency =
-      body.billingFrequency !== undefined
-        ? asNonEmptyString(body.billingFrequency, "billingFrequency").toUpperCase()
-        : current.billing_frequency;
-  
-    if (!["DAILY", "WEEKLY", "MONTHLY"].includes(billingFrequency)) {
-      throw new Error("billingFrequency must be DAILY, WEEKLY, or MONTHLY");
-    }
-  
-    const billingInterval =
-      body.billingInterval !== undefined
-        ? Math.max(1, Number(body.billingInterval))
-        : current.billing_interval;
-  
-    if (!Number.isFinite(billingInterval) || billingInterval < 1) {
-      throw new Error("billingInterval must be at least 1");
-    }
-  
-    const billingAnchorDate =
-      body.billingAnchorDate !== undefined
-        ? asOptionalString(body.billingAnchorDate)
-        : current.billing_anchor_date;
-  
-    const serviceFrequency =
-      body.serviceFrequency !== undefined
-        ? asNonEmptyString(body.serviceFrequency, "serviceFrequency").toUpperCase()
-        : current.service_frequency;
-  
-    if (!["DAILY", "WEEKLY", "MONTHLY"].includes(serviceFrequency)) {
-      throw new Error("serviceFrequency must be DAILY, WEEKLY, or MONTHLY");
-    }
-  
-    const serviceInterval =
-      body.serviceInterval !== undefined
-        ? Math.max(1, Number(body.serviceInterval))
-        : current.service_interval;
-  
-    if (!Number.isFinite(serviceInterval) || serviceInterval < 1) {
-      throw new Error("serviceInterval must be at least 1");
-    }
-  
-    const serviceAnchorDate =
-      body.serviceAnchorDate !== undefined
-        ? asOptionalString(body.serviceAnchorDate)
-        : current.service_anchor_date;
-  
-    const status =
-      body.status !== undefined
-        ? asNonEmptyString(body.status, "status").toUpperCase()
-        : current.status;
-  
-    if (!["ACTIVE", "PAUSED", "CANCELED"].includes(status)) {
-      throw new Error("status must be ACTIVE, PAUSED, or CANCELED");
-    }
-  
-    const rows = await sql`
-      UPDATE admin_retainers
-      SET
-        client_id = ${clientId},
-        property_id = ${propertyId},
-        name = ${name},
-        amount_cents = ${amountCents},
-        billing_frequency = ${billingFrequency},
-        billing_interval = ${billingInterval},
-        billing_anchor_date = ${billingAnchorDate},
-        service_frequency = ${serviceFrequency},
-        service_interval = ${serviceInterval},
-        service_anchor_date = ${serviceAnchorDate},
-        status = ${status},
-        notes = ${notes},
-        updated_at = NOW()
-      WHERE id = ${id} AND organization_id = ${organizationId}
-      RETURNING *
-    `;
-  
-    return rows[0] ?? null;
+  const billingFrequency = normalizeFrequency(
+    body.billingFrequency,
+    "billingFrequency"
+  );
+  const billingInterval = parsePositiveInteger(
+    body.billingInterval,
+    "billingInterval"
+  );
+  const billingAnchorDate = asOptionalString(body.billingAnchorDate);
+  const serviceFrequency = normalizeFrequency(
+    asOptionalString(body.serviceFrequency) ?? "WEEKLY",
+    "serviceFrequency"
+  );
+  const serviceInterval = parsePositiveInteger(
+    body.serviceInterval,
+    "serviceInterval"
+  );
+  const serviceAnchorDate =
+    asOptionalString(body.serviceAnchorDate) ?? billingAnchorDate;
+  const status = normalizeStatus(body.status);
+
+  await assertClientExists(organizationId, clientId);
+  await assertPropertyExists(organizationId, propertyId, clientId);
+
+  await sql`
+    INSERT INTO admin_retainers (
+      id,
+      organization_id,
+      client_id,
+      property_id,
+      name,
+      amount_cents,
+      billing_frequency,
+      billing_interval,
+      billing_anchor_date,
+      service_frequency,
+      service_interval,
+      service_anchor_date,
+      status,
+      notes
+    )
+    VALUES (
+      ${id},
+      ${organizationId},
+      ${clientId},
+      ${propertyId},
+      ${name},
+      ${Math.round(amountCents)},
+      ${billingFrequency},
+      ${billingInterval},
+      ${billingAnchorDate},
+      ${serviceFrequency},
+      ${serviceInterval},
+      ${serviceAnchorDate},
+      ${status},
+      ${notes}
+    )
+  `;
+
+  return fetchRetainerRecord(organizationId, id);
+}
+
+export async function updateRetainer(
+  organizationId: string,
+  id: string,
+  body: Record<string, unknown>
+) {
+  await ensureAdminTables();
+
+  const existing = await getRetainerById(organizationId, id);
+  if (!existing) return null;
+
+  const clientId =
+    body.clientId !== undefined
+      ? asNonEmptyString(body.clientId, "clientId")
+      : String(existing.client_id);
+  const propertyId =
+    body.propertyId !== undefined
+      ? asOptionalString(body.propertyId)
+      : (existing.property_id as string | null);
+  const name =
+    body.name !== undefined ? asNonEmptyString(body.name, "name") : String(existing.name);
+  const notes =
+    body.notes !== undefined ? asOptionalString(body.notes) : existing.notes;
+  const amountCents =
+    body.amountCents !== undefined ? Number(body.amountCents) : Number(existing.amount_cents);
+
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    throw new Error("amountCents must be greater than 0");
   }
 
-  export async function syncRetainerJobs(
-    organizationId: string,
-    retainerId: string
-  ) {
-    await ensureAdminTables();
-  
-    const retainerRows = await sql`
-      SELECT *
-      FROM admin_retainers
-      WHERE id = ${retainerId} AND organization_id = ${organizationId}
-      LIMIT 1
-    `;
-  
-    const retainer = retainerRows[0];
-    if (!retainer) return null;
-  
-    // Always clear future uncompleted generated jobs for this retainer,
-    // then rebuild from current service schedule.
+  const billingFrequency =
+    body.billingFrequency !== undefined
+      ? normalizeFrequency(body.billingFrequency, "billingFrequency")
+      : normalizeFrequency(existing.billing_frequency, "billingFrequency");
+  const billingInterval =
+    body.billingInterval !== undefined
+      ? parsePositiveInteger(body.billingInterval, "billingInterval")
+      : parsePositiveInteger(existing.billing_interval, "billingInterval");
+  const billingAnchorDate =
+    body.billingAnchorDate !== undefined
+      ? asOptionalString(body.billingAnchorDate)
+      : (existing.billing_anchor_date as string | null);
+  const serviceFrequency =
+    body.serviceFrequency !== undefined
+      ? normalizeFrequency(body.serviceFrequency, "serviceFrequency")
+      : normalizeFrequency(existing.service_frequency, "serviceFrequency");
+  const serviceInterval =
+    body.serviceInterval !== undefined
+      ? parsePositiveInteger(body.serviceInterval, "serviceInterval")
+      : parsePositiveInteger(existing.service_interval, "serviceInterval");
+  const serviceAnchorDate =
+    body.serviceAnchorDate !== undefined
+      ? asOptionalString(body.serviceAnchorDate)
+      : (existing.service_anchor_date as string | null);
+  const status =
+    body.status !== undefined
+      ? normalizeStatus(body.status)
+      : normalizeStatus(existing.status);
+
+  await assertClientExists(organizationId, clientId);
+  await assertPropertyExists(organizationId, propertyId, clientId);
+
+  await sql`
+    UPDATE admin_retainers
+    SET
+      client_id = ${clientId},
+      property_id = ${propertyId},
+      name = ${name},
+      amount_cents = ${Math.round(amountCents)},
+      billing_frequency = ${billingFrequency},
+      billing_interval = ${billingInterval},
+      billing_anchor_date = ${billingAnchorDate},
+      service_frequency = ${serviceFrequency},
+      service_interval = ${serviceInterval},
+      service_anchor_date = ${serviceAnchorDate},
+      status = ${status},
+      notes = ${notes},
+      updated_at = NOW()
+    WHERE id = ${id} AND organization_id = ${organizationId}
+  `;
+
+  return fetchRetainerRecord(organizationId, id);
+}
+
+export async function syncRetainerJobs(
+  organizationId: string,
+  retainerId: string,
+  options: { regenerate?: boolean } = {}
+) {
+  await ensureAdminTables();
+
+  const retainer = await fetchRetainerRecord(organizationId, retainerId);
+  if (!retainer) return null;
+
+  if (options.regenerate) {
     await sql`
       DELETE FROM admin_jobs
       WHERE organization_id = ${organizationId}
         AND retainer_id = ${retainerId}
+        AND source_type = 'PLAN'
         AND completed_at IS NULL
         AND scheduled_for >= NOW()
     `;
-  
-    if (retainer.status !== "ACTIVE") {
-      return retainer;
-    }
-  
-    const serviceFrequency = String(retainer.service_frequency).toUpperCase() as Frequency;
-    const serviceInterval = Math.max(1, Number(retainer.service_interval ?? 1));
-  
-    if (!["DAILY", "WEEKLY", "MONTHLY"].includes(serviceFrequency)) {
-      throw new Error("Invalid retainer service frequency");
-    }
-  
-    const now = new Date();
-    const horizon = new Date();
-    horizon.setMonth(horizon.getMonth() + 3); // generate ~90 days ahead
-  
-    let cursor = normalizeAnchorDate(retainer.service_anchor_date);
-  
-    // Advance anchor forward until it is at/after now
-    let safety = 0;
-    while (cursor < now && safety < 500) {
-      cursor = addFrequency(cursor, serviceFrequency, serviceInterval);
-      safety += 1;
-    }
-  
-    let insertSafety = 0;
-    while (cursor <= horizon && insertSafety < 200) {
+  }
+
+  if (String(retainer.status).toUpperCase() !== "ACTIVE") {
+    return fetchRetainerRecord(organizationId, retainerId);
+  }
+
+  const serviceFrequency = normalizeFrequency(
+    retainer.service_frequency,
+    "serviceFrequency"
+  );
+  const serviceInterval = parsePositiveInteger(
+    retainer.service_interval,
+    "serviceInterval"
+  );
+
+  const now = new Date();
+  const horizon = new Date(now);
+  horizon.setDate(horizon.getDate() + 90);
+
+  let cursor = normalizeAnchorDate(retainer.service_anchor_date);
+  let safety = 0;
+  while (cursor < now && safety < 500) {
+    cursor = addFrequency(cursor, serviceFrequency, serviceInterval);
+    safety += 1;
+  }
+
+  let insertSafety = 0;
+  while (cursor <= horizon && insertSafety < 240) {
+    const occurrenceDate = formatDateOnly(cursor);
+    const sourceKey = formatSourceKey(retainerId, cursor);
+
+    const existingRows = await sql`
+      SELECT id
+      FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND retainer_id = ${retainerId}
+        AND scheduled_for >= NOW() - INTERVAL '1 day'
+        AND (
+          source_key = ${sourceKey}
+          OR source_plan_occurrence_date = ${occurrenceDate}
+          OR DATE(scheduled_for) = ${occurrenceDate}
+        )
+      LIMIT 1
+    `;
+
+    if (!existingRows[0]) {
       await sql`
         INSERT INTO admin_jobs (
           id,
@@ -378,7 +447,12 @@ export async function createRetainer(
           notes,
           status,
           scheduled_for,
-          price_cents
+          duration_minutes,
+          price_cents,
+          source_type,
+          source_key,
+          source_plan_occurrence_date,
+          plan_visit_modified
         )
         VALUES (
           ${crypto.randomUUID()},
@@ -390,13 +464,20 @@ export async function createRetainer(
           ${retainer.notes},
           ${"SCHEDULED"},
           ${cursor.toISOString()},
-          ${null}
+          ${60},
+          ${null},
+          ${"PLAN"},
+          ${sourceKey},
+          ${occurrenceDate},
+          ${false}
         )
+        ON CONFLICT DO NOTHING
       `;
-  
-      cursor = addFrequency(cursor, serviceFrequency, serviceInterval);
-      insertSafety += 1;
     }
-  
-    return retainer;
+
+    cursor = addFrequency(cursor, serviceFrequency, serviceInterval);
+    insertSafety += 1;
   }
+
+  return fetchRetainerRecord(organizationId, retainerId);
+}
