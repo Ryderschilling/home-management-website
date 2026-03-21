@@ -95,25 +95,34 @@ export async function GET(req: NextRequest) {
 
     const orderRows = await sql`
       SELECT
-        customer_name,
-        customer_email,
-        customer_phone,
-        service_address,
-        rock_color,
-        product_key,
-        addon_product_key,
-        addon_product_name,
-        addon_price_cents,
-        total_amount_cents,
-        pipe_height_inches,
-        pipe_width_inches,
-        electrical_box_width,
-        electrical_box_depth,
-        electrical_box_height
-      FROM admin_orders
-      WHERE organization_id = ${env.DEFAULT_ORGANIZATION_ID}
-        AND stripe_session_id = ${sessionId}
-      ORDER BY updated_at DESC
+        o.customer_name,
+        o.customer_email,
+        o.customer_phone,
+        o.service_address,
+        o.rock_color,
+        o.product_key,
+        o.addon_product_key,
+        o.addon_product_name,
+        o.addon_price_cents,
+        o.total_amount_cents,
+        o.pipe_height_inches,
+        o.pipe_width_inches,
+        o.electrical_box_photo_url,
+        o.electrical_box_width,
+        o.electrical_box_depth,
+        o.electrical_box_height,
+        (
+          SELECT url
+          FROM admin_order_photos op
+          WHERE op.organization_id = o.organization_id
+            AND op.order_id = o.id
+          ORDER BY op.uploaded_at DESC
+          LIMIT 1
+        ) AS pipe_photo_url
+      FROM admin_orders o
+      WHERE o.organization_id = ${env.DEFAULT_ORGANIZATION_ID}
+        AND o.stripe_session_id = ${sessionId}
+      ORDER BY o.updated_at DESC
       LIMIT 1
     `;
 
@@ -210,6 +219,8 @@ export async function GET(req: NextRequest) {
         totalAmountCents,
         pipeHeight: safe(order?.pipe_height_inches),
         pipeWidth: safe(order?.pipe_width_inches),
+        pipePhotoUrl: safe(order?.pipe_photo_url),
+        electricalBoxPhotoUrl: safe(order?.electrical_box_photo_url),
         electricalBoxWidth: safe(order?.electrical_box_width),
         electricalBoxDepth: safe(order?.electrical_box_depth),
         electricalBoxHeight: safe(order?.electrical_box_height),

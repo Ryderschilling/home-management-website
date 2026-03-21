@@ -93,13 +93,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!(pipePhoto instanceof File)) {
-      return NextResponse.json(
-        { ok: false, error: { message: "Missing photo" } },
-        { status: 400 }
-      );
-    }
-
     if (!fullName) {
       return NextResponse.json(
         { ok: false, error: { message: "Missing full name" } },
@@ -135,20 +128,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!isImageFile(pipePhoto)) {
-      return NextResponse.json(
-        { ok: false, error: { message: "Photo must be an image" } },
-        { status: 400 }
-      );
-    }
-
     const maxBytes = 7 * 1024 * 1024;
-    if (pipePhoto.size > maxBytes) {
-      return NextResponse.json(
-        { ok: false, error: { message: "Photo too large (max 7MB)" } },
-        { status: 400 }
-      );
-    }
 
     let session;
     try {
@@ -181,26 +161,74 @@ export async function POST(req: NextRequest) {
         : QR_UPSELL_ADDON_PRICE_CENTS
       : null;
 
+    const orgId = env.DEFAULT_ORGANIZATION_ID;
+
+    const existingOrder = await sql`
+      SELECT
+        id,
+        electrical_box_photo_url,
+        (
+          SELECT url
+          FROM admin_order_photos op
+          WHERE op.organization_id = admin_orders.organization_id
+            AND op.order_id = admin_orders.id
+          ORDER BY op.uploaded_at DESC
+          LIMIT 1
+        ) AS pipe_photo_url
+      FROM admin_orders
+      WHERE organization_id = ${orgId} AND stripe_session_id = ${sessionId}
+      LIMIT 1
+    `;
+
+    const existingOrderRow = existingOrder[0] ?? null;
+    const existingPipePhotoUrl = safe(existingOrderRow?.pipe_photo_url);
+    const existingElectricalBoxPhotoUrl = safe(existingOrderRow?.electrical_box_photo_url);
+
+    if (!(pipePhoto instanceof File) && !existingPipePhotoUrl) {
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing photo" } },
+        { status: 400 }
+      );
+    }
+
+    if (pipePhoto instanceof File) {
+      if (!isImageFile(pipePhoto)) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Photo must be an image" } },
+          { status: 400 }
+        );
+      }
+
+      if (pipePhoto.size > maxBytes) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Photo too large (max 7MB)" } },
+          { status: 400 }
+        );
+      }
+    }
+
     if (addonSelected) {
-      if (!(electricalBoxPhoto instanceof File)) {
+      if (!(electricalBoxPhoto instanceof File) && !existingElectricalBoxPhotoUrl) {
         return NextResponse.json(
           { ok: false, error: { message: "Missing electrical box photo" } },
           { status: 400 }
         );
       }
 
-      if (!isImageFile(electricalBoxPhoto)) {
-        return NextResponse.json(
-          { ok: false, error: { message: "Electrical box photo must be an image" } },
-          { status: 400 }
-        );
-      }
+      if (electricalBoxPhoto instanceof File) {
+        if (!isImageFile(electricalBoxPhoto)) {
+          return NextResponse.json(
+            { ok: false, error: { message: "Electrical box photo must be an image" } },
+            { status: 400 }
+          );
+        }
 
-      if (electricalBoxPhoto.size > maxBytes) {
-        return NextResponse.json(
-          { ok: false, error: { message: "Electrical box photo too large (max 7MB)" } },
-          { status: 400 }
-        );
+        if (electricalBoxPhoto.size > maxBytes) {
+          return NextResponse.json(
+            { ok: false, error: { message: "Electrical box photo too large (max 7MB)" } },
+            { status: 400 }
+          );
+        }
       }
 
       if (!electricalBoxWidth || !electricalBoxDepth || !electricalBoxHeight) {
@@ -213,8 +241,6 @@ export async function POST(req: NextRequest) {
         );
       }
     }
-
-    const orgId = env.DEFAULT_ORGANIZATION_ID;
 
     const rockColor = safe(session.metadata?.rock_color || session.metadata?.color || "unknown");
     const productKey = safe(session.metadata?.product_key || QR_MAIN_PRODUCT_KEY);
@@ -292,27 +318,25 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    const pipePhotoBuffer = Buffer.from(await pipePhoto.arrayBuffer());
-    const pipePhotoBase64 = pipePhotoBuffer.toString("base64");
-    const pipePhotoUrl = imageDataUrl(pipePhotoBuffer, pipePhoto.type);
+    let pipePhotoBase64 = "";
+    let pipePhotoUrl = existingPipePhotoUrl || null;
 
-    let electricalBoxPhotoUrl: string | null = null;
+    if (pipePhoto instanceof File) {
+      const pipePhotoBuffer = Buffer.from(await pipePhoto.arrayBuffer());
+      pipePhotoBase64 = pipePhotoBuffer.toString("base64");
+      pipePhotoUrl = imageDataUrl(pipePhotoBuffer, pipePhoto.type);
+    }
+
+    let electricalBoxPhotoUrl: string | null = existingElectricalBoxPhotoUrl || null;
 
     if (addonSelected && electricalBoxPhoto instanceof File) {
       const electricalBoxBuffer = Buffer.from(await electricalBoxPhoto.arrayBuffer());
       electricalBoxPhotoUrl = imageDataUrl(electricalBoxBuffer, electricalBoxPhoto.type);
     }
 
-    const existingOrder = await sql`
-      SELECT id
-      FROM admin_orders
-      WHERE organization_id = ${orgId} AND stripe_session_id = ${sessionId}
-      LIMIT 1
-    `;
+    const orderId = existingOrderRow?.id ?? crypto.randomUUID();
 
-    const orderId = existingOrder.length ? existingOrder[0].id : crypto.randomUUID();
-
-    if (existingOrder.length === 0) {
+    if (!existingOrderRow) {
       await sql`
         INSERT INTO admin_orders (
           id,
@@ -374,7 +398,7 @@ export async function POST(req: NextRequest) {
           ${addonProductKey},
           ${addonProductName},
           ${addonPriceCents},
-          ${electricalBoxPhotoUrl},
+          ${electricalBoxPhotoUrl || null},
           ${addonSelected ? electricalBoxWidth : null},
           ${addonSelected ? electricalBoxDepth : null},
           ${addonSelected ? electricalBoxHeight : null},
@@ -456,26 +480,29 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    await sql`
-      INSERT INTO admin_order_photos (
-        id,
-        organization_id,
-        order_id,
-        url,
-        caption
-      )
-      VALUES (
-        ${crypto.randomUUID()},
-        ${orgId},
-        ${orderId},
-        ${pipePhotoUrl},
-        ${"QR upload"}
-      )
-    `;
+    if (pipePhotoUrl && pipePhoto instanceof File) {
+      await sql`
+        INSERT INTO admin_order_photos (
+          id,
+          organization_id,
+          order_id,
+          url,
+          caption
+        )
+        VALUES (
+          ${crypto.randomUUID()},
+          ${orgId},
+          ${orderId},
+          ${pipePhotoUrl},
+          ${"QR upload"}
+        )
+      `;
+    }
 
-    await sendPipePhotoEmail({
-      subject: `New Rock Order — ${rockColor.toUpperCase()}`,
-      html: `
+    if (pipePhotoBase64) {
+      await sendPipePhotoEmail({
+        subject: `New Rock Order — ${rockColor.toUpperCase()}`,
+        html: `
         <p><strong>Product:</strong> Artificial Rock Installation</p>
         <p><strong>Color:</strong> ${rockColor}</p>
         <p><strong>Name:</strong> ${fullName}</p>
@@ -505,9 +532,11 @@ export async function POST(req: NextRequest) {
         <p><strong>TOS ip:</strong> ${tosIp || "—"}</p>
         <p><strong>TOS user-agent:</strong> ${tosUserAgent || "—"}</p>
       `,
-      attachmentName: pipePhoto.name || "rock-photo.jpg",
-      attachmentBase64: pipePhotoBase64,
-    });
+        attachmentName:
+          pipePhoto instanceof File ? pipePhoto.name || "rock-photo.jpg" : "rock-photo.jpg",
+        attachmentBase64: pipePhotoBase64,
+      });
+    }
 
     await sql`
       UPDATE admin_orders

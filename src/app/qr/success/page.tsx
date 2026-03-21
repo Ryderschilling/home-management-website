@@ -42,6 +42,8 @@ type PrefillData = {
   totalAmountCents: number;
   pipeHeight: string;
   pipeWidth: string;
+  pipePhotoUrl: string;
+  electricalBoxPhotoUrl: string;
   electricalBoxWidth: string;
   electricalBoxDepth: string;
   electricalBoxHeight: string;
@@ -123,9 +125,11 @@ function QrSuccessPageInner() {
   const [file, setFile] = useState<File | null>(null);
   const [pipeHeight, setPipeHeight] = useState("");
   const [pipeWidth, setPipeWidth] = useState("");
+  const [pipePhotoUrl, setPipePhotoUrl] = useState("");
   const [notes, setNotes] = useState("");
 
   const [electricalBoxPhoto, setElectricalBoxPhoto] = useState<File | null>(null);
+  const [electricalBoxPhotoUrl, setElectricalBoxPhotoUrl] = useState("");
   const [electricalBoxWidth, setElectricalBoxWidth] = useState("");
   const [electricalBoxDepth, setElectricalBoxDepth] = useState("");
   const [electricalBoxHeight, setElectricalBoxHeight] = useState("");
@@ -172,6 +176,10 @@ function QrSuccessPageInner() {
         setPostalCode((current) => current || data.postalCode || "");
         setPipeHeight((current) => current || data.pipeHeight || "");
         setPipeWidth((current) => current || data.pipeWidth || "");
+        setPipePhotoUrl((current) => current || data.pipePhotoUrl || "");
+        setElectricalBoxPhotoUrl(
+          (current) => current || data.electricalBoxPhotoUrl || ""
+        );
         setElectricalBoxWidth((current) => current || data.electricalBoxWidth || "");
         setElectricalBoxDepth((current) => current || data.electricalBoxDepth || "");
         setElectricalBoxHeight((current) => current || data.electricalBoxHeight || "");
@@ -237,7 +245,7 @@ function QrSuccessPageInner() {
       return;
     }
 
-    if (!file) {
+    if (!file && !pipePhotoUrl) {
       setError("Please upload a photo of your backflow pipe before continuing.");
       setStatus("error");
       document.getElementById("fit-details")?.scrollIntoView({
@@ -258,7 +266,7 @@ function QrSuccessPageInner() {
     }
 
     if (hasAddon) {
-      if (!electricalBoxPhoto) {
+      if (!electricalBoxPhoto && !electricalBoxPhotoUrl) {
         setError("Please upload a photo of the electrical box cover area.");
         setStatus("error");
         document.getElementById("electrical-box-details")?.scrollIntoView({
@@ -302,7 +310,6 @@ function QrSuccessPageInner() {
     try {
       const fd = new FormData();
       fd.append("sessionId", sessionId);
-      fd.append("photo", file);
       fd.append("notes", notes);
 
       fd.append("pipeHeight", pipeHeight.trim());
@@ -318,8 +325,15 @@ function QrSuccessPageInner() {
       fd.append("state", stateRegion.trim());
       fd.append("postalCode", postalCode.trim());
 
+      if (file) {
+        fd.append("photo", file);
+      }
+
       if (hasAddon && electricalBoxPhoto) {
         fd.append("electricalBoxPhoto", electricalBoxPhoto);
+      }
+
+      if (hasAddon) {
         fd.append("electricalBoxWidth", electricalBoxWidth.trim());
         fd.append("electricalBoxDepth", electricalBoxDepth.trim());
         fd.append("electricalBoxHeight", electricalBoxHeight.trim());
@@ -453,6 +467,24 @@ function QrSuccessPageInner() {
                     />
                   </div>
 
+                  {pipePhotoUrl ? (
+                    <div className="mt-4">
+                      <div className={labelClass()}>Saved pipe photo</div>
+                      <a
+                        href={pipePhotoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-block overflow-hidden rounded-2xl border border-white/10"
+                      >
+                        <img
+                          src={pipePhotoUrl}
+                          alt="Saved backflow pipe photo"
+                          className="h-32 w-32 object-cover"
+                        />
+                      </a>
+                    </div>
+                  ) : null}
+
                   <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <div className={labelClass()}>Backflow pipe height (inches)</div>
@@ -526,6 +558,24 @@ function QrSuccessPageInner() {
                         }
                       />
                     </div>
+
+                    {electricalBoxPhotoUrl ? (
+                      <div className="mt-4">
+                        <div className={labelClass()}>Saved electrical box photo</div>
+                        <a
+                          href={electricalBoxPhotoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-block overflow-hidden rounded-2xl border border-white/10"
+                        >
+                          <img
+                            src={electricalBoxPhotoUrl}
+                            alt="Saved electrical box photo"
+                            className="h-32 w-32 object-cover"
+                          />
+                        </a>
+                      </div>
+                    ) : null}
 
                     <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div>

@@ -254,16 +254,39 @@ export default function PortalOrdersPage() {
                   return (
                     <tr key={o.id} style={{ borderBottom: "1px solid var(--border)" }} className="align-top">
                       <td className="px-5 py-5">
-                        {o.latest_photo_url ? (
-                          <a href={o.latest_photo_url} target="_blank" rel="noreferrer" className="block w-[100px]">
-                            <img src={o.latest_photo_url} alt="Order upload" className="h-20 w-20 rounded-xl object-cover" style={{ border: "1px solid var(--border)" }} />
-                            <div style={{ marginTop: 6, fontSize: 11, color: "var(--text-muted)" }}>{photoCount} photo{photoCount === 1 ? "" : "s"}</div>
-                          </a>
-                        ) : (
-                          <div className="w-[100px]">
-                            <div className="flex h-20 w-20 items-center justify-center rounded-xl" style={{ border: "1px dashed var(--border)", background: "var(--surface-2)", fontSize: 11, color: "var(--text-muted)" }}>No photo</div>
-                          </div>
-                        )}
+                        <div className="flex flex-col gap-3">
+                          {o.latest_photo_url ? (
+                            <a href={o.latest_photo_url} target="_blank" rel="noreferrer" className="block w-[100px]">
+                              <img src={o.latest_photo_url} alt="Order upload" className="h-20 w-20 rounded-xl object-cover" style={{ border: "1px solid var(--border)" }} />
+                              <div style={{ marginTop: 6, fontSize: 11, color: "var(--text-muted)" }}>
+                                Pipe photo {photoCount > 0 ? `• ${photoCount} total` : ""}
+                              </div>
+                            </a>
+                          ) : (
+                            <div className="w-[100px]">
+                              <div className="flex h-20 w-20 items-center justify-center rounded-xl" style={{ border: "1px dashed var(--border)", background: "var(--surface-2)", fontSize: 11, color: "var(--text-muted)" }}>No pipe photo</div>
+                            </div>
+                          )}
+
+                          {o.electrical_box_photo_url ? (
+                            <a
+                              href={o.electrical_box_photo_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block w-[100px]"
+                            >
+                              <img
+                                src={o.electrical_box_photo_url}
+                                alt="Electrical box upload"
+                                className="h-20 w-20 rounded-xl object-cover"
+                                style={{ border: "1px solid var(--border)" }}
+                              />
+                              <div style={{ marginTop: 6, fontSize: 11, color: "var(--text-muted)" }}>
+                                Electrical box photo
+                              </div>
+                            </a>
+                          ) : null}
+                        </div>
                       </td>
                       <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{fmtShortDate(o.created_at)}</td>
                       <td className="px-5 py-5">
@@ -277,16 +300,6 @@ export default function PortalOrdersPage() {
                             <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
                               Electrical box: {o.electrical_box_width || "—"} in × {o.electrical_box_depth || "—"} in × {o.electrical_box_height || "—"} in
                             </div>
-                          ) : null}
-                          {o.electrical_box_photo_url ? (
-                            <a
-                              href={o.electrical_box_photo_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{ display: "inline-block", fontSize: 12, color: "var(--accent-warm, #c9b89a)", marginTop: 6 }}
-                            >
-                              Electrical box photo
-                            </a>
                           ) : null}
                         </div>
                       </td>
