@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
-import { ensureAdminTables, sql } from "@/lib/server/db";
+import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 
 export const runtime = "nodejs";
 
@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
 
   try {
     await ensureAdminTables();
+    await ensureQrAddonColumns();
     const organizationId = getOrganizationId(req);
 
     const rows = await sql`
@@ -28,10 +29,17 @@ export async function GET(req: NextRequest) {
         status,
         total_amount_cents,
         rock_color,
+        addon_product_key,
+        addon_product_name,
+        addon_price_cents,
         customer_name,
         customer_email,
         customer_phone,
         service_address,
+        electrical_box_photo_url,
+        electrical_box_width,
+        electrical_box_depth,
+        electrical_box_height,
         stripe_session_id,
         notes
       FROM admin_orders
@@ -45,25 +53,40 @@ export async function GET(req: NextRequest) {
       "status",
       "total_amount_usd",
       "rock_color",
+      "addon_product_key",
+      "addon_product_name",
+      "addon_price_usd",
       "customer_name",
       "customer_email",
       "customer_phone",
       "service_address",
+      "electrical_box_photo_url",
+      "electrical_box_width",
+      "electrical_box_depth",
+      "electrical_box_height",
       "stripe_session_id",
       "notes",
     ].join(",");
 
     const lines = rows.map((r: any) => {
       const usd = r.total_amount_cents ? (Number(r.total_amount_cents) / 100).toFixed(2) : "0.00";
+      const addonUsd = r.addon_price_cents ? (Number(r.addon_price_cents) / 100).toFixed(2) : "";
       return [
         csvEscape(r.created_at),
         csvEscape(r.status),
         csvEscape(usd),
         csvEscape(r.rock_color),
+        csvEscape(r.addon_product_key),
+        csvEscape(r.addon_product_name),
+        csvEscape(addonUsd),
         csvEscape(r.customer_name),
         csvEscape(r.customer_email),
         csvEscape(r.customer_phone),
         csvEscape(r.service_address),
+        csvEscape(r.electrical_box_photo_url),
+        csvEscape(r.electrical_box_width),
+        csvEscape(r.electrical_box_depth),
+        csvEscape(r.electrical_box_height),
         csvEscape(r.stripe_session_id),
         csvEscape(r.notes),
       ].join(",");

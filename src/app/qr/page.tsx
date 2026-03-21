@@ -1,13 +1,9 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-
-const COLOR_OPTIONS = [
-  { id: "beige", label: "Beige", img: "/rocks/beige.JPG" },
-  { id: "sand", label: "Sand", img: "/rocks/sand.JPG" },
-  { id: "grey", label: "Grey", img: "/rocks/grey.JPG" },
-];
+import { QR_COLOR_OPTIONS } from "@/lib/qr-funnel";
 
 const TESTIMONIALS = [
   {
@@ -45,7 +41,10 @@ function getOrCreateBrowserSessionKey() {
 }
 
 export default function QrPage() {
-  const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0]);
+  const router = useRouter();
+  const [selectedColor, setSelectedColor] = useState<(typeof QR_COLOR_OPTIONS)[number]>(
+    QR_COLOR_OPTIONS[0]
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [agree, setAgree] = useState(false);
@@ -117,27 +116,16 @@ export default function QrPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          color: selectedColor.id,
-          tosAccepted: true,
-          campaignCode,
-          sessionKey,
-          landingPath,
-        }),
+      const next = new URLSearchParams({
+        color: selectedColor.id,
+        campaignCode,
+        sessionKey,
+        landingPath,
       });
 
-      const json = await res.json().catch(() => ({}));
-
-      if (!res.ok || !json.ok) {
-        throw new Error(json?.error?.message ?? "Checkout failed");
-      }
-
-      window.location.href = json.data.url;
+      router.push(`/qr/upgrade?${next.toString()}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Checkout failed");
+      setError(e instanceof Error ? e.message : "Unable to continue");
       setLoading(false);
     }
   }
@@ -258,7 +246,7 @@ export default function QrPage() {
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              {COLOR_OPTIONS.map((option) => {
+              {QR_COLOR_OPTIONS.map((option) => {
                 const active = option.id === selectedColor.id;
                 return (
                   <button

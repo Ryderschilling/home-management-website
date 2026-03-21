@@ -21,6 +21,13 @@
 
   --radius:    12px;
   --radius-sm: 8px;
+
+  --portal-sidebar-width: 288px;
+  --portal-content-max: 1600px;
+  --portal-shell-y: clamp(1.25rem, 2.2vw, 2rem);
+  --portal-shell-x: clamp(1rem, 2vw, 1.75rem);
+  --portal-card-pad: clamp(1rem, 1.6vw, 1.35rem);
+  --portal-card-pad-lg: clamp(1.2rem, 2.2vw, 1.75rem);
 }
 
 @theme inline {
@@ -91,6 +98,35 @@ textarea {
   padding-right: 1rem;
 }
 
+.portal-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(201, 184, 154, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.01) 0%, transparent 22%),
+    var(--background);
+  color: var(--foreground);
+}
+
+.portal-sidebar {
+  position: relative;
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  background: rgba(14, 14, 15, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.portal-main {
+  min-width: 0;
+}
+
+.portal-content {
+  width: min(100%, var(--portal-content-max));
+  margin: 0 auto;
+  padding-top: var(--portal-shell-y);
+  padding-bottom: calc(var(--portal-shell-y) + 0.5rem);
+}
+
 .portal-table-scroll {
   overflow-x: auto;
   overscroll-behavior-x: contain;
@@ -108,6 +144,24 @@ textarea {
   .portal-safe-x {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .portal-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--portal-sidebar-width);
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+  }
+
+  .portal-main {
+    padding-left: var(--portal-sidebar-width);
+  }
+
+  .portal-content {
+    padding-top: calc(var(--portal-shell-y) + 0.25rem);
   }
 }
 

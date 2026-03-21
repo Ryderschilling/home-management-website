@@ -1,5 +1,5 @@
 // src/lib/server/services/orders.ts
-import { ensureAdminTables, sql } from "@/lib/server/db";
+import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { sendThankYouEmail } from "@/lib/server/email-thankyou";
 
 export type FulfillmentStatus = "NEW" | "ORDERED" | "INSTALLED" | "CANCELED";
@@ -13,6 +13,7 @@ function normalizeFulfillment(v: unknown): FulfillmentStatus | null {
 
 export async function listOrders(organizationId: string) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   return sql`
     SELECT
@@ -32,14 +33,21 @@ export async function listOrders(organizationId: string) {
       o.source,
       o.product_key,
       o.rock_color,
+      o.addon_product_key,
+      o.addon_product_name,
+      o.addon_price_cents,
       o.customer_name,
-o.customer_email,
-o.customer_phone,
-o.service_address,
-o.pipe_height_inches,
-o.pipe_width_inches,
+      o.customer_email,
+      o.customer_phone,
+      o.service_address,
+      o.pipe_height_inches,
+      o.pipe_width_inches,
+      o.electrical_box_photo_url,
+      o.electrical_box_width,
+      o.electrical_box_depth,
+      o.electrical_box_height,
 
-o.fulfillment_status,
+      o.fulfillment_status,
       o.ordered_at,
       o.installed_at,
       o.thank_you_sent_at,
@@ -88,6 +96,7 @@ o.fulfillment_status,
 
 export async function getOrderById(organizationId: string, orderId: string) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   const rows = await sql`
     SELECT
@@ -126,6 +135,7 @@ export async function getOrderById(organizationId: string, orderId: string) {
 
 export async function createOrder(organizationId: string, body: Record<string, unknown>) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   const id = crypto.randomUUID();
   const status =
@@ -137,10 +147,66 @@ export async function createOrder(organizationId: string, body: Record<string, u
       : Number(body.totalAmountCents);
 
   const notes = typeof body.notes === "string" ? body.notes : null;
+  const addonProductKey =
+    typeof body.addon_product_key === "string" && body.addon_product_key.trim()
+      ? body.addon_product_key.trim()
+      : null;
+  const addonProductName =
+    typeof body.addon_product_name === "string" && body.addon_product_name.trim()
+      ? body.addon_product_name.trim()
+      : null;
+  const addonPriceRaw =
+    body.addon_price_cents === undefined || body.addon_price_cents === null
+      ? null
+      : Number(body.addon_price_cents);
+  const addonPriceCents =
+    addonPriceRaw !== null && Number.isFinite(addonPriceRaw) ? Math.round(addonPriceRaw) : null;
+  const electricalBoxPhotoUrl =
+    typeof body.electrical_box_photo_url === "string" && body.electrical_box_photo_url.trim()
+      ? body.electrical_box_photo_url.trim()
+      : null;
+  const electricalBoxWidth =
+    typeof body.electrical_box_width === "string" && body.electrical_box_width.trim()
+      ? body.electrical_box_width.trim()
+      : null;
+  const electricalBoxDepth =
+    typeof body.electrical_box_depth === "string" && body.electrical_box_depth.trim()
+      ? body.electrical_box_depth.trim()
+      : null;
+  const electricalBoxHeight =
+    typeof body.electrical_box_height === "string" && body.electrical_box_height.trim()
+      ? body.electrical_box_height.trim()
+      : null;
 
   const rows = await sql`
-    INSERT INTO admin_orders (id, organization_id, status, total_amount_cents, notes)
-    VALUES (${id}, ${organizationId}, ${status}, ${Number.isFinite(total) ? total : 0}, ${notes})
+    INSERT INTO admin_orders (
+      id,
+      organization_id,
+      status,
+      total_amount_cents,
+      notes,
+      addon_product_key,
+      addon_product_name,
+      addon_price_cents,
+      electrical_box_photo_url,
+      electrical_box_width,
+      electrical_box_depth,
+      electrical_box_height
+    )
+    VALUES (
+      ${id},
+      ${organizationId},
+      ${status},
+      ${Number.isFinite(total) ? total : 0},
+      ${notes},
+      ${addonProductKey},
+      ${addonProductName},
+      ${addonPriceCents},
+      ${electricalBoxPhotoUrl},
+      ${electricalBoxWidth},
+      ${electricalBoxDepth},
+      ${electricalBoxHeight}
+    )
     RETURNING *
   `;
 
@@ -153,6 +219,7 @@ export async function updateOrder(
   body: Record<string, unknown>
 ) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   const existing = await getOrderById(organizationId, orderId);
   if (!existing) return null;
@@ -191,6 +258,7 @@ export async function updateOrder(
 
 export async function deleteOrder(organizationId: string, orderId: string) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   const deleted = await sql`
     DELETE FROM admin_orders
@@ -202,6 +270,7 @@ export async function deleteOrder(organizationId: string, orderId: string) {
 
 export async function sendThankYouEmailAndMarkSent(organizationId: string, orderId: string) {
   await ensureAdminTables();
+  await ensureQrAddonColumns();
 
   const order = await getOrderById(organizationId, orderId);
   if (!order) return null;
@@ -217,11 +286,14 @@ export async function sendThankYouEmailAndMarkSent(organizationId: string, order
 
   const productLabel =
     order.product_key ? String(order.product_key).replaceAll("_", " ") : "artificial rock installation";
+  const addonLabel = order.addon_product_name
+    ? String(order.addon_product_name).trim()
+    : "";
 
   await sendThankYouEmail({
     to,
     customerName: name,
-    productLabel,
+    productLabel: addonLabel ? `${productLabel} + ${addonLabel}` : productLabel,
   });
 
   await sql`

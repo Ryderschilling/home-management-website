@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/server/stripe";
-import { ensureAdminTables, sql } from "@/lib/server/db";
+import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import { sendPipePhotoEmail } from "@/lib/server/email";
+import {
+  QR_MAIN_PRODUCT_KEY,
+  QR_UPSELL_ADDON_KEY,
+  QR_UPSELL_ADDON_NAME,
+  QR_UPSELL_ADDON_PRICE_CENTS,
+  parseBooleanFlag,
+} from "@/lib/qr-funnel";
 
 export const runtime = "nodejs";
 
@@ -31,6 +38,7 @@ async function ensureOrderWebhookColumns() {
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_promo_code_id TEXT`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_created_at TIMESTAMPTZ`;
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS paid_notification_sent_at TIMESTAMPTZ`;
+  await ensureQrAddonColumns();
 }
 
 function makeReferralCode() {
@@ -117,7 +125,20 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
   const rockColor = safe(
     session.metadata?.rock_color || (session.metadata as any)?.color || "unknown"
   );
-  const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
+  const productKey = safe(session.metadata?.product_key || QR_MAIN_PRODUCT_KEY);
+  const addonSelected = parseBooleanFlag(session.metadata?.addon_selected);
+  const addonProductKey = addonSelected
+    ? safe(session.metadata?.addon_product_key || QR_UPSELL_ADDON_KEY)
+    : null;
+  const addonProductName = addonSelected
+    ? safe(session.metadata?.addon_product_name || QR_UPSELL_ADDON_NAME)
+    : null;
+  const addonPriceRaw = Number(session.metadata?.addon_price_cents);
+  const addonPriceCents = addonSelected
+    ? Number.isFinite(addonPriceRaw) && addonPriceRaw > 0
+      ? Math.round(addonPriceRaw)
+      : QR_UPSELL_ADDON_PRICE_CENTS
+    : null;
 
   const email = safe(session.customer_details?.email).toLowerCase();
   const phone = safe(session.customer_details?.phone);
@@ -217,6 +238,9 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         source,
         product_key,
         rock_color,
+        addon_product_key,
+        addon_product_name,
+        addon_price_cents,
         customer_name,
         customer_email,
         customer_phone,
@@ -245,6 +269,9 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         ${"qr"},
         ${productKey},
         ${rockColor},
+        ${addonProductKey},
+        ${addonProductName},
+        ${addonPriceCents},
         ${fullName || null},
         ${email || null},
         ${phone || null},
@@ -276,6 +303,9 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         source = ${"qr"},
         product_key = ${productKey},
         rock_color = ${rockColor},
+        addon_product_key = ${addonProductKey},
+        addon_product_name = ${addonProductName},
+        addon_price_cents = ${addonPriceCents},
         customer_name = ${fullName || null},
         customer_email = ${email || null},
         customer_phone = ${phone || null},
@@ -329,6 +359,8 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
           ${JSON.stringify({
             totalCents,
             rockColor,
+            addonSelected,
+            addonProductName,
             usedPromotionCode: discountAmountCents > 0,
             promotionCode: promotionCode || null,
           })}
@@ -369,6 +401,11 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         <p><strong>Status:</strong> PAID (NEW)</p>
         <p><strong>Product:</strong> ${productKey.replaceAll("_", " ")}</p>
         <p><strong>Color:</strong> ${rockColor}</p>
+        <p><strong>Add-on:</strong> ${
+          addonSelected
+            ? `${addonProductName} ($${((addonPriceCents ?? 0) / 100).toFixed(2)})`
+            : "—"
+        }</p>
         <p><strong>Name:</strong> ${fullName || "—"}</p>
         <p><strong>Email:</strong> ${email || "—"}</p>
         <p><strong>Phone:</strong> ${phone || "—"}</p>

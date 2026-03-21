@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/server/stripe";
 import { sendPipePhotoEmail } from "@/lib/server/email";
-import { ensureAdminTables, sql } from "@/lib/server/db";
+import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
+import {
+  QR_MAIN_PRODUCT_KEY,
+  QR_UPSELL_ADDON_KEY,
+  QR_UPSELL_ADDON_NAME,
+  QR_UPSELL_ADDON_PRICE_CENTS,
+  parseBooleanFlag,
+} from "@/lib/qr-funnel";
 
 export const runtime = "nodejs";
 
-function safe(v: unknown) {
-  return String(v ?? "").trim();
+function safe(value: unknown) {
+  return String(value ?? "").trim();
 }
 
 function addressToString(addr: any): string {
@@ -24,11 +31,11 @@ function addressToString(addr: any): string {
 }
 
 function parseIsoToTimestamptz(value: string): string | null {
-  const s = safe(value);
-  if (!s) return null;
-  const d = new Date(s);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
+  const normalized = safe(value);
+  if (!normalized) return null;
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString();
 }
 
 function getClientIp(req: NextRequest): string | null {
@@ -41,9 +48,18 @@ function getClientIp(req: NextRequest): string | null {
   return null;
 }
 
+function isImageFile(file: FormDataEntryValue | null): file is File {
+  return file instanceof File && file.type.startsWith("image/");
+}
+
+function imageDataUrl(buffer: Buffer, mimeType: string) {
+  return `data:${mimeType};base64,${buffer.toString("base64")}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     await ensureAdminTables();
+    await ensureQrAddonColumns();
 
     const form = await req.formData();
 
@@ -55,15 +71,20 @@ export async function POST(req: NextRequest) {
     const phoneRaw = safe(form.get("phone"));
 
     const address1 = safe(form.get("address1"));
-const address2 = safe(form.get("address2"));
-const city = safe(form.get("city"));
-const stateRegion = safe(form.get("state"));
-const postalCode = safe(form.get("postalCode"));
+    const address2 = safe(form.get("address2"));
+    const city = safe(form.get("city"));
+    const stateRegion = safe(form.get("state"));
+    const postalCode = safe(form.get("postalCode"));
 
-const pipeHeight = safe(form.get("pipeHeight"));
-const pipeWidth = safe(form.get("pipeWidth"));
+    const pipeHeight = safe(form.get("pipeHeight"));
+    const pipeWidth = safe(form.get("pipeWidth"));
 
-const file = form.get("photo");
+    const electricalBoxWidth = safe(form.get("electricalBoxWidth"));
+    const electricalBoxDepth = safe(form.get("electricalBoxDepth"));
+    const electricalBoxHeight = safe(form.get("electricalBoxHeight"));
+
+    const pipePhoto = form.get("photo");
+    const electricalBoxPhoto = form.get("electricalBoxPhoto");
 
     if (!sessionId) {
       return NextResponse.json(
@@ -72,7 +93,7 @@ const file = form.get("photo");
       );
     }
 
-    if (!(file instanceof File)) {
+    if (!(pipePhoto instanceof File)) {
       return NextResponse.json(
         { ok: false, error: { message: "Missing photo" } },
         { status: 400 }
@@ -101,21 +122,20 @@ const file = form.get("photo");
     }
 
     if (!address1 || !city || !stateRegion || !postalCode) {
-        return NextResponse.json(
-          { ok: false, error: { message: "Missing service address" } },
-          { status: 400 }
-        );
-      }
-
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing service address" } },
+        { status: 400 }
+      );
+    }
 
     if (!pipeHeight || !pipeWidth) {
-        return NextResponse.json(
-          { ok: false, error: { message: "Missing pipe height or width" } },
-          { status: 400 }
-        );
-      }
+      return NextResponse.json(
+        { ok: false, error: { message: "Missing pipe height or width" } },
+        { status: 400 }
+      );
+    }
 
-    if (!file.type.startsWith("image/")) {
+    if (!isImageFile(pipePhoto)) {
       return NextResponse.json(
         { ok: false, error: { message: "Photo must be an image" } },
         { status: 400 }
@@ -123,7 +143,7 @@ const file = form.get("photo");
     }
 
     const maxBytes = 7 * 1024 * 1024;
-    if (file.size > maxBytes) {
+    if (pipePhoto.size > maxBytes) {
       return NextResponse.json(
         { ok: false, error: { message: "Photo too large (max 7MB)" } },
         { status: 400 }
@@ -147,14 +167,63 @@ const file = form.get("photo");
       );
     }
 
+    const addonSelected = parseBooleanFlag(session.metadata?.addon_selected);
+    const addonProductKey = addonSelected
+      ? safe(session.metadata?.addon_product_key) || QR_UPSELL_ADDON_KEY
+      : null;
+    const addonProductName = addonSelected
+      ? safe(session.metadata?.addon_product_name) || QR_UPSELL_ADDON_NAME
+      : null;
+    const addonPriceCentsRaw = Number(session.metadata?.addon_price_cents);
+    const addonPriceCents = addonSelected
+      ? Number.isFinite(addonPriceCentsRaw) && addonPriceCentsRaw > 0
+        ? Math.round(addonPriceCentsRaw)
+        : QR_UPSELL_ADDON_PRICE_CENTS
+      : null;
+
+    if (addonSelected) {
+      if (!(electricalBoxPhoto instanceof File)) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Missing electrical box photo" } },
+          { status: 400 }
+        );
+      }
+
+      if (!isImageFile(electricalBoxPhoto)) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Electrical box photo must be an image" } },
+          { status: 400 }
+        );
+      }
+
+      if (electricalBoxPhoto.size > maxBytes) {
+        return NextResponse.json(
+          { ok: false, error: { message: "Electrical box photo too large (max 7MB)" } },
+          { status: 400 }
+        );
+      }
+
+      if (!electricalBoxWidth || !electricalBoxDepth || !electricalBoxHeight) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: { message: "Missing electrical box cover measurements" },
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const orgId = env.DEFAULT_ORGANIZATION_ID;
 
     const rockColor = safe(session.metadata?.rock_color || session.metadata?.color || "unknown");
-    const productKey = safe(session.metadata?.product_key || "artificial_rock_installation");
+    const productKey = safe(session.metadata?.product_key || QR_MAIN_PRODUCT_KEY);
 
     const tosVersion = safe(session.metadata?.tos_version);
     const tosUrl = safe(session.metadata?.tos_url);
-    const tosAcceptedAtIso = parseIsoToTimestamptz(String(session.metadata?.tos_accepted_at ?? ""));
+    const tosAcceptedAtIso = parseIsoToTimestamptz(
+      String(session.metadata?.tos_accepted_at ?? "")
+    );
     const tosTextHash = safe(session.metadata?.tos_text_hash) || "missing";
 
     const tosIp = getClientIp(req);
@@ -223,6 +292,17 @@ const file = form.get("photo");
       `;
     }
 
+    const pipePhotoBuffer = Buffer.from(await pipePhoto.arrayBuffer());
+    const pipePhotoBase64 = pipePhotoBuffer.toString("base64");
+    const pipePhotoUrl = imageDataUrl(pipePhotoBuffer, pipePhoto.type);
+
+    let electricalBoxPhotoUrl: string | null = null;
+
+    if (addonSelected && electricalBoxPhoto instanceof File) {
+      const electricalBoxBuffer = Buffer.from(await electricalBoxPhoto.arrayBuffer());
+      electricalBoxPhotoUrl = imageDataUrl(electricalBoxBuffer, electricalBoxPhoto.type);
+    }
+
     const existingOrder = await sql`
       SELECT id
       FROM admin_orders
@@ -233,7 +313,7 @@ const file = form.get("photo");
     const orderId = existingOrder.length ? existingOrder[0].id : crypto.randomUUID();
 
     if (existingOrder.length === 0) {
-        await sql`
+      await sql`
         INSERT INTO admin_orders (
           id,
           organization_id,
@@ -248,12 +328,19 @@ const file = form.get("photo");
           product_key,
           rock_color,
           customer_name,
-customer_email,
-customer_phone,
-service_address,
-pipe_height_inches,
-pipe_width_inches,
-campaign_id,
+          customer_email,
+          customer_phone,
+          service_address,
+          pipe_height_inches,
+          pipe_width_inches,
+          addon_product_key,
+          addon_product_name,
+          addon_price_cents,
+          electrical_box_photo_url,
+          electrical_box_width,
+          electrical_box_depth,
+          electrical_box_height,
+          campaign_id,
           campaign_code,
           landing_path,
           browser_session_key,
@@ -284,6 +371,13 @@ campaign_id,
           ${serviceAddress},
           ${pipeHeight},
           ${pipeWidth},
+          ${addonProductKey},
+          ${addonProductName},
+          ${addonPriceCents},
+          ${electricalBoxPhotoUrl},
+          ${addonSelected ? electricalBoxWidth : null},
+          ${addonSelected ? electricalBoxDepth : null},
+          ${addonSelected ? electricalBoxHeight : null},
           ${campaignId || null},
           ${campaignCode || null},
           ${landingPath || null},
@@ -298,7 +392,7 @@ campaign_id,
         )
       `;
     } else {
-        await sql`
+      await sql`
         UPDATE admin_orders
         SET
           client_id = ${clientId},
@@ -311,12 +405,22 @@ campaign_id,
           product_key = ${productKey},
           rock_color = ${rockColor},
           customer_name = ${fullName},
-customer_email = ${email},
-customer_phone = ${phone},
-service_address = ${serviceAddress},
-pipe_height_inches = ${pipeHeight},
-pipe_width_inches = ${pipeWidth},
-campaign_id = COALESCE(${campaignId || null}, campaign_id),
+          customer_email = ${email},
+          customer_phone = ${phone},
+          service_address = ${serviceAddress},
+          pipe_height_inches = ${pipeHeight},
+          pipe_width_inches = ${pipeWidth},
+          addon_product_key = ${addonProductKey},
+          addon_product_name = ${addonProductName},
+          addon_price_cents = ${addonPriceCents},
+          electrical_box_photo_url = COALESCE(
+            ${electricalBoxPhotoUrl},
+            electrical_box_photo_url
+          ),
+          electrical_box_width = ${addonSelected ? electricalBoxWidth : null},
+          electrical_box_depth = ${addonSelected ? electricalBoxDepth : null},
+          electrical_box_height = ${addonSelected ? electricalBoxHeight : null},
+          campaign_id = COALESCE(${campaignId || null}, campaign_id),
           campaign_code = COALESCE(${campaignCode || null}, campaign_code),
           landing_path = COALESCE(${landingPath || null}, landing_path),
           browser_session_key = COALESCE(${browserSessionKey || null}, browser_session_key),
@@ -352,10 +456,6 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
       });
     }
 
-    const buf = Buffer.from(await file.arrayBuffer());
-    const base64 = buf.toString("base64");
-    const dataUrl = `data:${file.type};base64,${base64}`;
-
     await sql`
       INSERT INTO admin_order_photos (
         id,
@@ -368,7 +468,7 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
         ${crypto.randomUUID()},
         ${orgId},
         ${orderId},
-        ${dataUrl},
+        ${pipePhotoUrl},
         ${"QR upload"}
       )
     `;
@@ -380,11 +480,22 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
         <p><strong>Color:</strong> ${rockColor}</p>
         <p><strong>Name:</strong> ${fullName}</p>
         <p><strong>Email:</strong> ${email}</p>
-<p><strong>Phone:</strong> ${phone}</p>
-<p><strong>Pipe height:</strong> ${pipeHeight} in</p>
-<p><strong>Pipe width:</strong> ${pipeWidth} in</p>
-<p><strong>Service address:</strong><br/>${serviceAddress.replaceAll(", ", "<br/>")}</p>
-<p><strong>Stripe session:</strong> ${sessionId}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Pipe height:</strong> ${pipeHeight} in</p>
+        <p><strong>Pipe width:</strong> ${pipeWidth} in</p>
+        ${
+          addonSelected
+            ? `
+        <p><strong>Add-on:</strong> ${addonProductName} ($${((addonPriceCents ?? 0) / 100).toFixed(2)})</p>
+        <p><strong>Electrical box width:</strong> ${electricalBoxWidth} in</p>
+        <p><strong>Electrical box depth:</strong> ${electricalBoxDepth} in</p>
+        <p><strong>Electrical box height:</strong> ${electricalBoxHeight} in</p>
+        <p><strong>Electrical box photo received:</strong> Yes</p>
+        `
+            : ""
+        }
+        <p><strong>Service address:</strong><br/>${serviceAddress.replaceAll(", ", "<br/>")}</p>
+        <p><strong>Stripe session:</strong> ${sessionId}</p>
         <p><strong>Order id:</strong> ${orderId}</p>
         <p><strong>Notes:</strong><br/>${notes ? notes.replaceAll("\n", "<br/>") : "—"}</p>
         <hr/>
@@ -394,11 +505,11 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
         <p><strong>TOS ip:</strong> ${tosIp || "—"}</p>
         <p><strong>TOS user-agent:</strong> ${tosUserAgent || "—"}</p>
       `,
-      attachmentName: file.name || "rock-photo.jpg",
-      attachmentBase64: base64,
+      attachmentName: pipePhoto.name || "rock-photo.jpg",
+      attachmentBase64: pipePhotoBase64,
     });
 
-       await sql`
+    await sql`
       UPDATE admin_orders
       SET
         upload_completed_at = NOW(),
@@ -416,20 +527,20 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
     `;
 
     const alreadyHasUploadEvent = await sql`
-  SELECT id
-  FROM marketing_campaign_events
-  WHERE organization_id = ${orgId}
-    AND order_id = ${orderId}
-    AND event_type = ${"upload_completed"}
-  LIMIT 1
-`;
+      SELECT id
+      FROM marketing_campaign_events
+      WHERE organization_id = ${orgId}
+        AND order_id = ${orderId}
+        AND event_type = ${"upload_completed"}
+      LIMIT 1
+    `;
 
     const campaignOrder = campaignRows[0];
 
     if (
-        (campaignOrder?.campaign_id || campaignOrder?.campaign_code) &&
-        !alreadyHasUploadEvent[0]
-      ) {
+      (campaignOrder?.campaign_id || campaignOrder?.campaign_code) &&
+      !alreadyHasUploadEvent[0]
+    ) {
       await sql`
         INSERT INTO marketing_campaign_events (
           id,
@@ -451,7 +562,12 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
           ${"upload_completed"},
           ${campaignOrder.landing_path || "/qr"},
           ${orderId},
-          ${JSON.stringify({ fullName, email })}
+          ${JSON.stringify({
+            fullName,
+            email,
+            addonSelected,
+            addonProductName,
+          })}
         )
       `;
     }
@@ -464,9 +580,9 @@ campaign_id = COALESCE(${campaignId || null}, campaign_id),
         alreadySubmitted: false,
       },
     });
-  } catch (e) {
+  } catch (error) {
     return NextResponse.json(
-      { ok: false, error: { message: e instanceof Error ? e.message : "Upload failed" } },
+      { ok: false, error: { message: error instanceof Error ? error.message : "Upload failed" } },
       { status: 500 }
     );
   }

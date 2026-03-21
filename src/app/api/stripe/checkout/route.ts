@@ -3,6 +3,15 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/server/stripe";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
+import {
+  QR_MAIN_PRODUCT_KEY,
+  QR_MAIN_PRODUCT_NAME,
+  QR_UPSELL_ADDON_KEY,
+  QR_UPSELL_ADDON_NAME,
+  QR_UPSELL_ADDON_PRICE_CENTS,
+  parseBooleanFlag,
+  safeString,
+} from "@/lib/qr-funnel";
 
 export const runtime = "nodejs";
 
@@ -31,6 +40,14 @@ export async function POST(req: NextRequest) {
     const campaignCode = safe(body.campaignCode);
     const sessionKey = safe(body.sessionKey);
     const landingPath = safe(body.landingPath || "/qr") || "/qr";
+    const addonSelected = parseBooleanFlag(body.addonSelected);
+    const addonProductKey = safeString(body.addonProductKey) || QR_UPSELL_ADDON_KEY;
+    const addonProductName = safeString(body.addonProductName) || QR_UPSELL_ADDON_NAME;
+    const addonPriceCentsRaw = Number(body.addonPriceCents);
+    const addonPriceCents =
+      addonSelected && Number.isFinite(addonPriceCentsRaw) && addonPriceCentsRaw > 0
+        ? Math.round(addonPriceCentsRaw)
+        : QR_UPSELL_ADDON_PRICE_CENTS;
 
     if (!tosAccepted) {
       return NextResponse.json(
@@ -97,27 +114,62 @@ export async function POST(req: NextRequest) {
           ${sessionKey || null},
           ${"checkout_started"},
           ${landingPath},
-          ${JSON.stringify({ color })}
+          ${JSON.stringify({ color, addonSelected })}
         )
       `;
     }
 
+    const upgradeParams = new URLSearchParams({
+      color,
+      campaignCode,
+      sessionKey,
+      landingPath,
+      addon: addonSelected ? "1" : "0",
+    });
+
+    const successParams = new URLSearchParams({
+      color,
+      addon: addonSelected ? "1" : "0",
+    });
+
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      { price: priceId, quantity: 1 },
+    ];
+
+    if (addonSelected) {
+      lineItems.push({
+        quantity: 1,
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: addonProductName,
+          },
+          unit_amount: addonPriceCents,
+        },
+      });
+    }
+
     const params: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: lineItems,
       customer_creation: "always",
 
       allow_promotion_codes: true,
       billing_address_collection: "required",
       phone_number_collection: { enabled: true },
 
-      success_url: `${appUrl}/qr/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/qr`,
+      success_url: `${appUrl}/qr/success?session_id={CHECKOUT_SESSION_ID}&${successParams.toString()}`,
+      cancel_url: `${appUrl}/qr/upgrade?${upgradeParams.toString()}`,
 
       metadata: {
         source: "qr",
-        product_key: "artificial_rock_installation",
+        product_key: QR_MAIN_PRODUCT_KEY,
+        product_name: QR_MAIN_PRODUCT_NAME,
         rock_color: color,
+        addon_selected: addonSelected ? "true" : "false",
+        addon_product_key: addonSelected ? addonProductKey : "",
+        addon_product_name: addonSelected ? addonProductName : "",
+        addon_price_cents: addonSelected ? String(addonPriceCents) : "0",
 
         campaign_id: campaignId,
         campaign_code: normalizedCampaignCode,

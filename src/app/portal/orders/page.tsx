@@ -18,6 +18,13 @@ type Order = {
   pipe_width_inches?: string | null;
   product_key?: string | null;
   rock_color?: string | null;
+  addon_product_key?: string | null;
+  addon_product_name?: string | null;
+  addon_price_cents?: number | null;
+  electrical_box_photo_url?: string | null;
+  electrical_box_width?: string | null;
+  electrical_box_depth?: string | null;
+  electrical_box_height?: string | null;
   stripe_session_id?: string | null;
   notes?: string | null;
   created_at?: string | null;
@@ -52,7 +59,7 @@ function fmtShortDate(value: string | null | undefined) {
 }
 function cleanProductLabel(value: string | null | undefined) {
   if (!value) return "Order";
-  return value.replaceAll("_", " ");
+  return value.replaceAll("_", " ").replaceAll("-", " ");
 }
 function normalizeFulfillment(v: unknown): Fulfillment {
   const s = String(v ?? "NEW").toUpperCase().trim();
@@ -102,7 +109,27 @@ export default function PortalOrdersPage() {
       if (statusFilter !== "ALL" && status !== statusFilter) return false;
       if (colorFilter !== "ALL" && String(o.rock_color ?? "") !== colorFilter) return false;
       if (!query) return true;
-      const haystack = [o.customer_name, o.customer_email, o.customer_phone, o.client_name, o.client_email, o.client_phone, o.service_address, o.client_address, o.product_key, o.rock_color, o.stripe_session_id, o.notes].map((v) => String(v ?? "").toLowerCase()).join(" • ");
+      const haystack = [
+        o.customer_name,
+        o.customer_email,
+        o.customer_phone,
+        o.client_name,
+        o.client_email,
+        o.client_phone,
+        o.service_address,
+        o.client_address,
+        o.product_key,
+        o.rock_color,
+        o.addon_product_key,
+        o.addon_product_name,
+        o.electrical_box_width,
+        o.electrical_box_depth,
+        o.electrical_box_height,
+        o.stripe_session_id,
+        o.notes,
+      ]
+        .map((v) => String(v ?? "").toLowerCase())
+        .join(" • ");
       return haystack.includes(query);
     });
     const priority: Record<Fulfillment, number> = { NEW: 0, ORDERED: 1, INSTALLED: 2, CANCELED: 3 };
@@ -223,6 +250,7 @@ export default function PortalOrdersPage() {
                   const customerPhone = o.customer_phone || o.client_phone || "—";
                   const photoCount = typeof o.photo_count === "number" ? o.photo_count : 0;
                   const isBusy = busyId === o.id;
+                  const hasAddon = Boolean(o.addon_product_key || o.addon_product_name);
                   return (
                     <tr key={o.id} style={{ borderBottom: "1px solid var(--border)" }} className="align-top">
                       <td className="px-5 py-5">
@@ -245,10 +273,35 @@ export default function PortalOrdersPage() {
                           <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{customerPhone}</div>
                           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>{o.service_address || o.client_address || "—"}</div>
                           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Pipe: {o.pipe_height_inches || "—"} in × {o.pipe_width_inches || "—"} in</div>
+                          {hasAddon ? (
+                            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
+                              Electrical box: {o.electrical_box_width || "—"} in × {o.electrical_box_depth || "—"} in × {o.electrical_box_height || "—"} in
+                            </div>
+                          ) : null}
+                          {o.electrical_box_photo_url ? (
+                            <a
+                              href={o.electrical_box_photo_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{ display: "inline-block", fontSize: 12, color: "var(--accent-warm, #c9b89a)", marginTop: 6 }}
+                            >
+                              Electrical box photo
+                            </a>
+                          ) : null}
                         </div>
                       </td>
                       <td className="px-5 py-5">
                         <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{cleanProductLabel(o.product_key)}</div>
+                        {hasAddon ? (
+                          <div style={{ marginTop: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+                            Add-on: {o.addon_product_name || cleanProductLabel(o.addon_product_key)}{typeof o.addon_price_cents === "number" ? ` • ${money(o.addon_price_cents)}` : ""}
+                          </div>
+                        ) : null}
+                        {hasAddon ? (
+                          <div style={{ marginTop: 4, fontSize: 11, color: "var(--text-muted)" }}>
+                            Single ticket: base rock plus electrical box cover
+                          </div>
+                        ) : null}
                         {o.notes && <div style={{ marginTop: 6, maxWidth: 240, fontSize: 12, color: "var(--text-muted)" }}>{o.notes}</div>}
                       </td>
                       <td className="px-5 py-5" style={{ fontSize: 13, color: "var(--text-secondary)" }}>{o.rock_color || "—"}</td>

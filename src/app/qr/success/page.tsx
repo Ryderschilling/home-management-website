@@ -4,6 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import {
+  QR_MAIN_PRODUCT_NAME,
+  QR_UPSELL_ADDON_NAME,
+  QR_UPSELL_ADDON_PRICE_CENTS,
+  formatUsd,
+  getQrColorOption,
+} from "@/lib/qr-funnel";
 
 function labelClass() {
   return "text-[11px] uppercase tracking-[0.22em] text-white/60";
@@ -26,12 +33,72 @@ type PrefillData = {
   city: string;
   state: string;
   postalCode: string;
+  rockColor: string;
+  productName: string;
+  productPriceCents: number;
+  addonSelected: boolean;
+  addonProductName: string;
+  addonPriceCents: number;
+  totalAmountCents: number;
+  pipeHeight: string;
+  pipeWidth: string;
+  electricalBoxWidth: string;
+  electricalBoxDepth: string;
+  electricalBoxHeight: string;
 };
+
+type OrderSummary = {
+  rockColor: string;
+  productName: string;
+  productPriceCents: number;
+  addonSelected: boolean;
+  addonProductName: string;
+  addonPriceCents: number;
+  totalAmountCents: number;
+};
+
+const defaultSummary: OrderSummary = {
+  rockColor: "beige",
+  productName: QR_MAIN_PRODUCT_NAME,
+  productPriceCents: 0,
+  addonSelected: false,
+  addonProductName: QR_UPSELL_ADDON_NAME,
+  addonPriceCents: QR_UPSELL_ADDON_PRICE_CENTS,
+  totalAmountCents: 0,
+};
+
+function SummaryLine({
+  label,
+  detail,
+  amount,
+  strong = false,
+}: {
+  label: string;
+  detail?: string;
+  amount: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div className="min-w-0">
+        <div className={strong ? "text-sm font-medium text-white" : "text-sm text-white/80"}>
+          {label}
+        </div>
+        {detail ? <div className="mt-1 text-xs text-white/50">{detail}</div> : null}
+      </div>
+      <div className={strong ? "text-sm font-medium text-white" : "text-sm text-white/72"}>
+        {amount}
+      </div>
+    </div>
+  );
+}
 
 function QrSuccessPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const sessionId = params.get("session_id") ?? "";
+  const colorFromQuery = params.get("color") ?? "";
+  const addonFromQuery = params.get("addon") === "1";
 
   const [scrolled, setScrolled] = useState(false);
   const [prefillLoading, setPrefillLoading] = useState(false);
@@ -57,6 +124,17 @@ function QrSuccessPageInner() {
   const [pipeHeight, setPipeHeight] = useState("");
   const [pipeWidth, setPipeWidth] = useState("");
   const [notes, setNotes] = useState("");
+
+  const [electricalBoxPhoto, setElectricalBoxPhoto] = useState<File | null>(null);
+  const [electricalBoxWidth, setElectricalBoxWidth] = useState("");
+  const [electricalBoxDepth, setElectricalBoxDepth] = useState("");
+  const [electricalBoxHeight, setElectricalBoxHeight] = useState("");
+
+  const [summary, setSummary] = useState<OrderSummary>({
+    ...defaultSummary,
+    rockColor: colorFromQuery || defaultSummary.rockColor,
+    addonSelected: addonFromQuery,
+  });
 
   const [status, setStatus] = useState<"idle" | "uploading" | "error">("idle");
   const [error, setError] = useState("");
@@ -92,9 +170,38 @@ function QrSuccessPageInner() {
         setCity((current) => current || data.city || "");
         setStateRegion((current) => current || data.state || "");
         setPostalCode((current) => current || data.postalCode || "");
+        setPipeHeight((current) => current || data.pipeHeight || "");
+        setPipeWidth((current) => current || data.pipeWidth || "");
+        setElectricalBoxWidth((current) => current || data.electricalBoxWidth || "");
+        setElectricalBoxDepth((current) => current || data.electricalBoxDepth || "");
+        setElectricalBoxHeight((current) => current || data.electricalBoxHeight || "");
+        setSummary({
+          rockColor: data.rockColor || colorFromQuery || defaultSummary.rockColor,
+          productName: data.productName || QR_MAIN_PRODUCT_NAME,
+          productPriceCents:
+            typeof data.productPriceCents === "number" ? data.productPriceCents : 0,
+          addonSelected:
+            typeof data.addonSelected === "boolean"
+              ? data.addonSelected
+              : addonFromQuery,
+          addonProductName: data.addonProductName || QR_UPSELL_ADDON_NAME,
+          addonPriceCents:
+            typeof data.addonPriceCents === "number"
+              ? data.addonPriceCents
+              : addonFromQuery
+                ? QR_UPSELL_ADDON_PRICE_CENTS
+                : 0,
+          totalAmountCents:
+            typeof data.totalAmountCents === "number" ? data.totalAmountCents : 0,
+        });
       } catch {
-        // Silent failure is intentional here.
-        // The page still works even if prefill fails.
+        if (!cancelled) {
+          setSummary((current) => ({
+            ...current,
+            rockColor: current.rockColor || colorFromQuery || defaultSummary.rockColor,
+            addonSelected: current.addonSelected || addonFromQuery,
+          }));
+        }
       } finally {
         if (!cancelled) {
           setPrefillLoading(false);
@@ -107,17 +214,28 @@ function QrSuccessPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [addonFromQuery, colorFromQuery, sessionId]);
+
+  const hasAddon = summary.addonSelected || addonFromQuery;
 
   const disabled = useMemo(() => {
     if (!sessionId) return true;
     return status === "uploading";
   }, [sessionId, status]);
 
+  const selectedColor = useMemo(
+    () => getQrColorOption(summary.rockColor || colorFromQuery),
+    [colorFromQuery, summary.rockColor]
+  );
+
   async function submit() {
     setError("");
 
-    if (!sessionId) return;
+    if (!sessionId) {
+      setError("Missing checkout session. Please reopen the payment confirmation page.");
+      setStatus("error");
+      return;
+    }
 
     if (!file) {
       setError("Please upload a photo of your backflow pipe before continuing.");
@@ -139,6 +257,34 @@ function QrSuccessPageInner() {
       return;
     }
 
+    if (hasAddon) {
+      if (!electricalBoxPhoto) {
+        setError("Please upload a photo of the electrical box cover area.");
+        setStatus("error");
+        document.getElementById("electrical-box-details")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return;
+      }
+
+      if (
+        !electricalBoxWidth.trim() ||
+        !electricalBoxDepth.trim() ||
+        !electricalBoxHeight.trim()
+      ) {
+        setError(
+          "Please enter the width, depth, and height for the electrical box cover."
+        );
+        setStatus("error");
+        document.getElementById("electrical-box-details")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return;
+      }
+    }
+
     if (!fullName.trim() || !email.trim() || !phone.trim()) {
       setError("Please confirm your contact information before continuing.");
       setStatus("error");
@@ -156,7 +302,7 @@ function QrSuccessPageInner() {
     try {
       const fd = new FormData();
       fd.append("sessionId", sessionId);
-      fd.append("photo", file as File);
+      fd.append("photo", file);
       fd.append("notes", notes);
 
       fd.append("pipeHeight", pipeHeight.trim());
@@ -172,16 +318,23 @@ function QrSuccessPageInner() {
       fd.append("state", stateRegion.trim());
       fd.append("postalCode", postalCode.trim());
 
+      if (hasAddon && electricalBoxPhoto) {
+        fd.append("electricalBoxPhoto", electricalBoxPhoto);
+        fd.append("electricalBoxWidth", electricalBoxWidth.trim());
+        fd.append("electricalBoxDepth", electricalBoxDepth.trim());
+        fd.append("electricalBoxHeight", electricalBoxHeight.trim());
+      }
+
       const res = await fetch("/api/qr/upload", { method: "POST", body: fd });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({}));
 
       if (!res.ok || !json.ok) {
         throw new Error(json?.error?.message ?? "Upload failed");
       }
 
       router.replace(`/qr/thanks?session_id=${encodeURIComponent(sessionId)}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Upload failed");
       setStatus("error");
       setTimeout(() => setStatus("idle"), 250);
     }
@@ -226,13 +379,12 @@ function QrSuccessPageInner() {
               Payment received
             </h1>
             <p className="mx-auto mt-3 max-w-[46ch] text-sm leading-6 text-white/70 sm:text-[15px]">
-              Upload a photo and dimensions of your backflow pipe, then confirm your
-              contact and installation details so we can verify fit and schedule
-              installation.
+              Review your order, then upload the sizing details we need to verify fit
+              and schedule installation.
             </p>
             {prefillLoading ? (
               <p className="mt-3 text-xs uppercase tracking-[0.22em] text-white/45">
-                Loading your checkout details…
+                Loading your order details…
               </p>
             ) : null}
           </div>
@@ -245,8 +397,38 @@ function QrSuccessPageInner() {
             ) : null}
 
             <div className="space-y-7">
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 sm:p-5">
+                <div className={sectionTitle()}>Order summary</div>
+
+                <div className="mt-4 space-y-4">
+                  <SummaryLine
+                    label={summary.productName || QR_MAIN_PRODUCT_NAME}
+                    detail={`Color: ${selectedColor.label}`}
+                    amount={formatUsd(summary.productPriceCents)}
+                  />
+
+                  {hasAddon ? (
+                    <SummaryLine
+                      label={summary.addonProductName || QR_UPSELL_ADDON_NAME}
+                      detail="Add-on: Electrical Box Cover"
+                      amount={formatUsd(
+                        summary.addonPriceCents || QR_UPSELL_ADDON_PRICE_CENTS
+                      )}
+                    />
+                  ) : null}
+
+                  <div className="border-t border-white/10 pt-4">
+                    <SummaryLine
+                      label="Total"
+                      amount={formatUsd(summary.totalAmountCents)}
+                      strong
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div id="fit-details">
-                <div className={sectionTitle()}>Required fit details</div>
+                <div className={sectionTitle()}>Artificial rock details</div>
 
                 <div className="mt-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 sm:p-5">
                   <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
@@ -267,7 +449,7 @@ function QrSuccessPageInner() {
                       ].join(" ")}
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                      onChange={(event) => setFile(event.target.files?.[0] ?? null)}
                     />
                   </div>
 
@@ -277,7 +459,7 @@ function QrSuccessPageInner() {
                       <input
                         className={`${inputClass()} mt-2`}
                         value={pipeHeight}
-                        onChange={(e) => setPipeHeight(e.target.value)}
+                        onChange={(event) => setPipeHeight(event.target.value)}
                         placeholder="Example: 12"
                         inputMode="decimal"
                       />
@@ -288,7 +470,7 @@ function QrSuccessPageInner() {
                       <input
                         className={`${inputClass()} mt-2`}
                         value={pipeWidth}
-                        onChange={(e) => setPipeWidth(e.target.value)}
+                        onChange={(event) => setPipeWidth(event.target.value)}
                         placeholder="Example: 8"
                         inputMode="decimal"
                       />
@@ -300,6 +482,94 @@ function QrSuccessPageInner() {
                   </p>
                 </div>
               </div>
+
+              {hasAddon ? (
+                <div id="electrical-box-details">
+                  <div className={sectionTitle()}>Electrical box cover details</div>
+
+                  <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                    <div className="grid gap-5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-start">
+                      <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+                        <img
+                          src="/rocks/electrical-box-cover-after.jpg"
+                          alt="Electrical box cover preview"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+
+                      <div>
+                        <h2 className="text-base font-semibold tracking-tight text-white sm:text-lg">
+                          Electrical box cover details
+                        </h2>
+
+                        <p className="mt-2 text-sm leading-6 text-white/72">
+                          Upload a photo and enter the width, depth, and height so we
+                          can size the electrical box cover correctly for this same
+                          order.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-5">
+                      <div className={labelClass()}>
+                        Upload electrical box photo (required)
+                      </div>
+                      <input
+                        className={[
+                          inputClass(),
+                          "mt-2 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.2em] file:text-white hover:file:bg-white/15",
+                        ].join(" ")}
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) =>
+                          setElectricalBoxPhoto(event.target.files?.[0] ?? null)
+                        }
+                      />
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                      <div>
+                        <div className={labelClass()}>
+                          Electrical box cover width (inches)
+                        </div>
+                        <input
+                          className={`${inputClass()} mt-2`}
+                          value={electricalBoxWidth}
+                          onChange={(event) => setElectricalBoxWidth(event.target.value)}
+                          placeholder="Example: 18"
+                          inputMode="decimal"
+                        />
+                      </div>
+
+                      <div>
+                        <div className={labelClass()}>
+                          Electrical box cover depth (inches)
+                        </div>
+                        <input
+                          className={`${inputClass()} mt-2`}
+                          value={electricalBoxDepth}
+                          onChange={(event) => setElectricalBoxDepth(event.target.value)}
+                          placeholder="Example: 12"
+                          inputMode="decimal"
+                        />
+                      </div>
+
+                      <div>
+                        <div className={labelClass()}>
+                          Electrical box cover height (inches)
+                        </div>
+                        <input
+                          className={`${inputClass()} mt-2`}
+                          value={electricalBoxHeight}
+                          onChange={(event) => setElectricalBoxHeight(event.target.value)}
+                          placeholder="Example: 24"
+                          inputMode="decimal"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
               {status === "error" && error ? (
                 <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
@@ -332,7 +602,7 @@ function QrSuccessPageInner() {
                         <input
                           className={inputClass()}
                           value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
+                          onChange={(event) => setFullName(event.target.value)}
                           placeholder="First and last name"
                           autoComplete="name"
                         />
@@ -344,7 +614,7 @@ function QrSuccessPageInner() {
                           <input
                             className={inputClass()}
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(event) => setEmail(event.target.value)}
                             placeholder="you@email.com"
                             inputMode="email"
                             autoComplete="email"
@@ -356,7 +626,7 @@ function QrSuccessPageInner() {
                           <input
                             className={inputClass()}
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(event) => setPhone(event.target.value)}
                             placeholder="(555) 555-5555"
                             inputMode="tel"
                             autoComplete="tel"
@@ -375,7 +645,7 @@ function QrSuccessPageInner() {
                         <input
                           className={inputClass()}
                           value={address1}
-                          onChange={(e) => setAddress1(e.target.value)}
+                          onChange={(event) => setAddress1(event.target.value)}
                           placeholder="Street address"
                           autoComplete="address-line1"
                         />
@@ -386,7 +656,7 @@ function QrSuccessPageInner() {
                         <input
                           className={inputClass()}
                           value={address2}
-                          onChange={(e) => setAddress2(e.target.value)}
+                          onChange={(event) => setAddress2(event.target.value)}
                           placeholder="Unit, building, gate code, etc."
                           autoComplete="address-line2"
                         />
@@ -398,7 +668,7 @@ function QrSuccessPageInner() {
                           <input
                             className={inputClass()}
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            onChange={(event) => setCity(event.target.value)}
                             placeholder="City"
                             autoComplete="address-level2"
                           />
@@ -409,7 +679,7 @@ function QrSuccessPageInner() {
                           <input
                             className={inputClass()}
                             value={stateRegion}
-                            onChange={(e) => setStateRegion(e.target.value)}
+                            onChange={(event) => setStateRegion(event.target.value)}
                             placeholder="State"
                             autoComplete="address-level1"
                           />
@@ -420,7 +690,7 @@ function QrSuccessPageInner() {
                           <input
                             className={inputClass()}
                             value={postalCode}
-                            onChange={(e) => setPostalCode(e.target.value)}
+                            onChange={(event) => setPostalCode(event.target.value)}
                             placeholder="ZIP"
                             inputMode="numeric"
                             autoComplete="postal-code"
@@ -440,7 +710,7 @@ function QrSuccessPageInner() {
                     className={`${inputClass()} min-h-[110px] resize-none`}
                     placeholder="Access notes, best time to call, anything we should know…"
                     value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    onChange={(event) => setNotes(event.target.value)}
                   />
                 </div>
               </div>

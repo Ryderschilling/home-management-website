@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 14;
+const ADMIN_SCHEMA_VERSION = 15;
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
@@ -12,6 +12,16 @@ export const sql =
   globalForDb.sql ?? postgres(env.DATABASE_URL, { prepare: false, max: 5 });
 
 if (!globalForDb.sql) globalForDb.sql = sql;
+
+export async function ensureQrAddonColumns(): Promise<void> {
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_product_key TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_product_name TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_price_cents INTEGER`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_photo_url TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_width TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_depth TEXT`;
+  await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_height TEXT`;
+}
 
 export async function ensureAdminTables(): Promise<void> {
   if (process.env.VERCEL_ENV === "production") return;
@@ -277,6 +287,13 @@ await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_clients_org_email_uq
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS product_key TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_product_key TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_product_name TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS addon_price_cents INTEGER`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_photo_url TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_width TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_depth TEXT`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_height TEXT`;
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_stripe_session_idx ON admin_orders (organization_id, stripe_session_id)`;
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_client_idx ON admin_orders (organization_id, client_id)`;
 
