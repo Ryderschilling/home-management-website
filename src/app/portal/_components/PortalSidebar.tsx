@@ -91,7 +91,7 @@ export function PortalSidebar({
 
   return (
     <aside className="portal-sidebar portal-safe-x">
-      <div className="flex h-full flex-col gap-6 py-5 lg:py-6">
+      <div className="flex h-full min-h-0 flex-col gap-6 py-5 lg:py-6">
         <Link
           href="/portal"
           className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[rgba(255,255,255,0.02)] px-3.5 py-3 no-underline"
@@ -114,23 +114,11 @@ export function PortalSidebar({
           </div>
         </Link>
 
-        <div className="grid gap-6 lg:flex-1 lg:content-start">
+        <div className="grid min-h-0 gap-6 overflow-y-auto pr-1 lg:flex-1 lg:content-start">
           <SidebarNavGroup title="Operations" items={primaryNav} pathname={pathname} />
           <SidebarNavGroup title="Platform" items={secondaryNav} pathname={pathname} />
         </div>
 
-        <div className="rounded-2xl border border-[var(--border)] bg-[rgba(255,255,255,0.02)] p-4">
-          <div className="text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--text-muted)]">
-            Utility
-          </div>
-          <div className="mt-3 text-sm font-medium text-[var(--text-primary)]">
-            Internal operator console
-          </div>
-          <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
-            Scheduling, fulfillment, and client operations stay centered here. Account
-            controls remain unchanged in this pass.
-          </p>
-        </div>
       </div>
 
       {isResizable && onResizeStart ? (

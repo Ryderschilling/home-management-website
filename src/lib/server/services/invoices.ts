@@ -76,16 +76,25 @@ async function assertClientExists(organizationId: string, clientId: string | nul
   if (!rows[0]) throw new Error("Selected client not found");
 }
 
-async function assertPropertyExists(organizationId: string, propertyId: string | null) {
-  if (!propertyId) return;
+async function assertPropertyExists(
+  organizationId: string,
+  propertyId: string | null,
+  clientId?: string | null
+) {
+  if (!propertyId) return null;
   const rows = await sql`
-    SELECT id
+    SELECT id, client_id
     FROM admin_properties
     WHERE organization_id = ${organizationId} AND id = ${propertyId}
     LIMIT 1
   `;
 
-  if (!rows[0]) throw new Error("Selected property not found");
+  const property = rows[0] ?? null;
+  if (!property) throw new Error("Selected property not found");
+  if (clientId && property.client_id && property.client_id !== clientId) {
+    throw new Error("Selected property does not belong to the selected client");
+  }
+  return property;
 }
 
 async function fetchRetainer(organizationId: string, retainerId: string | null) {
@@ -289,7 +298,16 @@ export async function createInvoice(
   }
 
   await assertClientExists(organizationId, clientId);
-  await assertPropertyExists(organizationId, propertyId);
+  await assertPropertyExists(organizationId, propertyId, clientId);
+
+  if (retainer) {
+    if (retainer.client_id && retainer.client_id !== clientId) {
+      throw new Error("Selected plan does not belong to the selected client");
+    }
+    if (propertyId && retainer.property_id && retainer.property_id !== propertyId) {
+      throw new Error("Selected plan does not belong to the selected property");
+    }
+  }
 
   const lineItems: DraftLineItemInput[] = [];
 
@@ -312,7 +330,7 @@ export async function createInvoice(
 
   if (requestedJobIds.length > 0) {
     const jobs = await sql`
-      SELECT id, retainer_id, title, scheduled_for, price_cents
+      SELECT id, client_id, property_id, retainer_id, title, scheduled_for, price_cents
       FROM admin_jobs
       WHERE organization_id = ${organizationId}
         AND id = ANY(${requestedJobIds})
@@ -324,6 +342,13 @@ export async function createInvoice(
     }
 
     for (const job of jobs) {
+      if (job.client_id && job.client_id !== clientId) {
+        throw new Error("Selected billable job does not belong to the selected client");
+      }
+      if (propertyId && job.property_id && job.property_id !== propertyId) {
+        throw new Error("Selected billable job does not belong to the selected property");
+      }
+
       const unitPriceCents = Math.max(0, Number(job.price_cents ?? 0));
       lineItems.push({
         description: `${job.title} visit on ${new Date(job.scheduled_for).toLocaleDateString()}`,

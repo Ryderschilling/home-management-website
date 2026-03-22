@@ -209,7 +209,12 @@ function statusPillStyle(status: string): React.CSSProperties {
   if (s === "NEW") return { background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
   if (s === "ORDERED") return { background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", color: "#60a5fa", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
   if (s === "INSTALLED") return { background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", color: "#4ade80", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (s === "DRAFT") return { background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.25)", color: "#fbbf24", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (s === "SENT") return { background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.25)", color: "#60a5fa", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (s === "PAID") return { background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", color: "#4ade80", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (s === "OVERDUE") return { background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
   if (s === "CANCELED") return { background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (s === "VOID") return { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "#c4c4c4", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
   return { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text-secondary)", borderRadius: "999px", padding: "2px 10px", fontSize: "10px", letterSpacing: "0.15em", textTransform: "uppercase" };
 }
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 type Client = { id: string; name: string; };
 type Property = { id: string; client_id?: string | null; name: string; address_line1?: string | null; };
-type Retainer = { id: string; client_id?: string | null; property_id?: string | null; client_name?: string | null; property_name?: string | null; property_address_line1?: string | null; name: string; amount_cents: number; billing_frequency: "DAILY" | "WEEKLY" | "MONTHLY"; billing_interval: number; billing_anchor_date?: string | null; service_frequency: "DAILY" | "WEEKLY" | "MONTHLY"; service_interval: number; service_anchor_date?: string | null; status: "ACTIVE" | "PAUSED" | "CANCELED"; notes?: string | null; created_at?: string | null; future_visit_count?: number | null; next_visit_at?: string | null; invoice_count?: number | null; };
+type Retainer = { id: string; client_id?: string | null; property_id?: string | null; client_name?: string | null; property_name?: string | null; property_address_line1?: string | null; name: string; amount_cents: number; billing_frequency: "DAILY" | "WEEKLY" | "MONTHLY"; billing_interval: number; billing_anchor_date?: string | null; service_frequency: "DAILY" | "WEEKLY" | "MONTHLY"; service_interval: number; service_anchor_date?: string | null; status: "ACTIVE" | "PAUSED" | "CANCELED"; notes?: string | null; created_at?: string | null; future_visit_count?: number | null; next_visit_at?: string | null; };
 
 const S = {
   input: "w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--border-hover)]",
@@ -224,7 +224,7 @@ export default function PortalRetainersPage() {
           <div className="portal-table-scroll">
             <table className="min-w-[1120px] w-full text-left md:min-w-[1380px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
-                <tr>{["Plan", "Client", "Property", "Amount", "Billing cadence", "Visit cadence", "Next visit", "Future visits", "Invoices", "Status", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
+                <tr>{["Plan", "Client", "Property", "Amount", "Billing cadence", "Visit cadence", "Next visit", "Future visits", "Status", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>
               <tbody>
                 {filteredRetainers.map((r) => (
@@ -237,7 +237,6 @@ export default function PortalRetainersPage() {
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>Every {r.service_interval} {r.service_frequency.toLowerCase()}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Anchor: {r.service_anchor_date || "—"}</div></td>
                     <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{fmtDate(r.next_visit_at)}</td>
                     <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{r.future_visit_count ?? 0}</td>
-                    <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{r.invoice_count ?? 0}</td>
                     <td className="px-5 py-5"><span style={retainerStatusStyle(r.status)}>{r.status}</span></td>
                     <td className="px-5 py-5">
                       <div className="flex flex-wrap gap-2">

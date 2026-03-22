@@ -106,6 +106,7 @@ export default function PortalInvoicesPage() {
   const [error, setError] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [listClientFilter, setListClientFilter] = useState("");
   const [clientId, setClientId] = useState("");
   const [propertyId, setPropertyId] = useState("");
   const [retainerId, setRetainerId] = useState("");
@@ -157,9 +158,10 @@ export default function PortalInvoicesPage() {
   const filteredInvoices = useMemo(() => {
     return invoices.filter((invoice) => {
       if (statusFilter !== "ALL" && invoice.status !== statusFilter) return false;
+      if (listClientFilter && invoice.client_id !== listClientFilter) return false;
       return true;
     });
-  }, [invoices, statusFilter]);
+  }, [invoices, listClientFilter, statusFilter]);
 
   const propertiesForClient = useMemo(() => {
     if (!clientId) return properties;
@@ -170,6 +172,20 @@ export default function PortalInvoicesPage() {
     if (!clientId) return plans;
     return plans.filter((plan) => plan.client_id === clientId);
   }, [clientId, plans]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    if (!propertiesForClient.some((property) => property.id === propertyId)) {
+      setPropertyId("");
+    }
+  }, [clientId, propertiesForClient, propertyId]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    if (!plansForClient.some((plan) => plan.id === retainerId)) {
+      setRetainerId("");
+    }
+  }, [clientId, plansForClient, retainerId]);
 
   const billableJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -205,6 +221,10 @@ export default function PortalInvoicesPage() {
     setManualLines((current) =>
       current.map((line, lineIndex) => (lineIndex === index ? { ...line, [key]: value } : line))
     );
+  }
+
+  function removeManualLine(index: number) {
+    setManualLines((current) => (current.length === 1 ? current : current.filter((_, lineIndex) => lineIndex !== index)));
   }
 
   async function createInvoice() {
@@ -296,14 +316,20 @@ export default function PortalInvoicesPage() {
         </div>
 
         <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <select className={S.input} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="ALL">All statuses</option>
-            <option value="DRAFT">Draft</option>
-            <option value="SENT">Sent</option>
-            <option value="PAID">Paid</option>
-            <option value="VOID">Void</option>
-            <option value="OVERDUE">Overdue</option>
-          </select>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <select className={S.input} value={listClientFilter} onChange={(event) => setListClientFilter(event.target.value)}>
+              <option value="">All clients</option>
+              {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
+            </select>
+            <select className={S.input} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+              <option value="ALL">All statuses</option>
+              <option value="DRAFT">Draft</option>
+              <option value="SENT">Sent</option>
+              <option value="PAID">Paid</option>
+              <option value="VOID">Void</option>
+              <option value="OVERDUE">Overdue</option>
+            </select>
+          </div>
           <button type="button" onClick={() => setDrawerOpen(true)} className={S.btnPrimary}>
             Create draft invoice
           </button>
@@ -470,10 +496,13 @@ export default function PortalInvoicesPage() {
             </div>
             <div className="mt-3 space-y-3">
               {manualLines.map((line, index) => (
-                <div key={`manual-${index}`} className="grid grid-cols-1 gap-3 rounded-xl border border-[var(--border)] p-4 md:grid-cols-[minmax(0,1fr)_140px_160px]">
+                <div key={`manual-${index}`} className="grid grid-cols-1 gap-3 rounded-xl border border-[var(--border)] p-4 md:grid-cols-[minmax(0,1fr)_140px_160px_120px]">
                   <input className={S.input} value={line.description} onChange={(event) => updateManualLine(index, "description", event.target.value)} placeholder="Description" />
                   <input className={S.input} value={line.quantity} onChange={(event) => updateManualLine(index, "quantity", event.target.value)} placeholder="Qty" />
                   <input className={S.input} value={line.unitPrice} onChange={(event) => updateManualLine(index, "unitPrice", event.target.value)} placeholder="Unit price (USD)" />
+                  <button type="button" onClick={() => removeManualLine(index)} className={S.btnGhost}>
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>

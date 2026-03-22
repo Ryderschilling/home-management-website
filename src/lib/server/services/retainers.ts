@@ -115,8 +115,7 @@ async function fetchRetainerRecord(organizationId: string, retainerId: string) {
       p.name AS property_name,
       p.address_line1 AS property_address_line1,
       COALESCE(job_summary.future_visit_count, 0) AS future_visit_count,
-      job_summary.next_visit_at,
-      COALESCE(invoice_summary.invoice_count, 0) AS invoice_count
+      job_summary.next_visit_at
     FROM admin_retainers r
     LEFT JOIN admin_clients c
       ON c.id = r.client_id
@@ -134,12 +133,6 @@ async function fetchRetainerRecord(organizationId: string, retainerId: string) {
         AND j.scheduled_for >= NOW()
         AND UPPER(j.status) <> 'CANCELED'
     ) AS job_summary ON true
-    LEFT JOIN LATERAL (
-      SELECT COUNT(*)::int AS invoice_count
-      FROM admin_invoices i
-      WHERE i.organization_id = r.organization_id
-        AND i.retainer_id = r.id
-    ) AS invoice_summary ON true
     WHERE r.organization_id = ${organizationId} AND r.id = ${retainerId}
     LIMIT 1
   `;
@@ -174,8 +167,7 @@ export async function listRetainers(organizationId: string) {
       p.name AS property_name,
       p.address_line1 AS property_address_line1,
       COALESCE(job_summary.future_visit_count, 0) AS future_visit_count,
-      job_summary.next_visit_at,
-      COALESCE(invoice_summary.invoice_count, 0) AS invoice_count
+      job_summary.next_visit_at
     FROM admin_retainers r
     LEFT JOIN admin_clients c
       ON c.id = r.client_id
@@ -193,12 +185,6 @@ export async function listRetainers(organizationId: string) {
         AND j.scheduled_for >= NOW()
         AND UPPER(j.status) <> 'CANCELED'
     ) AS job_summary ON true
-    LEFT JOIN LATERAL (
-      SELECT COUNT(*)::int AS invoice_count
-      FROM admin_invoices i
-      WHERE i.organization_id = r.organization_id
-        AND i.retainer_id = r.id
-    ) AS invoice_summary ON true
     WHERE r.organization_id = ${organizationId}
     ORDER BY r.created_at DESC
   `;

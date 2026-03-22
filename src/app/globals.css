@@ -112,6 +112,9 @@ textarea {
   z-index: 20;
   border-bottom: 1px solid var(--border);
   background: rgba(14, 14, 15, 0.94);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
