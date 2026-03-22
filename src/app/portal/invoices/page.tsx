@@ -22,6 +22,10 @@ type Job = {
   client_id?: string | null;
   property_id?: string | null;
   retainer_id?: string | null;
+  client_name?: string | null;
+  property_name?: string | null;
+  property_address_line1?: string | null;
+  plan_name?: string | null;
   title: string;
   scheduled_for: string;
   status: string;
@@ -61,7 +65,7 @@ type ManualLine = { description: string; quantity: string; unitPrice: string };
 
 const S = {
   input:
-    "w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--border-hover)]",
+    "w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--border-hover)] disabled:cursor-not-allowed disabled:opacity-60",
   label: "text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]",
   card: "rounded-2xl border border-[var(--border)] bg-[var(--surface)]",
   cardInner: "rounded-xl border border-[var(--border)] bg-[var(--surface-2)]",
@@ -95,6 +99,22 @@ function newManualLine(): ManualLine {
   return { description: "", quantity: "1", unitPrice: "" };
 }
 
+function todayDateInput() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addDaysToDateInput(value: string, days: number) {
+  const [year, month, day] = value.split("-").map((part) => Number(part));
+  if (!year || !month || !day) return value;
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function shortJobReference(jobId: string) {
+  return `JOB-${jobId.slice(0, 8).toUpperCase()}`;
+}
+
 export default function PortalInvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -112,11 +132,13 @@ export default function PortalInvoicesPage() {
   const [retainerId, setRetainerId] = useState("");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
-  const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
-  const [dueDate, setDueDate] = useState("");
+  const [issueDate, setIssueDate] = useState(() => todayDateInput());
+  const [dueDate, setDueDate] = useState(() => addDaysToDateInput(todayDateInput(), 7));
+  const [dueDateTouched, setDueDateTouched] = useState(false);
   const [selectedJobIds, setSelectedJobIds] = useState<string[]>([]);
   const [manualLines, setManualLines] = useState<ManualLine[]>([newManualLine()]);
   const [notes, setNotes] = useState("");
+  const selectClassName = `${S.input} portal-select`;
 
   async function load() {
     setLoading(true);
@@ -163,37 +185,74 @@ export default function PortalInvoicesPage() {
     });
   }, [invoices, listClientFilter, statusFilter]);
 
+  const selectedPlan = useMemo(
+    () => plans.find((plan) => plan.id === retainerId) ?? null,
+    [plans, retainerId]
+  );
+
+  const alreadyInvoicedJobMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { invoiceId: string; invoiceNumber: string; status: string }
+    >();
+
+    for (const invoice of invoices) {
+      if (invoice.status === "VOID" || !Array.isArray(invoice.line_items)) continue;
+
+      for (const item of invoice.line_items) {
+        if (item.line_type !== "JOB_EXTRA" || !item.job_id || map.has(item.job_id)) continue;
+        map.set(item.job_id, {
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoice_number,
+          status: invoice.status,
+        });
+      }
+    }
+
+    return map;
+  }, [invoices]);
+
   const propertiesForClient = useMemo(() => {
-    if (!clientId) return properties;
+    if (!clientId) return [];
     return properties.filter((property) => property.client_id === clientId);
   }, [clientId, properties]);
 
   const plansForClient = useMemo(() => {
-    if (!clientId) return plans;
+    if (!clientId) return [];
     return plans.filter((plan) => plan.client_id === clientId);
   }, [clientId, plans]);
 
   useEffect(() => {
-    if (!clientId) return;
+    if (!clientId) {
+      setPropertyId("");
+      return;
+    }
     if (!propertiesForClient.some((property) => property.id === propertyId)) {
       setPropertyId("");
     }
   }, [clientId, propertiesForClient, propertyId]);
 
   useEffect(() => {
-    if (!clientId) return;
+    if (!clientId) {
+      setRetainerId("");
+      return;
+    }
     if (!plansForClient.some((plan) => plan.id === retainerId)) {
       setRetainerId("");
     }
   }, [clientId, plansForClient, retainerId]);
 
   const billableJobs = useMemo(() => {
+    if (!clientId) return [];
+
     return jobs.filter((job) => {
       if (clientId && job.client_id !== clientId) return false;
       if (propertyId && job.property_id !== propertyId) return false;
+      if (selectedPlan?.property_id && job.property_id !== selectedPlan.property_id) return false;
+      if (selectedPlan && job.retainer_id && job.retainer_id !== selectedPlan.id) return false;
       return job.status !== "CANCELED";
     });
-  }, [clientId, jobs, propertyId]);
+  }, [clientId, jobs, propertyId, selectedPlan]);
 
   const stats = useMemo(() => {
     const sent = invoices.filter((invoice) => invoice.status === "SENT").length;
@@ -210,6 +269,23 @@ export default function PortalInvoicesPage() {
     setClientId(plan.client_id ?? "");
     setPropertyId(plan.property_id ?? "");
   }, [plans, retainerId]);
+
+  useEffect(() => {
+    if (!issueDate || dueDateTouched) return;
+    setDueDate(addDaysToDateInput(issueDate, 7));
+  }, [dueDateTouched, issueDate]);
+
+  useEffect(() => {
+    const allowedJobIds = new Set(
+      billableJobs
+        .filter((job) => !alreadyInvoicedJobMap.has(job.id))
+        .map((job) => job.id)
+    );
+
+    setSelectedJobIds((current) =>
+      current.filter((jobId, index) => current.indexOf(jobId) === index && allowedJobIds.has(jobId))
+    );
+  }, [alreadyInvoicedJobMap, billableJobs]);
 
   function toggleJob(jobId: string) {
     setSelectedJobIds((current) =>
@@ -265,8 +341,10 @@ export default function PortalInvoicesPage() {
       setRetainerId("");
       setPeriodStart("");
       setPeriodEnd("");
-      setIssueDate(new Date().toISOString().slice(0, 10));
-      setDueDate("");
+      const nextIssueDate = todayDateInput();
+      setIssueDate(nextIssueDate);
+      setDueDate(addDaysToDateInput(nextIssueDate, 7));
+      setDueDateTouched(false);
       setSelectedJobIds([]);
       setManualLines([newManualLine()]);
       setNotes("");
@@ -317,11 +395,11 @@ export default function PortalInvoicesPage() {
 
         <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <select className={S.input} value={listClientFilter} onChange={(event) => setListClientFilter(event.target.value)}>
+            <select className={selectClassName} value={listClientFilter} onChange={(event) => setListClientFilter(event.target.value)}>
               <option value="">All clients</option>
               {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
             </select>
-            <select className={S.input} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <select className={selectClassName} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
               <option value="ALL">All statuses</option>
               <option value="DRAFT">Draft</option>
               <option value="SENT">Sent</option>
@@ -419,7 +497,7 @@ export default function PortalInvoicesPage() {
               Cancel
             </button>
             <button type="button" onClick={createInvoice} disabled={saving} className={S.btnPrimary}>
-              {saving ? "Creating..." : "Create invoice"}
+              {saving ? "Creating draft..." : "Create draft invoice"}
             </button>
           </div>
         }
@@ -428,24 +506,51 @@ export default function PortalInvoicesPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className={S.label}>Client</label>
-              <select className={S.input} value={clientId} onChange={(event) => setClientId(event.target.value)}>
+              <select
+                className={selectClassName}
+                value={clientId}
+                onChange={(event) => setClientId(event.target.value)}
+                disabled={Boolean(selectedPlan)}
+              >
                 <option value="">Select client</option>
                 {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
+              </select>
+              {selectedPlan ? (
+                <div className="text-xs text-[var(--text-muted)]">Client is locked to the selected plan.</div>
+              ) : null}
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className={S.label}>Plan</label>
+              <select
+                className={selectClassName}
+                value={retainerId}
+                onChange={(event) => setRetainerId(event.target.value)}
+                disabled={!clientId}
+              >
+                <option value="">{clientId ? "Optional plan base charge" : "Select client first"}</option>
+                {plansForClient.map((plan) => <option key={plan.id} value={plan.id}>{plan.name} • {money(plan.amount_cents)} • every {plan.billing_interval} {plan.billing_frequency.toLowerCase()}</option>)}
               </select>
             </div>
             <div className="space-y-2">
               <label className={S.label}>Property</label>
-              <select className={S.input} value={propertyId} onChange={(event) => setPropertyId(event.target.value)}>
-                <option value="">Optional property</option>
+              <select
+                className={selectClassName}
+                value={propertyId}
+                onChange={(event) => setPropertyId(event.target.value)}
+                disabled={!clientId || Boolean(selectedPlan?.property_id)}
+              >
+                <option value="">
+                  {!clientId
+                    ? "Select client first"
+                    : selectedPlan?.property_id
+                      ? "Property locked to selected plan"
+                      : "Optional property"}
+                </option>
                 {propertiesForClient.map((property) => <option key={property.id} value={property.id}>{property.name}{property.address_line1 ? ` - ${property.address_line1}` : ""}</option>)}
               </select>
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className={S.label}>Plan</label>
-              <select className={S.input} value={retainerId} onChange={(event) => setRetainerId(event.target.value)}>
-                <option value="">Optional plan base charge</option>
-                {plansForClient.map((plan) => <option key={plan.id} value={plan.id}>{plan.name} • {money(plan.amount_cents)} • every {plan.billing_interval} {plan.billing_frequency.toLowerCase()}</option>)}
-              </select>
+              {selectedPlan?.property_id ? (
+                <div className="text-xs text-[var(--text-muted)]">Property is locked to the selected plan.</div>
+              ) : null}
             </div>
             <div className="space-y-2">
               <label className={S.label}>Period start</label>
@@ -461,25 +566,72 @@ export default function PortalInvoicesPage() {
             </div>
             <div className="space-y-2">
               <label className={S.label}>Due date</label>
-              <input type="date" className={S.input} value={dueDate} onChange={(event) => setDueDate(event.target.value)} />
+              <input
+                type="date"
+                className={S.input}
+                value={dueDate}
+                onChange={(event) => {
+                  setDueDate(event.target.value);
+                  setDueDateTouched(true);
+                }}
+              />
             </div>
           </div>
 
           <div>
             <div className={S.label}>Optional extra billable jobs</div>
             <div className="mt-3 max-h-[240px] space-y-2 overflow-y-auto">
-              {billableJobs.length === 0 ? (
-                <div className="rounded-xl border border-[var(--border)] px-4 py-4 text-sm text-[var(--text-muted)]">No billable jobs match the selected client or property.</div>
+              {!clientId ? (
+                <div className="rounded-xl border border-[var(--border)] px-4 py-4 text-sm text-[var(--text-muted)]">Select a client before reviewing optional extra billable jobs.</div>
+              ) : billableJobs.length === 0 ? (
+                <div className="rounded-xl border border-[var(--border)] px-4 py-4 text-sm text-[var(--text-muted)]">No billable jobs match the selected client, property, or plan context.</div>
               ) : (
-                billableJobs.map((job) => (
-                  <label key={job.id} className={`${S.cardInner} flex items-start gap-3 px-4 py-3 text-sm text-[var(--text-secondary)]`}>
-                    <input type="checkbox" checked={selectedJobIds.includes(job.id)} onChange={() => toggleJob(job.id)} />
-                    <div className="min-w-0">
-                      <div className="font-medium text-[var(--text-primary)]">{job.title}</div>
-                      <div className="mt-1 text-[12px] text-[var(--text-secondary)]">{fmtDate(job.scheduled_for)} • {job.status} • {money(job.price_cents)}</div>
-                    </div>
-                  </label>
-                ))
+                billableJobs.map((job) => {
+                  const alreadyInvoiced = alreadyInvoicedJobMap.get(job.id);
+                  const checked = selectedJobIds.includes(job.id);
+
+                  return (
+                    <label
+                      key={job.id}
+                      className={`${S.cardInner} flex items-start gap-3 px-4 py-3 text-sm ${alreadyInvoiced ? "opacity-70" : ""} text-[var(--text-secondary)]`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={Boolean(alreadyInvoiced)}
+                        onChange={() => toggleJob(job.id)}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="font-medium text-[var(--text-primary)]">{job.title}</div>
+                            <div className="mt-1 text-[12px] text-[var(--text-secondary)]">
+                              {fmtDate(job.scheduled_for)} • {job.status} • {money(job.price_cents)}
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                              {shortJobReference(job.id)}
+                            </span>
+                            {alreadyInvoiced ? (
+                              <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-amber-200">
+                                Already invoiced
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="mt-2 text-[12px] text-[var(--text-muted)]">
+                          {[job.client_name, job.property_name, job.property_address_line1].filter(Boolean).join(" • ") || "Client/property context unavailable"}
+                        </div>
+                        {alreadyInvoiced ? (
+                          <div className="mt-2 text-[12px] text-amber-200/90">
+                            Attached to invoice {alreadyInvoiced.invoiceNumber} ({alreadyInvoiced.status}).
+                          </div>
+                        ) : null}
+                      </div>
+                    </label>
+                  );
+                })
               )}
             </div>
           </div>

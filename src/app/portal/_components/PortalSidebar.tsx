@@ -10,21 +10,23 @@ type NavItem = {
   label: string;
 };
 
-const primaryNav: NavItem[] = [
+const operationsNav: NavItem[] = [
   { href: "/portal", label: "Dashboard" },
   { href: "/portal/jobs", label: "Jobs" },
+  { href: "/portal/retainers", label: "Plans" },
   { href: "/portal/invoices", label: "Invoices" },
-  { href: "/portal/orders", label: "Orders" },
   { href: "/portal/clients", label: "Clients" },
+  { href: "/portal/orders", label: "Orders" },
+];
+
+const dataNav: NavItem[] = [
+  { href: "/portal/properties", label: "Properties" },
   { href: "/portal/services", label: "Services" },
 ];
 
 const secondaryNav: NavItem[] = [
-  { href: "/portal/properties", label: "Properties" },
-  { href: "/portal/campaigns", label: "Campaigns" },
   { href: "/portal/contacts", label: "Contacts" },
-  { href: "/portal/retainers", label: "Plans" },
-  { href: "/portal/exports", label: "Exports" },
+  { href: "/portal/campaigns", label: "Campaigns" },
 ];
 
 function isActiveRoute(pathname: string, href: string) {
@@ -115,8 +117,9 @@ export function PortalSidebar({
         </Link>
 
         <div className="grid min-h-0 gap-6 overflow-y-auto pr-1 lg:flex-1 lg:content-start">
-          <SidebarNavGroup title="Operations" items={primaryNav} pathname={pathname} />
-          <SidebarNavGroup title="Platform" items={secondaryNav} pathname={pathname} />
+          <SidebarNavGroup title="Operations" items={operationsNav} pathname={pathname} />
+          <SidebarNavGroup title="Data" items={dataNav} pathname={pathname} />
+          <SidebarNavGroup title="Secondary" items={secondaryNav} pathname={pathname} />
         </div>
 
       </div>

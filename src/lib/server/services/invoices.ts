@@ -47,6 +47,17 @@ function parseDateOnly(value: unknown, label: string) {
   return date.toISOString().slice(0, 10);
 }
 
+function addDaysToDateOnly(value: string, days: number) {
+  const [year, month, day] = value.split("-").map((part) => Number(part));
+  if (!year || !month || !day) {
+    throw new Error("Invalid date");
+  }
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
 function parseOptionalInteger(value: unknown, label: string) {
   if (value === undefined || value === null || value === "") return null;
   const parsed = Math.round(Number(value));
@@ -289,7 +300,8 @@ export async function createInvoice(
   const issueDate =
     parseDateOnly(body.issueDate, "issueDate") ??
     new Date().toISOString().slice(0, 10);
-  const dueDate = parseDateOnly(body.dueDate, "dueDate");
+  const dueDate =
+    parseDateOnly(body.dueDate, "dueDate") ?? addDaysToDateOnly(issueDate, 7);
   const notes = asOptionalString(body.notes);
   const includePlanBase = body.includePlanBase === undefined ? true : Boolean(body.includePlanBase);
 
@@ -327,17 +339,22 @@ export async function createInvoice(
         .map((value) => String(value ?? "").trim())
         .filter(Boolean)
     : [];
+  const uniqueRequestedJobIds = Array.from(new Set(requestedJobIds));
 
-  if (requestedJobIds.length > 0) {
+  if (uniqueRequestedJobIds.length !== requestedJobIds.length) {
+    throw new Error("Duplicate billable jobs are not allowed on the same invoice");
+  }
+
+  if (uniqueRequestedJobIds.length > 0) {
     const jobs = await sql`
       SELECT id, client_id, property_id, retainer_id, title, scheduled_for, price_cents
       FROM admin_jobs
       WHERE organization_id = ${organizationId}
-        AND id = ANY(${requestedJobIds})
+        AND id = ANY(${uniqueRequestedJobIds})
       ORDER BY scheduled_for ASC
     `;
 
-    if (jobs.length !== requestedJobIds.length) {
+    if (jobs.length !== uniqueRequestedJobIds.length) {
       throw new Error("One or more selected jobs could not be found");
     }
 
@@ -347,6 +364,9 @@ export async function createInvoice(
       }
       if (propertyId && job.property_id && job.property_id !== propertyId) {
         throw new Error("Selected billable job does not belong to the selected property");
+      }
+      if (retainer && job.retainer_id && job.retainer_id !== retainer.id) {
+        throw new Error("Selected billable job does not belong to the selected plan");
       }
 
       const unitPriceCents = Math.max(0, Number(job.price_cents ?? 0));
@@ -400,6 +420,40 @@ export async function createInvoice(
   const invoiceId = crypto.randomUUID();
 
   await sql.begin(async (tx) => {
+    if (uniqueRequestedJobIds.length > 0) {
+      await tx`
+        SELECT id
+        FROM admin_jobs
+        WHERE organization_id = ${organizationId}
+          AND id = ANY(${uniqueRequestedJobIds})
+        ORDER BY id
+        FOR UPDATE
+      `;
+
+      const existingExtraJobInvoices = await tx`
+        SELECT DISTINCT ON (li.job_id)
+          li.job_id,
+          i.invoice_number,
+          i.status
+        FROM admin_invoice_line_items li
+        INNER JOIN admin_invoices i
+          ON i.id = li.invoice_id
+          AND i.organization_id = li.organization_id
+        WHERE li.organization_id = ${organizationId}
+          AND li.line_type = 'JOB_EXTRA'
+          AND li.job_id = ANY(${uniqueRequestedJobIds})
+          AND UPPER(i.status) <> 'VOID'
+        ORDER BY li.job_id, i.created_at DESC
+      `;
+
+      if (existingExtraJobInvoices.length > 0) {
+        const conflict = existingExtraJobInvoices[0];
+        throw new Error(
+          `Job ${String(conflict.job_id).slice(0, 8)} is already invoiced on ${conflict.invoice_number}`
+        );
+      }
+    }
+
     await tx`
       INSERT INTO admin_invoices (
         id,

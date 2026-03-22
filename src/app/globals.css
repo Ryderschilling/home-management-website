@@ -136,6 +136,21 @@ textarea {
   -webkit-overflow-scrolling: touch;
 }
 
+.portal-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.25 4.5L6 8.25L9.75 4.5' stroke='%238a8a8a' stroke-width='1.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 12px 12px;
+  padding-right: 2.75rem;
+}
+
+.portal-select option {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
 @media (max-width: 639px) {
   .portal-table-scroll {
     margin-inline: -4px;
