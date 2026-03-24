@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   QR_MAIN_PRODUCT_NAME,
@@ -16,6 +16,41 @@ import {
 } from "@/lib/qr-funnel";
 
 type CheckoutAction = "add" | "skip" | "";
+
+function shouldTrackOnce(key: string) {
+  if (typeof window === "undefined" || !key) return false;
+
+  const storageKey = `chm-track:${key}`;
+
+  if (window.sessionStorage.getItem(storageKey) === "1") {
+    return false;
+  }
+
+  window.sessionStorage.setItem(storageKey, "1");
+  return true;
+}
+
+async function trackCampaignEvent(
+  eventType: string,
+  campaignCode: string,
+  sessionKey: string,
+  pagePath: string,
+  metadata?: Record<string, unknown>
+) {
+  if (!campaignCode) return;
+
+  await fetch("/api/marketing/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      eventType,
+      campaignCode,
+      sessionKey,
+      pagePath,
+      metadata,
+    }),
+  }).catch(() => {});
+}
 
 function UpgradeImageCard({
   src,
@@ -50,11 +85,42 @@ function QrUpgradePageInner() {
 
   const selectedColor = useMemo(() => getQrColorOption(color), [color]);
 
+  useEffect(() => {
+    if (!campaignCode || !shouldTrackOnce(`page_view:/qr/upgrade:${campaignCode}:${sessionKey}`)) {
+      return;
+    }
+
+    void trackCampaignEvent("page_view", campaignCode, sessionKey, "/qr/upgrade", {
+      color: selectedColor.id,
+      sourceLandingPath: landingPath,
+    });
+  }, [campaignCode, landingPath, selectedColor.id, sessionKey]);
+
   async function continueToCheckout(addAddon: boolean) {
     setAction(addAddon ? "add" : "skip");
     setError("");
 
     try {
+      if (
+        addAddon &&
+        campaignCode &&
+        shouldTrackOnce(`add_on_selected:${campaignCode}:${sessionKey}`)
+      ) {
+        await trackCampaignEvent(
+          "add_on_selected",
+          campaignCode,
+          sessionKey,
+          "/qr/upgrade",
+          {
+            addonSelected: true,
+            addonProductKey: QR_UPSELL_ADDON_KEY,
+            addonProductName: QR_UPSELL_ADDON_NAME,
+            addonPriceCents: QR_UPSELL_ADDON_PRICE_CENTS,
+            color: selectedColor.id,
+          }
+        );
+      }
+
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

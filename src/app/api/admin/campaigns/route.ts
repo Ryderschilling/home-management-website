@@ -52,11 +52,15 @@ export async function GET(request: NextRequest) {
         COALESCE(v.visits, 0) AS visits,
         COALESCE(v.unique_visitors, 0) AS unique_visitors,
         COALESCE(cs.checkout_starts, 0) AS checkout_starts,
+        COALESCE(cs.add_on_selects, 0) AS add_on_selects,
+        COALESCE(cs.add_on_checkout_starts, 0) AS add_on_checkout_starts,
         COALESCE(o.paid_orders, 0) AS paid_orders,
-COALESCE(o.upload_completed, 0) AS upload_completed,
-COALESCE(o.discount_uses, 0) AS discount_uses,
-COALESCE(o.revenue_cents, 0) AS revenue_cents,
-COALESCE(l.email_leads, 0) AS email_leads
+        COALESCE(o.upload_completed, 0) AS upload_completed,
+        COALESCE(o.discount_uses, 0) AS discount_uses,
+        COALESCE(o.revenue_cents, 0) AS revenue_cents,
+        COALESCE(o.add_on_paid_orders, 0) AS add_on_paid_orders,
+        COALESCE(o.add_on_revenue_cents, 0) AS add_on_revenue_cents,
+        COALESCE(l.email_leads, 0) AS email_leads
       FROM marketing_campaigns c
       LEFT JOIN (
         SELECT
@@ -72,31 +76,57 @@ COALESCE(l.email_leads, 0) AS email_leads
       LEFT JOIN (
         SELECT
           campaign_id,
-          COUNT(*) FILTER (WHERE event_type = 'checkout_started')::int AS checkout_starts
+          COUNT(*) FILTER (WHERE event_type = 'checkout_started')::int AS checkout_starts,
+          COUNT(*) FILTER (WHERE event_type = 'add_on_selected')::int AS add_on_selects,
+          COUNT(*) FILTER (
+            WHERE event_type = 'checkout_started'
+              AND LOWER(COALESCE(metadata_json->>'addonSelected', 'false')) IN ('true', '1', 'yes', 'on')
+          )::int AS add_on_checkout_starts
         FROM marketing_campaign_events
         WHERE organization_id = ${orgId}
         GROUP BY campaign_id
       ) cs ON cs.campaign_id = c.id
       LEFT JOIN (
-  SELECT
-    campaign_id,
-    COUNT(*) FILTER (WHERE status = 'PAID')::int AS paid_orders,
-    COUNT(*) FILTER (WHERE upload_completed_at IS NOT NULL)::int AS upload_completed,
-    COUNT(*) FILTER (WHERE used_promotion_code = TRUE)::int AS discount_uses,
-    COALESCE(SUM(total_amount_cents), 0)::int AS revenue_cents
-  FROM admin_orders
-  WHERE organization_id = ${orgId}
-  GROUP BY campaign_id
-) o ON o.campaign_id = c.id
-LEFT JOIN (
-  SELECT
-    campaign_id,
-    COUNT(*)::int AS email_leads
-  FROM marketing_email_leads
-  WHERE organization_id = ${orgId}
-  GROUP BY campaign_id
-) l ON l.campaign_id = c.id
-WHERE c.organization_id = ${orgId}
+        SELECT
+          campaign_id,
+          COUNT(*) FILTER (WHERE status = 'PAID')::int AS paid_orders,
+          COUNT(*) FILTER (WHERE upload_completed_at IS NOT NULL)::int AS upload_completed,
+          COUNT(*) FILTER (WHERE used_promotion_code = TRUE)::int AS discount_uses,
+          COALESCE(SUM(total_amount_cents), 0)::int AS revenue_cents,
+          COUNT(*) FILTER (
+            WHERE status = 'PAID'
+              AND (
+                COALESCE(addon_product_key, '') <> ''
+                OR COALESCE(addon_product_name, '') <> ''
+              )
+          )::int AS add_on_paid_orders,
+          COALESCE(
+            SUM(
+              CASE
+                WHEN status = 'PAID'
+                  AND (
+                    COALESCE(addon_product_key, '') <> ''
+                    OR COALESCE(addon_product_name, '') <> ''
+                  )
+                THEN COALESCE(addon_price_cents, 0)
+                ELSE 0
+              END
+            ),
+            0
+          )::int AS add_on_revenue_cents
+        FROM admin_orders
+        WHERE organization_id = ${orgId}
+        GROUP BY campaign_id
+      ) o ON o.campaign_id = c.id
+      LEFT JOIN (
+        SELECT
+          campaign_id,
+          COUNT(*)::int AS email_leads
+        FROM marketing_email_leads
+        WHERE organization_id = ${orgId}
+        GROUP BY campaign_id
+      ) l ON l.campaign_id = c.id
+      WHERE c.organization_id = ${orgId}
       ORDER BY c.created_at DESC
     `;
 

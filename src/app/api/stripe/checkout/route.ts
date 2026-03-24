@@ -128,6 +128,8 @@ export async function POST(req: NextRequest) {
 
     const successParams = new URLSearchParams({
       color,
+      campaignCode: normalizedCampaignCode,
+      sessionKey,
       addon: addonSelected ? "1" : "0",
     });
 

@@ -28,6 +28,7 @@ const dataNav: NavItem[] = [
 const secondaryNav: NavItem[] = [
   { href: "/portal/contacts", label: "Contacts" },
   { href: "/portal/campaigns", label: "Campaigns" },
+  { href: "/portal/templates", label: "Templates" },
 ];
 
 function isActiveRoute(pathname: string, href: string) {

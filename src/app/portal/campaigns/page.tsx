@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Campaign = {
@@ -19,9 +20,14 @@ type Campaign = {
   unique_visitors: number;
   checkout_starts: number;
   paid_orders: number;
+  upload_completed: number;
   discount_uses: number;
   revenue_cents: number;
   email_leads: number;
+  add_on_selects: number;
+  add_on_checkout_starts: number;
+  add_on_paid_orders: number;
+  add_on_revenue_cents: number;
 };
 
 const S = {
@@ -34,8 +40,19 @@ const S = {
   btnDanger: "rounded-lg border border-red-900/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-red-400 transition hover:bg-red-900/20",
 };
 
+type MetricCard = {
+  label: string;
+  value: string | number;
+  accent?: boolean;
+};
+
 function money(cents: number | null | undefined) {
   return `$${((typeof cents === "number" ? cents : 0) / 100).toFixed(2)}`;
+}
+
+function percent(value: number) {
+  if (!Number.isFinite(value)) return "0.0%";
+  return `${(value * 100).toFixed(1)}%`;
 }
 
 export default function PortalCampaignsPage() {
@@ -115,10 +132,10 @@ export default function PortalCampaignsPage() {
           <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Create a flyer campaign, use its code in your QR URL, and track visits, checkout starts, paid orders, discount usage, revenue, CAC, and customer value.</p>
         </div>
         <div className="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-7 md:grid-cols-4">
-          {[{ label: "Flyers sent", value: summary.flyers }, { label: "Visits", value: summary.visits }, { label: "Paid orders", value: summary.orders }, { label: "Revenue", value: money(summary.revenue), accent: true }].map((s) => (
+          {([{ label: "Flyers sent", value: summary.flyers }, { label: "Visits", value: summary.visits }, { label: "Paid orders", value: summary.orders }, { label: "Revenue", value: money(summary.revenue), accent: true }] as MetricCard[]).map((s) => (
             <div key={s.label}>
               <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>{s.label}</div>
-              <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 26, color: (s as any).accent ? "var(--accent-warm, #c9b89a)" : "var(--text-primary)", marginTop: 8 }}>{s.value}</div>
+              <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 26, color: s.accent ? "var(--accent-warm, #c9b89a)" : "var(--text-primary)", marginTop: 8 }}>{s.value}</div>
             </div>
           ))}
         </div>
@@ -161,6 +178,7 @@ export default function PortalCampaignsPage() {
                 const customerValueCents = campaign.paid_orders > 0 ? Math.round((campaign.revenue_cents ?? 0) / campaign.paid_orders) : 0;
                 const flyerToVisit = campaign.flyers_sent > 0 ? ((campaign.unique_visitors / campaign.flyers_sent) * 100).toFixed(1) : "0.0";
                 const visitToOrder = Math.min(campaign.unique_visitors > 0 ? (campaign.paid_orders / campaign.unique_visitors) * 100 : 0, 100).toFixed(1);
+                const addOnAttachRate = campaign.paid_orders > 0 ? campaign.add_on_paid_orders / campaign.paid_orders : 0;
                 return (
                   <div key={campaign.id} className={S.cardInner} style={{ padding: 20 }}>
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -171,15 +189,16 @@ export default function PortalCampaignsPage() {
                         {campaign.notes && <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{campaign.notes}</div>}
                       </div>
                       <div className="flex flex-wrap gap-2">
+                        <Link href={`/portal/campaigns/${campaign.id}`} className={S.btnGhost}>View</Link>
                         <button onClick={() => updateCampaign(campaign)} className={S.btnGhost}>Update counts / costs</button>
                         <button onClick={() => deleteCampaign(campaign)} className={S.btnDanger}>Delete</button>
                       </div>
                     </div>
                     <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6">
-                      {[{ label: "Flyers", value: campaign.flyers_sent }, { label: "Unique visitors", value: campaign.unique_visitors }, { label: "Checkout starts", value: campaign.checkout_starts }, { label: "Paid orders", value: campaign.paid_orders }, { label: "Discount uses", value: campaign.discount_uses }, { label: "Email leads", value: campaign.email_leads }, { label: "Customer value", value: campaign.paid_orders > 0 ? money(customerValueCents) : "—" }, { label: "Revenue", value: money(campaign.revenue_cents), accent: true }, { label: "Total cost", value: money(totalCostCents) }, { label: "CAC", value: campaign.paid_orders > 0 ? money(cacCents) : "—" }, { label: "Flyer → visit", value: `${flyerToVisit}%` }, { label: "Visit → order", value: `${visitToOrder}%` }].map((m) => (
+                      {([{ label: "Flyers", value: campaign.flyers_sent }, { label: "Unique visitors", value: campaign.unique_visitors }, { label: "Checkout starts", value: campaign.checkout_starts }, { label: "Paid orders", value: campaign.paid_orders }, { label: "Discount uses", value: campaign.discount_uses }, { label: "Email leads", value: campaign.email_leads }, { label: "Customer value", value: campaign.paid_orders > 0 ? money(customerValueCents) : "—" }, { label: "Revenue", value: money(campaign.revenue_cents), accent: true }, { label: "Total cost", value: money(totalCostCents) }, { label: "CAC", value: campaign.paid_orders > 0 ? money(cacCents) : "—" }, { label: "Flyer → visit", value: `${flyerToVisit}%` }, { label: "Visit → order", value: `${visitToOrder}%` }, { label: "Add-on selects", value: campaign.add_on_selects }, { label: "Add-on checkouts", value: campaign.add_on_checkout_starts }, { label: "Add-on paid", value: campaign.add_on_paid_orders }, { label: "Add-on revenue", value: money(campaign.add_on_revenue_cents) }, { label: "Attach rate", value: percent(addOnAttachRate) }] as MetricCard[]).map((m) => (
                         <div key={m.label}>
                           <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>{m.label}</div>
-                          <div style={{ fontSize: 16, fontWeight: 500, color: (m as any).accent ? "var(--accent-warm, #c9b89a)" : "var(--text-primary)", marginTop: 4 }}>{m.value}</div>
+                          <div style={{ fontSize: 16, fontWeight: 500, color: m.accent ? "var(--accent-warm, #c9b89a)" : "var(--text-primary)", marginTop: 4 }}>{m.value}</div>
                         </div>
                       ))}
                     </div>

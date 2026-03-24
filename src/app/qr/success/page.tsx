@@ -10,6 +10,7 @@ import {
   QR_UPSELL_ADDON_PRICE_CENTS,
   formatUsd,
   getQrColorOption,
+  safeString,
 } from "@/lib/qr-funnel";
 
 function labelClass() {
@@ -69,6 +70,19 @@ const defaultSummary: OrderSummary = {
   totalAmountCents: 0,
 };
 
+function shouldTrackOnce(key: string) {
+  if (typeof window === "undefined" || !key) return false;
+
+  const storageKey = `chm-track:${key}`;
+
+  if (window.sessionStorage.getItem(storageKey) === "1") {
+    return false;
+  }
+
+  window.sessionStorage.setItem(storageKey, "1");
+  return true;
+}
+
 function SummaryLine({
   label,
   detail,
@@ -101,6 +115,8 @@ function QrSuccessPageInner() {
   const sessionId = params.get("session_id") ?? "";
   const colorFromQuery = params.get("color") ?? "";
   const addonFromQuery = params.get("addon") === "1";
+  const campaignCode = safeString(params.get("campaignCode"));
+  const sessionKey = safeString(params.get("sessionKey"));
 
   const [scrolled, setScrolled] = useState(false);
   const [prefillLoading, setPrefillLoading] = useState(false);
@@ -223,6 +239,28 @@ function QrSuccessPageInner() {
       cancelled = true;
     };
   }, [addonFromQuery, colorFromQuery, sessionId]);
+
+  useEffect(() => {
+    if (!campaignCode || !shouldTrackOnce(`page_view:/qr/success:${campaignCode}:${sessionKey}`)) {
+      return;
+    }
+
+    fetch("/api/marketing/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventType: "page_view",
+        campaignCode,
+        sessionKey,
+        pagePath: "/qr/success",
+        metadata: {
+          sessionId,
+          addonSelected: addonFromQuery,
+          color: colorFromQuery,
+        },
+      }),
+    }).catch(() => {});
+  }, [addonFromQuery, campaignCode, colorFromQuery, sessionId, sessionKey]);
 
   const hasAddon = summary.addonSelected || addonFromQuery;
 
