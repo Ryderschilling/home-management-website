@@ -7,6 +7,15 @@ import { deleteJob, getJobById, updateJob } from "@/lib/server/services/jobs";
 
 export const runtime = "nodejs";
 
+async function parseOptionalJsonBody(request: NextRequest) {
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    return {};
+  }
+
+  return parseJsonBody(request);
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ jobId: string }> }) {
   if (!isAdminRequest(request)) {
     return NextResponse.json(fail("UNAUTHORIZED", "Admin authentication required."), { status: 401 });
@@ -57,9 +66,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
   try {
     const organizationId = getOrganizationId(request);
-    const deleted = await deleteJob(organizationId, jobId);
+    const body = await parseOptionalJsonBody(request);
+    const deleted = await deleteJob(organizationId, jobId, body);
     if (!deleted) return NextResponse.json(fail("NOT_FOUND", "Job not found."), { status: 404 });
-    return NextResponse.json(ok({ deleted: true }));
+    return NextResponse.json(ok(deleted));
   } catch (error) {
     return NextResponse.json(
       fail("JOB_DELETE_FAILED", error instanceof Error ? error.message : "Failed to delete job"),

@@ -3,6 +3,7 @@ import { fail, ok, parseJsonBody } from "@/lib/server/api";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
 import {
+    deleteRetainer,
     getRetainerById,
     syncRetainerJobs,
     updateRetainer,
@@ -89,6 +90,40 @@ export async function PATCH(
       fail(
         "RETAINER_UPDATE_FAILED",
         error instanceof Error ? error.message : "Failed to update retainer"
+      ),
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ retainerId: string }> }
+) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json(
+      fail("UNAUTHORIZED", "Admin authentication required."),
+      { status: 401 }
+    );
+  }
+
+  try {
+    const { retainerId } = await params;
+    const organizationId = getOrganizationId(request);
+    const data = await deleteRetainer(organizationId, retainerId);
+
+    if (!data) {
+      return NextResponse.json(fail("NOT_FOUND", "Retainer not found."), {
+        status: 404,
+      });
+    }
+
+    return NextResponse.json(ok(data));
+  } catch (error) {
+    return NextResponse.json(
+      fail(
+        "RETAINER_DELETE_FAILED",
+        error instanceof Error ? error.message : "Failed to delete retainer"
       ),
       { status: 400 }
     );

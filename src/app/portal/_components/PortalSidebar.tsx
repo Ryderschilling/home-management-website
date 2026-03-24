@@ -12,6 +12,7 @@ type NavItem = {
 
 const operationsNav: NavItem[] = [
   { href: "/portal", label: "Dashboard" },
+  { href: "/portal/analytics", label: "Analytics" },
   { href: "/portal/jobs", label: "Jobs" },
   { href: "/portal/retainers", label: "Plans" },
   { href: "/portal/invoices", label: "Invoices" },

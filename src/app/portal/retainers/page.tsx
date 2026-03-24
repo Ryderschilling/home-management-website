@@ -13,6 +13,7 @@ const S = {
   cardInner: "rounded-xl border border-[var(--border)] bg-[var(--surface-2)]",
   btnPrimary: "inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-6 py-3 text-xs font-medium uppercase tracking-[0.24em] text-[#0e0e0f] transition hover:brightness-110",
   btnGhostLg: "inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-6 py-3 text-xs font-medium uppercase tracking-[0.24em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)]",
+  btnDanger: "inline-flex items-center justify-center rounded-lg border border-red-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-red-400 transition hover:bg-red-900/20",
 };
 
 function money(cents: number | null | undefined) { return `$${((typeof cents === "number" ? cents : 0) / 100).toFixed(2)}`; }
@@ -43,6 +44,7 @@ export default function PortalRetainersPage() {
   const [serviceInterval, setServiceInterval] = useState("1");
   const [serviceAnchorDate, setServiceAnchorDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [notice, setNotice] = useState("");
 
   async function load() {
     setLoading(true); setError("");
@@ -82,7 +84,7 @@ export default function PortalRetainersPage() {
   }, [retainers]);
 
   async function createRetainer() {
-    setError("");
+    setError(""); setNotice("");
     if (!name.trim()) return setError("Plan name is required");
     if (!clientId) return setError("Client is required");
     const amountCents = Math.round(Number(amount) * 100);
@@ -99,7 +101,7 @@ export default function PortalRetainersPage() {
   }
 
   async function updateRetainerStatus(retainerId: string, status: "ACTIVE" | "PAUSED" | "CANCELED") {
-    setError("");
+    setError(""); setNotice("");
     try {
       const res = await fetch(`/api/admin/retainers/${retainerId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
       const json = await res.json();
@@ -109,7 +111,7 @@ export default function PortalRetainersPage() {
   }
 
   async function regenerateFutureVisits(retainerId: string) {
-    setError("");
+    setError(""); setNotice("");
     try {
       const res = await fetch(`/api/admin/retainers/${retainerId}`, {
         method: "PATCH",
@@ -121,6 +123,35 @@ export default function PortalRetainersPage() {
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to regenerate future visits");
+    }
+  }
+
+  async function deleteRetainerAction(retainer: Retainer) {
+    const futureVisitCount = retainer.future_visit_count ?? 0;
+    const confirmed = window.confirm(
+      futureVisitCount > 0
+        ? `Delete this plan? This will also remove ${futureVisitCount} future uncompleted plan-generated visit${futureVisitCount === 1 ? "" : "s"}. Completed history is preserved.`
+        : "Delete this plan? Completed history and invoiced plans cannot be deleted through this action."
+    );
+    if (!confirmed) return;
+
+    setError("");
+    setNotice("");
+    try {
+      const res = await fetch(`/api/admin/retainers/${retainer.id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to delete plan");
+      const deletedFutureVisitCount = Number(json.data?.deletedFutureVisitCount ?? 0);
+      setNotice(
+        deletedFutureVisitCount > 0
+          ? `Deleted plan and removed ${deletedFutureVisitCount} future uncompleted plan visit${deletedFutureVisitCount === 1 ? "" : "s"}.`
+          : "Deleted plan."
+      );
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete plan");
     }
   }
 
@@ -159,6 +190,7 @@ export default function PortalRetainersPage() {
           </div>
         </div>
         {error && <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>}
+        {!error && notice && <div className="mt-5 rounded-xl border border-emerald-900/30 bg-emerald-900/10 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
       </section>
 
       {showForm && (
@@ -244,6 +276,7 @@ export default function PortalRetainersPage() {
                         {r.status !== "ACTIVE" && <button onClick={() => updateRetainerStatus(r.id, "ACTIVE")} className="rounded-lg border border-green-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-green-400 transition hover:bg-green-900/20">Activate</button>}
                         {r.status !== "PAUSED" && <button onClick={() => updateRetainerStatus(r.id, "PAUSED")} className="rounded-lg border border-amber-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-amber-400 transition hover:bg-amber-900/20">Pause</button>}
                         {r.status !== "CANCELED" && <button onClick={() => updateRetainerStatus(r.id, "CANCELED")} className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)]">Cancel</button>}
+                        <button onClick={() => deleteRetainerAction(r)} className={S.btnDanger}>Delete plan</button>
                       </div>
                     </td>
                   </tr>

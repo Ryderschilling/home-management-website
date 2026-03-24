@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeCampaignCode } from "@/lib/campaigns";
+import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 
@@ -15,7 +17,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({} as Record<string, unknown>));
 
     const eventType = safe(body.eventType);
-    const campaignCode = safe(body.campaignCode);
+    const campaignCode = normalizeCampaignCode(body.campaignCode);
     const sessionKey = safe(body.sessionKey);
     const pagePath = safe(body.pagePath);
     const metadata = body.metadata && typeof body.metadata === "object" ? body.metadata : null;
@@ -36,15 +38,7 @@ export async function POST(req: NextRequest) {
 
     const orgId = env.DEFAULT_ORGANIZATION_ID;
 
-    const campaignRows = await sql`
-      SELECT id, campaign_code
-      FROM marketing_campaigns
-      WHERE organization_id = ${orgId}
-        AND campaign_code = ${campaignCode}
-      LIMIT 1
-    `;
-
-    const campaign = campaignRows[0];
+    const campaign = await resolveCampaignByCode(orgId, campaignCode);
     if (!campaign) {
       return NextResponse.json({
         ok: true,
@@ -67,7 +61,7 @@ export async function POST(req: NextRequest) {
         ${crypto.randomUUID()},
         ${orgId},
         ${campaign.id},
-        ${campaign.campaign_code},
+        ${campaign.campaignCode},
         ${sessionKey || null},
         ${eventType},
         ${pagePath || null},

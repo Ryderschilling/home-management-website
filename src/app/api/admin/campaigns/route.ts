@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeCampaignCode } from "@/lib/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({} as Record<string, unknown>));
 
     const name = safe(body.name);
-    const campaignCode = safe(body.campaign_code).toLowerCase();
+    const campaignCode = normalizeCampaignCode(body.campaign_code);
     const channel = safe(body.channel || "flyer") || "flyer";
     const landingPath = safe(body.landing_path || "/qr") || "/qr";
     const flyersSent = intOrZero(body.flyers_sent);

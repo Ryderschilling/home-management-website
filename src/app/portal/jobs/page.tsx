@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   CSSProperties,
   MouseEvent as ReactMouseEvent,
@@ -28,6 +29,12 @@ type Job = {
   client_id?: string | null;
   property_id?: string | null;
   retainer_id?: string | null;
+  recurrence_enabled?: boolean | null;
+  recurrence_frequency?: string | null;
+  recurrence_interval?: number | null;
+  recurrence_end_date?: string | null;
+  parent_job_id?: string | null;
+  recurring_series_id?: string | null;
   client_name?: string | null;
   property_name?: string | null;
   property_address_line1?: string | null;
@@ -54,6 +61,45 @@ type ResizeState = {
   startY: number;
   startDuration: number;
   currentDuration: number;
+};
+type RecurrenceScope =
+  | "THIS"
+  | "FUTURE"
+  | "SERIES"
+  | "THIS_VISIT_ONLY"
+  | "FUTURE_PLAN_VISITS";
+type JobPayload = {
+  title: string;
+  clientId: string | null;
+  propertyId: string | null;
+  notes: string | null;
+  status: string;
+  scheduledFor: string;
+  durationMinutes: number | null;
+  hours: number | null;
+  priceCents: number | null;
+};
+type ScopeOption = {
+  value: RecurrenceScope;
+  label: string;
+  description: string;
+  disabled?: boolean;
+  actionLabel?: string;
+  tone?: "primary" | "danger" | "neutral";
+};
+type ScopeModalState = {
+  action: "edit" | "delete";
+  title: string;
+  description: string;
+  options: ScopeOption[];
+  payload?: Partial<JobPayload>;
+};
+type DeleteJobResult = {
+  deleted: boolean;
+  deletedCount: number;
+  skippedCompletedCount: number;
+  skippedModifiedCount: number;
+  recurrenceScope: RecurrenceScope | "NONE";
 };
 
 type DraftState = {
@@ -274,6 +320,90 @@ function createEmptyDraft(initialDate?: Date, clientId?: string, propertyId?: st
   };
 }
 
+function normalizeDraftPayload(draft: DraftState): JobPayload {
+  const priceCents = draft.price.trim() === "" ? null : Math.round(Number(draft.price) * 100);
+  if (priceCents !== null && Number.isNaN(priceCents)) {
+    throw new Error("Price must be a valid number");
+  }
+
+  const hours = draft.hours.trim() === "" ? null : Number(draft.hours);
+  if (hours !== null && Number.isNaN(hours)) {
+    throw new Error("Hours must be a valid number");
+  }
+
+  const durationMinutes =
+    draft.durationMinutes.trim() === "" ? null : Number(draft.durationMinutes);
+  if (durationMinutes !== null && Number.isNaN(durationMinutes)) {
+    throw new Error("Duration must be a valid number");
+  }
+
+  return {
+    title: draft.title.trim(),
+    clientId: draft.clientId || null,
+    propertyId: draft.propertyId || null,
+    notes: draft.notes.trim() || null,
+    status: draft.status,
+    scheduledFor: fromDateTimeInputValue(draft.scheduledFor),
+    durationMinutes,
+    hours,
+    priceCents,
+  };
+}
+
+function buildEditPayload(draft: DraftState, job: Job): Partial<JobPayload> {
+  const next = normalizeDraftPayload(draft);
+  const current: JobPayload = {
+    title: job.title ?? "",
+    clientId: job.client_id ?? null,
+    propertyId: job.property_id ?? null,
+    notes: job.notes ?? null,
+    status: job.status ?? "SCHEDULED",
+    scheduledFor: new Date(job.scheduled_for).toISOString(),
+    durationMinutes: getDurationMinutes(job),
+    hours:
+      job.hours_numeric === undefined || job.hours_numeric === null || job.hours_numeric === ""
+        ? null
+        : Number(job.hours_numeric),
+    priceCents: typeof job.price_cents === "number" ? job.price_cents : null,
+  };
+
+  const payload: Partial<JobPayload> = {};
+  if (next.title !== current.title) payload.title = next.title;
+  if (next.clientId !== current.clientId) payload.clientId = next.clientId;
+  if (next.propertyId !== current.propertyId) payload.propertyId = next.propertyId;
+  if (next.notes !== current.notes) payload.notes = next.notes;
+  if (next.status !== current.status) payload.status = next.status;
+  if (next.scheduledFor !== current.scheduledFor) payload.scheduledFor = next.scheduledFor;
+  if (next.durationMinutes !== current.durationMinutes) {
+    payload.durationMinutes = next.durationMinutes;
+  }
+  if (next.hours !== current.hours) payload.hours = next.hours;
+  if (next.priceCents !== current.priceCents) payload.priceCents = next.priceCents;
+  return payload;
+}
+
+function isPlanGeneratedJob(job: Job | null | undefined) {
+  return String(job?.source_type ?? "").toUpperCase() === "PLAN";
+}
+
+function isManualRecurringJob(job: Job | null | undefined) {
+  if (!job || isPlanGeneratedJob(job)) return false;
+  return Boolean(job.recurring_series_id || job.parent_job_id || job.recurrence_enabled);
+}
+
+function hasManualScopedEditRestrictions(payload: Partial<JobPayload>) {
+  const allowedKeys = new Set([
+    "title",
+    "notes",
+    "status",
+    "durationMinutes",
+    "hours",
+    "priceCents",
+  ]);
+
+  return Object.keys(payload).some((key) => !allowedKeys.has(key));
+}
+
 function buildMonthGrid(date: Date) {
   const range = getRangeForView(date, "month");
   const days: Date[] = [];
@@ -309,6 +439,7 @@ function nextCursor(date: Date, view: CalendarView, delta: number) {
 }
 
 export default function PortalJobsPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [properties, setProperties] = useState<Property[]>([]);
@@ -317,6 +448,7 @@ export default function PortalJobsPage() {
   const [deleting, setDeleting] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [view, setView] = useState<CalendarView>("week");
   const [cursorDate, setCursorDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -328,6 +460,7 @@ export default function PortalJobsPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftState>(() => createEmptyDraft());
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
+  const [scopeModal, setScopeModal] = useState<ScopeModalState | null>(null);
 
   const range = useMemo(() => getRangeForView(cursorDate, view), [cursorDate, view]);
   const monthGrid = useMemo(() => buildMonthGrid(cursorDate), [cursorDate]);
@@ -395,6 +528,7 @@ export default function PortalJobsPage() {
   async function loadAll() {
     setLoading(true);
     setError("");
+    setNotice("");
     try {
       await Promise.all([loadReferenceData(), loadJobs()]);
     } catch (loadError) {
@@ -510,16 +644,28 @@ export default function PortalJobsPage() {
     };
   }, [resizeState]);
 
+  useEffect(() => {
+    if (drawerOpen) return;
+    setScopeModal(null);
+  }, [drawerOpen]);
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+    setScopeModal(null);
+  }
+
   function openCreateDrawer(date: Date) {
     setDrawerMode("create");
     setSelectedJobId(null);
     setDraft(createEmptyDraft(date, clientFilter || undefined, propertyFilter || undefined));
+    setScopeModal(null);
     setDrawerOpen(true);
   }
 
   function openEditDrawer(job: Job) {
     setDrawerMode("edit");
     setSelectedJobId(job.id);
+    setScopeModal(null);
     setDrawerOpen(true);
   }
 
@@ -551,45 +697,24 @@ export default function PortalJobsPage() {
     }
   }
 
-  async function saveJob() {
+  async function refreshSelectedJob(jobId: string) {
+    const detailResponse = await fetch(`/api/admin/jobs/${jobId}`);
+    const detailJson = await detailResponse.json();
+    if (detailResponse.ok && detailJson.ok) {
+      setSelectedJobId(jobId);
+    }
+  }
+
+  async function submitCreateJob(payload: JobPayload) {
     setSaving(true);
     setError("");
+    setNotice("");
     try {
-      const priceCents =
-        draft.price.trim() === "" ? null : Math.round(Number(draft.price) * 100);
-      if (priceCents !== null && Number.isNaN(priceCents)) {
-        throw new Error("Price must be a valid number");
-      }
-
-      const hours =
-        draft.hours.trim() === "" ? null : Number(draft.hours);
-      if (hours !== null && Number.isNaN(hours)) {
-        throw new Error("Hours must be a valid number");
-      }
-
-      const payload = {
-        title: draft.title.trim(),
-        clientId: draft.clientId || null,
-        propertyId: draft.propertyId || null,
-        notes: draft.notes.trim() || null,
-        status: draft.status,
-        scheduledFor: fromDateTimeInputValue(draft.scheduledFor),
-        durationMinutes:
-          draft.durationMinutes.trim() === ""
-            ? null
-            : Number(draft.durationMinutes),
-        hours,
-        priceCents,
-      };
-
-      const response = await fetch(
-        drawerMode === "create" ? "/api/admin/jobs" : `/api/admin/jobs/${draft.id}`,
-        {
-          method: drawerMode === "create" ? "POST" : "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch("/api/admin/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       const json = await response.json();
       if (!response.ok || !json.ok) {
         throw new Error(json?.error?.message ?? "Failed to save job");
@@ -601,14 +726,8 @@ export default function PortalJobsPage() {
       }
 
       await refreshJobsOnly();
-      if (savedJobId) {
-        const detailResponse = await fetch(`/api/admin/jobs/${savedJobId}`);
-        const detailJson = await detailResponse.json();
-        if (detailResponse.ok && detailJson.ok) {
-          setSelectedJobId(savedJobId);
-        }
-      }
-      setDrawerOpen(false);
+      if (savedJobId) await refreshSelectedJob(savedJobId);
+      closeDrawer();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Failed to save job");
     } finally {
@@ -616,27 +735,260 @@ export default function PortalJobsPage() {
     }
   }
 
-  async function deleteSelectedJob() {
+  async function submitJobUpdate(payload: Partial<JobPayload>, recurrenceScope?: RecurrenceScope) {
     if (!draft.id) return;
-    if (!window.confirm("Delete this job? This cannot be undone.")) return;
+
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/admin/jobs/${draft.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          recurrenceScope ? { ...payload, recurrenceScope } : payload
+        ),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to save job");
+      }
+
+      const savedJobId = (json.data?.id as string | undefined) ?? draft.id;
+      if (draft.photoFile && savedJobId) {
+        await uploadPhoto(savedJobId);
+      }
+
+      await refreshJobsOnly();
+      if (savedJobId) await refreshSelectedJob(savedJobId);
+      closeDrawer();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Failed to save job");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function submitPhotoOnly(jobId: string) {
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      await uploadPhoto(jobId);
+      await refreshJobsOnly();
+      await refreshSelectedJob(jobId);
+      closeDrawer();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Failed to save job");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function openManualScopeModal(action: "edit" | "delete", payload?: Partial<JobPayload>) {
+    const editHasRestrictions =
+      action === "edit" && payload ? hasManualScopedEditRestrictions(payload) : false;
+    const restrictedDescription =
+      "Date, client, property, and recurrence pattern changes stay single-event only in this pass.";
+
+    setScopeModal({
+      action,
+      title: action === "delete" ? "Delete recurring visit" : "Apply changes to recurring visit",
+      description:
+        action === "delete"
+          ? "Choose how far this manual recurring series action should reach."
+          : "Choose how far these manual recurring job updates should reach.",
+      payload,
+      options: [
+        {
+          value: "THIS",
+          label: "This event only",
+          description:
+            action === "delete"
+              ? "Only this scheduled visit will be removed."
+              : "Update only this scheduled visit.",
+          actionLabel: action === "delete" ? "Delete this event" : "Save this event",
+          tone: action === "delete" ? "danger" : "primary",
+        },
+        {
+          value: "FUTURE",
+          label: "This and future events",
+          description: editHasRestrictions
+            ? restrictedDescription
+            : action === "delete"
+              ? "Delete this visit and later incomplete visits in the same series."
+              : "Update this visit and later incomplete visits in the same series.",
+          disabled: editHasRestrictions,
+          actionLabel: action === "delete" ? "Delete future events" : "Save future events",
+          tone: action === "delete" ? "danger" : "neutral",
+        },
+        {
+          value: "SERIES",
+          label: "Entire series",
+          description: editHasRestrictions
+            ? restrictedDescription
+            : action === "delete"
+              ? "Delete every incomplete visit in this manual recurring series."
+              : "Update every incomplete visit in this manual recurring series.",
+          disabled: editHasRestrictions,
+          actionLabel: action === "delete" ? "Delete series" : "Save series",
+          tone: action === "delete" ? "danger" : "neutral",
+        },
+      ],
+    });
+  }
+
+  function openPlanScopeModal(action: "edit" | "delete", payload?: Partial<JobPayload>) {
+    setScopeModal({
+      action,
+      title: action === "delete" ? "Plan-generated visit" : "Apply changes to plan-generated visit",
+      description:
+        action === "delete"
+          ? "Delete only this plan visit or delete this visit and later plan-generated visits for the same plan while preserving completed and manually modified future visits."
+          : "Plan-generated visits are owned by the plan. Single-visit changes stay here; future-plan changes go through Plans.",
+      payload,
+      options: [
+        {
+          value: "THIS_VISIT_ONLY",
+          label: "This visit only",
+          description:
+            action === "delete"
+              ? "Only this visit will be deleted."
+              : "Only this visit will be updated.",
+          actionLabel: action === "delete" ? "Delete this visit" : "Save this visit",
+          tone: action === "delete" ? "danger" : "primary",
+        },
+        {
+          value: "FUTURE_PLAN_VISITS",
+          label: "Future plan visits",
+          description: action === "delete"
+            ? "Delete this visit and later plan-generated visits for the same plan. Completed visits and manually modified future visits are preserved."
+            : "Open Plans to regenerate or adjust future visits safely.",
+          actionLabel: action === "delete" ? "Delete future plan visits" : "Open Plans",
+          tone: "neutral",
+        },
+      ],
+    });
+  }
+
+  async function saveJob() {
+    try {
+      if (drawerMode === "create") {
+        await submitCreateJob(normalizeDraftPayload(draft));
+        return;
+      }
+
+      if (!selectedJob || !draft.id) return;
+
+      const payload = buildEditPayload(draft, selectedJob);
+      if (Object.keys(payload).length === 0) {
+        if (draft.photoFile) {
+          await submitPhotoOnly(draft.id);
+          return;
+        }
+
+        closeDrawer();
+        return;
+      }
+
+      if (isPlanGeneratedJob(selectedJob)) {
+        openPlanScopeModal("edit", payload);
+        return;
+      }
+
+      if (isManualRecurringJob(selectedJob)) {
+        openManualScopeModal("edit", payload);
+        return;
+      }
+
+      await submitJobUpdate(payload);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "Failed to save job");
+    }
+  }
+
+  async function submitJobDelete(recurrenceScope?: RecurrenceScope) {
+    if (!draft.id) return;
 
     setDeleting(true);
     setError("");
+    setNotice("");
     try {
       const response = await fetch(`/api/admin/jobs/${draft.id}`, {
         method: "DELETE",
+        headers: recurrenceScope ? { "Content-Type": "application/json" } : undefined,
+        body: recurrenceScope ? JSON.stringify({ recurrenceScope }) : undefined,
       });
       const json = await response.json();
       if (!response.ok || !json.ok) {
         throw new Error(json?.error?.message ?? "Failed to delete job");
       }
-      setDrawerOpen(false);
+      const result = (json.data ?? {}) as DeleteJobResult;
+      if (recurrenceScope === "FUTURE_PLAN_VISITS") {
+        const messageParts = [`Deleted ${result.deletedCount} future plan visit${result.deletedCount === 1 ? "" : "s"}`];
+        if (result.skippedCompletedCount > 0) {
+          messageParts.push(`preserved ${result.skippedCompletedCount} completed`);
+        }
+        if (result.skippedModifiedCount > 0) {
+          messageParts.push(`preserved ${result.skippedModifiedCount} manually modified`);
+        }
+        setNotice(messageParts.join(" • "));
+      } else if (
+        (recurrenceScope === "FUTURE" || recurrenceScope === "SERIES") &&
+        result.skippedCompletedCount > 0
+      ) {
+        setNotice(
+          `Deleted ${result.deletedCount} recurring visit${result.deletedCount === 1 ? "" : "s"} • preserved ${result.skippedCompletedCount} completed`
+        );
+      }
+
+      closeDrawer();
       setSelectedJobId(null);
       await refreshJobsOnly();
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Failed to delete job");
     } finally {
       setDeleting(false);
+    }
+  }
+
+  async function deleteSelectedJob() {
+    if (!draft.id || !selectedJob) return;
+
+    if (isPlanGeneratedJob(selectedJob)) {
+      openPlanScopeModal("delete");
+      return;
+    }
+
+    if (isManualRecurringJob(selectedJob)) {
+      openManualScopeModal("delete");
+      return;
+    }
+
+    if (!window.confirm("Delete this job? This cannot be undone.")) return;
+    await submitJobDelete();
+  }
+
+  async function handleScopeOption(value: RecurrenceScope) {
+    if (!scopeModal || !selectedJob) return;
+
+    if (value === "FUTURE_PLAN_VISITS" && scopeModal.action === "edit") {
+      closeDrawer();
+      const target = selectedJob.retainer_id
+        ? `/portal/retainers?plan=${selectedJob.retainer_id}`
+        : "/portal/retainers";
+      router.push(target);
+      return;
+    }
+
+    setScopeModal(null);
+    if (scopeModal.action === "delete") {
+      await submitJobDelete(value);
+      return;
+    }
+
+    if (scopeModal.payload) {
+      await submitJobUpdate(scopeModal.payload, value);
     }
   }
 
@@ -1159,6 +1511,11 @@ export default function PortalJobsPage() {
             {error}
           </div>
         ) : null}
+        {!error && notice ? (
+          <div className="mt-5 rounded-xl border border-emerald-900/30 bg-emerald-900/10 px-4 py-3 text-sm text-emerald-300">
+            {notice}
+          </div>
+        ) : null}
       </section>
 
       {loading ? (
@@ -1175,7 +1532,7 @@ export default function PortalJobsPage() {
 
       <PortalDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={closeDrawer}
         title={drawerMode === "create" ? "Create visit" : draft.title || "Edit visit"}
         subtitle={
           drawerMode === "create"
@@ -1197,7 +1554,7 @@ export default function PortalJobsPage() {
               ) : null}
             </div>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setDrawerOpen(false)} className={S.btnGhostLg}>
+              <button type="button" onClick={closeDrawer} className={S.btnGhostLg}>
                 Cancel
               </button>
               <button
@@ -1216,11 +1573,13 @@ export default function PortalJobsPage() {
           {drawerMode === "edit" && selectedJob ? (
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <div className={S.cardInner} style={{ padding: "14px 16px" }}>
-                <div className={S.label}>Plan source</div>
+                <div className={S.label}>Visit source</div>
                 <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
                   {selectedJob.source_type === "PLAN"
                     ? selectedJob.plan_name || "Plan-generated visit"
-                    : "Manual visit"}
+                    : isManualRecurringJob(selectedJob)
+                      ? "Manual recurring series"
+                      : "Manual visit"}
                 </div>
               </div>
               <div className={S.cardInner} style={{ padding: "14px 16px" }}>
@@ -1276,7 +1635,7 @@ export default function PortalJobsPage() {
                 value={draft.propertyId}
                 onChange={(event) => setDraft((current) => ({ ...current, propertyId: event.target.value }))}
               >
-                <option value="">Select property</option>
+                <option value="">No property</option>
                 {draftProperties.map((property) => (
                   <option key={property.id} value={property.id}>
                     {property.name}
@@ -1412,6 +1771,77 @@ export default function PortalJobsPage() {
           ) : null}
         </div>
       </PortalDrawer>
+
+      {scopeModal ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/65 px-4">
+          <div className="w-full max-w-2xl rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[0_28px_90px_rgba(0,0,0,0.45)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-[0.24em] text-[var(--text-muted)]">
+                  {scopeModal.action === "delete" ? "Delete scope" : "Edit scope"}
+                </div>
+                <h3 className="mt-2 text-xl font-medium text-[var(--text-primary)]">
+                  {scopeModal.title}
+                </h3>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">
+                  {scopeModal.description}
+                </p>
+              </div>
+              <button
+                type="button"
+                className={S.btnGhost}
+                onClick={() => setScopeModal(null)}
+                disabled={saving || deleting}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-3">
+              {scopeModal.options.map((option) => {
+                const toneClass =
+                  option.tone === "danger"
+                    ? "border-red-900/40 bg-red-950/20 hover:bg-red-950/30"
+                    : option.tone === "primary"
+                      ? "border-[var(--accent)]/40 bg-[rgba(232,224,208,0.08)] hover:bg-[rgba(232,224,208,0.12)]"
+                      : "border-[var(--border)] bg-[var(--surface-2)] hover:bg-[rgba(255,255,255,0.04)]";
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleScopeOption(option.value)}
+                    disabled={option.disabled || saving || deleting}
+                    className={`rounded-2xl border p-4 text-left transition ${
+                      option.disabled
+                        ? "cursor-not-allowed border-[var(--border)] bg-[var(--surface-2)] opacity-55"
+                        : toneClass
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="text-sm font-medium text-[var(--text-primary)]">
+                          {option.label}
+                        </div>
+                        <div className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                          {option.description}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-[11px] uppercase tracking-[0.22em] text-[var(--text-muted)]">
+                        {option.actionLabel}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-5 text-xs leading-5 text-[var(--text-muted)]">
+              Bulk manual recurring actions skip completed visits. Future plan changes stay in Plans so the plan can regenerate safely.
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1112,10 +1112,6 @@ export default function PortalDashboardPage() {
       setError("Client is required");
       return;
     }
-    if (!propertyId) {
-      setError("Property is required");
-      return;
-    }
 
     const priceCents = price.trim() === "" ? null : Math.round(Number(price) * 100);
     if (priceCents !== null && (Number.isNaN(priceCents) || priceCents < 0)) {
@@ -1141,7 +1137,7 @@ export default function PortalDashboardPage() {
         title: title.trim(),
         scheduledFor: new Date(scheduledFor).toISOString(),
         clientId,
-        propertyId,
+        propertyId: propertyId || null,
         serviceId: serviceId || null,
         notes: notes.trim() || null,
         priceCents: priceCents === null ? "" : priceCents,
@@ -1378,8 +1374,8 @@ export default function PortalDashboardPage() {
                     {!clientId
                       ? "Select client first"
                       : propertiesForClient.length === 0
-                        ? "No properties for this client"
-                        : "Select property"}
+                        ? "No property"
+                        : "No property"}
                   </option>
                   {propertiesForClient.map((property) => (
                     <option key={property.id} value={property.id}>

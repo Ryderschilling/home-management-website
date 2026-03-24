@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { normalizeCampaignCode } from "@/lib/campaigns";
 import { stripe } from "@/lib/server/stripe";
+import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import {
@@ -37,7 +39,7 @@ export async function POST(req: NextRequest) {
     const color = safe(body.color || "unknown") || "unknown";
     const tosAccepted = Boolean(body.tosAccepted);
 
-    const campaignCode = safe(body.campaignCode);
+    const campaignCode = normalizeCampaignCode(body.campaignCode);
     const sessionKey = safe(body.sessionKey);
     const landingPath = safe(body.landingPath || "/qr") || "/qr";
     const addonSelected = parseBooleanFlag(body.addonSelected);
@@ -80,17 +82,14 @@ export async function POST(req: NextRequest) {
     let normalizedCampaignCode = "";
 
     if (campaignCode) {
-      const rows = await sql`
-        SELECT id, campaign_code
-        FROM marketing_campaigns
-        WHERE organization_id = ${env.DEFAULT_ORGANIZATION_ID}
-          AND campaign_code = ${campaignCode}
-        LIMIT 1
-      `;
+      const campaign = await resolveCampaignByCode(
+        env.DEFAULT_ORGANIZATION_ID,
+        campaignCode
+      );
 
-      if (rows[0]) {
-        campaignId = String(rows[0].id);
-        normalizedCampaignCode = String(rows[0].campaign_code);
+      if (campaign) {
+        campaignId = campaign.id;
+        normalizedCampaignCode = campaign.campaignCode;
       }
     }
 

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeCampaignCode } from "@/lib/campaigns";
+import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const firstName = safe(body.firstName);
     const email = safe(body.email).toLowerCase();
-    const campaignCode = safe(body.campaignCode);
+    const campaignCode = normalizeCampaignCode(body.campaignCode);
     const sessionKey = safe(body.sessionKey);
     const sourcePage = safe(body.sourcePage || "/qr") || "/qr";
     const consent = body.consent === true;
@@ -44,17 +46,11 @@ export async function POST(req: NextRequest) {
     let normalizedCampaignCode: string | null = null;
 
     if (campaignCode) {
-      const campaignRows = await sql`
-        SELECT id, campaign_code
-        FROM marketing_campaigns
-        WHERE organization_id = ${orgId}
-          AND campaign_code = ${campaignCode}
-        LIMIT 1
-      `;
+      const campaign = await resolveCampaignByCode(orgId, campaignCode);
 
-      if (campaignRows[0]) {
-        campaignId = String(campaignRows[0].id);
-        normalizedCampaignCode = String(campaignRows[0].campaign_code);
+      if (campaign) {
+        campaignId = campaign.id;
+        normalizedCampaignCode = campaign.campaignCode;
       }
     }
 

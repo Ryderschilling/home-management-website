@@ -1,11 +1,15 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 16;
+const ADMIN_SCHEMA_VERSION = 18;
+const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
+const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
+const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
 
 const globalForDb = globalThis as unknown as {
   sql: postgres.Sql | undefined;
   adminSchemaVersion: number | undefined;
+  adminSchemaReadyPromise: Promise<void> | undefined;
 };
 
 export const sql =
@@ -26,8 +30,12 @@ export async function ensureQrAddonColumns(): Promise<void> {
 export async function ensureAdminTables(): Promise<void> {
   if (process.env.VERCEL_ENV === "production") return;
   if (globalForDb.adminSchemaVersion === ADMIN_SCHEMA_VERSION) return;
+  if (globalForDb.adminSchemaReadyPromise) return globalForDb.adminSchemaReadyPromise;
 
-  await sql.begin(async (tx) => {
+  const readyPromise = sql.begin(async (tx) => {
+    // Serialize bootstrap across concurrent dev requests and local workers.
+    await tx`SELECT pg_advisory_xact_lock(${ADMIN_SCHEMA_LOCK_PRIMARY}, ${ADMIN_SCHEMA_LOCK_SECONDARY})`;
+
     await tx`CREATE TABLE IF NOT EXISTS admin_clients (
       id TEXT PRIMARY KEY,
       organization_id TEXT NOT NULL,
@@ -179,6 +187,7 @@ export async function ensureAdminTables(): Promise<void> {
       recurrence_interval INTEGER,
       recurrence_end_date TIMESTAMPTZ,
       parent_job_id TEXT,
+      recurring_series_id TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       CONSTRAINT admin_jobs_client_fk
@@ -315,6 +324,11 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
       ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
 
+    await tx`CREATE TABLE IF NOT EXISTS admin_bootstrap_state (
+      key TEXT PRIMARY KEY,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`;
+
     // Safe adds (existing DBs)
     await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS notes TEXT`;
 
@@ -343,10 +357,32 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_interval INTEGER`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurrence_end_date TIMESTAMPTZ`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS parent_job_id TEXT`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS recurring_series_id TEXT`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_type TEXT NOT NULL DEFAULT 'MANUAL'`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_key TEXT`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS source_plan_occurrence_date DATE`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS plan_visit_modified BOOLEAN NOT NULL DEFAULT FALSE`;
+    const recurringSeriesBackfillState = await tx`
+      SELECT key
+      FROM admin_bootstrap_state
+      WHERE key = ${RECURRING_SERIES_BACKFILL_KEY}
+      LIMIT 1
+    `;
+    if (!recurringSeriesBackfillState[0]) {
+      await tx`
+        UPDATE admin_jobs
+        SET recurring_series_id = COALESCE(recurring_series_id, parent_job_id, id)
+        WHERE source_type = 'MANUAL'
+          AND recurrence_enabled = TRUE
+          AND recurring_series_id IS NULL
+      `;
+      await tx`
+        INSERT INTO admin_bootstrap_state (key)
+        VALUES (${RECURRING_SERIES_BACKFILL_KEY})
+        ON CONFLICT (key)
+        DO UPDATE SET updated_at = NOW()
+      `;
+    }
 
     await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS stripe_session_id TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS source TEXT`;
@@ -381,7 +417,11 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS fulfillment_status TE
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS ordered_at TIMESTAMPTZ`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS installed_at TIMESTAMPTZ`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS thank_you_sent_at TIMESTAMPTZ`;
+await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS follow_up_email_sent_at TIMESTAMPTZ`;
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_fulfillment_idx ON admin_orders (organization_id, fulfillment_status, created_at)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_orders_follow_up_ready_idx
+  ON admin_orders (organization_id, installed_at)
+  WHERE fulfillment_status = 'INSTALLED' AND follow_up_email_sent_at IS NULL`;
 
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_version TEXT`;
 await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_url TEXT`;
@@ -491,6 +531,9 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_source_type_idx
   ON admin_jobs (organization_id, source_type, scheduled_for)`;
 await tx`CREATE INDEX IF NOT EXISTS admin_jobs_plan_occurrence_idx
   ON admin_jobs (organization_id, retainer_id, source_plan_occurrence_date)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
+  ON admin_jobs (organization_id, recurring_series_id, scheduled_for)
+  WHERE recurring_series_id IS NOT NULL`;
 await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
   id TEXT PRIMARY KEY,
   organization_id TEXT NOT NULL,
@@ -575,5 +618,12 @@ await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
     `;
   });
 
-  globalForDb.adminSchemaVersion = ADMIN_SCHEMA_VERSION;
+  globalForDb.adminSchemaReadyPromise = readyPromise;
+
+  try {
+    await readyPromise;
+    globalForDb.adminSchemaVersion = ADMIN_SCHEMA_VERSION;
+  } finally {
+    globalForDb.adminSchemaReadyPromise = undefined;
+  }
 }

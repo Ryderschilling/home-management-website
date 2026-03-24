@@ -3,6 +3,36 @@ import { asNonEmptyString, asOptionalString } from "@/lib/server/validation";
 
 type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
 type JobStatus = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELED";
+type RecurrenceScope =
+  | "THIS"
+  | "FUTURE"
+  | "SERIES"
+  | "THIS_VISIT_ONLY"
+  | "FUTURE_PLAN_VISITS";
+type JobRecord = {
+  id: string;
+  title: string;
+  notes?: string | null;
+  status: string;
+  scheduled_for: string | Date;
+  duration_minutes?: number | null;
+  hours_numeric?: string | number | null;
+  price_cents?: number | null;
+  completed_at?: string | Date | null;
+  client_id?: string | null;
+  property_id?: string | null;
+  service_id?: string | null;
+  retainer_id?: string | null;
+  recurrence_enabled?: boolean | null;
+  recurrence_frequency?: string | null;
+  recurrence_interval?: number | null;
+  recurrence_end_date?: string | Date | null;
+  parent_job_id?: string | null;
+  recurring_series_id?: string | null;
+  source_type?: string | null;
+  source_plan_occurrence_date?: string | Date | null;
+  plan_visit_modified?: boolean | null;
+};
 
 export type JobListFilters = {
   start?: string | null;
@@ -13,11 +43,26 @@ export type JobListFilters = {
   includeCompleted?: boolean;
 };
 
+export type DeleteJobResult = {
+  deleted: boolean;
+  deletedCount: number;
+  skippedCompletedCount: number;
+  skippedModifiedCount: number;
+  recurrenceScope: RecurrenceScope | "NONE";
+};
+
 const VALID_JOB_STATUSES = new Set<JobStatus>([
   "SCHEDULED",
   "IN_PROGRESS",
   "COMPLETED",
   "CANCELED",
+]);
+const VALID_RECURRENCE_SCOPES = new Set<RecurrenceScope>([
+  "THIS",
+  "FUTURE",
+  "SERIES",
+  "THIS_VISIT_ONLY",
+  "FUTURE_PLAN_VISITS",
 ]);
 
 function addInterval(date: Date, frequency: Frequency, interval: number) {
@@ -72,6 +117,96 @@ function normalizeStatus(value: unknown, fallback: JobStatus = "SCHEDULED"): Job
     throw new Error("Invalid job status");
   }
   return status;
+}
+
+function normalizeRecurrenceScope(value: unknown) {
+  if (value === undefined || value === null || value === "") return null;
+  const scope = String(value).trim().toUpperCase() as RecurrenceScope;
+  if (!VALID_RECURRENCE_SCOPES.has(scope)) {
+    throw new Error("Invalid recurrenceScope");
+  }
+  return scope;
+}
+
+function isPlanJob(job: JobRecord) {
+  return String(job.source_type ?? "MANUAL").toUpperCase() === "PLAN";
+}
+
+function isManualRecurringJob(job: JobRecord) {
+  return !isPlanJob(job) && Boolean(job.recurring_series_id || job.parent_job_id || job.recurrence_enabled);
+}
+
+function coerceDbString(value: unknown) {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string") {
+    const normalized = value.trim();
+    return normalized === "" ? null : normalized;
+  }
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : value.toISOString();
+  }
+  const normalized = String(value).trim();
+  return normalized === "" ? null : normalized;
+}
+
+function coerceDbDate(value: unknown, label: string) {
+  if (value === undefined || value === null || value === "") {
+    throw new Error(`Missing ${label}`);
+  }
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Invalid ${label}`);
+  }
+  return date;
+}
+
+function coerceDbIsoDateTime(value: unknown, label: string) {
+  return coerceDbDate(value, label).toISOString();
+}
+
+function coerceDbDateOnly(value: unknown) {
+  if (value === undefined || value === null || value === "") return null;
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString().slice(0, 10);
+}
+
+function getManualSeriesId(job: JobRecord) {
+  return (
+    coerceDbString(job.recurring_series_id) ??
+    coerceDbString(job.parent_job_id) ??
+    coerceDbString(job.id) ??
+    (() => {
+      throw new Error("Job record is missing a series identifier");
+    })()
+  );
+}
+
+function getPlanFutureBoundary(job: JobRecord) {
+  return {
+    occurrenceDate: coerceDbDateOnly(job.source_plan_occurrence_date),
+    scheduledBoundary: coerceDbIsoDateTime(job.scheduled_for, "scheduled_for"),
+  };
+}
+
+function assertManualScopedUpdateAllowed(body: Record<string, unknown>) {
+  const restrictedKeys = [
+    "clientId",
+    "propertyId",
+    "serviceId",
+    "retainerId",
+    "scheduledFor",
+    "recurrenceEnabled",
+    "recurrenceFrequency",
+    "recurrenceInterval",
+    "recurrenceEndDate",
+  ];
+
+  if (restrictedKeys.some((key) => body[key] !== undefined)) {
+    throw new Error(
+      "This and future / entire series edits currently support title, notes, status, duration, hours, and price only. Save this event only for schedule or ownership changes."
+    );
+  }
 }
 
 async function assertClientExists(organizationId: string, clientId: string | null) {
@@ -159,6 +294,7 @@ async function fetchJobRecord(organizationId: string, jobId: string) {
       j.recurrence_interval,
       j.recurrence_end_date,
       j.parent_job_id,
+      j.recurring_series_id,
       j.source_type,
       j.source_key,
       j.source_plan_occurrence_date,
@@ -249,6 +385,7 @@ export async function listJobs(organizationId: string, filters: JobListFilters =
       j.recurrence_interval,
       j.recurrence_end_date,
       j.parent_job_id,
+      j.recurring_series_id,
       j.source_type,
       j.source_key,
       j.source_plan_occurrence_date,
@@ -379,6 +516,7 @@ export async function createJob(
       recurrence_frequency,
       recurrence_interval,
       recurrence_end_date,
+      recurring_series_id,
       source_type
     )
     VALUES (
@@ -400,6 +538,7 @@ export async function createJob(
       ${recurrenceFrequency},
       ${recurrenceInterval},
       ${recurrenceEndDate ? recurrenceEndDate.toISOString() : null},
+      ${recurrenceEnabled ? id : null},
       ${"MANUAL"}
     )
   `;
@@ -432,6 +571,7 @@ export async function createJob(
           recurrence_interval,
           recurrence_end_date,
           parent_job_id,
+          recurring_series_id,
           source_type
         )
         VALUES (
@@ -453,6 +593,7 @@ export async function createJob(
           ${recurrenceInterval},
           ${recurrenceEndDate.toISOString()},
           ${id},
+          ${id},
           ${"MANUAL"}
         )
       `;
@@ -473,6 +614,11 @@ export async function updateJob(
 
   const existing = await fetchJobRecord(organizationId, jobId);
   if (!existing) return null;
+
+  const scope = normalizeRecurrenceScope(body.recurrenceScope);
+  if (scope === "FUTURE_PLAN_VISITS" && !isPlanJob(existing as JobRecord)) {
+    throw new Error("Future plan visit scope is only available for plan-generated visits");
+  }
 
   const nextClientId =
     body.clientId !== undefined ? asOptionalString(body.clientId) : existing.client_id;
@@ -516,7 +662,7 @@ export async function updateJob(
     body.status === undefined ? normalizeStatus(existing.status) : normalizeStatus(body.status);
   const nextScheduledFor =
     body.scheduledFor === undefined || body.scheduledFor === null || body.scheduledFor === ""
-      ? new Date(String(existing.scheduled_for))
+      ? coerceDbDate(existing.scheduled_for, "scheduled_for")
       : parseDateInput(body.scheduledFor, "scheduledFor");
   const nextDurationMinutes =
     body.durationMinutes === undefined && body.duration_minutes === undefined
@@ -532,53 +678,234 @@ export async function updateJob(
       ? existing.completed_at ?? new Date().toISOString()
       : null;
 
-  const planVisitModified =
-    Boolean(existing.plan_visit_modified) ||
-    (String(existing.source_type ?? "MANUAL").toUpperCase() === "PLAN" &&
-      [
-        body.clientId,
-        body.propertyId,
-        body.title,
-        body.notes,
-        body.status,
-        body.scheduledFor,
-        body.durationMinutes,
-        body.duration_minutes,
-        body.hours,
-        body.hoursNumeric,
-        body.priceCents,
-      ].some((value) => value !== undefined));
+  const effectiveScope =
+    scope === "THIS_VISIT_ONLY" ? "THIS" : scope;
 
-  await sql`
-    UPDATE admin_jobs
-    SET
-      client_id = ${nextClientId},
-      property_id = ${nextPropertyId},
-      service_id = ${nextServiceId},
-      retainer_id = ${nextRetainerId},
-      title = ${nextTitle},
-      notes = ${nextNotes},
-      status = ${nextStatus},
-      scheduled_for = ${nextScheduledFor.toISOString()},
-      duration_minutes = ${nextDurationMinutes},
-      hours_numeric = ${nextHours},
-      price_cents = ${nextPriceCents},
-      completed_at = ${completedAt},
-      plan_visit_modified = ${planVisitModified},
-      updated_at = NOW()
-    WHERE organization_id = ${organizationId} AND id = ${jobId}
-  `;
+  async function updateSingleJob() {
+    const planVisitModified =
+      Boolean(existing.plan_visit_modified) ||
+      (String(existing.source_type ?? "MANUAL").toUpperCase() === "PLAN" &&
+        [
+          body.clientId,
+          body.propertyId,
+          body.title,
+          body.notes,
+          body.status,
+          body.scheduledFor,
+          body.durationMinutes,
+          body.duration_minutes,
+          body.hours,
+          body.hoursNumeric,
+          body.priceCents,
+        ].some((value) => value !== undefined));
 
-  return fetchJobRecord(organizationId, jobId);
+    await sql`
+      UPDATE admin_jobs
+      SET
+        client_id = ${nextClientId},
+        property_id = ${nextPropertyId},
+        service_id = ${nextServiceId},
+        retainer_id = ${nextRetainerId},
+        title = ${nextTitle},
+        notes = ${nextNotes},
+        status = ${nextStatus},
+        scheduled_for = ${nextScheduledFor.toISOString()},
+        duration_minutes = ${nextDurationMinutes},
+        hours_numeric = ${nextHours},
+        price_cents = ${nextPriceCents},
+        completed_at = ${completedAt},
+        plan_visit_modified = ${planVisitModified},
+        updated_at = NOW()
+      WHERE organization_id = ${organizationId} AND id = ${jobId}
+    `;
+
+    return fetchJobRecord(organizationId, jobId);
+  }
+
+  if (isPlanJob(existing as JobRecord)) {
+    if (scope === "FUTURE_PLAN_VISITS") {
+      if (!existing.retainer_id) {
+        throw new Error("This plan-generated visit is missing its plan reference");
+      }
+
+      throw new Error(
+        "Future plan visit edits are managed from Plans. Open the plan workspace to regenerate or adjust future visits safely."
+      );
+    }
+
+    return updateSingleJob();
+  }
+
+  if ((effectiveScope === "FUTURE" || effectiveScope === "SERIES") && !isManualRecurringJob(existing as JobRecord)) {
+    throw new Error("Scoped series edits are only available for manual recurring jobs");
+  }
+
+  if ((effectiveScope === "FUTURE" || effectiveScope === "SERIES") && isManualRecurringJob(existing as JobRecord)) {
+    if (existing.completed_at) {
+      throw new Error("Completed visits can only be edited individually");
+    }
+
+    assertManualScopedUpdateAllowed(body);
+
+    const seriesId = getManualSeriesId(existing as JobRecord);
+    const scheduledBoundary = coerceDbIsoDateTime(existing.scheduled_for, "scheduled_for");
+    const bulkCompletedAt =
+      nextStatus === "COMPLETED"
+        ? existing.completed_at ?? new Date().toISOString()
+        : null;
+
+    await sql`
+      UPDATE admin_jobs
+      SET
+        title = ${nextTitle},
+        notes = ${nextNotes},
+        status = ${nextStatus},
+        duration_minutes = ${nextDurationMinutes},
+        hours_numeric = ${nextHours},
+        price_cents = ${nextPriceCents},
+        completed_at = ${bulkCompletedAt},
+        updated_at = NOW()
+      WHERE organization_id = ${organizationId}
+        AND recurring_series_id = ${seriesId}
+        ${effectiveScope === "FUTURE" ? sql`AND scheduled_for >= ${scheduledBoundary}` : sql``}
+        AND completed_at IS NULL
+    `;
+
+    return fetchJobRecord(organizationId, jobId);
+  }
+
+  return updateSingleJob();
 }
 
-export async function deleteJob(organizationId: string, jobId: string) {
+export async function deleteJob(
+  organizationId: string,
+  jobId: string,
+  body: Record<string, unknown> = {}
+) {
   await ensureAdminTables();
+
+  const existing = await fetchJobRecord(organizationId, jobId);
+  if (!existing) return null;
+
+  const scope = normalizeRecurrenceScope(body.recurrenceScope);
+  if (scope === "FUTURE_PLAN_VISITS" && !isPlanJob(existing as JobRecord)) {
+    throw new Error("Future plan visit scope is only available for plan-generated visits");
+  }
+
+  if (isPlanJob(existing as JobRecord) && scope === "FUTURE_PLAN_VISITS") {
+    const retainerId = coerceDbString(existing.retainer_id);
+    if (!retainerId) {
+      throw new Error("This plan-generated visit is missing its plan reference");
+    }
+
+    const { occurrenceDate, scheduledBoundary } = getPlanFutureBoundary(existing as JobRecord);
+    const matchingPlanVisits = await sql`
+      SELECT
+        id,
+        completed_at,
+        plan_visit_modified
+      FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND retainer_id = ${retainerId}
+        AND source_type = 'PLAN'
+        AND (
+          id = ${jobId}
+          OR ${
+            occurrenceDate
+              ? sql`(
+                  (source_plan_occurrence_date IS NOT NULL AND source_plan_occurrence_date >= ${occurrenceDate})
+                  OR (source_plan_occurrence_date IS NULL AND scheduled_for >= ${scheduledBoundary})
+                )`
+              : sql`scheduled_for >= ${scheduledBoundary}`
+          }
+        )
+    `;
+
+    const skippedCompletedCount = matchingPlanVisits.filter((job) => Boolean(job.completed_at)).length;
+    const skippedModifiedCount = matchingPlanVisits.filter(
+      (job) => job.id !== jobId && !job.completed_at && Boolean(job.plan_visit_modified)
+    ).length;
+    const deletableIds = matchingPlanVisits
+      .filter((job) => {
+        if (job.completed_at) return false;
+        if (job.id === jobId) return true;
+        return !Boolean(job.plan_visit_modified);
+      })
+      .map((job) => String(job.id));
+
+    if (deletableIds.length === 0) {
+      return {
+        deleted: false,
+        deletedCount: 0,
+        skippedCompletedCount,
+        skippedModifiedCount,
+        recurrenceScope: scope,
+      } satisfies DeleteJobResult;
+    }
+
+    const result = await sql`
+      DELETE FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND id = ANY(${deletableIds})
+    `;
+
+    return {
+      deleted: Number(result.count ?? 0) > 0,
+      deletedCount: Number(result.count ?? 0),
+      skippedCompletedCount,
+      skippedModifiedCount,
+      recurrenceScope: scope,
+    } satisfies DeleteJobResult;
+  }
+
+  const effectiveScope = scope === "THIS_VISIT_ONLY" ? "THIS" : scope;
+  if ((effectiveScope === "FUTURE" || effectiveScope === "SERIES") && !isManualRecurringJob(existing as JobRecord)) {
+    throw new Error("Scoped series deletes are only available for manual recurring jobs");
+  }
+
+  if ((effectiveScope === "FUTURE" || effectiveScope === "SERIES") && isManualRecurringJob(existing as JobRecord)) {
+    if (existing.completed_at) {
+      throw new Error("Completed visits can only be deleted individually");
+    }
+
+    const seriesId = getManualSeriesId(existing as JobRecord);
+    const scheduledBoundary = coerceDbIsoDateTime(existing.scheduled_for, "scheduled_for");
+    const skippedCompletedRows = await sql`
+      SELECT COUNT(*)::int AS count
+      FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND recurring_series_id = ${seriesId}
+        ${effectiveScope === "FUTURE" ? sql`AND scheduled_for >= ${scheduledBoundary}` : sql``}
+        AND completed_at IS NOT NULL
+    `;
+
+    const result = await sql`
+      DELETE FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND recurring_series_id = ${seriesId}
+        ${effectiveScope === "FUTURE" ? sql`AND scheduled_for >= ${scheduledBoundary}` : sql``}
+        AND completed_at IS NULL
+    `;
+
+    return {
+      deleted: true,
+      deletedCount: Number(result.count ?? 0),
+      skippedCompletedCount: Number(skippedCompletedRows[0]?.count ?? 0),
+      skippedModifiedCount: 0,
+      recurrenceScope: effectiveScope,
+    } satisfies DeleteJobResult;
+  }
 
   const result = await sql`
     DELETE FROM admin_jobs
     WHERE organization_id = ${organizationId} AND id = ${jobId}
   `;
 
-  return result.count > 0;
+  return {
+    deleted: Number(result.count ?? 0) > 0,
+    deletedCount: Number(result.count ?? 0),
+    skippedCompletedCount: 0,
+    skippedModifiedCount: 0,
+    recurrenceScope: scope ?? "NONE",
+  } satisfies DeleteJobResult;
 }

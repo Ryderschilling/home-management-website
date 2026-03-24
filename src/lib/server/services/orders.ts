@@ -1,8 +1,20 @@
 // src/lib/server/services/orders.ts
 import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
-import { sendThankYouEmail } from "@/lib/server/email-thankyou";
+import {
+  sendRockInstallationFollowUpEmail,
+  sendThankYouEmail,
+} from "@/lib/server/email-thankyou";
 
 export type FulfillmentStatus = "NEW" | "ORDERED" | "INSTALLED" | "CANCELED";
+const FOLLOW_UP_DELAY_DAYS = 7;
+
+type EligibleFollowUpOrder = {
+  id: string;
+  customer_email: string | null;
+  customer_name: string | null;
+  client_email: string | null;
+  client_name: string | null;
+};
 
 function normalizeFulfillment(v: unknown): FulfillmentStatus | null {
   const s = String(v ?? "").trim().toUpperCase();
@@ -51,6 +63,7 @@ export async function listOrders(organizationId: string) {
       o.ordered_at,
       o.installed_at,
       o.thank_you_sent_at,
+      o.follow_up_email_sent_at,
 
       o.tos_version,
       o.tos_url,
@@ -303,4 +316,108 @@ export async function sendThankYouEmailAndMarkSent(organizationId: string, order
   `;
 
   return { ok: true, alreadySent: false };
+}
+
+async function getEligibleInstalledOrderIdsForFollowUp(organizationId: string, limit: number) {
+  const rows = await sql<{ id: string }[]>`
+    SELECT o.id
+    FROM admin_orders o
+    LEFT JOIN admin_clients c
+      ON c.id = o.client_id
+      AND c.organization_id = o.organization_id
+    WHERE o.organization_id = ${organizationId}
+      AND COALESCE(NULLIF(UPPER(o.status), ''), 'OPEN') <> 'CANCELED'
+      AND COALESCE(NULLIF(UPPER(o.fulfillment_status), ''), 'NEW') = 'INSTALLED'
+      AND o.installed_at IS NOT NULL
+      AND o.installed_at <= NOW() - (${FOLLOW_UP_DELAY_DAYS} * INTERVAL '1 day')
+      AND o.follow_up_email_sent_at IS NULL
+      AND COALESCE(NULLIF(BTRIM(o.customer_email), ''), NULLIF(BTRIM(c.email), '')) IS NOT NULL
+    ORDER BY o.installed_at ASC, o.created_at ASC
+    LIMIT ${limit}
+  `;
+
+  return rows.map((row) => row.id);
+}
+
+async function sendInstalledOrderFollowUpEmailAndMarkSent(
+  organizationId: string,
+  orderId: string
+) {
+  return sql.begin(async (tx) => {
+    const rows = await tx<EligibleFollowUpOrder[]>`
+      SELECT
+        o.id,
+        o.customer_email,
+        o.customer_name,
+        c.email AS client_email,
+        c.name AS client_name
+      FROM admin_orders o
+      LEFT JOIN admin_clients c
+        ON c.id = o.client_id
+        AND c.organization_id = o.organization_id
+      WHERE o.organization_id = ${organizationId}
+        AND o.id = ${orderId}
+        AND COALESCE(NULLIF(UPPER(o.status), ''), 'OPEN') <> 'CANCELED'
+        AND COALESCE(NULLIF(UPPER(o.fulfillment_status), ''), 'NEW') = 'INSTALLED'
+        AND o.installed_at IS NOT NULL
+        AND o.installed_at <= NOW() - (${FOLLOW_UP_DELAY_DAYS} * INTERVAL '1 day')
+        AND o.follow_up_email_sent_at IS NULL
+        AND COALESCE(NULLIF(BTRIM(o.customer_email), ''), NULLIF(BTRIM(c.email), '')) IS NOT NULL
+      FOR UPDATE SKIP LOCKED
+    `;
+
+    const order = rows[0];
+    if (!order) return null;
+
+    const to = (order.customer_email || order.client_email || "").toString().trim();
+    const customerName = (order.customer_name || order.client_name || "there").toString().trim();
+
+    if (!to) return null;
+
+    await sendRockInstallationFollowUpEmail({
+      to,
+      customerName,
+    });
+
+    const updated = await tx<{ follow_up_email_sent_at: string }[]>`
+      UPDATE admin_orders
+      SET follow_up_email_sent_at = NOW(), updated_at = NOW()
+      WHERE organization_id = ${organizationId}
+        AND id = ${orderId}
+        AND follow_up_email_sent_at IS NULL
+      RETURNING follow_up_email_sent_at
+    `;
+
+    if (!updated[0]) return null;
+
+    return {
+      orderId,
+      to,
+      followUpSentAt: updated[0].follow_up_email_sent_at,
+    };
+  });
+}
+
+export async function sendEligibleInstalledOrderFollowUps(
+  organizationId: string,
+  opts?: { limit?: number }
+) {
+  await ensureAdminTables();
+  await ensureQrAddonColumns();
+
+  const limit = Math.max(1, Math.min(100, Math.trunc(opts?.limit ?? 50)));
+  const candidateIds = await getEligibleInstalledOrderIdsForFollowUp(organizationId, limit);
+
+  const sent: Array<{ orderId: string; to: string; followUpSentAt: string }> = [];
+
+  for (const orderId of candidateIds) {
+    const result = await sendInstalledOrderFollowUpEmailAndMarkSent(organizationId, orderId);
+    if (result) sent.push(result);
+  }
+
+  return {
+    scanned: candidateIds.length,
+    sentCount: sent.length,
+    sent,
+  };
 }

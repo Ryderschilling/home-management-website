@@ -3,7 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { QR_COLOR_OPTIONS } from "@/lib/qr-funnel";
+import {
+  getCanonicalQrCampaignPath,
+  normalizeCampaignCode,
+  resolveCampaignCodeFromSearchParams,
+} from "@/lib/campaigns";
+import { QR_COLOR_OPTIONS, formatUsd } from "@/lib/qr-funnel";
 
 const TESTIMONIALS = [
   {
@@ -26,10 +31,6 @@ const TESTIMONIALS = [
   },
 ];
 
-function safe(v: unknown) {
-  return String(v ?? "").trim();
-}
-
 function getOrCreateBrowserSessionKey() {
   const key = "chm_campaign_session_key";
   const existing = localStorage.getItem(key);
@@ -51,6 +52,7 @@ export default function QrPage() {
   const [compactHeader, setCompactHeader] = useState(false);
   const [campaignCode, setCampaignCode] = useState("");
   const [sessionKey, setSessionKey] = useState("");
+  const [mainProductPriceCents, setMainProductPriceCents] = useState<number | null>(null);
 
   const [leadFirstName, setLeadFirstName] = useState("");
   const [leadEmail, setLeadEmail] = useState("");
@@ -74,17 +76,54 @@ export default function QrPage() {
   }, [agree]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const fromQuery = safe(params.get("c"));
-    const stored = safe(localStorage.getItem("chm_campaign_code"));
-    const resolved = fromQuery || stored;
+    let cancelled = false;
 
-    if (fromQuery) {
-      localStorage.setItem("chm_campaign_code", fromQuery);
+    async function loadMainProductPrice() {
+      try {
+        const res = await fetch("/api/qr/product-price", { cache: "no-store" });
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok) return;
+
+        const nextPrice =
+          typeof json?.data?.productPriceCents === "number"
+            ? json.data.productPriceCents
+            : null;
+
+        if (!cancelled && nextPrice && nextPrice > 0) {
+          setMainProductPriceCents(nextPrice);
+        }
+      } catch {}
     }
 
+    loadMainProductPrice();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromQuery = resolveCampaignCodeFromSearchParams(params);
+    const stored = normalizeCampaignCode(localStorage.getItem("chm_campaign_code"));
+    const resolved = fromQuery.campaignCode || stored;
+
+    if (fromQuery.campaignCode) {
+      localStorage.setItem("chm_campaign_code", fromQuery.campaignCode);
+
+      if (fromQuery.shouldCanonicalize) {
+        window.location.replace(getCanonicalQrCampaignPath(fromQuery.campaignCode));
+        return;
+      }
+    } else if (stored) {
+      localStorage.setItem("chm_campaign_code", stored);
+    }
+
+    const browserSessionKey = getOrCreateBrowserSessionKey();
+
     setCampaignCode(resolved);
-    setSessionKey(getOrCreateBrowserSessionKey());
+    setSessionKey(browserSessionKey);
 
     if (resolved) {
       fetch("/api/marketing/track", {
@@ -93,7 +132,7 @@ export default function QrPage() {
         body: JSON.stringify({
           eventType: "page_view",
           campaignCode: resolved,
-          sessionKey: getOrCreateBrowserSessionKey(),
+          sessionKey: browserSessionKey,
           pagePath: "/qr",
           metadata: {
             referrer: document.referrer || "",
@@ -211,16 +250,16 @@ export default function QrPage() {
 
       <div className="mx-auto max-w-6xl px-6 py-10">
         <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
-        <video
-  className="h-auto w-full"
-  controls
-  playsInline
-  preload="metadata"
-  poster="/qr-poster.jpg"
->
-  <source src="/videos/qr-hero.mov" type="video/quicktime" />
-  Your browser does not support video playback.
-</video>
+          <video
+            className="h-auto w-full"
+            controls
+            playsInline
+            preload="metadata"
+            poster="/qr-poster.jpg"
+          >
+            <source src="/videos/qr-hero.mov" type="video/quicktime" />
+            Your browser does not support video playback.
+          </video>
         </section>
 
         <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -292,6 +331,15 @@ export default function QrPage() {
               rock. We’ll verify fit from your photo and schedule installation.
             </p>
 
+            {typeof mainProductPriceCents === "number" && mainProductPriceCents > 0 ? (
+              <p className="mt-4 text-sm text-white/62">
+                Starting at{" "}
+                <span className="font-medium text-white/84">
+                  {formatUsd(mainProductPriceCents)}
+                </span>
+              </p>
+            ) : null}
+
             <ul className="mt-4 space-y-2 text-sm text-white/75">
               <li>• Custom fit verified from your photo</li>
               <li>• Fast, clean installation</li>
@@ -346,17 +394,17 @@ export default function QrPage() {
           </h2>
 
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {TESTIMONIALS.map((item) => (
-  <div
-    key={item.name}
-    className="flex min-h-[220px] flex-col rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-6 text-white/80"
-  >
-    <div>“{item.quote}”</div>
-    <div className="mt-auto pt-6 text-xs uppercase tracking-[0.22em] text-white/50">
-      {item.name} • {item.meta}
-    </div>
-  </div>
-))}
+            {TESTIMONIALS.map((item) => (
+              <div
+                key={item.name}
+                className="flex min-h-[220px] flex-col rounded-2xl border border-white/10 bg-white/5 p-5 text-sm leading-6 text-white/80"
+              >
+                <div>“{item.quote}”</div>
+                <div className="mt-auto pt-6 text-xs uppercase tracking-[0.22em] text-white/50">
+                  {item.name} • {item.meta}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

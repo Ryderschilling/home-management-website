@@ -58,6 +58,11 @@ function formatSourceKey(retainerId: string, occurrence: Date) {
   return `plan:${retainerId}:${occurrence.toISOString().slice(0, 16)}`;
 }
 
+export type DeleteRetainerResult = {
+  deleted: boolean;
+  deletedFutureVisitCount: number;
+};
+
 async function assertClientExists(organizationId: string, clientId: string) {
   const rows = await sql`
     SELECT id
@@ -355,6 +360,80 @@ export async function updateRetainer(
   `;
 
   return fetchRetainerRecord(organizationId, id);
+}
+
+export async function deleteRetainer(organizationId: string, retainerId: string) {
+  await ensureAdminTables();
+
+  const existing = await fetchRetainerRecord(organizationId, retainerId);
+  if (!existing) return null;
+
+  const historicalJobRows = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM admin_jobs
+    WHERE organization_id = ${organizationId}
+      AND retainer_id = ${retainerId}
+      AND NOT (
+        source_type = 'PLAN'
+        AND completed_at IS NULL
+        AND scheduled_for >= NOW()
+      )
+  `;
+  const invoiceRows = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM admin_invoices
+    WHERE organization_id = ${organizationId}
+      AND retainer_id = ${retainerId}
+  `;
+  const invoiceLineItemRows = await sql`
+    SELECT COUNT(*)::int AS count
+    FROM admin_invoice_line_items
+    WHERE organization_id = ${organizationId}
+      AND retainer_id = ${retainerId}
+  `;
+
+  const historicalJobCount = Number(historicalJobRows[0]?.count ?? 0);
+  const invoiceCount = Number(invoiceRows[0]?.count ?? 0);
+  const invoiceLineItemCount = Number(invoiceLineItemRows[0]?.count ?? 0);
+
+  if (historicalJobCount > 0 || invoiceCount > 0 || invoiceLineItemCount > 0) {
+    const blockers: string[] = [];
+    if (historicalJobCount > 0) {
+      blockers.push(`${historicalJobCount} historical job${historicalJobCount === 1 ? "" : "s"}`);
+    }
+    if (invoiceCount > 0) {
+      blockers.push(`${invoiceCount} invoice${invoiceCount === 1 ? "" : "s"}`);
+    }
+    if (invoiceLineItemCount > 0) {
+      blockers.push(`${invoiceLineItemCount} invoice line item${invoiceLineItemCount === 1 ? "" : "s"}`);
+    }
+
+    throw new Error(
+      `This plan can't be deleted because it still has ${blockers.join(", ")}. Delete is only allowed for unused plans or plans with only future uncompleted plan-generated visits.`
+    );
+  }
+
+  return sql.begin(async (tx) => {
+    const futureVisitDelete = await tx`
+      DELETE FROM admin_jobs
+      WHERE organization_id = ${organizationId}
+        AND retainer_id = ${retainerId}
+        AND source_type = 'PLAN'
+        AND completed_at IS NULL
+        AND scheduled_for >= NOW()
+    `;
+
+    const retainerDelete = await tx`
+      DELETE FROM admin_retainers
+      WHERE organization_id = ${organizationId}
+        AND id = ${retainerId}
+    `;
+
+    return {
+      deleted: Number(retainerDelete.count ?? 0) > 0,
+      deletedFutureVisitCount: Number(futureVisitDelete.count ?? 0),
+    } satisfies DeleteRetainerResult;
+  });
 }
 
 export async function syncRetainerJobs(
