@@ -277,7 +277,7 @@ export async function GET(
 
     const metrics = metricRows[0] ?? {};
 
-    const recentEventsRows = await sql`
+    const recentEventsRows = await sql<CampaignEventRow[]>`
       SELECT
         id,
         session_key,
@@ -293,7 +293,7 @@ export async function GET(
       LIMIT 80
     `;
 
-    const flowEventRows = await sql`
+    const flowEventRows = await sql<CampaignEventRow[]>`
       SELECT
         id,
         session_key,
@@ -329,7 +329,7 @@ export async function GET(
     const addOnPaidOrders = asInteger(metrics.add_on_paid_orders);
     const addOnRevenueCents = asInteger(metrics.add_on_revenue_cents);
 
-    const recentEvents = (recentEventsRows as CampaignEventRow[]).map((event) => {
+    const recentEvents = recentEventsRows.map((event) => {
       const metadata = normalizeMetadata(event.metadata_json);
 
       return {
@@ -391,7 +391,7 @@ export async function GET(
           add_on_attach_rate: ratio(addOnPaidOrders, paidOrders),
           lead_conversion_rate: ratio(emailLeads, visits),
         },
-        path_transitions: buildPathTransitions(flowEventRows as CampaignEventRow[]),
+        path_transitions: buildPathTransitions(flowEventRows),
         recent_events: recentEvents,
       },
     });
