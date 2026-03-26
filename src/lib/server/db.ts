@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 18;
+const ADMIN_SCHEMA_VERSION = 21;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -27,8 +27,368 @@ export async function ensureQrAddonColumns(): Promise<void> {
   await sql`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS electrical_box_height TEXT`;
 }
 
+type AdminTx = typeof sql;
+
+function bootstrapStepMessage(stepName: string, error: unknown) {
+  const detail = error instanceof Error ? error.message : String(error);
+  return `Admin schema bootstrap failed at ${stepName}: ${detail}`;
+}
+
+async function runBootstrapStep(stepName: string, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } catch (error) {
+    throw new Error(bootstrapStepMessage(stepName, error));
+  }
+}
+
+async function tableExists(tx: AdminTx, tableName: string) {
+  const rows = await tx`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.tables
+      WHERE table_schema = current_schema()
+        AND table_name = ${tableName}
+    ) AS exists
+  `;
+
+  return Boolean(rows[0]?.exists);
+}
+
+async function columnsExist(tx: AdminTx, tableName: string, columns: string[]) {
+  if (!(await tableExists(tx, tableName))) return false;
+  if (columns.length === 0) return true;
+
+  const rows = await tx`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = current_schema()
+      AND table_name = ${tableName}
+      AND column_name = ANY(${columns})
+  `;
+
+  const existing = new Set(rows.map((row) => String(row.column_name)));
+  return columns.every((column) => existing.has(column));
+}
+
+async function constraintExists(tx: AdminTx, tableName: string, constraintName: string) {
+  const rows = await tx`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.table_constraints
+      WHERE table_schema = current_schema()
+        AND table_name = ${tableName}
+        AND constraint_name = ${constraintName}
+    ) AS exists
+  `;
+
+  return Boolean(rows[0]?.exists);
+}
+
+async function createOptionalIndexStep(
+  tx: AdminTx,
+  stepName: string,
+  tableName: string,
+  columns: string[],
+  fn: () => Promise<void>
+) {
+  const ready = await columnsExist(tx, tableName, columns);
+  if (!ready) return;
+
+  try {
+    await fn();
+  } catch (error) {
+    console.warn(`[ensureAdminTables] skipped ${stepName}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+async function ensureInvoiceBootstrap(tx: AdminTx) {
+  await runBootstrapStep("invoice.create-admin_invoices-table", async () => {
+    await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      client_id TEXT,
+      property_id TEXT,
+      retainer_id TEXT,
+      invoice_number TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'DRAFT',
+      stripe_customer_id TEXT,
+      stripe_invoice_id TEXT,
+      stripe_status TEXT,
+      send_at TIMESTAMPTZ,
+      period_start DATE,
+      period_end DATE,
+      issue_date DATE,
+      due_date DATE,
+      subtotal_cents INTEGER NOT NULL DEFAULT 0,
+      tax_cents INTEGER NOT NULL DEFAULT 0,
+      total_cents INTEGER NOT NULL DEFAULT 0,
+      notes TEXT,
+      internal_notes TEXT,
+      amount_paid_cents INTEGER NOT NULL DEFAULT 0,
+      amount_remaining_cents INTEGER NOT NULL DEFAULT 0,
+      currency TEXT NOT NULL DEFAULT 'usd',
+      hosted_invoice_url TEXT,
+      invoice_pdf_url TEXT,
+      sent_at TIMESTAMPTZ,
+      paid_at TIMESTAMPTZ,
+      finalized_at TIMESTAMPTZ,
+      last_synced_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_invoices_client_fk
+        FOREIGN KEY (client_id)
+        REFERENCES admin_clients(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoices_property_fk
+        FOREIGN KEY (property_id)
+        REFERENCES admin_properties(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoices_retainer_fk
+        FOREIGN KEY (retainer_id)
+        REFERENCES admin_retainers(id)
+        ON DELETE SET NULL
+    )`;
+  });
+
+  await runBootstrapStep("invoice.ensure-admin_invoices-columns", async () => {
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS client_id TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS property_id TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS invoice_number TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'DRAFT'`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS stripe_invoice_id TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS stripe_status TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS send_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_start DATE`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_end DATE`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS issue_date DATE`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS due_date DATE`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS subtotal_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS tax_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS total_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS notes TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS internal_notes TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS amount_paid_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS amount_remaining_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS currency TEXT NOT NULL DEFAULT 'usd'`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS hosted_invoice_url TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS invoice_pdf_url TEXT`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS sent_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS finalized_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS last_synced_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+    await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+  });
+
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-org-number",
+    "admin_invoices",
+    ["organization_id", "invoice_number"],
+    async () => {
+      await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_number_uq
+        ON admin_invoices (organization_id, invoice_number)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-org-status",
+    "admin_invoices",
+    ["organization_id", "status", "issue_date", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoices_org_status_idx
+        ON admin_invoices (organization_id, status, issue_date DESC, created_at DESC)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-client",
+    "admin_invoices",
+    ["organization_id", "client_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoices_client_idx
+        ON admin_invoices (organization_id, client_id, created_at DESC)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-retainer",
+    "admin_invoices",
+    ["organization_id", "retainer_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoices_retainer_idx
+        ON admin_invoices (organization_id, retainer_id, created_at DESC)
+        WHERE retainer_id IS NOT NULL`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-stripe-invoice",
+    "admin_invoices",
+    ["organization_id", "stripe_invoice_id"],
+    async () => {
+      await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_stripe_invoice_uq
+        ON admin_invoices (organization_id, stripe_invoice_id)
+        WHERE stripe_invoice_id IS NOT NULL`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoices-send-at",
+    "admin_invoices",
+    ["organization_id", "status", "send_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoices_send_at_idx
+        ON admin_invoices (organization_id, status, send_at)
+        WHERE send_at IS NOT NULL`;
+    }
+  );
+
+  await runBootstrapStep("invoice.create-admin_invoice_line_items-table", async () => {
+    await tx`CREATE TABLE IF NOT EXISTS admin_invoice_line_items (
+      id TEXT PRIMARY KEY,
+      invoice_id TEXT NOT NULL,
+      organization_id TEXT NOT NULL,
+      job_id TEXT,
+      retainer_id TEXT,
+      description TEXT NOT NULL,
+      quantity NUMERIC NOT NULL DEFAULT 1,
+      unit_price_cents INTEGER NOT NULL DEFAULT 0,
+      line_total_cents INTEGER NOT NULL DEFAULT 0,
+      line_type TEXT NOT NULL DEFAULT 'MANUAL',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_invoice_line_items_invoice_fk
+        FOREIGN KEY (invoice_id)
+        REFERENCES admin_invoices(id)
+        ON DELETE CASCADE,
+      CONSTRAINT admin_invoice_line_items_job_fk
+        FOREIGN KEY (job_id)
+        REFERENCES admin_jobs(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_invoice_line_items_retainer_fk
+        FOREIGN KEY (retainer_id)
+        REFERENCES admin_retainers(id)
+        ON DELETE SET NULL
+    )`;
+  });
+
+  await runBootstrapStep("invoice.ensure-admin_invoice_line_items-columns", async () => {
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS invoice_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS organization_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS job_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS description TEXT`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS quantity NUMERIC NOT NULL DEFAULT 1`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS unit_price_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_total_cents INTEGER NOT NULL DEFAULT 0`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_type TEXT NOT NULL DEFAULT 'MANUAL'`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+  });
+
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoice_line_items-invoice",
+    "admin_invoice_line_items",
+    ["organization_id", "invoice_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
+        ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoice_line_items-job",
+    "admin_invoice_line_items",
+    ["organization_id", "job_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_job_idx
+        ON admin_invoice_line_items (organization_id, job_id, created_at)
+        WHERE job_id IS NOT NULL`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoice_line_items-retainer",
+    "admin_invoice_line_items",
+    ["organization_id", "retainer_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_retainer_idx
+        ON admin_invoice_line_items (organization_id, retainer_id, created_at)
+        WHERE retainer_id IS NOT NULL`;
+    }
+  );
+
+  await runBootstrapStep("invoice.create-admin_invoice_events-table", async () => {
+    await tx`CREATE TABLE IF NOT EXISTS admin_invoice_events (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      invoice_id TEXT NOT NULL,
+      source TEXT NOT NULL DEFAULT 'SYSTEM',
+      event_type TEXT NOT NULL,
+      stripe_event_id TEXT,
+      message TEXT,
+      payload_json JSONB,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_invoice_events_invoice_fk
+        FOREIGN KEY (invoice_id)
+        REFERENCES admin_invoices(id)
+        ON DELETE CASCADE
+    )`;
+  });
+
+  await runBootstrapStep("invoice.ensure-admin_invoice_events-columns", async () => {
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS organization_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS invoice_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'SYSTEM'`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS event_type TEXT NOT NULL DEFAULT 'unknown'`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS stripe_event_id TEXT`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS message TEXT`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS payload_json JSONB`;
+    await tx`ALTER TABLE admin_invoice_events ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+  });
+
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoice_events-invoice",
+    "admin_invoice_events",
+    ["organization_id", "invoice_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_invoice_events_invoice_idx
+        ON admin_invoice_events (organization_id, invoice_id, created_at DESC)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "invoice.index-admin_invoice_events-stripe-event",
+    "admin_invoice_events",
+    ["stripe_event_id"],
+    async () => {
+      await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoice_events_stripe_event_uq
+        ON admin_invoice_events (stripe_event_id)
+        WHERE stripe_event_id IS NOT NULL`;
+    }
+  );
+
+  await runBootstrapStep("invoice.constraint-admin_invoice_events-invoice-fk", async () => {
+    const invoiceEventsReady = await columnsExist(tx, "admin_invoice_events", ["invoice_id"]);
+    const invoicesReady = await columnsExist(tx, "admin_invoices", ["id"]);
+    if (!invoiceEventsReady || !invoicesReady) return;
+    if (await constraintExists(tx, "admin_invoice_events", "admin_invoice_events_invoice_fk")) return;
+
+    await tx`
+      ALTER TABLE admin_invoice_events
+      ADD CONSTRAINT admin_invoice_events_invoice_fk
+      FOREIGN KEY (invoice_id)
+      REFERENCES admin_invoices(id)
+      ON DELETE CASCADE
+    `;
+  });
+}
+
 export async function ensureAdminTables(): Promise<void> {
-  if (process.env.VERCEL_ENV === "production") return;
   if (globalForDb.adminSchemaVersion === ADMIN_SCHEMA_VERSION) return;
   if (globalForDb.adminSchemaReadyPromise) return globalForDb.adminSchemaReadyPromise;
 
@@ -259,75 +619,12 @@ export async function ensureAdminTables(): Promise<void> {
 
     await tx`CREATE INDEX IF NOT EXISTS admin_job_photos_job_idx ON admin_job_photos (job_id, uploaded_at)`;
 
-    await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
-      id TEXT PRIMARY KEY,
-      organization_id TEXT NOT NULL,
-      client_id TEXT,
-      property_id TEXT,
-      retainer_id TEXT,
-      invoice_number TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'DRAFT',
-      period_start DATE,
-      period_end DATE,
-      issue_date DATE,
-      due_date DATE,
-      subtotal_cents INTEGER NOT NULL DEFAULT 0,
-      total_cents INTEGER NOT NULL DEFAULT 0,
-      notes TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      CONSTRAINT admin_invoices_client_fk
-        FOREIGN KEY (client_id)
-        REFERENCES admin_clients(id)
-        ON DELETE SET NULL,
-      CONSTRAINT admin_invoices_property_fk
-        FOREIGN KEY (property_id)
-        REFERENCES admin_properties(id)
-        ON DELETE SET NULL,
-      CONSTRAINT admin_invoices_retainer_fk
-        FOREIGN KEY (retainer_id)
-        REFERENCES admin_retainers(id)
-        ON DELETE SET NULL
-    )`;
-    await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_number_uq
-      ON admin_invoices (organization_id, invoice_number)`;
-    await tx`CREATE INDEX IF NOT EXISTS admin_invoices_org_status_idx
-      ON admin_invoices (organization_id, status, issue_date DESC, created_at DESC)`;
-    await tx`CREATE INDEX IF NOT EXISTS admin_invoices_client_idx
-      ON admin_invoices (organization_id, client_id, created_at DESC)`;
-
-    await tx`CREATE TABLE IF NOT EXISTS admin_invoice_line_items (
-      id TEXT PRIMARY KEY,
-      invoice_id TEXT NOT NULL,
-      organization_id TEXT NOT NULL,
-      job_id TEXT,
-      retainer_id TEXT,
-      description TEXT NOT NULL,
-      quantity NUMERIC NOT NULL DEFAULT 1,
-      unit_price_cents INTEGER NOT NULL DEFAULT 0,
-      line_total_cents INTEGER NOT NULL DEFAULT 0,
-      line_type TEXT NOT NULL DEFAULT 'MANUAL',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      CONSTRAINT admin_invoice_line_items_invoice_fk
-        FOREIGN KEY (invoice_id)
-        REFERENCES admin_invoices(id)
-        ON DELETE CASCADE,
-      CONSTRAINT admin_invoice_line_items_job_fk
-        FOREIGN KEY (job_id)
-        REFERENCES admin_jobs(id)
-        ON DELETE SET NULL,
-      CONSTRAINT admin_invoice_line_items_retainer_fk
-        FOREIGN KEY (retainer_id)
-        REFERENCES admin_retainers(id)
-        ON DELETE SET NULL
-    )`;
-    await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
-      ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
-
     await tx`CREATE TABLE IF NOT EXISTS admin_bootstrap_state (
       key TEXT PRIMARY KEY,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`;
+
+    await ensureInvoiceBootstrap(tx);
 
     // Safe adds (existing DBs)
     await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS notes TEXT`;
@@ -523,7 +820,15 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS referral_created_at T
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_referral_code_idx
   ON admin_orders (organization_id, referral_code)`;
 
-await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
+await createOptionalIndexStep(
+  tx,
+  "invoice.index-admin_jobs-retainer",
+  "admin_jobs",
+  ["organization_id", "retainer_id"],
+  async () => {
+    await tx`CREATE INDEX IF NOT EXISTS admin_jobs_retainer_idx ON admin_jobs (organization_id, retainer_id)`;
+  }
+);
 await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_jobs_source_key_uq
   ON admin_jobs (organization_id, source_key)
   WHERE source_key IS NOT NULL`;
@@ -534,88 +839,30 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_plan_occurrence_idx
 await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
   ON admin_jobs (organization_id, recurring_series_id, scheduled_for)
   WHERE recurring_series_id IS NOT NULL`;
-await tx`CREATE TABLE IF NOT EXISTS admin_invoices (
-  id TEXT PRIMARY KEY,
-  organization_id TEXT NOT NULL,
-  client_id TEXT,
-  property_id TEXT,
-  retainer_id TEXT,
-  invoice_number TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'DRAFT',
-  period_start DATE,
-  period_end DATE,
-  issue_date DATE,
-  due_date DATE,
-  subtotal_cents INTEGER NOT NULL DEFAULT 0,
-  total_cents INTEGER NOT NULL DEFAULT 0,
-  notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS client_id TEXT`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS property_id TEXT`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS invoice_number TEXT`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'DRAFT'`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_start DATE`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS period_end DATE`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS issue_date DATE`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS due_date DATE`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS subtotal_cents INTEGER NOT NULL DEFAULT 0`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS total_cents INTEGER NOT NULL DEFAULT 0`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS notes TEXT`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
-await tx`ALTER TABLE admin_invoices ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
-await tx`CREATE UNIQUE INDEX IF NOT EXISTS admin_invoices_org_number_uq
-  ON admin_invoices (organization_id, invoice_number)`;
-await tx`CREATE INDEX IF NOT EXISTS admin_invoices_org_status_idx
-  ON admin_invoices (organization_id, status, issue_date DESC, created_at DESC)`;
-await tx`CREATE INDEX IF NOT EXISTS admin_invoices_client_idx
-  ON admin_invoices (organization_id, client_id, created_at DESC)`;
-await tx`CREATE TABLE IF NOT EXISTS admin_invoice_line_items (
-  id TEXT PRIMARY KEY,
-  invoice_id TEXT NOT NULL,
-  organization_id TEXT NOT NULL,
-  job_id TEXT,
-  retainer_id TEXT,
-  description TEXT NOT NULL,
-  quantity NUMERIC NOT NULL DEFAULT 1,
-  unit_price_cents INTEGER NOT NULL DEFAULT 0,
-  line_total_cents INTEGER NOT NULL DEFAULT 0,
-  line_type TEXT NOT NULL DEFAULT 'MANUAL',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS invoice_id TEXT`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS organization_id TEXT`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS job_id TEXT`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS description TEXT`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS quantity NUMERIC NOT NULL DEFAULT 1`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS unit_price_cents INTEGER NOT NULL DEFAULT 0`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_total_cents INTEGER NOT NULL DEFAULT 0`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_type TEXT NOT NULL DEFAULT 'MANUAL'`;
-await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
-await tx`CREATE INDEX IF NOT EXISTS admin_invoice_line_items_invoice_idx
-  ON admin_invoice_line_items (organization_id, invoice_id, created_at)`;
 
-    // FK for retainer_id if missing (older DB)
-    await tx`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (
-          SELECT 1
-          FROM pg_constraint
-          WHERE conname = 'admin_jobs_retainer_fk'
-        ) THEN
+    const jobsRetainerReady =
+      (await columnsExist(tx, "admin_jobs", ["retainer_id"])) &&
+      (await columnsExist(tx, "admin_retainers", ["id"]));
+    if (
+      jobsRetainerReady &&
+      !(await constraintExists(tx, "admin_jobs", "admin_jobs_retainer_fk"))
+    ) {
+      try {
+        await tx`
           ALTER TABLE admin_jobs
           ADD CONSTRAINT admin_jobs_retainer_fk
           FOREIGN KEY (retainer_id)
           REFERENCES admin_retainers(id)
-          ON DELETE SET NULL;
-        END IF;
-      END
-      $$;
-    `;
+          ON DELETE SET NULL
+        `;
+      } catch (error) {
+        console.warn(
+          `[ensureAdminTables] skipped jobs.constraint-admin_jobs-retainer-fk: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
+      }
+    }
   });
 
   globalForDb.adminSchemaReadyPromise = readyPromise;

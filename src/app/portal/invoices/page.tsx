@@ -1,671 +1,417 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { PortalDrawer } from "@/app/portal/_components/PortalDrawer";
 
-type Client = { id: string; name: string };
-type Property = { id: string; client_id?: string | null; name: string; address_line1?: string | null };
-type Retainer = {
-  id: string;
-  client_id?: string | null;
-  property_id?: string | null;
-  client_name?: string | null;
-  property_name?: string | null;
-  name: string;
-  amount_cents: number;
-  billing_frequency: string;
-  billing_interval: number;
-  status: string;
-};
-type Job = {
-  id: string;
-  client_id?: string | null;
-  property_id?: string | null;
-  retainer_id?: string | null;
-  client_name?: string | null;
-  property_name?: string | null;
-  property_address_line1?: string | null;
-  plan_name?: string | null;
-  title: string;
-  scheduled_for: string;
-  status: string;
-  price_cents?: number | null;
-};
-type InvoiceLineItem = {
-  id: string;
-  description: string;
-  quantity: number | string;
-  unit_price_cents: number;
-  line_total_cents: number;
-  line_type: string;
-  job_id?: string | null;
-  retainer_id?: string | null;
-};
-type Invoice = {
-  id: string;
-  client_id?: string | null;
-  property_id?: string | null;
-  retainer_id?: string | null;
-  invoice_number: string;
-  status: string;
-  period_start?: string | null;
-  period_end?: string | null;
-  issue_date?: string | null;
-  due_date?: string | null;
-  subtotal_cents: number;
-  total_cents: number;
-  notes?: string | null;
-  client_name?: string | null;
-  property_name?: string | null;
-  property_address_line1?: string | null;
-  plan_name?: string | null;
-  line_items?: InvoiceLineItem[] | null;
-};
-type ManualLine = { description: string; quantity: string; unitPrice: string };
+import {
+  InvoiceCard,
+  S,
+  formatDate,
+  invoiceGroupLabel,
+  money,
+  type InvoiceDashboardData,
+  type PortalClient,
+  type PortalInvoice,
+  type QueueJob,
+} from "./_components/invoice-ui";
 
-const S = {
-  input:
-    "w-full rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3.5 py-2.5 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--border-hover)] disabled:cursor-not-allowed disabled:opacity-60",
-  label: "text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--text-muted)]",
-  card: "rounded-2xl border border-[var(--border)] bg-[var(--surface)]",
-  cardInner: "rounded-xl border border-[var(--border)] bg-[var(--surface-2)]",
-  btnPrimary:
-    "inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-5 py-3 text-xs font-medium uppercase tracking-[0.24em] text-[#0e0e0f] transition hover:brightness-110",
-  btnGhost:
-    "inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-4 py-2 text-xs uppercase tracking-[0.2em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]",
-};
-
-function money(cents: number | null | undefined) {
-  return `$${((typeof cents === "number" ? cents : 0) / 100).toFixed(2)}`;
+function queueJobHref(job: QueueJob) {
+  const params = new URLSearchParams();
+  if (job.client_id) params.set("clientId", job.client_id);
+  if (job.property_id) params.set("propertyId", job.property_id);
+  params.append("jobId", job.id);
+  return `/portal/invoices/new?${params.toString()}`;
 }
 
-function fmtDate(value: string | null | undefined) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString();
-}
+function filterInvoices(
+  invoices: PortalInvoice[],
+  clientFilter: string,
+  query: string
+) {
+  const normalizedQuery = query.trim().toLowerCase();
 
-function invoiceStatusStyle(status: string): React.CSSProperties {
-  const normalized = status.toUpperCase();
-  if (normalized === "PAID") return { background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.24)", color: "#4ade80", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
-  if (normalized === "SENT") return { background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.24)", color: "#60a5fa", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
-  if (normalized === "OVERDUE") return { background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.24)", color: "#f87171", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
-  if (normalized === "VOID") return { background: "rgba(120,120,120,0.12)", border: "1px solid rgba(120,120,120,0.26)", color: "#b4b4b4", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
-  return { background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.24)", color: "#fbbf24", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
-}
+  return invoices.filter((invoice) => {
+    if (clientFilter && invoice.client_id !== clientFilter) return false;
+    if (!normalizedQuery) return true;
 
-function newManualLine(): ManualLine {
-  return { description: "", quantity: "1", unitPrice: "" };
-}
-
-function todayDateInput() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function addDaysToDateInput(value: string, days: number) {
-  const [year, month, day] = value.split("-").map((part) => Number(part));
-  if (!year || !month || !day) return value;
-  const date = new Date(Date.UTC(year, month - 1, day));
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
-function shortJobReference(jobId: string) {
-  return `JOB-${jobId.slice(0, 8).toUpperCase()}`;
+    return [
+      invoice.invoice_number,
+      invoice.client_name,
+      invoice.property_name,
+      invoice.stripe_invoice_id,
+      invoice.memo,
+      invoice.notes,
+    ]
+      .map((value) => String(value ?? "").toLowerCase())
+      .some((value) => value.includes(normalizedQuery));
+  });
 }
 
 export default function PortalInvoicesPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [plans, setPlans] = useState<Retainer[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [dashboard, setDashboard] = useState<InvoiceDashboardData | null>(null);
+  const [clients, setClients] = useState<PortalClient[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [listClientFilter, setListClientFilter] = useState("");
-  const [clientId, setClientId] = useState("");
-  const [propertyId, setPropertyId] = useState("");
-  const [retainerId, setRetainerId] = useState("");
-  const [periodStart, setPeriodStart] = useState("");
-  const [periodEnd, setPeriodEnd] = useState("");
-  const [issueDate, setIssueDate] = useState(() => todayDateInput());
-  const [dueDate, setDueDate] = useState(() => addDaysToDateInput(todayDateInput(), 7));
-  const [dueDateTouched, setDueDateTouched] = useState(false);
-  const [selectedJobIds, setSelectedJobIds] = useState<string[]>([]);
-  const [manualLines, setManualLines] = useState<ManualLine[]>([newManualLine()]);
-  const [notes, setNotes] = useState("");
-  const selectClassName = `${S.input} portal-select`;
-
-  async function load() {
-    setLoading(true);
-    setError("");
-    try {
-      const [invoicesRes, clientsRes, propertiesRes, plansRes, jobsRes] = await Promise.all([
-        fetch("/api/admin/invoices"),
-        fetch("/api/admin/clients"),
-        fetch("/api/admin/properties"),
-        fetch("/api/admin/retainers"),
-        fetch(`/api/admin/jobs?includeCompleted=true&start=${encodeURIComponent(new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString())}&end=${encodeURIComponent(new Date(Date.now() + 1000 * 60 * 60 * 24 * 45).toISOString())}`),
-      ]);
-      const invoicesJson = await invoicesRes.json();
-      const clientsJson = await clientsRes.json();
-      const propertiesJson = await propertiesRes.json();
-      const plansJson = await plansRes.json();
-      const jobsJson = await jobsRes.json();
-      if (!invoicesRes.ok || !invoicesJson.ok) throw new Error(invoicesJson?.error?.message ?? "Failed to load invoices");
-      if (!clientsRes.ok || !clientsJson.ok) throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
-      if (!propertiesRes.ok || !propertiesJson.ok) throw new Error(propertiesJson?.error?.message ?? "Failed to load properties");
-      if (!plansRes.ok || !plansJson.ok) throw new Error(plansJson?.error?.message ?? "Failed to load plans");
-      if (!jobsRes.ok || !jobsJson.ok) throw new Error(jobsJson?.error?.message ?? "Failed to load jobs");
-      setInvoices(invoicesJson.data ?? []);
-      setClients(clientsJson.data ?? []);
-      setProperties(propertiesJson.data ?? []);
-      setPlans(plansJson.data ?? []);
-      setJobs(jobsJson.data ?? []);
-    } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Failed to load invoices");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [clientFilter, setClientFilter] = useState("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
+    async function load() {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [dashboardRes, clientsRes] = await Promise.all([
+          fetch("/api/admin/invoices/dashboard"),
+          fetch("/api/admin/clients"),
+        ]);
+        const [dashboardJson, clientsJson] = await Promise.all([
+          dashboardRes.json(),
+          clientsRes.json(),
+        ]);
+
+        if (!dashboardRes.ok || !dashboardJson.ok) {
+          throw new Error(dashboardJson?.error?.message ?? "Failed to load invoices");
+        }
+        if (!clientsRes.ok || !clientsJson.ok) {
+          throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
+        }
+
+        setDashboard(dashboardJson.data);
+        setClients(clientsJson.data ?? []);
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : "Failed to load invoices");
+      } finally {
+        setLoading(false);
+      }
+    }
+
     load();
   }, []);
 
-  const filteredInvoices = useMemo(() => {
-    return invoices.filter((invoice) => {
-      if (statusFilter !== "ALL" && invoice.status !== statusFilter) return false;
-      if (listClientFilter && invoice.client_id !== listClientFilter) return false;
-      return true;
-    });
-  }, [invoices, listClientFilter, statusFilter]);
+  const filteredGroups = useMemo(() => {
+    if (!dashboard) return {};
 
-  const selectedPlan = useMemo(
-    () => plans.find((plan) => plan.id === retainerId) ?? null,
-    [plans, retainerId]
-  );
+    return Object.fromEntries(
+      Object.entries(dashboard.groups).map(([groupKey, invoices]) => [
+        groupKey,
+        filterInvoices(invoices ?? [], clientFilter, query),
+      ])
+    ) as Record<string, PortalInvoice[]>;
+  }, [clientFilter, dashboard, query]);
 
-  const alreadyInvoicedJobMap = useMemo(() => {
-    const map = new Map<
-      string,
-      { invoiceId: string; invoiceNumber: string; status: string }
-    >();
-
-    for (const invoice of invoices) {
-      if (invoice.status === "VOID" || !Array.isArray(invoice.line_items)) continue;
-
-      for (const item of invoice.line_items) {
-        if (item.line_type !== "JOB_EXTRA" || !item.job_id || map.has(item.job_id)) continue;
-        map.set(item.job_id, {
-          invoiceId: invoice.id,
-          invoiceNumber: invoice.invoice_number,
-          status: invoice.status,
-        });
-      }
+  const filteredQueue = useMemo(() => {
+    if (!dashboard) {
+      return {
+        completedJobsWithoutInvoice: [] as QueueJob[],
+        agingCompletedJobsWithoutInvoice: [] as QueueJob[],
+        draftInvoices: [] as PortalInvoice[],
+        scheduledDueSoon: [] as PortalInvoice[],
+        overdueInvoices: [] as PortalInvoice[],
+      };
     }
 
-    return map;
-  }, [invoices]);
-
-  const propertiesForClient = useMemo(() => {
-    if (!clientId) return [];
-    return properties.filter((property) => property.client_id === clientId);
-  }, [clientId, properties]);
-
-  const plansForClient = useMemo(() => {
-    if (!clientId) return [];
-    return plans.filter((plan) => plan.client_id === clientId);
-  }, [clientId, plans]);
-
-  useEffect(() => {
-    if (!clientId) {
-      setPropertyId("");
-      return;
-    }
-    if (!propertiesForClient.some((property) => property.id === propertyId)) {
-      setPropertyId("");
-    }
-  }, [clientId, propertiesForClient, propertyId]);
-
-  useEffect(() => {
-    if (!clientId) {
-      setRetainerId("");
-      return;
-    }
-    if (!plansForClient.some((plan) => plan.id === retainerId)) {
-      setRetainerId("");
-    }
-  }, [clientId, plansForClient, retainerId]);
-
-  const billableJobs = useMemo(() => {
-    if (!clientId) return [];
-
-    return jobs.filter((job) => {
-      if (clientId && job.client_id !== clientId) return false;
-      if (propertyId && job.property_id !== propertyId) return false;
-      if (selectedPlan?.property_id && job.property_id !== selectedPlan.property_id) return false;
-      if (selectedPlan && job.retainer_id && job.retainer_id !== selectedPlan.id) return false;
-      return job.status !== "CANCELED";
-    });
-  }, [clientId, jobs, propertyId, selectedPlan]);
-
-  const stats = useMemo(() => {
-    const sent = invoices.filter((invoice) => invoice.status === "SENT").length;
-    const paid = invoices.filter((invoice) => invoice.status === "PAID").length;
-    const draft = invoices.filter((invoice) => invoice.status === "DRAFT").length;
-    const total = invoices.reduce((sum, invoice) => sum + (invoice.total_cents ?? 0), 0);
-    return { sent, paid, draft, total };
-  }, [invoices]);
-
-  useEffect(() => {
-    if (!retainerId) return;
-    const plan = plans.find((item) => item.id === retainerId);
-    if (!plan) return;
-    setClientId(plan.client_id ?? "");
-    setPropertyId(plan.property_id ?? "");
-  }, [plans, retainerId]);
-
-  useEffect(() => {
-    if (!issueDate || dueDateTouched) return;
-    setDueDate(addDaysToDateInput(issueDate, 7));
-  }, [dueDateTouched, issueDate]);
-
-  useEffect(() => {
-    const allowedJobIds = new Set(
-      billableJobs
-        .filter((job) => !alreadyInvoicedJobMap.has(job.id))
-        .map((job) => job.id)
-    );
-
-    setSelectedJobIds((current) =>
-      current.filter((jobId, index) => current.indexOf(jobId) === index && allowedJobIds.has(jobId))
-    );
-  }, [alreadyInvoicedJobMap, billableJobs]);
-
-  function toggleJob(jobId: string) {
-    setSelectedJobIds((current) =>
-      current.includes(jobId) ? current.filter((id) => id !== jobId) : [...current, jobId]
-    );
-  }
-
-  function updateManualLine(index: number, key: keyof ManualLine, value: string) {
-    setManualLines((current) =>
-      current.map((line, lineIndex) => (lineIndex === index ? { ...line, [key]: value } : line))
-    );
-  }
-
-  function removeManualLine(index: number) {
-    setManualLines((current) => (current.length === 1 ? current : current.filter((_, lineIndex) => lineIndex !== index)));
-  }
-
-  async function createInvoice() {
-    setSaving(true);
-    setError("");
-    try {
-      const manualLineItems = manualLines
-        .filter((line) => line.description.trim())
-        .map((line) => ({
-          description: line.description.trim(),
-          quantity: Number(line.quantity || 1),
-          unitPriceCents: Math.round(Number(line.unitPrice || 0) * 100),
-        }));
-
-      const response = await fetch("/api/admin/invoices", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clientId: clientId || null,
-          propertyId: propertyId || null,
-          retainerId: retainerId || null,
-          periodStart: periodStart || null,
-          periodEnd: periodEnd || null,
-          issueDate: issueDate || null,
-          dueDate: dueDate || null,
-          jobIds: selectedJobIds,
-          manualLineItems,
-          notes: notes || null,
-        }),
-      });
-      const json = await response.json();
-      if (!response.ok || !json.ok) {
-        throw new Error(json?.error?.message ?? "Failed to create invoice");
-      }
-      setDrawerOpen(false);
-      setClientId("");
-      setPropertyId("");
-      setRetainerId("");
-      setPeriodStart("");
-      setPeriodEnd("");
-      const nextIssueDate = todayDateInput();
-      setIssueDate(nextIssueDate);
-      setDueDate(addDaysToDateInput(nextIssueDate, 7));
-      setDueDateTouched(false);
-      setSelectedJobIds([]);
-      setManualLines([newManualLine()]);
-      setNotes("");
-      await load();
-    } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "Failed to create invoice");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function updateInvoiceStatus(invoiceId: string, status: string) {
-    setError("");
-    try {
-      const response = await fetch(`/api/admin/invoices/${invoiceId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      const json = await response.json();
-      if (!response.ok || !json.ok) {
-        throw new Error(json?.error?.message ?? "Failed to update invoice");
-      }
-      await load();
-    } catch (updateError) {
-      setError(updateError instanceof Error ? updateError.message : "Failed to update invoice");
-    }
-  }
+    return {
+      completedJobsWithoutInvoice: dashboard.queue.completedJobsWithoutInvoice.filter((job) =>
+        clientFilter ? job.client_id === clientFilter : true
+      ),
+      agingCompletedJobsWithoutInvoice: dashboard.queue.agingCompletedJobsWithoutInvoice.filter(
+        (job) => (clientFilter ? job.client_id === clientFilter : true)
+      ),
+      draftInvoices: filterInvoices(dashboard.queue.draftInvoices, clientFilter, query),
+      scheduledDueSoon: filterInvoices(dashboard.queue.scheduledDueSoon, clientFilter, query),
+      overdueInvoices: filterInvoices(dashboard.queue.overdueInvoices, clientFilter, query),
+    };
+  }, [clientFilter, dashboard, query]);
 
   return (
     <div className="space-y-6">
       <section className={`${S.card} px-5 py-6 sm:px-7 sm:py-7`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <div className={S.label} style={{ marginBottom: 6 }}>Invoices</div>
-            <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Billing records and draft generation</h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 680 }}>Plans own billing cadence, jobs can optionally add extra charges, and invoices now exist as first-class operator records without touching payment collection flows.</p>
+            <div className={S.label}>Invoices</div>
+            <h1
+              className="mt-2 text-[34px] text-[var(--text-primary)]"
+              style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.02 }}
+            >
+              Invoice operations
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-[var(--text-secondary)]">
+              Create Stripe invoices from completed work, track what still needs to be billed,
+              and manage draft, scheduled, outstanding, overdue, and paid invoices from one
+              operator view.
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {[{ label: "Draft", value: stats.draft }, { label: "Sent", value: stats.sent }, { label: "Paid", value: stats.paid }, { label: "Total billed", value: money(stats.total) }].map((stat) => (
-              <div key={stat.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/portal/invoices/new" className={S.btnPrimary}>
+              Create invoice
+            </Link>
+          </div>
+        </div>
+
+        {dashboard ? (
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {[
+              { label: "Draft invoices", value: dashboard.summary.totalDraftInvoices },
+              { label: "Ready to send", value: dashboard.summary.totalReadyToSend },
+              { label: "Outstanding balance", value: money(dashboard.summary.outstandingBalanceCents) },
+              { label: "Overdue balance", value: money(dashboard.summary.overdueBalanceCents) },
+              { label: "Paid this month", value: money(dashboard.summary.paidThisMonthCents) },
+            ].map((stat) => (
+              <div key={stat.label} className={`${S.cardInner} px-4 py-4`}>
                 <div className={S.label}>{stat.label}</div>
-                <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)", marginTop: 8 }}>{stat.value}</div>
+                <div
+                  className="mt-2 text-[28px] text-[var(--text-primary)]"
+                  style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.05 }}
+                >
+                  {stat.value}
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        ) : null}
 
-        <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <select className={selectClassName} value={listClientFilter} onChange={(event) => setListClientFilter(event.target.value)}>
-              <option value="">All clients</option>
-              {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
-            </select>
-            <select className={selectClassName} value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-              <option value="ALL">All statuses</option>
-              <option value="DRAFT">Draft</option>
-              <option value="SENT">Sent</option>
-              <option value="PAID">Paid</option>
-              <option value="VOID">Void</option>
-              <option value="OVERDUE">Overdue</option>
-            </select>
-          </div>
-          <button type="button" onClick={() => setDrawerOpen(true)} className={S.btnPrimary}>
-            Create draft invoice
-          </button>
+        <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-[220px_minmax(0,1fr)]">
+          <select
+            className={`${S.input} portal-select`}
+            value={clientFilter}
+            onChange={(event) => setClientFilter(event.target.value)}
+          >
+            <option value="">All clients</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}
+              </option>
+            ))}
+          </select>
+          <input
+            className={S.input}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search invoice number, client, property, Stripe id, or memo..."
+          />
         </div>
 
         {error ? (
-          <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">
+          <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-300">
             {error}
           </div>
         ) : null}
       </section>
 
-      <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 28px" }}>
-          <div style={{ fontSize: 15, fontWeight: 500, color: "var(--text-primary)" }}>Invoices</div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{loading ? "Loading..." : `${filteredInvoices.length} invoice records`}</div>
-        </div>
-        {loading ? (
-          <div className="px-5 py-8 text-sm text-[var(--text-muted)]">Loading invoices...</div>
-        ) : filteredInvoices.length === 0 ? (
-          <div className="px-5 py-8 text-sm text-[var(--text-muted)]">No invoices created yet.</div>
-        ) : (
-          <div className="space-y-4 p-5 sm:p-6">
-            {filteredInvoices.map((invoice) => (
-              <div key={invoice.id} className={S.cardInner} style={{ padding: 18 }}>
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)" }}>{invoice.invoice_number}</div>
-                      <span style={invoiceStatusStyle(invoice.status)}>{invoice.status}</span>
-                    </div>
-                    <div className="mt-2 text-sm text-[var(--text-secondary)]">
-                      {invoice.client_name || "No client"} {invoice.property_name ? `• ${invoice.property_name}` : ""}
-                    </div>
-                    <div className="mt-1 text-sm text-[var(--text-muted)]">
-                      Period: {fmtDate(invoice.period_start)} - {fmtDate(invoice.period_end)} • Issue {fmtDate(invoice.issue_date)} • Due {fmtDate(invoice.due_date)}
-                    </div>
-                    <div className="mt-2 text-sm text-[var(--text-secondary)]">
-                      {invoice.notes || "No notes"}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-start gap-3 lg:items-end">
-                    <div style={{ fontFamily: "var(--font-serif), serif", fontSize: 24, color: "var(--text-primary)" }}>{money(invoice.total_cents)}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {["DRAFT", "SENT", "PAID", "OVERDUE", "VOID"].map((status) => (
-                        <button key={status} type="button" onClick={() => updateInvoiceStatus(invoice.id, status)} className={S.btnGhost}>
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                {Array.isArray(invoice.line_items) && invoice.line_items.length > 0 ? (
-                  <div className="mt-4 overflow-x-auto rounded-xl border border-[var(--border)]">
-                    <table className="min-w-[760px] w-full text-left">
-                      <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-3)" }}>
-                        <tr>{["Description", "Type", "Qty", "Unit", "Line total"].map((heading) => <th key={heading} className="px-4 py-3 text-[9px] uppercase tracking-[0.2em] text-[var(--text-muted)]">{heading}</th>)}</tr>
-                      </thead>
-                      <tbody>
-                        {invoice.line_items.map((item) => (
-                          <tr key={item.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                            <td className="px-4 py-3 text-sm text-[var(--text-primary)]">{item.description}</td>
-                            <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.line_type}</td>
-                            <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{item.quantity}</td>
-                            <td className="px-4 py-3 text-sm text-[var(--text-secondary)]">{money(item.unit_price_cents)}</td>
-                            <td className="px-4 py-3 text-sm font-medium text-[var(--text-primary)]">{money(item.line_total_cents)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <PortalDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        title="Create draft invoice"
-        subtitle="Generate from a service plan, optionally attach extra billable jobs, and add manual line items without leaving the portal."
-        footer={
-          <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setDrawerOpen(false)} className={S.btnGhost}>
-              Cancel
-            </button>
-            <button type="button" onClick={createInvoice} disabled={saving} className={S.btnPrimary}>
-              {saving ? "Creating draft..." : "Create draft invoice"}
-            </button>
-          </div>
-        }
-      >
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className={S.label}>Client</label>
-              <select
-                className={selectClassName}
-                value={clientId}
-                onChange={(event) => setClientId(event.target.value)}
-                disabled={Boolean(selectedPlan)}
-              >
-                <option value="">Select client</option>
-                {clients.map((client) => <option key={client.id} value={client.id}>{client.name}</option>)}
-              </select>
-              {selectedPlan ? (
-                <div className="text-xs text-[var(--text-muted)]">Client is locked to the selected plan.</div>
-              ) : null}
-            </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className={S.label}>Plan</label>
-              <select
-                className={selectClassName}
-                value={retainerId}
-                onChange={(event) => setRetainerId(event.target.value)}
-                disabled={!clientId}
-              >
-                <option value="">{clientId ? "Optional plan base charge" : "Select client first"}</option>
-                {plansForClient.map((plan) => <option key={plan.id} value={plan.id}>{plan.name} • {money(plan.amount_cents)} • every {plan.billing_interval} {plan.billing_frequency.toLowerCase()}</option>)}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className={S.label}>Property</label>
-              <select
-                className={selectClassName}
-                value={propertyId}
-                onChange={(event) => setPropertyId(event.target.value)}
-                disabled={!clientId || Boolean(selectedPlan?.property_id)}
-              >
-                <option value="">
-                  {!clientId
-                    ? "Select client first"
-                    : selectedPlan?.property_id
-                      ? "Property locked to selected plan"
-                      : "Optional property"}
-                </option>
-                {propertiesForClient.map((property) => <option key={property.id} value={property.id}>{property.name}{property.address_line1 ? ` - ${property.address_line1}` : ""}</option>)}
-              </select>
-              {selectedPlan?.property_id ? (
-                <div className="text-xs text-[var(--text-muted)]">Property is locked to the selected plan.</div>
-              ) : null}
-            </div>
-            <div className="space-y-2">
-              <label className={S.label}>Period start</label>
-              <input type="date" className={S.input} value={periodStart} onChange={(event) => setPeriodStart(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <label className={S.label}>Period end</label>
-              <input type="date" className={S.input} value={periodEnd} onChange={(event) => setPeriodEnd(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <label className={S.label}>Issue date</label>
-              <input type="date" className={S.input} value={issueDate} onChange={(event) => setIssueDate(event.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <label className={S.label}>Due date</label>
-              <input
-                type="date"
-                className={S.input}
-                value={dueDate}
-                onChange={(event) => {
-                  setDueDate(event.target.value);
-                  setDueDateTouched(true);
-                }}
-              />
-            </div>
-          </div>
-
+      <section className={`${S.card} p-5 sm:p-7`}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className={S.label}>Optional extra billable jobs</div>
-            <div className="mt-3 max-h-[240px] space-y-2 overflow-y-auto">
-              {!clientId ? (
-                <div className="rounded-xl border border-[var(--border)] px-4 py-4 text-sm text-[var(--text-muted)]">Select a client before reviewing optional extra billable jobs.</div>
-              ) : billableJobs.length === 0 ? (
-                <div className="rounded-xl border border-[var(--border)] px-4 py-4 text-sm text-[var(--text-muted)]">No billable jobs match the selected client, property, or plan context.</div>
-              ) : (
-                billableJobs.map((job) => {
-                  const alreadyInvoiced = alreadyInvoicedJobMap.get(job.id);
-                  const checked = selectedJobIds.includes(job.id);
+            <div className={S.label}>Needs invoice queue</div>
+            <h2
+              className="mt-2 text-[26px] text-[var(--text-primary)]"
+              style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.04 }}
+            >
+              What needs attention next
+            </h2>
+          </div>
+          <div className="text-sm text-[var(--text-muted)]">
+            Aging jobs are completed jobs older than 7 days without an invoice.
+          </div>
+        </div>
 
-                  return (
-                    <label
-                      key={job.id}
-                      className={`${S.cardInner} flex items-start gap-3 px-4 py-3 text-sm ${alreadyInvoiced ? "opacity-70" : ""} text-[var(--text-secondary)]`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        disabled={Boolean(alreadyInvoiced)}
-                        onChange={() => toggleJob(job.id)}
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="font-medium text-[var(--text-primary)]">{job.title}</div>
-                            <div className="mt-1 text-[12px] text-[var(--text-secondary)]">
-                              {fmtDate(job.scheduled_for)} • {job.status} • {money(job.price_cents)}
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="rounded-full border border-[var(--border)] px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                              {shortJobReference(job.id)}
-                            </span>
-                            {alreadyInvoiced ? (
-                              <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-amber-200">
-                                Already invoiced
-                              </span>
-                            ) : null}
-                          </div>
+        <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-2">
+          <div className={`${S.cardInner} p-4`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="text-sm font-medium text-[var(--text-primary)]">
+                Completed jobs with no invoice
+              </div>
+              <div className="text-xs text-[var(--text-muted)]">
+                {filteredQueue.completedJobsWithoutInvoice.length} visible
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              {filteredQueue.completedJobsWithoutInvoice.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">
+                  No completed uninvoiced jobs in the current filter.
+                </div>
+              ) : (
+                filteredQueue.completedJobsWithoutInvoice.map((job) => (
+                  <Link
+                    key={job.id}
+                    href={queueJobHref(job)}
+                    className="block rounded-xl border border-[var(--border)] p-4 transition hover:border-[var(--border-hover)]"
+                  >
+                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-[var(--text-primary)]">
+                          {job.title}
                         </div>
-                        <div className="mt-2 text-[12px] text-[var(--text-muted)]">
-                          {[job.client_name, job.property_name, job.property_address_line1].filter(Boolean).join(" • ") || "Client/property context unavailable"}
+                        <div className="mt-1 text-xs text-[var(--text-secondary)]">
+                          {job.client_name || "No client"}
+                          {job.property_name ? ` • ${job.property_name}` : ""}
                         </div>
-                        {alreadyInvoiced ? (
-                          <div className="mt-2 text-[12px] text-amber-200/90">
-                            Attached to invoice {alreadyInvoiced.invoiceNumber} ({alreadyInvoiced.status}).
-                          </div>
-                        ) : null}
+                        <div className="mt-1 text-xs text-[var(--text-muted)]">
+                          Completed {formatDate(job.completed_at ?? job.scheduled_for)}
+                        </div>
                       </div>
-                    </label>
-                  );
-                })
+                      <div className="text-sm font-medium text-[var(--text-primary)]">
+                        {money(job.price_cents)}
+                      </div>
+                    </div>
+                  </Link>
+                ))
               )}
             </div>
           </div>
 
-          <div>
+          <div className={`${S.cardInner} p-4`}>
             <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className={S.label}>Manual line items</div>
-                <div className="mt-1 text-sm text-[var(--text-secondary)]">Use this for admin fees, one-off adjustments, or non-job charges.</div>
+              <div className="text-sm font-medium text-[var(--text-primary)]">
+                Aging completed jobs
               </div>
-              <button type="button" onClick={() => setManualLines((current) => [...current, newManualLine()])} className={S.btnGhost}>
-                Add line
-              </button>
+              <div className="text-xs text-[var(--text-muted)]">
+                {filteredQueue.agingCompletedJobsWithoutInvoice.length} visible
+              </div>
             </div>
-            <div className="mt-3 space-y-3">
-              {manualLines.map((line, index) => (
-                <div key={`manual-${index}`} className="grid grid-cols-1 gap-3 rounded-xl border border-[var(--border)] p-4 md:grid-cols-[minmax(0,1fr)_140px_160px_120px]">
-                  <input className={S.input} value={line.description} onChange={(event) => updateManualLine(index, "description", event.target.value)} placeholder="Description" />
-                  <input className={S.input} value={line.quantity} onChange={(event) => updateManualLine(index, "quantity", event.target.value)} placeholder="Qty" />
-                  <input className={S.input} value={line.unitPrice} onChange={(event) => updateManualLine(index, "unitPrice", event.target.value)} placeholder="Unit price (USD)" />
-                  <button type="button" onClick={() => removeManualLine(index)} className={S.btnGhost}>
-                    Remove
-                  </button>
+            <div className="mt-4 space-y-3">
+              {filteredQueue.agingCompletedJobsWithoutInvoice.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">
+                  No aging uninvoiced jobs in the current filter.
                 </div>
-              ))}
+              ) : (
+                filteredQueue.agingCompletedJobsWithoutInvoice.map((job) => (
+                  <Link
+                    key={job.id}
+                    href={queueJobHref(job)}
+                    className="block rounded-xl border border-[var(--border)] p-4 transition hover:border-[var(--border-hover)]"
+                  >
+                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-[var(--text-primary)]">
+                          {job.title}
+                        </div>
+                        <div className="mt-1 text-xs text-[var(--text-secondary)]">
+                          {job.client_name || "No client"}
+                          {job.property_name ? ` • ${job.property_name}` : ""}
+                        </div>
+                        <div className="mt-1 text-xs text-red-300">
+                          Completed {formatDate(job.completed_at ?? job.scheduled_for)}
+                        </div>
+                      </div>
+                      <div className="text-sm font-medium text-[var(--text-primary)]">
+                        {money(job.price_cents)}
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className={S.label}>Notes</label>
-            <textarea className={`${S.input} min-h-[110px] resize-none`} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Billing notes, context for the client, or operator-only reminders..." />
+          <div className={`${S.cardInner} p-4`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="text-sm font-medium text-[var(--text-primary)]">
+                Drafts not yet sent
+              </div>
+              <div className="text-xs text-[var(--text-muted)]">
+                {filteredQueue.draftInvoices.length} visible
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              {filteredQueue.draftInvoices.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">
+                  No unsent drafts in the current filter.
+                </div>
+              ) : (
+                filteredQueue.draftInvoices.map((invoice) => (
+                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className={`${S.cardInner} p-4`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="text-sm font-medium text-[var(--text-primary)]">
+                Scheduled to send soon
+              </div>
+              <div className="text-xs text-[var(--text-muted)]">
+                {filteredQueue.scheduledDueSoon.length} visible
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              {filteredQueue.scheduledDueSoon.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">
+                  No scheduled invoices due soon.
+                </div>
+              ) : (
+                filteredQueue.scheduledDueSoon.map((invoice) => (
+                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
+                ))
+              )}
+            </div>
           </div>
         </div>
-      </PortalDrawer>
+
+        <div className="mt-5">
+          <div className={`${S.cardInner} p-4`}>
+            <div className="flex items-center justify-between gap-4">
+              <div className="text-sm font-medium text-[var(--text-primary)]">
+                Overdue unpaid invoices
+              </div>
+              <div className="text-xs text-[var(--text-muted)]">
+                {filteredQueue.overdueInvoices.length} visible
+              </div>
+            </div>
+            <div className="mt-4 space-y-3">
+              {filteredQueue.overdueInvoices.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">
+                  No overdue invoices in the current filter.
+                </div>
+              ) : (
+                filteredQueue.overdueInvoices.map((invoice) => (
+                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-5">
+        {loading ? (
+          <div className={`${S.card} p-6 text-sm text-[var(--text-muted)]`}>
+            Loading invoices...
+          </div>
+        ) : (
+          Object.entries(filteredGroups).map(([groupKey, invoices]) => (
+            <div key={groupKey} className={`${S.card} p-5 sm:p-7`}>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className={S.label}>Status group</div>
+                  <h2
+                    className="mt-2 text-[24px] text-[var(--text-primary)]"
+                    style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.05 }}
+                  >
+                    {invoiceGroupLabel(groupKey)}
+                  </h2>
+                </div>
+                <div className="text-sm text-[var(--text-muted)]">
+                  {invoices.length} invoice{invoices.length === 1 ? "" : "s"}
+                </div>
+              </div>
+
+              {invoices.length === 0 ? (
+                <div className="mt-5 text-sm text-[var(--text-muted)]">
+                  No invoices in this group for the current filters.
+                </div>
+              ) : (
+                <div className="mt-5 grid grid-cols-1 gap-3 xl:grid-cols-2">
+                  {invoices.map((invoice) => (
+                    <InvoiceCard key={invoice.id} invoice={invoice} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </section>
     </div>
   );
 }

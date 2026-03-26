@@ -4,6 +4,7 @@ import { stripe } from "@/lib/server/stripe";
 import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import { sendPipePhotoEmail } from "@/lib/server/email";
+import { syncInvoiceFromStripeEvent } from "@/lib/server/services/invoices";
 import {
   QR_MAIN_PRODUCT_KEY,
   QR_UPSELL_ADDON_KEY,
@@ -14,11 +15,29 @@ import {
 
 export const runtime = "nodejs";
 
+type StripeAddressLike = Stripe.Address | null | undefined;
+type CheckoutDiscountRef = { code?: string | null } | string | null | undefined;
+type HydratedCheckoutSession = Stripe.Checkout.Session & {
+  shipping_details?: {
+    address?: StripeAddressLike;
+  } | null;
+  total_details?: {
+    amount_discount?: number | null;
+    breakdown?: {
+      discounts?: Array<{
+        discount?: {
+          promotion_code?: CheckoutDiscountRef;
+        } | null;
+      }>;
+    };
+  } | null;
+};
+
 function safe(v: unknown) {
   return String(v ?? "").trim();
 }
 
-function addressToString(addr: any): string {
+function addressToString(addr: StripeAddressLike): string {
   if (!addr) return "";
   const parts = [
     addr.line1,
@@ -81,19 +100,19 @@ async function createOneTimeReferralPromotionCode(percentOff = 15) {
 }
 
 async function getDiscountDetailsFromSession(sessionId: string) {
-  const hydrated = await stripe.checkout.sessions.retrieve(sessionId, {
+  const hydrated = (await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["total_details.breakdown.discounts.discount"],
-  });
+  })) as HydratedCheckoutSession;
 
-  const discountEntry = (hydrated as any).total_details?.breakdown?.discounts?.[0];
+  const discountEntry = hydrated.total_details?.breakdown?.discounts?.[0];
   const discountObj =
     discountEntry?.discount && typeof discountEntry.discount === "object"
-      ? (discountEntry.discount as any)
+      ? discountEntry.discount
       : null;
 
   const discountAmountCents =
-    typeof (hydrated as any).total_details?.amount_discount === "number"
-      ? (hydrated as any).total_details.amount_discount
+    typeof hydrated.total_details?.amount_discount === "number"
+      ? hydrated.total_details.amount_discount
       : 0;
 
   let promotionCode: string | null = null;
@@ -107,7 +126,7 @@ async function getDiscountDetailsFromSession(sessionId: string) {
       console.error("Failed to retrieve Stripe promotion code:", err);
     }
   } else if (promotionCodeRef && typeof promotionCodeRef === "object") {
-    promotionCode = safe((promotionCodeRef as any).code) || null;
+    promotionCode = safe(promotionCodeRef.code) || null;
   }
 
   return {
@@ -123,7 +142,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
   const orgId = env.DEFAULT_ORGANIZATION_ID;
 
   const rockColor = safe(
-    session.metadata?.rock_color || (session.metadata as any)?.color || "unknown"
+    session.metadata?.rock_color || session.metadata?.color || "unknown"
   );
   const productKey = safe(session.metadata?.product_key || QR_MAIN_PRODUCT_KEY);
   const addonSelected = parseBooleanFlag(session.metadata?.addon_selected);
@@ -143,7 +162,8 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
   const email = safe(session.customer_details?.email).toLowerCase();
   const phone = safe(session.customer_details?.phone);
 
-  const shippingAddr = addressToString((session as any).shipping_details?.address);
+  const hydratedSession = session as HydratedCheckoutSession;
+  const shippingAddr = addressToString(hydratedSession.shipping_details?.address);
   const billingAddr = addressToString(session.customer_details?.address);
   const serviceAddress = safe(shippingAddr || billingAddr);
 
@@ -464,6 +484,17 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    if (
+      event.type === "invoice.finalized" ||
+      event.type === "invoice.sent" ||
+      event.type === "invoice.paid" ||
+      event.type === "invoice.payment_failed" ||
+      event.type === "invoice.voided" ||
+      event.type === "invoice.finalization_failed"
+    ) {
+      await syncInvoiceFromStripeEvent(env.DEFAULT_ORGANIZATION_ID, event);
+    }
+
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
 

@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { fail, ok, parseJsonBody } from "@/lib/server/api";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
-import { getInvoiceById, updateInvoice } from "@/lib/server/services/invoices";
+import {
+  getInvoiceById,
+  resendInvoice,
+  scheduleInvoiceSend,
+  sendInvoiceNow,
+  syncInvoiceById,
+  updateInvoice,
+} from "@/lib/server/services/invoices";
 
 export const runtime = "nodejs";
 
@@ -51,7 +58,30 @@ export async function PATCH(request: NextRequest, context: Params) {
     const organizationId = getOrganizationId(request);
     const { invoiceId } = await context.params;
     const body = await parseJsonBody(request);
-    const data = await updateInvoice(organizationId, invoiceId, body);
+    const action = String(body.action ?? "saveDraft").trim();
+    const draftPayload =
+      body.draft && typeof body.draft === "object" && !Array.isArray(body.draft)
+        ? (body.draft as Record<string, unknown>)
+        : body;
+
+    let data = null;
+    if (action === "sendNow") {
+      if (body.draft) {
+        await updateInvoice(organizationId, invoiceId, draftPayload);
+      }
+      data = await sendInvoiceNow(organizationId, invoiceId);
+    } else if (action === "schedule") {
+      if (body.draft) {
+        await updateInvoice(organizationId, invoiceId, draftPayload);
+      }
+      data = await scheduleInvoiceSend(organizationId, invoiceId, body.sendAt);
+    } else if (action === "resend") {
+      data = await resendInvoice(organizationId, invoiceId);
+    } else if (action === "sync") {
+      data = await syncInvoiceById(organizationId, invoiceId);
+    } else {
+      data = await updateInvoice(organizationId, invoiceId, draftPayload);
+    }
 
     if (!data) {
       return NextResponse.json(fail("INVOICE_NOT_FOUND", "Invoice not found"), {

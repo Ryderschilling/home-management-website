@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { fail, ok, parseJsonBody } from "@/lib/server/api";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
-import { createInvoice, listInvoices } from "@/lib/server/services/invoices";
+import {
+  createInvoice,
+  listInvoices,
+  scheduleInvoiceSend,
+  sendInvoiceNow,
+} from "@/lib/server/services/invoices";
 
 export const runtime = "nodejs";
 
@@ -20,6 +25,7 @@ export async function GET(request: NextRequest) {
     const data = await listInvoices(organizationId, {
       clientId: searchParams.get("clientId"),
       status: searchParams.get("status"),
+      query: searchParams.get("query"),
     });
     return NextResponse.json(ok(data));
   } catch (error) {
@@ -44,7 +50,22 @@ export async function POST(request: NextRequest) {
   try {
     const organizationId = getOrganizationId(request);
     const body = await parseJsonBody(request);
-    const data = await createInvoice(organizationId, body);
+    const action = String(body.action ?? "saveDraft").trim();
+    const created = (await createInvoice(organizationId, body)) as
+      | ({ id: string } & Record<string, unknown>)
+      | null;
+    if (!created) {
+      throw new Error("Failed to create invoice");
+    }
+
+    let data: Record<string, unknown> = created;
+    if (action === "sendNow") {
+      data = (await sendInvoiceNow(organizationId, created.id)) ?? created;
+    } else if (action === "schedule") {
+      data =
+        (await scheduleInvoiceSend(organizationId, created.id, body.sendAt)) ?? created;
+    }
+
     return NextResponse.json(ok(data), { status: 201 });
   } catch (error) {
     return NextResponse.json(
