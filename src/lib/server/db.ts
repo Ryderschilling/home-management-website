@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 21;
+const ADMIN_SCHEMA_VERSION = 23;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -259,6 +259,7 @@ async function ensureInvoiceBootstrap(tx: AdminTx) {
       unit_price_cents INTEGER NOT NULL DEFAULT 0,
       line_total_cents INTEGER NOT NULL DEFAULT 0,
       line_type TEXT NOT NULL DEFAULT 'MANUAL',
+      metadata_json JSONB,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       CONSTRAINT admin_invoice_line_items_invoice_fk
         FOREIGN KEY (invoice_id)
@@ -285,6 +286,7 @@ async function ensureInvoiceBootstrap(tx: AdminTx) {
     await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS unit_price_cents INTEGER NOT NULL DEFAULT 0`;
     await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_total_cents INTEGER NOT NULL DEFAULT 0`;
     await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS line_type TEXT NOT NULL DEFAULT 'MANUAL'`;
+    await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS metadata_json JSONB`;
     await tx`ALTER TABLE admin_invoice_line_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
   });
 
@@ -386,6 +388,116 @@ async function ensureInvoiceBootstrap(tx: AdminTx) {
       ON DELETE CASCADE
     `;
   });
+}
+
+async function ensureCommunicationsBootstrap(tx: AdminTx) {
+  await runBootstrapStep("communications.create-admin_communications-table", async () => {
+    await tx`CREATE TABLE IF NOT EXISTS admin_communications (
+      id TEXT PRIMARY KEY,
+      organization_id TEXT NOT NULL,
+      client_id TEXT,
+      property_id TEXT,
+      job_id TEXT,
+      invoice_id TEXT,
+      channel TEXT NOT NULL DEFAULT 'EMAIL',
+      direction TEXT NOT NULL DEFAULT 'OUTBOUND',
+      type TEXT NOT NULL DEFAULT 'GENERAL',
+      status TEXT NOT NULL DEFAULT 'DRAFT',
+      subject TEXT,
+      body TEXT,
+      ai_generated BOOLEAN NOT NULL DEFAULT FALSE,
+      requires_approval BOOLEAN NOT NULL DEFAULT TRUE,
+      approved_at TIMESTAMPTZ,
+      sent_at TIMESTAMPTZ,
+      last_client_response_at TIMESTAMPTZ,
+      follow_up_due_at TIMESTAMPTZ,
+      metadata_json JSONB,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT admin_communications_client_fk
+        FOREIGN KEY (client_id)
+        REFERENCES admin_clients(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_communications_property_fk
+        FOREIGN KEY (property_id)
+        REFERENCES admin_properties(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_communications_job_fk
+        FOREIGN KEY (job_id)
+        REFERENCES admin_jobs(id)
+        ON DELETE SET NULL,
+      CONSTRAINT admin_communications_invoice_fk
+        FOREIGN KEY (invoice_id)
+        REFERENCES admin_invoices(id)
+        ON DELETE SET NULL
+    )`;
+  });
+
+  await runBootstrapStep("communications.ensure-admin_communications-columns", async () => {
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS organization_id TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS client_id TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS property_id TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS job_id TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS invoice_id TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS channel TEXT NOT NULL DEFAULT 'EMAIL'`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS direction TEXT NOT NULL DEFAULT 'OUTBOUND'`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT 'GENERAL'`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'DRAFT'`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS subject TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS body TEXT`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS ai_generated BOOLEAN NOT NULL DEFAULT FALSE`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS requires_approval BOOLEAN NOT NULL DEFAULT TRUE`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS sent_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS last_client_response_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS follow_up_due_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS metadata_json JSONB`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+    await tx`ALTER TABLE admin_communications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()`;
+  });
+
+  await createOptionalIndexStep(
+    tx,
+    "communications.index-admin_communications-org",
+    "admin_communications",
+    ["organization_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_communications_org_idx
+        ON admin_communications (organization_id, created_at DESC)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "communications.index-admin_communications-status",
+    "admin_communications",
+    ["organization_id", "status", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_communications_status_idx
+        ON admin_communications (organization_id, status, created_at DESC)`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "communications.index-admin_communications-follow-up",
+    "admin_communications",
+    ["organization_id", "follow_up_due_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_communications_follow_up_due_idx
+        ON admin_communications (organization_id, follow_up_due_at)
+        WHERE follow_up_due_at IS NOT NULL`;
+    }
+  );
+  await createOptionalIndexStep(
+    tx,
+    "communications.index-admin_communications-client",
+    "admin_communications",
+    ["organization_id", "client_id", "created_at"],
+    async () => {
+      await tx`CREATE INDEX IF NOT EXISTS admin_communications_client_idx
+        ON admin_communications (organization_id, client_id, created_at DESC)
+        WHERE client_id IS NOT NULL`;
+    }
+  );
 }
 
 export async function ensureAdminTables(): Promise<void> {
@@ -625,9 +737,18 @@ export async function ensureAdminTables(): Promise<void> {
     )`;
 
     await ensureInvoiceBootstrap(tx);
+    await ensureCommunicationsBootstrap(tx);
 
     // Safe adds (existing DBs)
     await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS notes TEXT`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS preferred_contact_method TEXT`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS service_address_text TEXT`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS entry_notes TEXT`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS billing_notes TEXT`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'ACTIVE'`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS last_contacted_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS welcome_email_sent_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_clients ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ`;
 
     await tx`ALTER TABLE admin_properties ADD COLUMN IF NOT EXISTS city TEXT`;
     await tx`ALTER TABLE admin_properties ADD COLUMN IF NOT EXISTS state TEXT`;
@@ -646,6 +767,16 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`ALTER TABLE admin_properties ADD COLUMN IF NOT EXISTS entry TEXT`;
 
     await tx`ALTER TABLE admin_services ADD COLUMN IF NOT EXISTS cost_cents INTEGER NOT NULL DEFAULT 0`;
+
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS service_type TEXT`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS billing_model TEXT NOT NULL DEFAULT 'FIXED_RECURRING'`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS visit_rate_cents INTEGER`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS on_call_base_fee_cents INTEGER`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS hourly_rate_cents INTEGER`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS checklist_template_json JSONB`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS checklist_template_text TEXT`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS auto_generate_jobs BOOLEAN NOT NULL DEFAULT TRUE`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ`;
 
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS service_id TEXT`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
@@ -729,6 +860,14 @@ await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS tos_text_hash TEXT`;
 
 await tx`CREATE INDEX IF NOT EXISTS admin_orders_tos_idx
   ON admin_orders (organization_id, tos_accepted_at)`;
+
+await tx`CREATE INDEX IF NOT EXISTS admin_clients_status_idx
+  ON admin_clients (organization_id, status, created_at DESC)`;
+await tx`CREATE INDEX IF NOT EXISTS admin_clients_archived_idx
+  ON admin_clients (organization_id, archived_at)
+  WHERE archived_at IS NOT NULL`;
+await tx`CREATE INDEX IF NOT EXISTS admin_retainers_active_generation_idx
+  ON admin_retainers (organization_id, status, auto_generate_jobs, archived_at)`;
 
   await tx`CREATE TABLE IF NOT EXISTS marketing_campaigns (
     id TEXT PRIMARY KEY,

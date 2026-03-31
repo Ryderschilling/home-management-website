@@ -1,4 +1,5 @@
 import { ensureAdminTables, sql } from "@/lib/server/db";
+import { queueJobCompletionSummaryDraft } from "@/lib/server/services/communications";
 import { asNonEmptyString, asOptionalString } from "@/lib/server/validation";
 
 type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
@@ -261,7 +262,15 @@ async function assertRetainerExists(organizationId: string, retainerId: string |
   if (!retainerId) return null;
 
   const rows = await sql`
-    SELECT id
+    SELECT
+      id,
+      name,
+      billing_model,
+      amount_cents,
+      visit_rate_cents,
+      on_call_base_fee_cents,
+      hourly_rate_cents,
+      service_type
     FROM admin_retainers
     WHERE organization_id = ${organizationId} AND id = ${retainerId}
     LIMIT 1
@@ -269,6 +278,48 @@ async function assertRetainerExists(organizationId: string, retainerId: string |
 
   if (!rows[0]) throw new Error("Selected plan not found");
   return rows[0];
+}
+
+function deriveRetainerLinkedPriceCents(
+  retainer:
+    | {
+        billing_model?: string | null;
+        amount_cents?: number | null;
+        visit_rate_cents?: number | null;
+        on_call_base_fee_cents?: number | null;
+        hourly_rate_cents?: number | null;
+      }
+    | null,
+  currentPriceCents: number | null,
+  hours: number | null
+) {
+  if (currentPriceCents !== null) return currentPriceCents;
+  if (!retainer) return currentPriceCents;
+
+  const billingModel = String(retainer.billing_model ?? "FIXED_RECURRING").toUpperCase();
+  const amountCents = Number(retainer.amount_cents ?? 0);
+  const visitRateCents = Number(retainer.visit_rate_cents ?? 0);
+  const onCallBaseFeeCents = Number(retainer.on_call_base_fee_cents ?? 0);
+  const hourlyRateCents = Number(retainer.hourly_rate_cents ?? 0);
+
+  if (billingModel === "USAGE_RECURRING") {
+    return visitRateCents > 0 ? visitRateCents : null;
+  }
+
+  if (billingModel === "ONE_OFF_TIME") {
+    const billableHours = Number.isFinite(hours ?? NaN) && (hours ?? 0) > 0 ? Number(hours) : 0;
+    const hourlyComponent =
+      hourlyRateCents > 0 && billableHours > 0 ? Math.round(hourlyRateCents * billableHours) : 0;
+    const total = Math.max(0, onCallBaseFeeCents) + Math.max(0, hourlyComponent);
+    return total > 0 ? total : null;
+  }
+
+  if (billingModel === "FLAT_ONE_OFF") {
+    if (amountCents > 0) return amountCents;
+    if (onCallBaseFeeCents > 0) return onCallBaseFeeCents;
+  }
+
+  return null;
 }
 
 async function fetchJobRecord(organizationId: string, jobId: string) {
@@ -463,7 +514,7 @@ export async function createJob(
   await assertClientExists(organizationId, clientId);
   await assertPropertyExists(organizationId, propertyId, clientId);
   const service = await assertServiceExists(organizationId, serviceId);
-  await assertRetainerExists(organizationId, retainerId);
+  const retainer = await assertRetainerExists(organizationId, retainerId);
 
   let title = asOptionalString(body.title);
   let priceCents = parseOptionalMoney(body.priceCents);
@@ -477,9 +528,16 @@ export async function createJob(
     if (!title) title = service.name;
     if (priceCents === null) priceCents = Number(service.unit_price_cents ?? 0);
   }
+  if (retainer) {
+    if (!title) title = String(retainer.name ?? "");
+    priceCents = deriveRetainerLinkedPriceCents(retainer, priceCents, hours);
+  }
 
   if (!title) {
     throw new Error("Title is required when no service is selected");
+  }
+  if (status === "COMPLETED" && !notes) {
+    throw new Error("Completion notes are required before a job can be marked completed");
   }
 
   const recurrenceEnabled = Boolean(body.recurrenceEnabled);
@@ -602,7 +660,11 @@ export async function createJob(
     }
   }
 
-  return fetchJobRecord(organizationId, id);
+  const saved = await fetchJobRecord(organizationId, id);
+  if (saved && status === "COMPLETED") {
+    await queueJobCompletionSummaryDraft(organizationId, id);
+  }
+  return saved;
 }
 
 export async function updateJob(
@@ -636,7 +698,7 @@ export async function updateJob(
   await assertClientExists(organizationId, nextClientId);
   await assertPropertyExists(organizationId, nextPropertyId, nextClientId);
   const service = await assertServiceExists(organizationId, nextServiceId);
-  await assertRetainerExists(organizationId, nextRetainerId);
+  const retainer = await assertRetainerExists(organizationId, nextRetainerId);
 
   let nextTitle =
     body.title === undefined
@@ -650,10 +712,6 @@ export async function updateJob(
   if (service) {
     if (!nextTitle) nextTitle = service.name;
     if (nextPriceCents === null) nextPriceCents = Number(service.unit_price_cents ?? 0);
-  }
-
-  if (!nextTitle) {
-    throw new Error("Title is required");
   }
 
   const nextNotes =
@@ -672,11 +730,22 @@ export async function updateJob(
     body.hours === undefined && body.hoursNumeric === undefined
       ? parseOptionalHours(existing.hours_numeric)
       : parseOptionalHours(body.hours ?? body.hoursNumeric);
+  if (retainer) {
+    if (!nextTitle) nextTitle = String(retainer.name ?? "");
+    nextPriceCents = deriveRetainerLinkedPriceCents(retainer, nextPriceCents, nextHours);
+  }
+
+  if (!nextTitle) {
+    throw new Error("Title is required");
+  }
 
   const completedAt =
     nextStatus === "COMPLETED"
       ? existing.completed_at ?? new Date().toISOString()
       : null;
+  if (nextStatus === "COMPLETED" && !nextNotes) {
+    throw new Error("Completion notes are required before a job can be marked completed");
+  }
 
   const effectiveScope =
     scope === "THIS_VISIT_ONLY" ? "THIS" : scope;
@@ -719,7 +788,11 @@ export async function updateJob(
       WHERE organization_id = ${organizationId} AND id = ${jobId}
     `;
 
-    return fetchJobRecord(organizationId, jobId);
+    const updatedJob = await fetchJobRecord(organizationId, jobId);
+    if (updatedJob && nextStatus === "COMPLETED") {
+      await queueJobCompletionSummaryDraft(organizationId, jobId);
+    }
+    return updatedJob;
   }
 
   if (isPlanJob(existing as JobRecord)) {
@@ -771,7 +844,11 @@ export async function updateJob(
         AND completed_at IS NULL
     `;
 
-    return fetchJobRecord(organizationId, jobId);
+    const updatedJob = await fetchJobRecord(organizationId, jobId);
+    if (updatedJob && nextStatus === "COMPLETED") {
+      await queueJobCompletionSummaryDraft(organizationId, jobId);
+    }
+    return updatedJob;
   }
 
   return updateSingleJob();

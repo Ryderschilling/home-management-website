@@ -140,7 +140,7 @@ const VIEW_OPTIONS: { value: CalendarView; label: string }[] = [
   { value: "agenda", label: "Agenda" },
 ];
 
-const STATUS_OPTIONS = ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELED"];
+const STATUS_OPTIONS = ["SCHEDULED", "COMPLETED", "CANCELED"];
 const START_HOUR = 6;
 const END_HOUR = 20;
 const SLOT_MINUTES = 30;
@@ -415,6 +415,14 @@ function buildMonthGrid(date: Date) {
   return days;
 }
 
+function getOperatorStatusOptions(value?: string) {
+  const current = String(value ?? "").toUpperCase();
+  if (current === "IN_PROGRESS") {
+    return ["SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCELED"];
+  }
+  return STATUS_OPTIONS;
+}
+
 function describeRange(view: CalendarView, date: Date) {
   if (view === "day") return fmtShortDate(date.toISOString());
   if (view === "week") {
@@ -582,13 +590,13 @@ export default function PortalJobsPage() {
 
   const stats = useMemo(() => {
     const scheduled = jobs.filter((job) => job.status === "SCHEDULED").length;
-    const inProgress = jobs.filter((job) => job.status === "IN_PROGRESS").length;
     const completed = jobs.filter((job) => job.status === "COMPLETED").length;
+    const canceled = jobs.filter((job) => job.status === "CANCELED").length;
     return {
       total: jobs.length,
       scheduled,
-      inProgress,
       completed,
+      canceled,
     };
   }, [jobs]);
 
@@ -873,6 +881,11 @@ export default function PortalJobsPage() {
 
   async function saveJob() {
     try {
+      if (draft.status === "COMPLETED" && !draft.notes.trim()) {
+        setError("Completion notes are required before a visit can be marked completed.");
+        return;
+      }
+
       if (drawerMode === "create") {
         await submitCreateJob(normalizeDraftPayload(draft));
         return;
@@ -1372,17 +1385,17 @@ export default function PortalJobsPage() {
               Service calendar workspace
             </h1>
             <p className="mt-2 max-w-2xl text-sm font-light text-[var(--text-secondary)]">
-              Jobs are execution instances only. Use this workspace to see the active
-              schedule, drag visits to a new slot, adjust duration inline, and open one
-              drawer for create, edit, photos, and deletion.
+              Plan visits and one-off work both land here. Use this workspace to run the
+              calendar, reschedule service without breaking plan linkage, log actual hours
+              and pricing when needed, and keep completion notes attached to every finished visit.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { label: "Visible jobs", value: stats.total },
               { label: "Scheduled", value: stats.scheduled },
-              { label: "In progress", value: stats.inProgress },
               { label: "Completed", value: stats.completed },
+              { label: "Canceled", value: stats.canceled },
             ].map((stat) => (
               <div key={stat.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
                 <div className={S.label}>{stat.label}</div>
@@ -1651,7 +1664,7 @@ export default function PortalJobsPage() {
                 value={draft.status}
                 onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value }))}
               >
-                {STATUS_OPTIONS.map((status) => (
+                {getOperatorStatusOptions(draft.status).map((status) => (
                   <option key={status} value={status}>
                     {status.replace("_", " ")}
                   </option>
@@ -1677,30 +1690,30 @@ export default function PortalJobsPage() {
               />
             </div>
             <div className="space-y-2">
-              <label className={S.label}>Hours</label>
+              <label className={S.label}>Actual hours</label>
               <input
                 className={S.input}
                 value={draft.hours}
                 onChange={(event) => setDraft((current) => ({ ...current, hours: event.target.value }))}
-                placeholder="Optional billable hours"
+                placeholder="Optional actual billable hours"
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label className={S.label}>Price (USD)</label>
+              <label className={S.label}>Billing amount (USD)</label>
               <input
                 className={S.input}
                 value={draft.price}
                 onChange={(event) => setDraft((current) => ({ ...current, price: event.target.value }))}
-                placeholder="Optional visit price"
+                placeholder="Optional flat or derived billing amount"
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <label className={S.label}>Notes</label>
+              <label className={S.label}>Completion / visit notes</label>
               <textarea
                 className={`${S.input} min-h-[120px] resize-none`}
                 value={draft.notes}
                 onChange={(event) => setDraft((current) => ({ ...current, notes: event.target.value }))}
-                placeholder="Arrival instructions, scope notes, follow-up items..."
+                placeholder="Required before completion. Save visit details, owner-facing summary notes, and follow-up items here."
               />
             </div>
           </div>

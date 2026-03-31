@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   InvoiceCard,
@@ -14,14 +14,13 @@ import {
   type PortalInvoice,
   type QueueJob,
 } from "./_components/invoice-ui";
+import { InvoiceComposer } from "./_components/InvoiceComposer";
 
-function queueJobHref(job: QueueJob) {
-  const params = new URLSearchParams();
-  if (job.client_id) params.set("clientId", job.client_id);
-  if (job.property_id) params.set("propertyId", job.property_id);
-  params.append("jobId", job.id);
-  return `/portal/invoices/new?${params.toString()}`;
-}
+type ComposerPrefill = {
+  clientId?: string;
+  propertyId?: string;
+  jobIds?: string[];
+};
 
 function filterInvoices(
   invoices: PortalInvoice[],
@@ -54,40 +53,85 @@ export default function PortalInvoicesPage() {
   const [error, setError] = useState("");
   const [clientFilter, setClientFilter] = useState("");
   const [query, setQuery] = useState("");
+  const [deleteSuccessMessage, setDeleteSuccessMessage] = useState("");
+  const [composerPrefill, setComposerPrefill] = useState<ComposerPrefill | null>(null);
+
+  const closeComposer = useCallback(() => {
+    setComposerPrefill(null);
+
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("compose");
+    params.delete("clientId");
+    params.delete("propertyId");
+    params.delete("jobId");
+    const nextQuery = params.toString();
+    window.history.replaceState({}, "", nextQuery ? `/portal/invoices?${nextQuery}` : "/portal/invoices");
+  }, []);
+
+  const openComposer = useCallback((prefill?: ComposerPrefill | null) => {
+    setComposerPrefill({
+      clientId: prefill?.clientId,
+      propertyId: prefill?.propertyId,
+      jobIds: prefill?.jobIds ?? [],
+    });
+  }, []);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const [dashboardRes, clientsRes] = await Promise.all([
+        fetch("/api/admin/invoices/dashboard"),
+        fetch("/api/admin/clients"),
+      ]);
+      const [dashboardJson, clientsJson] = await Promise.all([
+        dashboardRes.json(),
+        clientsRes.json(),
+      ]);
+
+      if (!dashboardRes.ok || !dashboardJson.ok) {
+        throw new Error(dashboardJson?.error?.message ?? "Failed to load invoices");
+      }
+      if (!clientsRes.ok || !clientsJson.ok) {
+        throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
+      }
+
+      setDashboard(dashboardJson.data);
+      setClients(clientsJson.data ?? []);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Failed to load invoices");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-      setError("");
+    if (typeof window === "undefined") return;
 
-      try {
-        const [dashboardRes, clientsRes] = await Promise.all([
-          fetch("/api/admin/invoices/dashboard"),
-          fetch("/api/admin/clients"),
-        ]);
-        const [dashboardJson, clientsJson] = await Promise.all([
-          dashboardRes.json(),
-          clientsRes.json(),
-        ]);
-
-        if (!dashboardRes.ok || !dashboardJson.ok) {
-          throw new Error(dashboardJson?.error?.message ?? "Failed to load invoices");
-        }
-        if (!clientsRes.ok || !clientsJson.ok) {
-          throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
-        }
-
-        setDashboard(dashboardJson.data);
-        setClients(clientsJson.data ?? []);
-      } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : "Failed to load invoices");
-      } finally {
-        setLoading(false);
-      }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("deleted") === "1") {
+      const deletedInvoiceLabel = params.get("invoice");
+      setDeleteSuccessMessage(
+        `${deletedInvoiceLabel || "Invoice"} deleted successfully.`
+      );
+    } else {
+      setDeleteSuccessMessage("");
     }
 
-    load();
-  }, []);
+    if (params.get("compose") === "1") {
+      openComposer({
+        clientId: params.get("clientId") ?? undefined,
+        propertyId: params.get("propertyId") ?? undefined,
+        jobIds: params.getAll("jobId"),
+      });
+    }
+  }, [openComposer]);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
 
   const filteredGroups = useMemo(() => {
     if (!dashboard) return {};
@@ -143,9 +187,9 @@ export default function PortalInvoicesPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/portal/invoices/new" className={S.btnPrimary}>
-              Create invoice
-            </Link>
+            <button type="button" onClick={() => openComposer()} className={S.btnPrimary}>
+              New invoice
+            </button>
           </div>
         </div>
 
@@ -197,6 +241,11 @@ export default function PortalInvoicesPage() {
             {error}
           </div>
         ) : null}
+        {deleteSuccessMessage ? (
+          <div className="mt-5 rounded-xl border border-emerald-900/30 bg-emerald-900/10 px-4 py-3 text-sm text-emerald-200">
+            {deleteSuccessMessage}
+          </div>
+        ) : null}
       </section>
 
       <section className={`${S.card} p-5 sm:p-7`}>
@@ -232,10 +281,17 @@ export default function PortalInvoicesPage() {
                 </div>
               ) : (
                 filteredQueue.completedJobsWithoutInvoice.map((job) => (
-                  <Link
+                  <button
                     key={job.id}
-                    href={queueJobHref(job)}
-                    className="block rounded-xl border border-[var(--border)] p-4 transition hover:border-[var(--border-hover)]"
+                    type="button"
+                    onClick={() =>
+                      openComposer({
+                        clientId: job.client_id ?? undefined,
+                        propertyId: job.property_id ?? undefined,
+                        jobIds: [job.id],
+                      })
+                    }
+                    className="block w-full rounded-xl border border-[var(--border)] p-4 text-left transition hover:border-[var(--border-hover)]"
                   >
                     <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                       <div>
@@ -254,7 +310,7 @@ export default function PortalInvoicesPage() {
                         {money(job.price_cents)}
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 ))
               )}
             </div>
@@ -276,10 +332,17 @@ export default function PortalInvoicesPage() {
                 </div>
               ) : (
                 filteredQueue.agingCompletedJobsWithoutInvoice.map((job) => (
-                  <Link
+                  <button
                     key={job.id}
-                    href={queueJobHref(job)}
-                    className="block rounded-xl border border-[var(--border)] p-4 transition hover:border-[var(--border-hover)]"
+                    type="button"
+                    onClick={() =>
+                      openComposer({
+                        clientId: job.client_id ?? undefined,
+                        propertyId: job.property_id ?? undefined,
+                        jobIds: [job.id],
+                      })
+                    }
+                    className="block w-full rounded-xl border border-[var(--border)] p-4 text-left transition hover:border-[var(--border-hover)]"
                   >
                     <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                       <div>
@@ -298,7 +361,7 @@ export default function PortalInvoicesPage() {
                         {money(job.price_cents)}
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 ))
               )}
             </div>
@@ -412,6 +475,33 @@ export default function PortalInvoicesPage() {
           ))
         )}
       </section>
+
+      {composerPrefill ? (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/65 px-4 py-6">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="New invoice"
+            className="w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-2 shadow-[0_28px_90px_rgba(0,0,0,0.45)]"
+          >
+            <div className="flex justify-end px-3 pt-3">
+              <button type="button" onClick={closeComposer} className={S.btnGhost}>
+                Close
+              </button>
+            </div>
+            <InvoiceComposer
+              mode="create"
+              initialPrefill={composerPrefill}
+              allowSchedule={false}
+              onCancel={closeComposer}
+              onSaved={async () => {
+                closeComposer();
+                await loadData();
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

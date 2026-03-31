@@ -3,6 +3,7 @@ import { fail, ok, parseJsonBody } from "@/lib/server/api";
 import { isAdminRequest } from "@/lib/server/auth";
 import { getOrganizationId } from "@/lib/server/request";
 import {
+  deleteInvoice,
   getInvoiceById,
   resendInvoice,
   scheduleInvoiceSend,
@@ -95,6 +96,37 @@ export async function PATCH(request: NextRequest, context: Params) {
       fail(
         "INVOICE_UPDATE_FAILED",
         error instanceof Error ? error.message : "Failed to update invoice"
+      ),
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest, context: Params) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json(
+      fail("UNAUTHORIZED", "Admin authentication required."),
+      { status: 401 }
+    );
+  }
+
+  try {
+    const organizationId = getOrganizationId(request);
+    const { invoiceId } = await context.params;
+    const data = await deleteInvoice(organizationId, invoiceId);
+
+    if (!data) {
+      return NextResponse.json(fail("INVOICE_NOT_FOUND", "Invoice not found"), {
+        status: 404,
+      });
+    }
+
+    return NextResponse.json(ok(data));
+  } catch (error) {
+    return NextResponse.json(
+      fail(
+        "INVOICE_DELETE_FAILED",
+        error instanceof Error ? error.message : "Failed to delete invoice"
       ),
       { status: 400 }
     );

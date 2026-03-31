@@ -26,6 +26,7 @@ type DraftLineItemInput = {
   lineType: LineType;
   jobId?: string | null;
   retainerId?: string | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 type ManualLineItemInput = {
@@ -55,6 +56,10 @@ type DashboardJobRow = {
   property_address_line1?: string | null;
   service_id?: string | null;
   service_name?: string | null;
+  retainer_id?: string | null;
+  plan_name?: string | null;
+  billing_model?: string | null;
+  hours_numeric?: string | number | null;
   title: string;
   scheduled_for?: string | null;
   completed_at?: string | null;
@@ -98,6 +103,9 @@ type InvoiceRecord = Record<string, unknown> & {
   property_name?: string | null;
   property_address_line1?: string | null;
   plan_name?: string | null;
+  checklist_template_text?: string | null;
+  can_delete?: boolean;
+  delete_block_reason?: string | null;
   line_items: Array<Record<string, unknown>>;
   events: Array<Record<string, unknown>>;
 };
@@ -106,6 +114,10 @@ const DEFAULT_CURRENCY = "usd";
 const DEFAULT_DUE_DAYS = 7;
 const NEEDS_INVOICE_STALE_DAYS = 7;
 const SCHEDULE_SOON_HOURS = 24;
+
+function currentStripeModeLabel() {
+  return process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" : "test";
+}
 
 function parseDateOnly(value: unknown, label: string) {
   const stringValue = String(value ?? "").trim();
@@ -185,6 +197,22 @@ function toIsoString(value: unknown) {
 function asJsonArray<T>(value: unknown): T[] {
   if (!Array.isArray(value)) return [];
   return value as T[];
+}
+
+function isMissingStripeCustomerError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+
+  const candidate = error as Error & {
+    type?: string;
+    code?: string;
+    param?: string;
+  };
+
+  return (
+    candidate.type === "StripeInvalidRequestError" &&
+    (candidate.code === "resource_missing" || candidate.param === "customer") &&
+    /no such customer/i.test(candidate.message)
+  );
 }
 
 function sumStripeTax(invoice: Stripe.Invoice) {
@@ -291,17 +319,124 @@ async function fetchClientRecord(organizationId: string, clientId: string) {
 
 async function fetchRetainer(organizationId: string, retainerId: string | null) {
   if (!retainerId) return null;
+  await ensureAdminTables();
 
   const rows = await sql`
-    SELECT id, client_id, property_id, name, amount_cents
-    FROM admin_retainers
-    WHERE organization_id = ${organizationId} AND id = ${retainerId}
+    SELECT
+      r.id,
+      r.client_id,
+      r.property_id,
+      r.name,
+      r.amount_cents,
+      r.service_type,
+      r.billing_model,
+      r.visit_rate_cents,
+      r.on_call_base_fee_cents,
+      r.hourly_rate_cents,
+      COALESCE(r.checklist_template_text, '') AS checklist_template_text,
+      r.checklist_template_json
+    FROM admin_retainers r
+    WHERE r.organization_id = ${organizationId} AND r.id = ${retainerId}
     LIMIT 1
   `;
 
   const retainer = rows[0] ?? null;
   if (!retainer) throw new Error("Selected plan not found");
   return retainer;
+}
+
+function getInvoiceDeletionState(
+  invoice: Pick<
+    InvoiceRecord,
+    | "status"
+    | "amount_paid_cents"
+    | "stripe_invoice_id"
+    | "hosted_invoice_url"
+    | "invoice_pdf_url"
+    | "send_at"
+    | "sent_at"
+    | "paid_at"
+    | "finalized_at"
+  >
+) {
+  const status = normalizeInvoiceStatus(invoice.status);
+
+  if (status === "PAID" || Number(invoice.amount_paid_cents ?? 0) > 0 || invoice.paid_at) {
+    return {
+      canDelete: false,
+      blockedReason: "Paid invoices can't be deleted.",
+    };
+  }
+
+  if (status === "SCHEDULED" || status === "OUTSTANDING" || status === "OVERDUE" || invoice.sent_at || invoice.send_at) {
+    return {
+      canDelete: false,
+      blockedReason: "Sent or scheduled invoices can't be deleted. Keep them for billing history.",
+    };
+  }
+
+  if (status === "VOID") {
+    return {
+      canDelete: false,
+      blockedReason: "Voided invoices are kept for billing history and can't be deleted.",
+    };
+  }
+
+  if (
+    status === "FINALIZATION_FAILED" ||
+    invoice.finalized_at ||
+    invoice.stripe_invoice_id ||
+    invoice.hosted_invoice_url ||
+    invoice.invoice_pdf_url
+  ) {
+    return {
+      canDelete: false,
+      blockedReason: "This invoice is already linked to Stripe and can't be hard-deleted.",
+    };
+  }
+
+  if (status !== "DRAFT" && status !== "READY_TO_SEND") {
+    return {
+      canDelete: false,
+      blockedReason: "Only local draft invoices can be deleted.",
+    };
+  }
+
+  return {
+    canDelete: true,
+    blockedReason: null,
+  };
+}
+
+function withInvoiceDeletionState<T extends Partial<InvoiceRecord> & Record<string, unknown>>(invoice: T) {
+  const deletionState = getInvoiceDeletionState({
+    status: String(invoice.status ?? "DRAFT"),
+    amount_paid_cents: Number(invoice.amount_paid_cents ?? 0),
+    stripe_invoice_id: asOptionalString(invoice.stripe_invoice_id),
+    hosted_invoice_url: asOptionalString(invoice.hosted_invoice_url),
+    invoice_pdf_url: asOptionalString(invoice.invoice_pdf_url),
+    send_at: asOptionalString(invoice.send_at),
+    sent_at: asOptionalString(invoice.sent_at),
+    paid_at: asOptionalString(invoice.paid_at),
+    finalized_at: asOptionalString(invoice.finalized_at),
+  } as Pick<
+    InvoiceRecord,
+    | "status"
+    | "amount_paid_cents"
+    | "stripe_invoice_id"
+    | "hosted_invoice_url"
+    | "invoice_pdf_url"
+    | "send_at"
+    | "sent_at"
+    | "paid_at"
+    | "finalized_at"
+  >);
+
+  return {
+    ...invoice,
+    can_delete: deletionState.canDelete,
+    delete_block_reason: deletionState.blockedReason,
+  };
 }
 
 async function generateInvoiceNumber(organizationId: string) {
@@ -358,6 +493,8 @@ async function fetchInvoiceBaseRecord(
   organizationId: string,
   invoiceId: string
 ): Promise<Partial<InvoiceRecord> | null> {
+  await ensureAdminTables();
+
   const rows = await sql`
     SELECT
       i.id,
@@ -399,6 +536,7 @@ async function fetchInvoiceBaseRecord(
       p.name AS property_name,
       p.address_line1 AS property_address_line1,
       r.name AS plan_name,
+      COALESCE(r.checklist_template_text, '') AS checklist_template_text,
       COALESCE(line_items.items, '[]'::json) AS line_items,
       COALESCE(line_items.line_item_count, 0) AS line_item_count
     FROM admin_invoices i
@@ -425,6 +563,7 @@ async function fetchInvoiceBaseRecord(
               'unit_price_cents', li.unit_price_cents,
               'line_total_cents', li.line_total_cents,
               'line_type', li.line_type,
+              'metadata_json', li.metadata_json,
               'job_title', j.title,
               'service_id', j.service_id,
               'service_name', s.name,
@@ -461,19 +600,19 @@ async function fetchInvoiceRecord(
   if (!base) return null;
 
   if (!options.includeEvents) {
-    return {
+    return withInvoiceDeletionState({
       ...base,
       line_items: asJsonArray(base.line_items),
       events: [],
-    } as unknown as InvoiceRecord;
+    }) as unknown as InvoiceRecord;
   }
 
   const events = await fetchInvoiceEvents(organizationId, invoiceId);
-  return {
+  return withInvoiceDeletionState({
     ...base,
     line_items: asJsonArray(base.line_items),
     events: events as Array<Record<string, unknown>>,
-  } as unknown as InvoiceRecord;
+  }) as unknown as InvoiceRecord;
 }
 
 async function recordInvoiceEvent(
@@ -534,16 +673,30 @@ async function buildLineItems(
   }
 
   const lineItems: DraftLineItemInput[] = [];
+  let firstJobDate: string | null = null;
+  let lastJobDate: string | null = null;
+
+  function captureJobDate(value: string | null) {
+    if (!value) return;
+    if (!firstJobDate || value < firstJobDate) firstJobDate = value;
+    if (!lastJobDate || value > lastJobDate) lastJobDate = value;
+  }
 
   if (retainer && input.includePlanBase) {
     const amountCents = Math.max(0, Number(retainer.amount_cents ?? 0));
+    const serviceType = String(retainer.service_type ?? "").trim();
     lineItems.push({
-      description: `${retainer.name} service plan`,
+      description: `${retainer.name}${serviceType ? ` ${serviceType.toLowerCase().replaceAll("_", " ")}` : ""} plan`.trim(),
       quantity: 1,
       unitPriceCents: amountCents,
       lineTotalCents: amountCents,
       lineType: "PLAN_BASE",
       retainerId: retainer.id,
+      metadata: {
+        source: "plan-base",
+        billingModel: retainer.billing_model,
+        serviceType: retainer.service_type,
+      },
     });
   }
 
@@ -557,9 +710,19 @@ async function buildLineItems(
         j.title,
         j.scheduled_for,
         j.completed_at,
+        j.hours_numeric,
         j.price_cents,
+        r.name AS plan_name,
+        r.billing_model,
+        r.service_type,
+        r.visit_rate_cents,
+        r.on_call_base_fee_cents,
+        r.hourly_rate_cents,
         s.unit_price_cents AS service_unit_price_cents
       FROM admin_jobs j
+      LEFT JOIN admin_retainers r
+        ON r.id = j.retainer_id
+        AND r.organization_id = j.organization_id
       LEFT JOIN admin_services s
         ON s.id = j.service_id
         AND s.organization_id = j.organization_id
@@ -583,11 +746,32 @@ async function buildLineItems(
         throw new Error("Selected billable job does not belong to the selected plan");
       }
 
+      const referenceDate = toDateOnly(job.completed_at ?? job.scheduled_for);
+      captureJobDate(referenceDate);
+      const billingModel = String(job.billing_model ?? retainer?.billing_model ?? "").toUpperCase();
+      const visitRateCents = Math.max(0, Number(job.visit_rate_cents ?? 0));
+      const baseFeeCents = Math.max(0, Number(job.on_call_base_fee_cents ?? 0));
+      const hourlyRateCents = Math.max(0, Number(job.hourly_rate_cents ?? 0));
+      const hoursNumeric = Number(job.hours_numeric ?? 0);
+      const derivedTimePriceCents =
+        billingModel === "ONE_OFF_TIME"
+          ? baseFeeCents +
+            (Number.isFinite(hoursNumeric) && hoursNumeric > 0
+              ? Math.round(hourlyRateCents * hoursNumeric)
+              : 0)
+          : 0;
       const unitPriceCents = Math.max(
         0,
-        Number(job.price_cents ?? job.service_unit_price_cents ?? 0)
+        Number(
+          job.price_cents ??
+            (billingModel === "USAGE_RECURRING" ? visitRateCents : null) ??
+            (billingModel === "ONE_OFF_TIME" && derivedTimePriceCents > 0
+              ? derivedTimePriceCents
+              : null) ??
+            job.service_unit_price_cents ??
+            0
+        )
       );
-      const referenceDate = toDateOnly(job.completed_at ?? job.scheduled_for);
       lineItems.push({
         description: `${job.title} ${referenceDate ? `on ${referenceDate}` : ""}`.trim(),
         quantity: 1,
@@ -596,6 +780,13 @@ async function buildLineItems(
         lineType: "JOB_EXTRA",
         jobId: job.id,
         retainerId: job.retainer_id,
+        metadata: {
+          source: "completed-job",
+          billingModel: job.billing_model,
+          planName: job.plan_name,
+          serviceType: job.service_type,
+          hours: Number.isFinite(hoursNumeric) ? hoursNumeric : null,
+        },
       });
     }
   }
@@ -609,6 +800,9 @@ async function buildLineItems(
       unitPriceCents: item.unitPriceCents,
       lineTotalCents: Math.round(item.quantity * item.unitPriceCents),
       lineType: "MANUAL",
+      metadata: {
+        source: "manual",
+      },
     });
   }
 
@@ -616,7 +810,7 @@ async function buildLineItems(
     throw new Error("Invoice must include at least one line item");
   }
 
-  return { retainer, lineItems };
+  return { retainer, lineItems, firstJobDate, lastJobDate };
 }
 
 function parseJobIds(body: Record<string, unknown>) {
@@ -729,15 +923,6 @@ async function saveDraftInvoice(
       ? parseDateOnly(body.dueDate, "dueDate")
       : ((existing?.due_date as string | null) ?? addDaysToDateOnly(issueDate, DEFAULT_DUE_DAYS));
 
-  const periodStart =
-    body.periodStart !== undefined
-      ? parseDateOnly(body.periodStart, "periodStart")
-      : (existing?.period_start as string | null);
-  const periodEnd =
-    body.periodEnd !== undefined
-      ? parseDateOnly(body.periodEnd, "periodEnd")
-      : (existing?.period_end as string | null);
-
   const memo =
     body.memo !== undefined
       ? asOptionalString(body.memo)
@@ -754,7 +939,7 @@ async function saveDraftInvoice(
 
   const jobIds = parseJobIds(body);
   const manualLineItems = parseManualLineItems(body);
-  const { lineItems } = await buildLineItems(organizationId, {
+  const { lineItems, firstJobDate, lastJobDate } = await buildLineItems(organizationId, {
     clientId,
     propertyId,
     retainerId,
@@ -762,6 +947,30 @@ async function saveDraftInvoice(
     jobIds,
     manualLineItems,
   });
+  const fallbackPeriodStart =
+    firstJobDate ??
+    (retainer && includePlanBase && issueDate ? `${issueDate.slice(0, 8)}01` : null);
+  const fallbackPeriodEnd =
+    lastJobDate ??
+    (retainer && includePlanBase && issueDate
+      ? new Date(
+          Date.UTC(
+            Number(issueDate.slice(0, 4)),
+            Number(issueDate.slice(5, 7)),
+            0
+          )
+        )
+          .toISOString()
+          .slice(0, 10)
+      : null);
+  const periodStart =
+    body.periodStart !== undefined
+      ? parseDateOnly(body.periodStart, "periodStart")
+      : ((existing?.period_start as string | null) ?? fallbackPeriodStart);
+  const periodEnd =
+    body.periodEnd !== undefined
+      ? parseDateOnly(body.periodEnd, "periodEnd")
+      : ((existing?.period_end as string | null) ?? fallbackPeriodEnd);
 
   const subtotalCents = lineItems.reduce((sum, item) => sum + Math.max(0, item.lineTotalCents), 0);
   const taxCents = 0;
@@ -913,7 +1122,8 @@ async function saveDraftInvoice(
           quantity,
           unit_price_cents,
           line_total_cents,
-          line_type
+          line_type,
+          metadata_json
         )
         VALUES (
           ${crypto.randomUUID()},
@@ -925,7 +1135,8 @@ async function saveDraftInvoice(
           ${item.quantity},
           ${item.unitPriceCents},
           ${item.lineTotalCents},
-          ${item.lineType}
+          ${item.lineType},
+          ${item.metadata ? JSON.stringify(item.metadata) : null}
         )
       `;
     }
@@ -957,47 +1168,95 @@ async function ensureStripeCustomerForClient(
     throw new Error("Selected client not found");
   }
 
-  const existingCustomerId = asOptionalString(client.stripe_customer_id);
-  if (existingCustomerId) {
-    await sql`
-      UPDATE admin_invoices
-      SET stripe_customer_id = ${existingCustomerId}, updated_at = NOW()
-      WHERE organization_id = ${organizationId}
-        AND id = ${invoiceRecord.id as string}
-    `;
+  async function persistStripeCustomerId(customerId: string) {
+    await sql.begin(async (tx) => {
+      await tx`
+        UPDATE admin_clients
+        SET stripe_customer_id = ${customerId}, updated_at = NOW()
+        WHERE organization_id = ${organizationId}
+          AND id = ${clientId}
+      `;
 
-    return existingCustomerId;
+      await tx`
+        UPDATE admin_invoices
+        SET stripe_customer_id = ${customerId}, updated_at = NOW()
+        WHERE organization_id = ${organizationId}
+          AND id = ${invoiceRecord.id as string}
+      `;
+    });
   }
 
-  const customer = await stripe.customers.create({
-    name: asOptionalString(client.name) ?? undefined,
-    email: asOptionalString(client.email) ?? undefined,
-    phone: asOptionalString(client.phone) ?? undefined,
-    description: `Portal client ${clientId}`,
-    metadata: {
-      organization_id: organizationId,
-      client_id: clientId,
-      local_invoice_id: String(invoiceRecord.id),
-    },
-  });
+  const existingCustomerId = asOptionalString(client.stripe_customer_id);
+  if (existingCustomerId) {
+    try {
+      const existingCustomer = await stripe.customers.retrieve(existingCustomerId);
+      if (!("deleted" in existingCustomer && existingCustomer.deleted)) {
+        await sql`
+          UPDATE admin_invoices
+          SET stripe_customer_id = ${existingCustomerId}, updated_at = NOW()
+          WHERE organization_id = ${organizationId}
+            AND id = ${invoiceRecord.id as string}
+        `;
 
-  await sql.begin(async (tx) => {
-    await tx`
-      UPDATE admin_clients
-      SET stripe_customer_id = ${customer.id}, updated_at = NOW()
-      WHERE organization_id = ${organizationId}
-        AND id = ${clientId}
-    `;
+        return existingCustomerId;
+      }
+    } catch (error) {
+      if (!isMissingStripeCustomerError(error)) {
+        throw error;
+      }
+    }
+  }
 
-    await tx`
-      UPDATE admin_invoices
-      SET stripe_customer_id = ${customer.id}, updated_at = NOW()
-      WHERE organization_id = ${organizationId}
-        AND id = ${invoiceRecord.id as string}
-    `;
-  });
+  const clientEmail = asOptionalString(client.email)?.toLowerCase() ?? null;
+  let repairedCustomerId: string | null = null;
 
-  return customer.id;
+  if (clientEmail) {
+    const matches = await stripe.customers.list({
+      email: clientEmail,
+      limit: 10,
+    });
+
+    const matchedCustomer = matches.data.find((customer) => {
+      if ("deleted" in customer && customer.deleted) return false;
+      return String(customer.email ?? "").trim().toLowerCase() === clientEmail;
+    });
+
+    repairedCustomerId = matchedCustomer?.id ?? null;
+  }
+
+  if (!repairedCustomerId) {
+    try {
+      const customer = await stripe.customers.create({
+        name: asOptionalString(client.name) ?? undefined,
+        email: asOptionalString(client.email) ?? undefined,
+        phone: asOptionalString(client.phone) ?? undefined,
+        description: `Portal client ${clientId}`,
+        metadata: {
+          organization_id: organizationId,
+          client_id: clientId,
+          local_invoice_id: String(invoiceRecord.id),
+        },
+      });
+
+      repairedCustomerId = customer.id;
+    } catch (error) {
+      if (existingCustomerId && isMissingStripeCustomerError(error)) {
+        throw new Error(
+          `The saved Stripe customer is no longer available in the ${currentStripeModeLabel()} Stripe account, and automatic repair failed. Check the client's email and try again.`
+        );
+      }
+      throw error;
+    }
+  }
+
+  if (!repairedCustomerId) {
+    throw new Error(
+      `Unable to find or create a Stripe customer in the ${currentStripeModeLabel()} Stripe account for this invoice.`
+    );
+  }
+
+  await persistStripeCustomerId(repairedCustomerId);
+  return repairedCustomerId;
 }
 
 async function createStripeDraftInvoice(
@@ -1261,6 +1520,7 @@ export async function listInvoices(
       p.name AS property_name,
       p.address_line1 AS property_address_line1,
       r.name AS plan_name,
+      COALESCE(r.checklist_template_text, '') AS checklist_template_text,
       COALESCE(line_items.items, '[]'::json) AS line_items,
       COALESCE(line_items.line_item_count, 0) AS line_item_count
     FROM admin_invoices i
@@ -1287,6 +1547,7 @@ export async function listInvoices(
               'unit_price_cents', li.unit_price_cents,
               'line_total_cents', li.line_total_cents,
               'line_type', li.line_type,
+              'metadata_json', li.metadata_json,
               'created_at', li.created_at
             )
             ORDER BY li.created_at ASC
@@ -1315,7 +1576,7 @@ export async function listInvoices(
 
   return rows.map(
     (row) =>
-      ({
+      withInvoiceDeletionState({
         ...row,
         line_items: asJsonArray(row.line_items),
         events: [],
@@ -1342,6 +1603,77 @@ export async function updateInvoice(
   body: Record<string, unknown>
 ) {
   return saveDraftInvoice(organizationId, body, invoiceId);
+}
+
+export async function deleteInvoice(organizationId: string, invoiceId: string) {
+  await ensureAdminTables();
+
+  const deleted = await sql.begin(async (tx) => {
+    const rows = await tx`
+      SELECT
+        id,
+        invoice_number,
+        status,
+        amount_paid_cents,
+        stripe_invoice_id,
+        hosted_invoice_url,
+        invoice_pdf_url,
+        send_at,
+        sent_at,
+        paid_at,
+        finalized_at
+      FROM admin_invoices
+      WHERE organization_id = ${organizationId}
+        AND id = ${invoiceId}
+      LIMIT 1
+      FOR UPDATE
+    `;
+
+    const invoice = rows[0] ?? null;
+    if (!invoice) return null;
+
+    const deletionState = getInvoiceDeletionState({
+      status: String(invoice.status ?? "DRAFT"),
+      amount_paid_cents: Number(invoice.amount_paid_cents ?? 0),
+      stripe_invoice_id: asOptionalString(invoice.stripe_invoice_id),
+      hosted_invoice_url: asOptionalString(invoice.hosted_invoice_url),
+      invoice_pdf_url: asOptionalString(invoice.invoice_pdf_url),
+      send_at: asOptionalString(invoice.send_at),
+      sent_at: asOptionalString(invoice.sent_at),
+      paid_at: asOptionalString(invoice.paid_at),
+      finalized_at: asOptionalString(invoice.finalized_at),
+    });
+
+    if (!deletionState.canDelete) {
+      throw new Error(deletionState.blockedReason ?? "Invoice cannot be deleted.");
+    }
+
+    await tx`
+      DELETE FROM admin_invoice_events
+      WHERE organization_id = ${organizationId}
+        AND invoice_id = ${invoiceId}
+    `;
+
+    await tx`
+      DELETE FROM admin_invoice_line_items
+      WHERE organization_id = ${organizationId}
+        AND invoice_id = ${invoiceId}
+    `;
+
+    await tx`
+      DELETE FROM admin_invoices
+      WHERE organization_id = ${organizationId}
+        AND id = ${invoiceId}
+    `;
+
+    return {
+      deleted: true,
+      invoiceId,
+      invoiceNumber: asOptionalString(invoice.invoice_number),
+    };
+  });
+
+  return deleted;
 }
 
 export async function sendInvoiceNow(organizationId: string, invoiceId: string) {
@@ -1600,6 +1932,10 @@ async function listCompletedJobsWithoutInvoice(
       p.address_line1 AS property_address_line1,
       j.service_id,
       s.name AS service_name,
+      j.retainer_id,
+      r.name AS plan_name,
+      r.billing_model,
+      j.hours_numeric,
       j.title,
       j.scheduled_for,
       j.completed_at,
@@ -1614,6 +1950,9 @@ async function listCompletedJobsWithoutInvoice(
     LEFT JOIN admin_services s
       ON s.id = j.service_id
       AND s.organization_id = j.organization_id
+    LEFT JOIN admin_retainers r
+      ON r.id = j.retainer_id
+      AND r.organization_id = j.organization_id
     WHERE j.organization_id = ${organizationId}
       AND UPPER(j.status) = 'COMPLETED'
       AND NOT EXISTS (

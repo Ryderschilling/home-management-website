@@ -110,6 +110,9 @@ export type PortalInvoice = {
   property_name?: string | null;
   property_address_line1?: string | null;
   plan_name?: string | null;
+  checklist_template_text?: string | null;
+  can_delete?: boolean;
+  delete_block_reason?: string | null;
   line_items?: PortalInvoiceLineItem[] | null;
   events?: PortalInvoiceEvent[] | null;
 };

@@ -53,28 +53,136 @@ function mapPropertyInput(body: Record<string, unknown>, current?: Record<string
   };
 }
 
+async function fetchPropertyRecord(organizationId: string, propertyId: string) {
+  const rows = await sql`
+    SELECT
+      p.id,
+      p.organization_id,
+      p.client_id,
+      p.name,
+      p.address_line1,
+      p.city,
+      p.state,
+      p.postal_code,
+      COALESCE(p.entry, p.gate_code, p.door_code, p.garage_code, p.alarm_code) AS entry,
+      p.irrigation_notes,
+      p.access_notes,
+      p.notes,
+      p.created_at,
+      p.updated_at,
+      c.name AS client_name,
+      c.email AS client_email,
+      COALESCE(summary.active_plan_count, 0) AS active_plan_count,
+      COALESCE(summary.recent_job_count, 0) AS recent_job_count,
+      summary.next_job_at,
+      summary.last_job_at
+    FROM admin_properties p
+    LEFT JOIN admin_clients c
+      ON c.id = p.client_id
+      AND c.organization_id = p.organization_id
+    LEFT JOIN LATERAL (
+      SELECT
+        (
+          SELECT COUNT(*)::int
+          FROM admin_retainers r
+          WHERE r.organization_id = p.organization_id
+            AND r.property_id = p.id
+            AND UPPER(r.status) = 'ACTIVE'
+            AND r.archived_at IS NULL
+        ) AS active_plan_count,
+        (
+          SELECT COUNT(*)::int
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND COALESCE(j.completed_at, j.scheduled_for) >= NOW() - INTERVAL '30 days'
+        ) AS recent_job_count,
+        (
+          SELECT MIN(j.scheduled_for)
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND j.scheduled_for >= NOW()
+            AND UPPER(j.status) <> 'CANCELED'
+        ) AS next_job_at,
+        (
+          SELECT MAX(COALESCE(j.completed_at, j.scheduled_for))
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+        ) AS last_job_at
+    ) AS summary ON true
+    WHERE p.id = ${propertyId}
+      AND p.organization_id = ${organizationId}
+    LIMIT 1
+  `;
+
+  return rows[0] ?? null;
+}
+
 export async function listProperties(organizationId: string) {
   await ensureAdminTables();
 
   return sql`
     SELECT
-      id,
-      organization_id,
-      client_id,
-      name,
-      address_line1,
-      city,
-      state,
-      postal_code,
-      COALESCE(entry, gate_code, door_code, garage_code, alarm_code) AS entry,
-      irrigation_notes,
-      access_notes,
-      notes,
-      created_at,
-      updated_at
-    FROM admin_properties
-    WHERE organization_id = ${organizationId}
-    ORDER BY created_at DESC
+      p.id,
+      p.organization_id,
+      p.client_id,
+      p.name,
+      p.address_line1,
+      p.city,
+      p.state,
+      p.postal_code,
+      COALESCE(p.entry, p.gate_code, p.door_code, p.garage_code, p.alarm_code) AS entry,
+      p.irrigation_notes,
+      p.access_notes,
+      p.notes,
+      p.created_at,
+      p.updated_at,
+      c.name AS client_name,
+      c.email AS client_email,
+      COALESCE(summary.active_plan_count, 0) AS active_plan_count,
+      COALESCE(summary.recent_job_count, 0) AS recent_job_count,
+      summary.next_job_at,
+      summary.last_job_at
+    FROM admin_properties p
+    LEFT JOIN admin_clients c
+      ON c.id = p.client_id
+      AND c.organization_id = p.organization_id
+    LEFT JOIN LATERAL (
+      SELECT
+        (
+          SELECT COUNT(*)::int
+          FROM admin_retainers r
+          WHERE r.organization_id = p.organization_id
+            AND r.property_id = p.id
+            AND UPPER(r.status) = 'ACTIVE'
+            AND r.archived_at IS NULL
+        ) AS active_plan_count,
+        (
+          SELECT COUNT(*)::int
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND COALESCE(j.completed_at, j.scheduled_for) >= NOW() - INTERVAL '30 days'
+        ) AS recent_job_count,
+        (
+          SELECT MIN(j.scheduled_for)
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND j.scheduled_for >= NOW()
+            AND UPPER(j.status) <> 'CANCELED'
+        ) AS next_job_at,
+        (
+          SELECT MAX(COALESCE(j.completed_at, j.scheduled_for))
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+        ) AS last_job_at
+    ) AS summary ON true
+    WHERE p.organization_id = ${organizationId}
+    ORDER BY p.created_at DESC
   `;
 }
 
@@ -83,51 +191,65 @@ export async function listPropertiesByClient(organizationId: string, clientId: s
 
   return sql`
     SELECT
-      id,
-      organization_id,
-      client_id,
-      name,
-      address_line1,
-      city,
-      state,
-      postal_code,
-      COALESCE(entry, gate_code, door_code, garage_code, alarm_code) AS entry,
-      irrigation_notes,
-      access_notes,
-      notes,
-      created_at,
-      updated_at
-    FROM admin_properties
-    WHERE organization_id = ${organizationId} AND client_id = ${clientId}
-    ORDER BY created_at ASC
+      p.id,
+      p.organization_id,
+      p.client_id,
+      p.name,
+      p.address_line1,
+      p.city,
+      p.state,
+      p.postal_code,
+      COALESCE(p.entry, p.gate_code, p.door_code, p.garage_code, p.alarm_code) AS entry,
+      p.irrigation_notes,
+      p.access_notes,
+      p.notes,
+      p.created_at,
+      p.updated_at,
+      COALESCE(summary.active_plan_count, 0) AS active_plan_count,
+      COALESCE(summary.recent_job_count, 0) AS recent_job_count,
+      summary.next_job_at,
+      summary.last_job_at
+    FROM admin_properties p
+    LEFT JOIN LATERAL (
+      SELECT
+        (
+          SELECT COUNT(*)::int
+          FROM admin_retainers r
+          WHERE r.organization_id = p.organization_id
+            AND r.property_id = p.id
+            AND UPPER(r.status) = 'ACTIVE'
+            AND r.archived_at IS NULL
+        ) AS active_plan_count,
+        (
+          SELECT COUNT(*)::int
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND COALESCE(j.completed_at, j.scheduled_for) >= NOW() - INTERVAL '30 days'
+        ) AS recent_job_count,
+        (
+          SELECT MIN(j.scheduled_for)
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+            AND j.scheduled_for >= NOW()
+            AND UPPER(j.status) <> 'CANCELED'
+        ) AS next_job_at,
+        (
+          SELECT MAX(COALESCE(j.completed_at, j.scheduled_for))
+          FROM admin_jobs j
+          WHERE j.organization_id = p.organization_id
+            AND j.property_id = p.id
+        ) AS last_job_at
+    ) AS summary ON true
+    WHERE p.organization_id = ${organizationId} AND p.client_id = ${clientId}
+    ORDER BY p.created_at ASC
   `;
 }
 
 export async function getPropertyById(organizationId: string, id: string) {
   await ensureAdminTables();
-
-  const rows = await sql`
-    SELECT
-      id,
-      organization_id,
-      client_id,
-      name,
-      address_line1,
-      city,
-      state,
-      postal_code,
-      COALESCE(entry, gate_code, door_code, garage_code, alarm_code) AS entry,
-      irrigation_notes,
-      access_notes,
-      notes,
-      created_at,
-      updated_at
-    FROM admin_properties
-    WHERE id = ${id} AND organization_id = ${organizationId}
-    LIMIT 1
-  `;
-
-  return rows[0] ?? null;
+  return fetchPropertyRecord(organizationId, id);
 }
 
 export async function createProperty(organizationId: string, body: Record<string, unknown>) {
@@ -136,7 +258,7 @@ export async function createProperty(organizationId: string, body: Record<string
   const id = crypto.randomUUID();
   const data = mapPropertyInput(body);
 
-  const rows = await sql`
+  await sql`
     INSERT INTO admin_properties (
       id,
       organization_id,
@@ -165,10 +287,9 @@ export async function createProperty(organizationId: string, body: Record<string
       ${data.accessNotes},
       ${data.notes}
     )
-    RETURNING *
   `;
 
-  return rows[0];
+  return fetchPropertyRecord(organizationId, id);
 }
 
 export async function updateProperty(
@@ -190,7 +311,7 @@ export async function updateProperty(
   const current = existing[0];
   const data = mapPropertyInput(body, current);
 
-  const updated = await sql`
+  await sql`
     UPDATE admin_properties
     SET
       client_id = ${data.clientId},
@@ -205,10 +326,9 @@ export async function updateProperty(
       notes = ${data.notes},
       updated_at = NOW()
     WHERE id = ${id} AND organization_id = ${organizationId}
-    RETURNING *
   `;
 
-  return updated[0] ?? null;
+  return fetchPropertyRecord(organizationId, id);
 }
 
 export async function deleteProperty(organizationId: string, id: string) {

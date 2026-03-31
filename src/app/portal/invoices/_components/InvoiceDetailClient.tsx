@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { isEditableInvoiceStatus } from "@/lib/invoices";
 
@@ -15,9 +16,10 @@ import {
 } from "./invoice-ui";
 
 export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
+  const router = useRouter();
   const [invoice, setInvoice] = useState<PortalInvoice | null>(null);
   const [loading, setLoading] = useState(true);
-  const [working, setWorking] = useState<"send" | "resend" | "sync" | "">("");
+  const [working, setWorking] = useState<"send" | "resend" | "sync" | "delete" | "">("");
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -64,6 +66,40 @@ export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
     }
   }
 
+  async function handleDelete() {
+    if (!invoice) return;
+    if (!invoice.can_delete) {
+      setError(invoice.delete_block_reason || "This invoice cannot be deleted.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete ${invoice.invoice_number}? This permanently removes the invoice and its history.`
+    );
+    if (!confirmed) return;
+
+    setWorking("delete");
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/invoices/${invoiceId}`, {
+        method: "DELETE",
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to delete invoice");
+      }
+
+      const deletedInvoiceNumber = String(json?.data?.invoiceNumber ?? invoice.invoice_number);
+      router.push(
+        `/portal/invoices?deleted=1&invoice=${encodeURIComponent(deletedInvoiceNumber)}`
+      );
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "Failed to delete invoice");
+      setWorking("");
+    }
+  }
+
   if (loading) {
     return (
       <div className={`${S.card} p-6 text-sm text-[var(--text-muted)]`}>
@@ -81,6 +117,7 @@ export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
   }
 
   const editable = isEditableInvoiceStatus(invoice.status);
+  const deleteBlockedReason = invoice.delete_block_reason || "This invoice cannot be deleted.";
 
   return (
     <div className="space-y-6">
@@ -133,6 +170,16 @@ export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
             >
               {working === "sync" ? "Syncing..." : "Sync"}
             </button>
+            {invoice.can_delete ? (
+              <button
+                type="button"
+                onClick={() => void handleDelete()}
+                className={S.btnDanger}
+                disabled={working !== ""}
+              >
+                {working === "delete" ? "Deleting..." : "Delete invoice"}
+              </button>
+            ) : null}
             {invoice.hosted_invoice_url ? (
               <a
                 href={invoice.hosted_invoice_url}
@@ -159,6 +206,12 @@ export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
         {error ? (
           <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-300">
             {error}
+          </div>
+        ) : null}
+
+        {!invoice.can_delete ? (
+          <div className="mt-5 rounded-xl border border-amber-900/30 bg-amber-900/10 px-4 py-3 text-sm text-amber-200">
+            Delete unavailable: {deleteBlockedReason}
           </div>
         ) : null}
 

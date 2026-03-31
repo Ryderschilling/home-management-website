@@ -47,7 +47,9 @@ type InvoiceComposerProps = {
     propertyId: string;
     jobIds: string[];
   }>;
-  onSaved?: (invoice: PortalInvoice) => void;
+  allowSchedule?: boolean;
+  onCancel?: () => void;
+  onSaved?: (invoice: PortalInvoice) => void | Promise<void>;
 };
 
 function emptyManualLine(): ManualLine {
@@ -135,6 +137,8 @@ export function InvoiceComposer({
   mode,
   initialInvoice,
   initialPrefill,
+  allowSchedule = mode === "edit",
+  onCancel,
   onSaved,
 }: InvoiceComposerProps) {
   const router = useRouter();
@@ -443,10 +447,10 @@ export function InvoiceComposer({
       }
 
       const savedInvoice = json.data as PortalInvoice;
-      if (mode === "create") {
+      if (onSaved) {
+        await onSaved(savedInvoice);
+      } else if (mode === "create") {
         router.push(`/portal/invoices/${savedInvoice.id}`);
-      } else {
-        onSaved?.(savedInvoice);
       }
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to save invoice");
@@ -469,7 +473,7 @@ export function InvoiceComposer({
             </h2>
             <p className="mt-3 max-w-2xl text-sm text-[var(--text-secondary)]">
               Pull completed work into a client invoice, add manual line items, then save,
-              send, or schedule the Stripe invoice from the portal.
+              {allowSchedule ? " send, or schedule the Stripe invoice from the portal." : " or send the Stripe invoice from the portal."}
             </p>
           </div>
           {initialInvoice ? (
@@ -550,7 +554,7 @@ export function InvoiceComposer({
                 </div>
 
                 <div className="space-y-2">
-                  <label className={S.label}>Plan context</label>
+                  <label className={S.label}>Plan</label>
                   <select
                     className={`${S.input} portal-select`}
                     value={draft.retainerId}
@@ -569,26 +573,38 @@ export function InvoiceComposer({
                 </div>
 
                 <div className="flex items-end">
-                  <label className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.02)] px-4 py-3 text-sm text-[var(--text-secondary)]">
-                    <input
-                      type="checkbox"
-                      checked={draft.includePlanBase}
-                      onChange={(event) =>
-                        setDraft((current) => ({
-                          ...current,
-                          includePlanBase: event.target.checked,
-                        }))
-                      }
-                      disabled={!draft.retainerId}
-                    />
-                    Include plan base amount
-                  </label>
+                  <div className="w-full space-y-2">
+                    <label className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[rgba(255,255,255,0.02)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+                      <input
+                        type="checkbox"
+                        checked={draft.includePlanBase}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            includePlanBase: event.target.checked,
+                          }))
+                        }
+                        disabled={!draft.retainerId}
+                      />
+                      Include monthly plan charge
+                    </label>
+                    {draft.retainerId ? (
+                      <p className="text-xs leading-5 text-[var(--text-muted)]">
+                        Adds this plan&apos;s normal recurring charge to the invoice total. Turn off
+                        if this invoice is only for extras or one-off work.
+                      </p>
+                    ) : (
+                      <p className="text-xs leading-5 text-[var(--text-muted)]">
+                        Select a plan to add its recurring monthly charge.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className={`${S.cardInner} p-4 sm:p-5`}>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div className="space-y-2">
                   <label className={S.label}>Issue date</label>
                   <input
@@ -596,18 +612,11 @@ export function InvoiceComposer({
                     type="date"
                     value={draft.issueDate}
                     onChange={(event) =>
-                      setDraft((current) => ({ ...current, issueDate: event.target.value }))
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className={S.label}>Due date</label>
-                  <input
-                    className={S.input}
-                    type="date"
-                    value={draft.dueDate}
-                    onChange={(event) =>
-                      setDraft((current) => ({ ...current, dueDate: event.target.value }))
+                      setDraft((current) => ({
+                        ...current,
+                        issueDate: event.target.value,
+                        dueDate: addDays(event.target.value, 7),
+                      }))
                     }
                   />
                 </div>
@@ -635,17 +644,19 @@ export function InvoiceComposer({
                 </div>
               </div>
 
-              <div className="mt-4 max-w-sm space-y-2">
-                <label className={S.label}>Schedule send</label>
-                <input
-                  className={S.input}
-                  type="datetime-local"
-                  value={draft.scheduleAt}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, scheduleAt: event.target.value }))
-                  }
-                />
-              </div>
+              {allowSchedule ? (
+                <div className="mt-4 max-w-sm space-y-2">
+                  <label className={S.label}>Schedule send</label>
+                  <input
+                    className={S.input}
+                    type="datetime-local"
+                    value={draft.scheduleAt}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, scheduleAt: event.target.value }))
+                    }
+                  />
+                </div>
+              ) : null}
             </div>
 
             <div className={`${S.cardInner} p-4 sm:p-5`}>
@@ -826,7 +837,7 @@ export function InvoiceComposer({
               <div className="mt-4 space-y-3 text-sm text-[var(--text-secondary)]">
                 {draft.includePlanBase && draft.retainerId ? (
                   <div className="flex items-center justify-between gap-3">
-                    <span>Plan base</span>
+                    <span>Monthly plan charge</span>
                     <span>{money(planAmountCents)}</span>
                   </div>
                 ) : null}
@@ -858,7 +869,7 @@ export function InvoiceComposer({
                   <>
                     {draft.includePlanBase && draft.retainerId ? (
                       <div className="rounded-xl border border-[var(--border)] px-3 py-3 text-sm text-[var(--text-secondary)]">
-                        Plan base
+                        Monthly plan charge
                       </div>
                     ) : null}
                     {selectedJobLineItems.map((item) => (
@@ -887,6 +898,16 @@ export function InvoiceComposer({
         </div>
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {onCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              className={S.btnGhost}
+              disabled={savingAction !== ""}
+            >
+              Cancel
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => submit("saveDraft")}
@@ -903,14 +924,16 @@ export function InvoiceComposer({
           >
             {savingAction === "sendNow" ? "Sending..." : "Send now"}
           </button>
-          <button
-            type="button"
-            onClick={() => submit("schedule")}
-            className={S.btnGhost}
-            disabled={savingAction !== ""}
-          >
-            {savingAction === "schedule" ? "Scheduling..." : "Schedule send"}
-          </button>
+          {allowSchedule ? (
+            <button
+              type="button"
+              onClick={() => submit("schedule")}
+              className={S.btnGhost}
+              disabled={savingAction !== ""}
+            >
+              {savingAction === "schedule" ? "Scheduling..." : "Schedule send"}
+            </button>
+          ) : null}
         </div>
       </section>
     </div>

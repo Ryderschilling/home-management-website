@@ -8,7 +8,20 @@ type Client = {
   email: string | null;
   phone: string | null;
   notes: string | null;
+  address_text?: string | null;
+  preferred_contact_method?: string | null;
+  service_address_text?: string | null;
+  entry_notes?: string | null;
+  billing_notes?: string | null;
+  status?: string | null;
+  last_contacted_at?: string | null;
+  welcome_email_sent_at?: string | null;
+  archived_at?: string | null;
   property_count?: number;
+  active_plans_count?: number;
+  upcoming_jobs_count?: number;
+  recent_jobs_count?: number;
+  unpaid_invoices_count?: number;
 };
 
 type Property = {
@@ -79,6 +92,7 @@ type Retainer = {
   service_frequency: string;
   service_interval: number;
   status: string;
+  archived_at?: string | null;
   next_visit_at?: string | null;
   future_visit_count?: number | null;
 };
@@ -113,6 +127,17 @@ type EmailRecord = {
   name: string;
   source: string;
   clientId?: string | null;
+};
+
+type Communication = {
+  id: string;
+  client_id?: string | null;
+  type?: string | null;
+  status?: string | null;
+  subject?: string | null;
+  follow_up_due_at?: string | null;
+  approved_at?: string | null;
+  sent_at?: string | null;
 };
 
 const emptyProperty = (): Property => ({
@@ -225,6 +250,7 @@ export default function PortalClientsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [retainers, setRetainers] = useState<Retainer[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [communications, setCommunications] = useState<Communication[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -235,6 +261,12 @@ export default function PortalClientsPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [addressText, setAddressText] = useState("");
+  const [preferredContactMethod, setPreferredContactMethod] = useState("EMAIL");
+  const [serviceAddressText, setServiceAddressText] = useState("");
+  const [entryNotes, setEntryNotes] = useState("");
+  const [billingNotes, setBillingNotes] = useState("");
+  const [clientStatus, setClientStatus] = useState("ACTIVE");
   const [clientNotes, setClientNotes] = useState("");
   const [propertyForms, setPropertyForms] = useState<Property[]>([emptyProperty()]);
 
@@ -242,13 +274,14 @@ export default function PortalClientsPage() {
     setLoading(true);
     setError("");
     try {
-      const [clientsRes, propertiesRes, ordersRes, jobsRes, retainersRes, invoicesRes] = await Promise.all([
+      const [clientsRes, propertiesRes, ordersRes, jobsRes, retainersRes, invoicesRes, communicationsRes] = await Promise.all([
         fetch("/api/admin/clients"),
         fetch("/api/admin/properties"),
         fetch("/api/admin/orders"),
         fetch(`/api/admin/jobs?includeCompleted=true&start=${encodeURIComponent(new Date(Date.now() - 1000 * 60 * 60 * 24 * 180).toISOString())}&end=${encodeURIComponent(new Date(Date.now() + 1000 * 60 * 60 * 24 * 120).toISOString())}`),
         fetch("/api/admin/retainers"),
         fetch("/api/admin/invoices"),
+        fetch("/api/admin/communications?includeResolved=true"),
       ]);
       const clientsJson = await clientsRes.json();
       const propertiesJson = await propertiesRes.json();
@@ -256,12 +289,14 @@ export default function PortalClientsPage() {
       const jobsJson = await jobsRes.json();
       const retainersJson = await retainersRes.json();
       const invoicesJson = await invoicesRes.json();
+      const communicationsJson = await communicationsRes.json();
       if (!clientsRes.ok || !clientsJson.ok) throw new Error(clientsJson?.error?.message ?? "Failed to load clients");
       if (!propertiesRes.ok || !propertiesJson.ok) throw new Error(propertiesJson?.error?.message ?? "Failed to load properties");
       if (!ordersRes.ok || !ordersJson.ok) throw new Error(ordersJson?.error?.message ?? "Failed to load orders");
       if (!jobsRes.ok || !jobsJson.ok) throw new Error(jobsJson?.error?.message ?? "Failed to load jobs");
       if (!retainersRes.ok || !retainersJson.ok) throw new Error(retainersJson?.error?.message ?? "Failed to load plans");
       if (!invoicesRes.ok || !invoicesJson.ok) throw new Error(invoicesJson?.error?.message ?? "Failed to load invoices");
+      if (!communicationsRes.ok || !communicationsJson.ok) throw new Error(communicationsJson?.error?.message ?? "Failed to load communications");
       const nextClients = clientsJson.data ?? [];
       setClients(nextClients);
       setProperties(propertiesJson.data ?? []);
@@ -269,6 +304,7 @@ export default function PortalClientsPage() {
       setJobs(jobsJson.data ?? []);
       setRetainers(retainersJson.data ?? []);
       setInvoices(invoicesJson.data ?? []);
+      setCommunications(communicationsJson.data ?? []);
       if (!selectedClientId && nextClients.length > 0) setSelectedClientId(nextClients[0].id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load clients");
@@ -342,6 +378,13 @@ export default function PortalClientsPage() {
       .sort((a, b) => new Date(b.issue_date ?? b.period_end ?? 0).getTime() - new Date(a.issue_date ?? a.period_end ?? 0).getTime());
   }, [invoices, selectedClient]);
 
+  const selectedClientCommunications = useMemo(() => {
+    if (!selectedClient) return [];
+    return communications
+      .filter((communication) => communication.client_id === selectedClient.id)
+      .sort((a, b) => new Date(b.follow_up_due_at ?? b.sent_at ?? 0).getTime() - new Date(a.follow_up_due_at ?? a.sent_at ?? 0).getTime());
+  }, [communications, selectedClient]);
+
   const selectedClientUpcomingJobs = useMemo(() => {
     const now = Date.now();
     return selectedClientJobs
@@ -356,7 +399,6 @@ export default function PortalClientsPage() {
   }, [selectedClientJobs]);
 
   const totalProperties = properties.length;
-  const selectedClientRevenue = selectedClientOrders.reduce((sum, o) => sum + (typeof o.total_amount_cents === "number" ? o.total_amount_cents : 0), 0);
 
   function downloadEmailsCsv() {
     const header = ["email", "name", "source"];
@@ -387,15 +429,15 @@ export default function PortalClientsPage() {
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to delete client"); }
   }
 
-  function resetForm() { setEditingClientId(null); setName(""); setEmail(""); setPhone(""); setClientNotes(""); setPropertyForms([emptyProperty()]); setShowForm(false); setError(""); }
-  function startCreateClient() { setEditingClientId(null); setName(""); setEmail(""); setPhone(""); setClientNotes(""); setPropertyForms([emptyProperty()]); setShowForm(true); setError(""); }
+  function resetForm() { setEditingClientId(null); setName(""); setEmail(""); setPhone(""); setAddressText(""); setPreferredContactMethod("EMAIL"); setServiceAddressText(""); setEntryNotes(""); setBillingNotes(""); setClientStatus("ACTIVE"); setClientNotes(""); setPropertyForms([emptyProperty()]); setShowForm(false); setError(""); }
+  function startCreateClient() { setEditingClientId(null); setName(""); setEmail(""); setPhone(""); setAddressText(""); setPreferredContactMethod("EMAIL"); setServiceAddressText(""); setEntryNotes(""); setBillingNotes(""); setClientStatus("ACTIVE"); setClientNotes(""); setPropertyForms([emptyProperty()]); setShowForm(true); setError(""); }
   function addPropertyBlock() { setPropertyForms((prev) => [...prev, emptyProperty()]); }
   function removePropertyBlock(index: number) { setPropertyForms((prev) => prev.length === 1 ? prev : prev.filter((_, i) => i !== index)); }
   function updatePropertyBlock(index: number, key: keyof Property, value: string) { setPropertyForms((prev) => prev.map((p, i) => i === index ? { ...p, [key]: value } : p)); }
 
   function startEditClient(client: Client) {
     setEditingClientId(client.id); setSelectedClientId(client.id);
-    setName(client.name ?? ""); setEmail(client.email ?? ""); setPhone(client.phone ?? ""); setClientNotes(client.notes ?? "");
+    setName(client.name ?? ""); setEmail(client.email ?? ""); setPhone(client.phone ?? ""); setAddressText(client.address_text ?? ""); setPreferredContactMethod(client.preferred_contact_method ?? "EMAIL"); setServiceAddressText(client.service_address_text ?? ""); setEntryNotes(client.entry_notes ?? ""); setBillingNotes(client.billing_notes ?? ""); setClientStatus(client.status ?? "ACTIVE"); setClientNotes(client.notes ?? "");
     const clientProperties = (propertiesByClient.get(client.id) ?? []).map(mapApiProperty);
     setPropertyForms(clientProperties.length > 0 ? clientProperties : [emptyProperty()]);
     setShowForm(true); setError("");
@@ -425,11 +467,11 @@ export default function PortalClientsPage() {
     }
     let clientId = editingClientId;
     if (editingClientId) {
-      const res = await fetch(`/api/admin/clients/${editingClientId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email: email || null, phone: phone || null, notes: clientNotes || null }) });
+      const res = await fetch(`/api/admin/clients/${editingClientId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email: email || null, phone: phone || null, addressText: addressText || null, preferredContactMethod: preferredContactMethod || null, serviceAddressText: serviceAddressText || null, entryNotes: entryNotes || null, billingNotes: billingNotes || null, status: clientStatus || "ACTIVE", notes: clientNotes || null }) });
       const json = await res.json();
       if (!res.ok || !json.ok) { setError(json?.error?.message ?? "Failed to update client"); return; }
     } else {
-      const res = await fetch("/api/admin/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email: email || null, phone: phone || null, notes: clientNotes || null }) });
+      const res = await fetch("/api/admin/clients", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email: email || null, phone: phone || null, addressText: addressText || null, preferredContactMethod: preferredContactMethod || null, serviceAddressText: serviceAddressText || null, entryNotes: entryNotes || null, billingNotes: billingNotes || null, status: clientStatus || "ACTIVE", notes: clientNotes || null }) });
       const json = await res.json();
       if (!res.ok || !json.ok) { setError(json?.error?.message ?? "Failed to create client"); return; }
       clientId = json.data.id;
@@ -567,6 +609,38 @@ export default function PortalClientsPage() {
                     <input className={S.input} placeholder={f.placeholder} value={f.val} onChange={(e) => f.set(e.target.value)} />
                   </div>
                 ))}
+                <div className="space-y-2">
+                  <label className={S.label}>Preferred contact</label>
+                  <select className={S.input} value={preferredContactMethod} onChange={(e) => setPreferredContactMethod(e.target.value)}>
+                    <option value="EMAIL">Email</option>
+                    <option value="PHONE">Phone</option>
+                    <option value="TEXT">Text</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className={S.label}>Status</label>
+                  <select className={S.input} value={clientStatus} onChange={(e) => setClientStatus(e.target.value)}>
+                    <option value="ACTIVE">Active</option>
+                    <option value="PAUSED">Paused</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className={S.label}>Billing address / mailing address</label>
+                  <textarea className={`${S.input} min-h-[70px] resize-none`} placeholder="Optional billing address or mailing address" value={addressText} onChange={(e) => setAddressText(e.target.value)} />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className={S.label}>Primary service address</label>
+                  <textarea className={`${S.input} min-h-[70px] resize-none`} placeholder="Where service happens if no property record is attached" value={serviceAddressText} onChange={(e) => setServiceAddressText(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className={S.label}>Entry notes</label>
+                  <textarea className={`${S.input} min-h-[100px] resize-none`} placeholder="Gate, alarm, lockbox, or access reminders" value={entryNotes} onChange={(e) => setEntryNotes(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <label className={S.label}>Billing notes</label>
+                  <textarea className={`${S.input} min-h-[100px] resize-none`} placeholder="Recurring billing reminders, invoice preferences, end-of-term notes" value={billingNotes} onChange={(e) => setBillingNotes(e.target.value)} />
+                </div>
                 <div className="space-y-2 md:col-span-2">
                   <label className={S.label}>Client notes</label>
                   <textarea className={`${S.input} min-h-[100px] resize-none`} placeholder="Billing notes, homeowner preferences, general reminders..." value={clientNotes} onChange={(e) => setClientNotes(e.target.value)} />
@@ -640,7 +714,7 @@ export default function PortalClientsPage() {
             ) : (
               <>
                 <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-6">
-                  {[{ label: "Email", value: selectedClient.email || "No email saved" }, { label: "Phone", value: selectedClient.phone || "No phone saved" }, { label: "Properties", value: selectedClientProperties.length }, { label: "Active plans", value: selectedClientPlans.filter((plan) => plan.status === "ACTIVE").length }, { label: "Upcoming jobs", value: selectedClientUpcomingJobs.length }, { label: "Revenue to Date", value: money(selectedClientRevenue) }].map((f) => (
+                  {[{ label: "Email", value: selectedClient.email || "No email saved" }, { label: "Phone", value: selectedClient.phone || "No phone saved" }, { label: "Preferred contact", value: selectedClient.preferred_contact_method || "—" }, { label: "Active plans", value: selectedClientPlans.filter((plan) => plan.status === "ACTIVE" && !plan.archived_at).length }, { label: "Upcoming jobs", value: selectedClientUpcomingJobs.length }, { label: "Unpaid invoices", value: selectedClientInvoices.filter((invoice) => ["READY_TO_SEND", "SCHEDULED", "OUTSTANDING", "OVERDUE", "FINALIZATION_FAILED"].includes(String(invoice.status ?? "").toUpperCase())).length }].map((f) => (
                     <div key={f.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
                       <div className={S.label}>{f.label}</div>
                       <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)", marginTop: 4 }}>{f.value}</div>
@@ -648,8 +722,15 @@ export default function PortalClientsPage() {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <div className={S.label} style={{ marginBottom: 6 }}>Client notes</div>
-                  <div className={S.cardInner} style={{ padding: "14px 16px", fontSize: 13, lineHeight: 1.6, color: selectedClient.notes ? "var(--text-secondary)" : "var(--text-muted)" }}>{selectedClient.notes || "No notes saved for this client."}</div>
+                  <div className={S.label} style={{ marginBottom: 6 }}>Operations memory</div>
+                  <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                    {[{ label: "Service address", value: selectedClient.service_address_text || selectedClient.address_text || "No service address saved." }, { label: "Entry notes", value: selectedClient.entry_notes || "No client-level entry notes saved." }, { label: "Billing notes", value: selectedClient.billing_notes || "No billing notes saved." }, { label: "General notes", value: selectedClient.notes || "No notes saved for this client." }].map((field) => (
+                      <div key={field.label} className={S.cardInner} style={{ padding: "14px 16px" }}>
+                        <div className={S.label}>{field.label}</div>
+                        <div style={{ marginTop: 6, fontSize: 13, lineHeight: 1.6, color: field.value.includes("No ") ? "var(--text-muted)" : "var(--text-secondary)" }}>{field.value}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="mt-8">
                   <div className={S.label}>Properties</div>
@@ -714,6 +795,31 @@ export default function PortalClientsPage() {
                             <div className="flex flex-col items-start gap-2 md:items-end">
                               <span style={statusPillStyle(invoice.status)}>{invoice.status}</span>
                               <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{money(invoice.total_cents)}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-8">
+                  <div className={S.label}>Communications</div>
+                  <h3 style={{ fontFamily: "var(--font-serif), serif", fontSize: 18, color: "var(--text-primary)", marginTop: 4, marginBottom: 12 }}>Drafts, follow-up, and approval queue</h3>
+                  {selectedClientCommunications.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No communication drafts or history saved for this client yet.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {selectedClientCommunications.slice(0, 6).map((communication) => (
+                        <div key={communication.id} className={S.cardInner} style={{ padding: 16 }}>
+                          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-primary)" }}>{communication.subject || communication.type || "Communication"}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>{communication.type?.replaceAll("_", " ") || "General"} • {communication.status || "DRAFT"}</div>
+                              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>Follow-up due {fmtDate(communication.follow_up_due_at)} • Sent {fmtDate(communication.sent_at)}</div>
+                            </div>
+                            <div className="flex flex-col items-start gap-2 md:items-end">
+                              <span style={statusPillStyle(communication.status || "DRAFT")}>{communication.status || "DRAFT"}</span>
+                              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{communication.approved_at ? "Approved" : "Approval required"}</div>
                             </div>
                           </div>
                         </div>
