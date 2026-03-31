@@ -257,7 +257,7 @@ export default function QrPage() {
             preload="metadata"
             poster="/qr-poster.jpg"
           >
-            <source src="/videos/qr-hero.mov" type="video/quicktime" />
+            <source src="/videos/qr-hero.mov" />
             Your browser does not support video playback.
           </video>
         </section>
