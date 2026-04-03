@@ -931,7 +931,11 @@ await tx`CREATE INDEX IF NOT EXISTS admin_retainers_active_generation_idx
     
     await tx`CREATE INDEX IF NOT EXISTS marketing_email_leads_campaign_idx
       ON marketing_email_leads (organization_id, campaign_id, created_at DESC)`;
-  
+
+  // Drip suppression — stores Resend scheduled email IDs so they can be cancelled on conversion
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_email_ids TEXT`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_suppressed_at TIMESTAMPTZ`;
+
   await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_id TEXT`;
   await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_code TEXT`;
   await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS landing_path TEXT`;

@@ -216,7 +216,7 @@ export default function LeadCapturePopup() {
                     <label style={labelStyle}>First name</label>
                     <input
                       type="text"
-                      placeholder="Ryder"
+                      placeholder="John"
                       value={firstName}
                       onChange={e => setFirstName(e.target.value)}
                       style={inputStyle}

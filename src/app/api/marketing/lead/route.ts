@@ -4,6 +4,7 @@ import { normalizeCampaignCode } from "@/lib/campaigns";
 import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
+import { scheduleDripSequence } from "@/lib/server/lead-drip";
 
 export const runtime = "nodejs";
 
@@ -285,8 +286,16 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    // Fire welcome email for new leads (non-blocking — errors are swallowed inside)
+    // Fire welcome email + schedule drip sequence (non-blocking)
     await sendWelcomeEmail(firstName || null, email);
+    await scheduleDripSequence(
+      firstName || null,
+      email,
+      env.APP_URL,
+      env.FROM_EMAIL,
+      env.REPLY_TO_EMAIL,
+      orgId
+    );
 
     return NextResponse.json({
       ok: true,
