@@ -1,10 +1,127 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 import { normalizeCampaignCode } from "@/lib/campaigns";
 import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 
 export const runtime = "nodejs";
+
+const resend = new Resend(env.RESEND_API_KEY);
+
+async function sendWelcomeEmail(firstName: string | null, email: string) {
+  const name = firstName || "there";
+  const displayName = firstName || "there";
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Coastal Home Management 30A</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f3;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f5f3;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;background:#fafaf8;border-top:3px solid #0b0b0b;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:36px 44px 0;">
+              <p style="margin:0 0 28px 0;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(0,0,0,0.4);">
+                Watersound Origins · Naturewalk · 30A
+              </p>
+              <h1 style="margin:0 0 16px 0;font-family:ui-serif,Georgia,'Times New Roman',Times,serif;font-size:26px;font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:#0b0b0b;">
+                Hey ${displayName} — thanks for reaching out.
+              </h1>
+              <div style="width:40px;height:1px;background:rgba(0,0,0,0.15);margin:20px 0;"></div>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:0 44px 32px;">
+              <p style="margin:0 0 20px 0;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
+                I'm Ryder — founder of Coastal Home Management 30A. You asked about protecting
+                your property, and that's exactly what I do.
+              </p>
+              <p style="margin:0 0 20px 0;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
+                Here's what typically goes wrong in 30A homes when owners are away:
+              </p>
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;width:100%;">
+                ${["Storm damage that sits undetected for weeks",
+                   "HVAC failures that cause mold before anyone notices",
+                   "Packages sitting on the porch for days",
+                   "Contractors who show up — and no one's there to let them in",
+                   "Pipes, leaks, and small issues that become expensive ones"].map(item => `
+                <tr>
+                  <td style="padding:6px 0;vertical-align:top;">
+                    <span style="display:inline-block;width:16px;font-size:13px;color:rgba(0,0,0,0.35);">—</span>
+                    <span style="font-size:14px;color:rgba(0,0,0,0.7);line-height:1.5;">${item}</span>
+                  </td>
+                </tr>`).join("")}
+              </table>
+              <p style="margin:0 0 32px 0;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
+                I'll be in touch within 24 hours to schedule a free walkthrough of your property.
+                No commitment — just a conversation and a real look at what your home needs.
+              </p>
+
+              <!-- CTA Button -->
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td>
+                    <a href="mailto:coastalhomemanagement30a@gmail.com?subject=Property%20Walkthrough%20Request"
+                       style="display:inline-block;background:#0b0b0b;color:#fafaf8;text-decoration:none;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;padding:14px 28px;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;">
+                      Reply to this email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Signature -->
+          <tr>
+            <td style="padding:24px 44px 36px;border-top:1px solid rgba(0,0,0,0.08);">
+              <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(0,0,0,0.6);">
+                — Ryder<br />
+                <span style="font-size:12px;color:rgba(0,0,0,0.4);">Coastal Home Management 30A</span><br />
+                <a href="tel:3094158793" style="font-size:12px;color:rgba(0,0,0,0.4);text-decoration:none;">(309) 415-8793</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:16px 44px 24px;background:#f0efed;">
+              <p style="margin:0;font-size:11px;color:rgba(0,0,0,0.35);line-height:1.5;">
+                You received this because you requested information at coastalhomemanagement30a.com.
+                We won't spam you — this is a real person reaching out.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    await resend.emails.send({
+      from: env.FROM_EMAIL,
+      to: email,
+      replyTo: env.REPLY_TO_EMAIL || "coastalhomemanagement30a@gmail.com",
+      subject: "Your 30A home — let's talk.",
+      html,
+    });
+  } catch (err) {
+    // Log but don't fail the lead capture if email sending fails
+    console.error("[CHM] Welcome email failed to send:", err);
+  }
+}
 
 function safe(v: unknown) {
   return String(v ?? "").trim();
@@ -167,6 +284,9 @@ export async function POST(req: NextRequest) {
         )
       `;
     }
+
+    // Fire welcome email for new leads (non-blocking — errors are swallowed inside)
+    await sendWelcomeEmail(firstName || null, email);
 
     return NextResponse.json({
       ok: true,

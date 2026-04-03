@@ -4,6 +4,7 @@ import Link from "next/link";
 import { siteData } from "@/data/siteData";
 import { useEffect } from "react";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import LeadCapturePopup from "@/components/LeadCapturePopup";
 
 export default function HomePage() {
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen font-sans bg-black text-black">
+      <LeadCapturePopup />
       {/* Sticky nav */}
       <nav className="fixed top-0 w-full z-50 bg-transparent px-4 md:px-6 py-2 flex justify-between items-center">
         <div className="flex items-center space-x-3">
