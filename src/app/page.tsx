@@ -330,7 +330,13 @@ export default function HomePage() {
             {/* Photo (slides in) */}
             <div className="about-media">
               <div className="about-media-frame">
-                <img src="/profile.png" alt="Profile" className="about-media-img" />
+                <img
+                  src="/profile-web.jpg"
+                  alt="Ryder Schilling"
+                  className="about-media-img"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </div>
 
@@ -764,7 +770,6 @@ export default function HomePage() {
           width: 100%;
           height: auto;
           display: block;
-          transform: scale(1.02);
         }
 
         /* --- Copy (staggered resolve) --- */
