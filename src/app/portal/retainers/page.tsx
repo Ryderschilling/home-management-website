@@ -30,6 +30,7 @@ type Retainer = {
   archived_at?: string | null;
   status: "ACTIVE" | "PAUSED" | "CANCELED";
   notes?: string | null;
+  tier?: "STANDARD" | "ELITE";
   created_at?: string | null;
   future_visit_count?: number | null;
   completed_visit_count?: number | null;
@@ -82,6 +83,7 @@ export default function PortalRetainersPage() {
   const [checklistTemplateText, setChecklistTemplateText] = useState("");
   const [autoGenerateJobs, setAutoGenerateJobs] = useState(true);
   const [notes, setNotes] = useState("");
+  const [tier, setTier] = useState<"STANDARD" | "ELITE">("STANDARD");
   const [notice, setNotice] = useState("");
 
   async function load() {
@@ -146,10 +148,10 @@ export default function PortalRetainersPage() {
     const intervalNum = Math.max(1, Number(billingInterval));
     const serviceIntervalNum = Math.max(1, Number(serviceInterval));
     try {
-      const res = await fetch("/api/admin/retainers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), clientId, propertyId: propertyId || null, amountCents, billingFrequency, billingInterval: intervalNum, billingAnchorDate: billingAnchorDate || null, serviceFrequency, serviceInterval: serviceIntervalNum, serviceAnchorDate: serviceAnchorDate || billingAnchorDate || null, serviceType, billingModel, visitRateCents: visitRate ? Math.round(Number(visitRate) * 100) : null, onCallBaseFeeCents: onCallBaseFee ? Math.round(Number(onCallBaseFee) * 100) : null, hourlyRateCents: hourlyRate ? Math.round(Number(hourlyRate) * 100) : null, checklistTemplateText: checklistTemplateText || null, autoGenerateJobs, notes: notes.trim() || null }) });
+      const res = await fetch("/api/admin/retainers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), clientId, propertyId: propertyId || null, amountCents, billingFrequency, billingInterval: intervalNum, billingAnchorDate: billingAnchorDate || null, serviceFrequency, serviceInterval: serviceIntervalNum, serviceAnchorDate: serviceAnchorDate || billingAnchorDate || null, serviceType, billingModel, visitRateCents: visitRate ? Math.round(Number(visitRate) * 100) : null, onCallBaseFeeCents: onCallBaseFee ? Math.round(Number(onCallBaseFee) * 100) : null, hourlyRateCents: hourlyRate ? Math.round(Number(hourlyRate) * 100) : null, checklistTemplateText: checklistTemplateText || null, autoGenerateJobs, notes: notes.trim() || null, tier }) });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to create retainer");
-      setName(""); setClientId(""); setPropertyId(""); setAmount(""); setBillingFrequency("MONTHLY"); setBillingInterval("1"); setBillingAnchorDate(""); setServiceFrequency("WEEKLY"); setServiceInterval("1"); setServiceAnchorDate(""); setServiceType("HOME_MANAGEMENT"); setBillingModel("FIXED_RECURRING"); setVisitRate(""); setOnCallBaseFee(""); setHourlyRate(""); setChecklistTemplateText(""); setAutoGenerateJobs(true); setNotes(""); setShowForm(false);
+      setName(""); setClientId(""); setPropertyId(""); setAmount(""); setBillingFrequency("MONTHLY"); setBillingInterval("1"); setBillingAnchorDate(""); setServiceFrequency("WEEKLY"); setServiceInterval("1"); setServiceAnchorDate(""); setServiceType("HOME_MANAGEMENT"); setBillingModel("FIXED_RECURRING"); setVisitRate(""); setOnCallBaseFee(""); setHourlyRate(""); setChecklistTemplateText(""); setAutoGenerateJobs(true); setNotes(""); setTier("STANDARD"); setShowForm(false);
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to create retainer"); }
   }
@@ -291,6 +293,12 @@ export default function PortalRetainersPage() {
                 <option value="CUSTOM">Custom</option>
               </select>
             </div>
+            <div className="space-y-2"><label className={S.label}>Membership tier</label>
+              <div className="flex gap-3">
+                <button onClick={() => setTier("STANDARD")} style={{ background: tier === "STANDARD" ? "var(--surface-2)" : "transparent", border: tier === "STANDARD" ? "1px solid var(--border)" : "1px solid var(--border)", color: tier === "STANDARD" ? "var(--text-primary)" : "var(--text-secondary)" }} className="flex-1 rounded-lg px-4 py-3 text-sm font-medium uppercase tracking-[0.12em] transition hover:bg-[var(--surface-2)]">Standard</button>
+                <button onClick={() => setTier("ELITE")} style={{ background: tier === "ELITE" ? "rgba(201,184,154,0.15)" : "transparent", border: tier === "ELITE" ? "1px solid rgba(201,184,154,0.4)" : "1px solid var(--border)", color: tier === "ELITE" ? "#c9b89a" : "var(--text-secondary)" }} className="flex-1 rounded-lg px-4 py-3 text-sm font-medium uppercase tracking-[0.12em] transition hover:brightness-110">{tier === "ELITE" ? "✦ " : ""}Elite</button>
+              </div>
+            </div>
             <div className="space-y-2"><label className={S.label}>Billing model</label>
               <select className={S.input} value={billingModel} onChange={(e) => setBillingModel(e.target.value as any)}>
                 <option value="FIXED_RECURRING">Fixed recurring</option>
@@ -358,7 +366,7 @@ export default function PortalRetainersPage() {
           <div className="portal-table-scroll">
             <table className="min-w-[1280px] w-full text-left md:min-w-[1520px]">
               <thead style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
-                <tr>{["Plan", "Client", "Property", "Billing", "Visit setup", "Usage history", "Next visit", "Status", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
+                <tr>{["Plan", "Client", "Property", "Billing", "Visit setup", "Tier", "Usage history", "Next visit", "Status", "Actions"].map((h) => (<th key={h} className="px-5 py-4" style={{ fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 500 }}>{h}</th>))}</tr>
               </thead>
               <tbody>
                 {filteredRetainers.map((r) => (
@@ -368,6 +376,7 @@ export default function PortalRetainersPage() {
                     <td className="px-5 py-5"><div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{r.property_name || "—"}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{r.property_address_line1 || ""}</div></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>{String(r.billing_model ?? "FIXED_RECURRING").replaceAll("_", " ")}</div><div style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-warm, #c9b89a)", marginTop: 4 }}>{money(r.amount_cents)}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Visit rate {money(r.visit_rate_cents)}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Base {money(r.on_call_base_fee_cents)} • Hourly {money(r.hourly_rate_cents)}</div></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>Bill every {r.billing_interval} {r.billing_frequency.toLowerCase()}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Visits every {r.service_interval} {r.service_frequency.toLowerCase()}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Auto-generate: {r.auto_generate_jobs ? "On" : "Off"}</div></td>
+                    <td className="px-5 py-5"><span style={r.tier === "ELITE" ? { background: "rgba(201,184,154,0.15)", border: "1px solid rgba(201,184,154,0.4)", color: "#c9b89a", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" } : { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text-muted)", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>{r.tier === "ELITE" ? "✦ Elite" : "Standard"}</span></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>{r.completed_visit_count ?? 0} completed</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{r.future_visit_count ?? 0} future in horizon</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Last completed: {fmtDate(r.last_completed_at)}</div></td>
                     <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{fmtDate(r.next_visit_at)}</td>
                     <td className="px-5 py-5"><span style={retainerStatusStyle(r.archived_at ? "CANCELED" : r.status)}>{r.archived_at ? "ARCHIVED" : r.status}</span></td>

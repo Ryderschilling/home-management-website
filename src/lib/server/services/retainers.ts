@@ -8,6 +8,7 @@ type BillingModel =
   | "USAGE_RECURRING"
   | "ONE_OFF_TIME"
   | "FLAT_ONE_OFF";
+type RetainerTier = "STANDARD" | "ELITE";
 
 const VALID_FREQUENCIES = new Set<Frequency>(["DAILY", "WEEKLY", "MONTHLY"]);
 const VALID_STATUSES = new Set<RetainerStatus>(["ACTIVE", "PAUSED", "CANCELED"]);
@@ -17,6 +18,7 @@ const VALID_BILLING_MODELS = new Set<BillingModel>([
   "ONE_OFF_TIME",
   "FLAT_ONE_OFF",
 ]);
+const VALID_TIERS = new Set<RetainerTier>(["STANDARD", "ELITE"]);
 
 function addFrequency(date: Date, frequency: Frequency, interval: number) {
   const next = new Date(date);
@@ -64,6 +66,14 @@ function normalizeBillingModel(
     );
   }
   return billingModel;
+}
+
+function normalizeTier(value: unknown, fallback: RetainerTier = "STANDARD") {
+  const tier = String(value ?? fallback).trim().toUpperCase() as RetainerTier;
+  if (!VALID_TIERS.has(tier)) {
+    throw new Error("tier must be STANDARD or ELITE");
+  }
+  return tier;
 }
 
 function parsePositiveInteger(value: unknown, label: string, fallback = 1) {
@@ -287,6 +297,7 @@ async function fetchRetainerRecord(organizationId: string, retainerId: string) {
       r.archived_at,
       r.status,
       r.notes,
+      r.tier,
       r.created_at,
       r.updated_at,
       c.name AS client_name,
@@ -358,6 +369,7 @@ export async function listRetainers(organizationId: string) {
       r.archived_at,
       r.status,
       r.notes,
+      r.tier,
       r.created_at,
       r.updated_at,
       c.name AS client_name,
@@ -454,6 +466,7 @@ export async function createRetainer(
     "onCallBaseFeeCents"
   );
   const hourlyRateCents = parseOptionalNonNegativeInteger(body.hourlyRateCents, "hourlyRateCents");
+  const tier = normalizeTier(body.tier);
   const { checklistTemplateText, checklistTemplateJson } = resolveChecklistTemplateFields({
     submittedText: body.checklistTemplateText,
     submittedJson: body.checklistTemplateJson,
@@ -489,7 +502,8 @@ export async function createRetainer(
       auto_generate_jobs,
       archived_at,
       status,
-      notes
+      notes,
+      tier
     )
     VALUES (
       ${id},
@@ -514,7 +528,8 @@ export async function createRetainer(
       ${autoGenerateJobs},
       ${archivedAt},
       ${status},
-      ${notes}
+      ${notes},
+      ${tier}
     )
   `;
 
@@ -607,6 +622,8 @@ export async function updateRetainer(
     body.archivedAt !== undefined
       ? parseOptionalTimestamp(body.archivedAt, "archivedAt")
       : (existing.archived_at as string | null);
+  const tier =
+    body.tier !== undefined ? normalizeTier(body.tier) : normalizeTier(existing.tier);
 
   await assertClientExists(organizationId, clientId);
   await assertPropertyExists(organizationId, propertyId, clientId);
@@ -635,6 +652,7 @@ export async function updateRetainer(
       archived_at = ${archivedAt},
       status = ${status},
       notes = ${notes},
+      tier = ${tier},
       updated_at = NOW()
     WHERE id = ${id} AND organization_id = ${organizationId}
   `;

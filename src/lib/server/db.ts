@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 23;
+const ADMIN_SCHEMA_VERSION = 24;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -777,6 +777,7 @@ export async function ensureAdminTables(): Promise<void> {
     await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS checklist_template_text TEXT`;
     await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS auto_generate_jobs BOOLEAN NOT NULL DEFAULT TRUE`;
     await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ`;
+    await tx`ALTER TABLE admin_retainers ADD COLUMN IF NOT EXISTS tier TEXT NOT NULL DEFAULT 'STANDARD'`;
 
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS service_id TEXT`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS retainer_id TEXT`;
