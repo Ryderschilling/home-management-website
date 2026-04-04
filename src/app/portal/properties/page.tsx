@@ -201,8 +201,6 @@ export default function PortalPropertiesPage() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Properties</div>
-            <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Property records</h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Keep each home practical: address, access, house memory, linked client, and quick context on plans and recent work.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {[{ label: "Total properties", value: properties.length }, { label: "Linked plans", value: retainers.filter((retainer) => !retainer.archived_at && retainer.status === "ACTIVE").length }, { label: "Jobs in scope", value: jobs.length }].map((stat) => (

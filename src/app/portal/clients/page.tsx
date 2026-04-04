@@ -500,8 +500,6 @@ export default function PortalClientsPage() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Clients</div>
-            <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Client management</h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 480 }}>Manage homeowners, properties, notes, purchase history, service history, and your email list from one operator view.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {[{ label: "Total clients", value: clients.length }, { label: "Properties", value: totalProperties }, { label: "Saved emails", value: emailRecords.length }].map((s) => (

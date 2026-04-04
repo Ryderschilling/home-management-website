@@ -174,17 +174,6 @@ export default function PortalInvoicesPage() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label}>Invoices</div>
-            <h1
-              className="mt-2 text-[34px] text-[var(--text-primary)]"
-              style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.02 }}
-            >
-              Invoice operations
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm text-[var(--text-secondary)]">
-              Create Stripe invoices from completed work, track what still needs to be billed,
-              and manage draft, scheduled, outstanding, overdue, and paid invoices from one
-              operator view.
-            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button type="button" onClick={() => openComposer()} className={S.btnPrimary}>

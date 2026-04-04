@@ -20,6 +20,8 @@ type Retainer = {
   id: string;
   service_type?: string | null;
   billing_model?: string | null;
+  billing_frequency?: string | null;
+  amount_cents?: number | null;
   status: string;
   archived_at?: string | null;
 };
@@ -54,8 +56,7 @@ type MonthCell = { kind: "blank" } | { kind: "day"; date: Date; key: string };
 
 const PANEL = "rounded-[24px] border border-[var(--border)] bg-[var(--surface)] shadow-[0_22px_60px_rgba(0,0,0,0.24)]";
 const PANEL_INNER = "rounded-2xl border border-[var(--border)] bg-[var(--surface-2)]";
-const LABEL =
-  "text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--text-muted)]";
+const LABEL = "text-[10px] font-medium uppercase tracking-[0.24em] text-[var(--text-muted)]";
 const BUTTON_SMALL =
   "inline-flex items-center justify-center rounded-lg border border-[var(--border)] px-3 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]";
 
@@ -71,6 +72,12 @@ function fmtDate(value: string | null | undefined) {
   if (!value) return "—";
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+function fmtDayKey(key: string) {
+  const d = new Date(`${key}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return key;
+  return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
 }
 
 function toLocalDateKey(date: Date) {
@@ -99,27 +106,25 @@ function buildMonthGrid(date: Date) {
   return cells;
 }
 
-function PanelFrame({
+function SectionPanel({
   eyebrow,
-  title,
   action,
   children,
 }: {
   eyebrow: string;
-  title: string;
   action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <section className={PANEL}>
-      <div className="flex flex-col gap-3 border-b border-[var(--border)] sm:flex-row sm:items-start sm:justify-between" style={panelPadding("lg")}>
-        <div>
-          <div className={LABEL}>{eyebrow}</div>
-          <h2 className="mt-2 font-serif text-[24px] leading-none tracking-[-0.02em] text-[var(--text-primary)]">{title}</h2>
-        </div>
+      <div
+        className="flex items-center justify-between gap-3 border-b border-[var(--border)]"
+        style={panelPadding()}
+      >
+        <div className={LABEL}>{eyebrow}</div>
         {action ? <div className="flex items-center gap-2">{action}</div> : null}
       </div>
-      <div style={panelPadding("lg")}>{children}</div>
+      <div style={panelPadding()}>{children}</div>
     </section>
   );
 }
@@ -165,9 +170,7 @@ export default function PortalDashboardPage() {
     }
   }
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const monthGrid = useMemo(() => buildMonthGrid(viewDate), [viewDate]);
   const jobsByDay = useMemo(() => {
@@ -182,187 +185,275 @@ export default function PortalDashboardPage() {
   }, [jobs]);
 
   const todayKey = toLocalDateKey(new Date());
-  const todayJobs = useMemo(() => (jobsByDay.get(todayKey) ?? []).filter((job) => job.status !== "CANCELED"), [jobsByDay, todayKey]);
-  const weekBoundary = new Date();
-  weekBoundary.setDate(weekBoundary.getDate() + 7);
-  const weekJobs = useMemo(() => jobs.filter((job) => {
-    const scheduled = new Date(job.scheduled_for).getTime();
-    return scheduled >= Date.now() && scheduled <= weekBoundary.getTime() && job.status !== "CANCELED";
-  }), [jobs]);
-  const awaitingApproval = useMemo(() => communications.filter((item) => item.status === "DRAFT" && !item.approved_at), [communications]);
+  const todayJobs = useMemo(() =>
+    (jobsByDay.get(todayKey) ?? []).filter((job) => job.status !== "CANCELED"),
+    [jobsByDay, todayKey]);
+
+  const weekBoundary = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d;
+  }, []);
+
+  const weekJobs = useMemo(() =>
+    jobs.filter((job) => {
+      const scheduled = new Date(job.scheduled_for).getTime();
+      return scheduled >= Date.now() && scheduled <= weekBoundary.getTime() && job.status !== "CANCELED";
+    }),
+    [jobs, weekBoundary]);
+
+  const awaitingApproval = useMemo(() =>
+    communications.filter((item) => item.status === "DRAFT" && !item.approved_at),
+    [communications]);
+
   const selectedDayJobs = useMemo(() => jobsByDay.get(selectedDayKey) ?? [], [jobsByDay, selectedDayKey]);
 
-  const stats = useMemo(() => {
-    const activePlans = retainers.filter((plan) => plan.status === "ACTIVE" && !plan.archived_at);
-    return [
-      { label: "Today's jobs", value: todayJobs.length, detail: "Visits and one-off work scheduled for today." },
-      { label: "This week's jobs", value: weekJobs.length, detail: "Execution load across the next seven days." },
-      { label: "Active plans", value: activePlans.length, detail: "Recurring agreements currently generating work." },
-      { label: "Awaiting approval", value: awaitingApproval.length, detail: "Draft communications that still need owner review." },
-      { label: "Outstanding balance", value: money(invoiceDashboard?.summary.outstandingBalanceCents), detail: "Open receivables across unpaid invoices.", accent: true },
-    ];
-  }, [awaitingApproval.length, invoiceDashboard?.summary.outstandingBalanceCents, retainers, todayJobs.length, weekJobs.length]);
+  const activePlans = useMemo(() =>
+    retainers.filter((plan) => plan.status === "ACTIVE" && !plan.archived_at),
+    [retainers]);
+
+  // MRR from active fixed-recurring monthly plans
+  const mrrCents = useMemo(() =>
+    activePlans
+      .filter((p) => p.billing_model === "FIXED_RECURRING" && (p.billing_frequency === "MONTHLY" || !p.billing_frequency))
+      .reduce((sum, p) => sum + (p.amount_cents ?? 0), 0),
+    [activePlans]);
 
   const serviceMix = useMemo(() => {
-    const activePlans = retainers.filter((plan) => plan.status === "ACTIVE" && !plan.archived_at);
     const counts = new Map<string, number>();
     for (const plan of activePlans) {
       const key = String(plan.service_type ?? "CUSTOM").replaceAll("_", " ");
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
-  }, [retainers]);
+  }, [activePlans]);
+
+  // Compact KPI strip — label + number only, no descriptive subtext
+  const kpis = [
+    { label: "Today", value: todayJobs.length },
+    { label: "This week", value: weekJobs.length },
+    { label: "Active plans", value: activePlans.length },
+    { label: "Messages", value: awaitingApproval.length, href: "/portal/contacts", alert: awaitingApproval.length > 0 },
+    { label: "Outstanding", value: money(invoiceDashboard?.summary.outstandingBalanceCents), href: "/portal/invoices", accent: true },
+    { label: "MRR", value: money(mrrCents), accent: true },
+  ];
 
   return (
     <div className="space-y-6">
-      <section className={PANEL} style={panelPadding("lg")}>
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-          <div>
-            <div className={LABEL}>Operator Dashboard</div>
-            <h1 className="mt-2 font-serif text-[34px] leading-none tracking-[-0.03em] text-[var(--text-primary)]">Calendar-first command center</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">Use this view to run recurring plans, one-off jobs, communication approvals, and unpaid invoice pressure from one daily workspace.</p>
-          </div>
-          <div className="text-sm text-[var(--text-muted)]">{loading ? "Refreshing live operator data..." : "Operator data synced across jobs, plans, communications, and invoices."}</div>
-        </div>
-        {error ? <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-300">{error}</div> : null}
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-          {stats.map((stat) => (
-            <div key={stat.label} className={PANEL_INNER} style={stat.accent ? { ...panelPadding(), background: "linear-gradient(180deg, rgba(201,184,154,0.12) 0%, rgba(28,28,31,1) 100%)", borderColor: "rgba(201,184,154,0.18)" } : panelPadding()}>
-              <div className={LABEL}>{stat.label}</div>
-              <div className="mt-3 font-serif text-[28px] leading-none tracking-[-0.03em]" style={{ color: stat.accent ? "var(--accent-warm)" : "var(--text-primary)" }}>{stat.value}</div>
-              <div className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{stat.detail}</div>
-            </div>
-          ))}
+
+      {/* Compact KPI bar */}
+      <section className={PANEL} style={panelPadding()}>
+        {error ? <div className="mb-4 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-300">{error}</div> : null}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+          {kpis.map((kpi) => {
+            const inner = (
+              <div
+                className={PANEL_INNER}
+                style={{
+                  ...panelPadding(),
+                  ...(kpi.accent ? { background: "linear-gradient(180deg, rgba(201,184,154,0.12) 0%, rgba(28,28,31,1) 100%)", borderColor: "rgba(201,184,154,0.18)" } : {}),
+                }}
+              >
+                <div className={LABEL}>{kpi.label}</div>
+                <div
+                  className="mt-2 font-serif text-[26px] leading-none tracking-[-0.02em]"
+                  style={{ color: kpi.accent ? "var(--accent-warm)" : kpi.alert ? "#fca5a5" : "var(--text-primary)" }}
+                >
+                  {loading ? "—" : kpi.value}
+                </div>
+              </div>
+            );
+            return kpi.href ? (
+              <Link key={kpi.label} href={kpi.href} className="block no-underline hover:opacity-80 transition">
+                {inner}
+              </Link>
+            ) : (
+              <div key={kpi.label}>{inner}</div>
+            );
+          })}
         </div>
       </section>
 
+      {/* Calendar + Right column */}
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.75fr)]">
-        <PanelFrame eyebrow="Calendar" title="Month at a glance" action={<><button onClick={() => setViewDate(new Date())} className={BUTTON_SMALL}>Today</button><button onClick={() => setViewDate((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1))} className={BUTTON_SMALL}>Prev</button><button onClick={() => setViewDate((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))} className={BUTTON_SMALL}>Next</button></>}>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-[var(--text-secondary)]">{formatMonthLabel(viewDate.getFullYear(), viewDate.getMonth())}</div>
-            <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)]">Click a day for the operator queue</div>
+
+        {/* Calendar */}
+        <SectionPanel
+          eyebrow="Calendar"
+          action={
+            <>
+              <button onClick={() => setViewDate(new Date())} className={BUTTON_SMALL}>Today</button>
+              <button onClick={() => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))} className={BUTTON_SMALL}>‹</button>
+              <button onClick={() => setViewDate((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))} className={BUTTON_SMALL}>›</button>
+            </>
+          }
+        >
+          <div className="mb-3 text-sm font-medium text-[var(--text-secondary)]">
+            {formatMonthLabel(viewDate.getFullYear(), viewDate.getMonth())}
           </div>
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
             <div>
-              <div className="grid grid-cols-7 gap-2 pb-2">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((weekday) => <div key={weekday} className={`${LABEL} text-center`}>{weekday}</div>)}
+              <div className="grid grid-cols-7 gap-1.5 pb-2">
+                {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+                  <div key={`${d}-${i}`} className={`${LABEL} text-center`}>{d}</div>
+                ))}
               </div>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-7 gap-1.5">
                 {monthGrid.map((cell, index) => {
-                  if (cell.kind === "blank") return <div key={`blank-${index}`} className="aspect-square rounded-2xl bg-transparent" />;
+                  if (cell.kind === "blank") return <div key={`blank-${index}`} className="aspect-square rounded-xl bg-transparent" />;
                   const count = (jobsByDay.get(cell.key) ?? []).length;
                   const isSelected = cell.key === selectedDayKey;
+                  const isToday = cell.key === todayKey;
                   return (
-                    <button key={cell.key} onClick={() => setSelectedDayKey(cell.key)} className={`aspect-square rounded-2xl border p-2 text-left transition ${isSelected ? "border-transparent bg-[var(--accent)] text-[#0e0e0f]" : "border-[var(--border)] bg-[rgba(255,255,255,0.015)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"}`}>
+                    <button
+                      key={cell.key}
+                      onClick={() => setSelectedDayKey(cell.key)}
+                      className={`aspect-square rounded-xl border p-1.5 text-left transition ${
+                        isSelected
+                          ? "border-transparent bg-[var(--accent)] text-[#0e0e0f]"
+                          : isToday
+                          ? "border-[rgba(201,184,154,0.35)] bg-[rgba(201,184,154,0.06)] text-[var(--text-primary)]"
+                          : "border-[var(--border)] bg-[rgba(255,255,255,0.015)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-2)]"
+                      }`}
+                    >
                       <div className="flex h-full flex-col justify-between">
-                        <span className="text-sm font-medium">{cell.date.getDate()}</span>
-                        <span className={`text-[10px] uppercase tracking-[0.16em] ${isSelected ? "text-[rgba(14,14,15,0.72)]" : "text-[var(--text-muted)]"}`}>{count > 0 ? `${count} job${count === 1 ? "" : "s"}` : "Open"}</span>
+                        <span className="text-xs font-medium">{cell.date.getDate()}</span>
+                        {count > 0 && (
+                          <span className={`text-[9px] uppercase tracking-[0.12em] ${isSelected ? "text-[rgba(14,14,15,0.65)]" : "text-[var(--text-muted)]"}`}>
+                            {count}
+                          </span>
+                        )}
                       </div>
                     </button>
                   );
                 })}
               </div>
             </div>
+
+            {/* Selected day panel */}
             <div className={PANEL_INNER} style={panelPadding()}>
-              <div className={LABEL}>Selected Day</div>
-              <div className="mt-2 text-lg font-semibold text-[var(--text-primary)]">{selectedDayKey}</div>
-              <div className="mt-4 space-y-3">
-                {selectedDayJobs.length === 0 ? <div className="text-sm text-[var(--text-muted)]">No jobs scheduled for this day yet.</div> : selectedDayJobs.map((job) => (
-                  <div key={job.id} className="rounded-xl border border-[var(--border)] p-4">
+              <div className={LABEL}>
+                {fmtDayKey(selectedDayKey)}
+              </div>
+              <div className="mt-3 space-y-2">
+                {selectedDayJobs.length === 0 ? (
+                  <div className="text-sm text-[var(--text-muted)]">No jobs.</div>
+                ) : selectedDayJobs.map((job) => (
+                  <div key={job.id} className="rounded-xl border border-[var(--border)] px-3 py-3">
                     <div className="text-sm font-medium text-[var(--text-primary)]">{job.title}</div>
-                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{job.client_name || "No client"}{job.property_name ? ` • ${job.property_name}` : ""}</div>
-                    <div className="mt-1 text-xs text-[var(--text-muted)]">{fmtDate(job.scheduled_for)} • {job.source_type === "PLAN" ? job.plan_name || "Plan visit" : "One-off work"}</div>
+                    <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
+                      {job.client_name || "No client"}{job.property_name ? ` · ${job.property_name}` : ""}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </PanelFrame>
+        </SectionPanel>
 
+        {/* Right column */}
         <div className="space-y-6">
-          <PanelFrame eyebrow="Today" title="Immediate queue">
-            <div className="space-y-3">
-              {todayJobs.length === 0 ? <div className="text-sm text-[var(--text-muted)]">No jobs scheduled for today.</div> : todayJobs.map((job) => (
+
+          {/* Today's queue */}
+          <SectionPanel eyebrow="Today's jobs" action={<Link href="/portal/jobs" className={BUTTON_SMALL}>All jobs</Link>}>
+            <div className="space-y-2">
+              {todayJobs.length === 0 ? (
+                <div className="text-sm text-[var(--text-muted)]">Nothing scheduled today.</div>
+              ) : todayJobs.map((job) => (
                 <div key={job.id} className={`${PANEL_INNER} flex items-start justify-between gap-3`} style={panelPadding()}>
                   <div>
                     <div className="text-sm font-medium text-[var(--text-primary)]">{job.title}</div>
-                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{job.client_name || "No client"}{job.property_name ? ` • ${job.property_name}` : ""}</div>
-                    <div className="mt-1 text-xs text-[var(--text-muted)]">{fmtDate(job.scheduled_for)}</div>
+                    <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
+                      {job.client_name || "No client"}{job.property_name ? ` · ${job.property_name}` : ""}
+                    </div>
                   </div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">{job.source_type === "PLAN" ? "Plan" : "One-off"}</div>
+                  <div className="text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                    {job.source_type === "PLAN" ? "Plan" : "One-off"}
+                  </div>
                 </div>
               ))}
             </div>
-          </PanelFrame>
+          </SectionPanel>
 
-          <PanelFrame eyebrow="Approvals" title="Draft communications">
-            <div className="space-y-3">
-              {awaitingApproval.length === 0 ? <div className="text-sm text-[var(--text-muted)]">No drafts are awaiting approval.</div> : awaitingApproval.slice(0, 5).map((item) => (
-                <div key={item.id} className={`${PANEL_INNER} flex items-start justify-between gap-3`} style={panelPadding()}>
-                  <div>
+          {/* Draft messages */}
+          {awaitingApproval.length > 0 && (
+            <SectionPanel eyebrow={`Messages (${awaitingApproval.length})`} action={<Link href="/portal/contacts" className={BUTTON_SMALL}>Review</Link>}>
+              <div className="space-y-2">
+                {awaitingApproval.slice(0, 4).map((item) => (
+                  <div key={item.id} className={`${PANEL_INNER}`} style={panelPadding()}>
                     <div className="text-sm font-medium text-[var(--text-primary)]">{item.subject || item.type || "Draft"}</div>
-                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{item.client_name || "No client"} • {String(item.type ?? "GENERAL").replaceAll("_", " ")}</div>
-                    <div className="mt-1 text-xs text-[var(--text-muted)]">Follow-up due {fmtDate(item.follow_up_due_at)}</div>
+                    <div className="mt-0.5 text-xs text-[var(--text-secondary)]">{item.client_name || "No client"}</div>
                   </div>
-                  <Link href="/portal/contacts" className={BUTTON_SMALL}>Review</Link>
-                </div>
-              ))}
-            </div>
-          </PanelFrame>
+                ))}
+              </div>
+            </SectionPanel>
+          )}
 
-          <PanelFrame eyebrow="Billing" title="Unpaid pressure">
-            <div className="space-y-3">
+          {/* Billing pressure */}
+          <SectionPanel eyebrow="Billing" action={<Link href="/portal/invoices" className={BUTTON_SMALL}>Invoices</Link>}>
+            <div className="space-y-2">
               <div className={`${PANEL_INNER} flex items-center justify-between gap-3`} style={panelPadding()}>
                 <div>
-                  <div className="text-sm text-[var(--text-secondary)]">Outstanding balance</div>
-                  <div className="mt-2 font-serif text-[26px] text-[var(--text-primary)]">{money(invoiceDashboard?.summary.outstandingBalanceCents)}</div>
+                  <div className="text-xs text-[var(--text-muted)]">Outstanding</div>
+                  <div className="mt-1 font-serif text-[22px] text-[var(--text-primary)]">{money(invoiceDashboard?.summary.outstandingBalanceCents)}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-[var(--text-secondary)]">Overdue</div>
-                  <div className="mt-2 font-serif text-[26px] text-[#fca5a5]">{money(invoiceDashboard?.summary.overdueBalanceCents)}</div>
+                  <div className="text-xs text-[var(--text-muted)]">Overdue</div>
+                  <div className="mt-1 font-serif text-[22px] text-[#fca5a5]">{money(invoiceDashboard?.summary.overdueBalanceCents)}</div>
                 </div>
               </div>
-              {(invoiceDashboard?.queue.overdueInvoices ?? []).slice(0, 4).map((invoice) => (
-                <div key={invoice.id} className={`${PANEL_INNER} flex items-start justify-between gap-3`} style={panelPadding()}>
+              {(invoiceDashboard?.queue.overdueInvoices ?? []).slice(0, 3).map((inv) => (
+                <div key={inv.id} className={`${PANEL_INNER} flex items-center justify-between gap-3`} style={panelPadding()}>
                   <div>
-                    <div className="text-sm font-medium text-[var(--text-primary)]">{invoice.invoice_number}</div>
-                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{invoice.client_name || "No client"}</div>
-                    <div className="mt-1 text-xs text-[var(--text-muted)]">Due {fmtDate(invoice.due_date)}</div>
+                    <div className="text-xs font-medium text-[var(--text-primary)]">{inv.invoice_number}</div>
+                    <div className="mt-0.5 text-xs text-[var(--text-secondary)]">{inv.client_name || "—"}</div>
                   </div>
-                  <div className="text-sm font-medium text-[var(--text-primary)]">{money(invoice.total_cents)}</div>
+                  <div className="text-sm font-medium text-[#fca5a5]">{money(inv.total_cents)}</div>
                 </div>
               ))}
             </div>
-          </PanelFrame>
+          </SectionPanel>
+
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,0.8fr)]">
-        <PanelFrame eyebrow="This Week" title="Seven-day execution">
-          <div className="space-y-3">
-            {weekJobs.length === 0 ? <div className="text-sm text-[var(--text-muted)]">No jobs scheduled for the next seven days.</div> : weekJobs.slice(0, 8).map((job) => (
+      {/* This week + service mix */}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.6fr)]">
+
+        <SectionPanel eyebrow="This week" action={<Link href="/portal/jobs" className={BUTTON_SMALL}>All jobs</Link>}>
+          <div className="space-y-2">
+            {weekJobs.length === 0 ? (
+              <div className="text-sm text-[var(--text-muted)]">No jobs scheduled this week.</div>
+            ) : weekJobs.slice(0, 8).map((job) => (
               <div key={job.id} className={`${PANEL_INNER} flex items-start justify-between gap-3`} style={panelPadding()}>
                 <div>
                   <div className="text-sm font-medium text-[var(--text-primary)]">{job.title}</div>
-                  <div className="mt-1 text-xs text-[var(--text-secondary)]">{job.client_name || "No client"}{job.property_name ? ` • ${job.property_name}` : ""}</div>
-                  <div className="mt-1 text-xs text-[var(--text-muted)]">{fmtDate(job.scheduled_for)}</div>
+                  <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
+                    {job.client_name || "No client"}{job.property_name ? ` · ${job.property_name}` : ""}
+                  </div>
+                  <div className="mt-0.5 text-xs text-[var(--text-muted)]">{fmtDate(job.scheduled_for)}</div>
                 </div>
-                <div className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">{job.source_type === "PLAN" ? "Plan" : "One-off"}</div>
+                <div className="text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                  {job.source_type === "PLAN" ? "Plan" : "One-off"}
+                </div>
               </div>
             ))}
           </div>
-        </PanelFrame>
+        </SectionPanel>
 
-        <PanelFrame eyebrow="Service Mix" title="Recurring base snapshot">
-          <div className="space-y-3">
-            {serviceMix.length === 0 ? <div className="text-sm text-[var(--text-muted)]">No active plans yet.</div> : serviceMix.map(([label, count]) => (
+        <SectionPanel eyebrow="Active plans by type">
+          <div className="space-y-2">
+            {serviceMix.length === 0 ? (
+              <div className="text-sm text-[var(--text-muted)]">No active plans.</div>
+            ) : serviceMix.map(([label, count]) => (
               <div key={label} className={`${PANEL_INNER} flex items-center justify-between gap-3`} style={panelPadding()}>
                 <div className="text-sm text-[var(--text-primary)]">{label}</div>
-                <div className="font-serif text-[24px] text-[var(--text-primary)]">{count}</div>
+                <div className="font-serif text-[22px] text-[var(--text-primary)]">{count}</div>
               </div>
             ))}
           </div>
-        </PanelFrame>
+        </SectionPanel>
+
       </div>
     </div>
   );

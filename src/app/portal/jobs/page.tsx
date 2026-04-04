@@ -1373,22 +1373,6 @@ export default function PortalJobsPage() {
             <div className={S.label} style={{ marginBottom: 6 }}>
               Schedule
             </div>
-            <h1
-              style={{
-                fontFamily: "var(--font-serif), 'Instrument Serif', serif",
-                fontSize: 32,
-                color: "var(--text-primary)",
-                letterSpacing: "-0.01em",
-                lineHeight: 1.1,
-              }}
-            >
-              Service calendar workspace
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm font-light text-[var(--text-secondary)]">
-              Plan visits and one-off work both land here. Use this workspace to run the
-              calendar, reschedule service without breaking plan linkage, log actual hours
-              and pricing when needed, and keep completion notes attached to every finished visit.
-            </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[

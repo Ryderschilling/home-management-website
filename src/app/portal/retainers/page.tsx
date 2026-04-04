@@ -233,8 +233,6 @@ export default function PortalRetainersPage() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label} style={{ marginBottom: 6 }}>Plans</div>
-            <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Service plans and recurring agreements</h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 640 }}>Use plans for prepaid home management, usage-based mail checks, and concierge pricing context. Billing cadence can stay separate from visit cadence while plan-generated jobs stay linked to the agreement.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {[{ label: "Total plans", value: stats.total }, { label: "Active", value: stats.active }, { label: "Usage plans", value: stats.usage }, { label: "Est. recurring base", value: money(stats.estimatedMrr), accent: true }].map((s) => (

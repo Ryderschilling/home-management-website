@@ -146,8 +146,6 @@ export default function PortalContactsPage() {
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <div className={S.label}>Communications</div>
-            <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Drafts and follow-up queue</h1>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 620 }}>This route keeps owner-reviewed communication in one place: welcome drafts, visit summaries, invoice reminders, and 3-day follow-up prompts. Nothing sends automatically from here.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {[{ label: "Drafts", value: stats.drafts }, { label: "Awaiting approval", value: stats.awaitingApproval }, { label: "Sent, no response", value: stats.sentAwaitingResponse }, { label: "Follow-ups due", value: stats.followUpsDue }].map((stat) => (

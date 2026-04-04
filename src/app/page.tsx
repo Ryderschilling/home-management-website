@@ -55,6 +55,12 @@ export default function HomePage() {
           >
             Services
           </a>
+          <Link
+            href="/pricing"
+            className="text-[11px] uppercase tracking-widest hover:underline"
+          >
+            Pricing
+          </Link>
           <a
             href="#contact"
             className="text-[11px] uppercase tracking-widest hover:underline"
@@ -407,6 +413,14 @@ export default function HomePage() {
         className="transition hover:text-black"
       >
         Home Checks
+      </Link>
+    </li>
+    <li>
+      <Link
+        href="/pricing"
+        className="transition hover:text-black font-medium"
+      >
+        Pricing &amp; Plans
       </Link>
     </li>
   </ul>
