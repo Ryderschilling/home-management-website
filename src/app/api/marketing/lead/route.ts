@@ -10,6 +10,47 @@ export const runtime = "nodejs";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
+/**
+ * GET /api/marketing/lead
+ * Returns all email leads for the org, sorted by most recent.
+ * Requires x-admin-password header.
+ */
+export async function GET(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get("x-admin-password");
+    if (authHeader !== env.ADMIN_PASSWORD) {
+      return NextResponse.json({ ok: false, error: { message: "Unauthorized" } }, { status: 401 });
+    }
+
+    await ensureAdminTables();
+
+    const orgId = env.DEFAULT_ORGANIZATION_ID;
+
+    const leads = await sql`
+      SELECT
+        id,
+        email,
+        first_name,
+        status,
+        source_page,
+        campaign_code,
+        drip_suppressed_at,
+        created_at
+      FROM marketing_email_leads
+      WHERE organization_id = ${orgId}
+      ORDER BY created_at DESC
+      LIMIT 200
+    `;
+
+    return NextResponse.json({ ok: true, data: { leads } });
+  } catch (e) {
+    return NextResponse.json(
+      { ok: false, error: { message: e instanceof Error ? e.message : "Failed to fetch leads" } },
+      { status: 500 }
+    );
+  }
+}
+
 async function sendWelcomeEmail(firstName: string | null, email: string) {
   const name = firstName || "there";
   const displayName = firstName || "there";
