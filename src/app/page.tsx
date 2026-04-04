@@ -475,14 +475,14 @@ export default function HomePage() {
           will-change: opacity;
           background: radial-gradient(
               1200px 600px at 50% 35%,
-              rgba(0, 0, 0, 0) 0%,
-              rgba(0, 0, 0, 0.18) 45%,
-              rgba(0, 0, 0, 0.45) 100%
+              rgba(0, 0, 0, 0.15) 0%,
+              rgba(0, 0, 0, 0.38) 45%,
+              rgba(0, 0, 0, 0.65) 100%
             ),
             linear-gradient(
               to bottom,
-              rgba(0, 0, 0, 0.15),
-              rgba(0, 0, 0, 0.55)
+              rgba(0, 0, 0, 0.30),
+              rgba(0, 0, 0, 0.72)
             );
           animation: heroOverlayIn 2400ms cubic-bezier(0.18, 0.82, 0.16, 1)
             500ms forwards;
