@@ -34,6 +34,12 @@ export default function TestimonialsSection() {
           "Ryder is one of the most responsible and reliable young men I have worked with to date. He has helped me with my property for over two years — and he might even share a couple of his favorite fishing honey holes if you ask.",
         name: "Sandie L.",
       },
+      {
+        quote:
+          "We have utilized Ryder Schilling's services at our homes here and highly recommend him. His communication, professionalism, and service quality is truly impressive.",
+        name: "Stacy Williams",
+        meta: "WSO Homeowners",
+      },
     ],
     []
   );
