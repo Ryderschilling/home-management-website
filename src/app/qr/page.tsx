@@ -1,6 +1,14 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+
+// Safe PostHog capture — no-ops if PostHog isn't loaded
+function phCapture(event: string, props?: Record<string, unknown>) {
+  try {
+    const ph = (window as unknown as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } }).posthog;
+    ph?.capture(event, props);
+  } catch {}
+}
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -125,6 +133,12 @@ export default function QrPage() {
     setCampaignCode(resolved);
     setSessionKey(browserSessionKey);
 
+    // Track QR page visit in PostHog (high-intent — this is someone who scanned your flyer)
+    phCapture("qr_page_view", {
+      campaign_code: resolved || null,
+      referrer: document.referrer || null,
+    });
+
     if (resolved) {
       fetch("/api/marketing/track", {
         method: "POST",
@@ -155,6 +169,11 @@ export default function QrPage() {
     setLoading(true);
 
     try {
+      phCapture("qr_checkout_started", {
+        color: selectedColor.id,
+        campaign_code: campaignCode || null,
+      });
+
       const next = new URLSearchParams({
         color: selectedColor.id,
         campaignCode,
@@ -205,6 +224,7 @@ export default function QrPage() {
         throw new Error(json?.error?.message ?? "Lead capture failed");
       }
 
+      phCapture("chm_lead_submitted", { source: "qr_page", campaign_code: campaignCode || null });
       setLeadSuccess(
         json?.data?.alreadyExists
           ? "You’re already on the list."

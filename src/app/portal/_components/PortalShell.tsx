@@ -21,6 +21,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
   const [hasRestoredWidth, setHasRestoredWidth] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [activePointerId, setActivePointerId] = useState<number | null>(null);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
@@ -32,6 +33,9 @@ export function PortalShell({ children }: { children: ReactNode }) {
       if (!nextIsDesktop) {
         setIsResizing(false);
         setActivePointerId(null);
+      } else {
+        // Always close mobile drawer when viewport goes desktop
+        setIsMobileNavOpen(false);
       }
     };
 
@@ -121,6 +125,16 @@ export function PortalShell({ children }: { children: ReactNode }) {
     };
   }, [activePointerId, isDesktop, isResizing]);
 
+  // Lock body scroll when mobile nav is open
+  useEffect(() => {
+    if (!isMobileNavOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobileNavOpen]);
+
   const handleResizeStart = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (!isDesktop) return;
 
@@ -135,10 +149,23 @@ export function PortalShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="portal-shell" style={shellStyle}>
+      {/* Mobile nav backdrop — tapping it closes the drawer */}
+      {!isDesktop && isMobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          onClick={() => setIsMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       <PortalSidebar
+        isDesktop={isDesktop}
         isResizable={isDesktop}
         isResizing={isResizing}
         onResizeStart={handleResizeStart}
+        isMobileNavOpen={isMobileNavOpen}
+        onMobileNavToggle={() => setIsMobileNavOpen((v) => !v)}
+        onMobileNavClose={() => setIsMobileNavOpen(false)}
       />
       <main className="portal-main">
         <div className="portal-content portal-safe-x">{children}</div>

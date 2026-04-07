@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/order-followups",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/gcal-sync",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

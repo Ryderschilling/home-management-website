@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import {
   QR_MAIN_PRODUCT_NAME,
   QR_UPSELL_ADDON_NAME,
@@ -383,6 +384,12 @@ function QrSuccessPageInner() {
       if (!res.ok || !json.ok) {
         throw new Error(json?.error?.message ?? "Upload failed");
       }
+
+      posthog.capture("qr_order_details_submitted", {
+        session_id: sessionId,
+        addon_selected: hasAddon,
+        rock_color: summary.rockColor || colorFromQuery,
+      });
 
       router.replace(`/qr/thanks?session_id=${encodeURIComponent(sessionId)}`);
     } catch (submitError) {

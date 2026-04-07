@@ -457,6 +457,26 @@ export default function PortalClientsPage() {
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to delete client"); }
   }
 
+  async function muteClientEmails() {
+    if (!selectedClient?.email) {
+      alert("This client has no email address saved — nothing to mute.");
+      return;
+    }
+    if (!window.confirm(`Mute all drip emails for ${selectedClient.name} (${selectedClient.email})?\n\nThis will cancel any pending email sequences for this address.`)) return;
+    setError("");
+    try {
+      const res = await fetch("/api/admin/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: selectedClient.email }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to mute emails");
+      const count = json.data?.cancelled ?? 0;
+      alert(`Done. ${count} pending email${count === 1 ? "" : "s"} cancelled for ${selectedClient.email}.`);
+    } catch (e) { setError(e instanceof Error ? e.message : "Failed to mute emails"); }
+  }
+
   async function saveClient() {
     setError("");
     if (!name.trim()) { setError("Client name is required"); return; }
@@ -703,6 +723,9 @@ export default function PortalClientsPage() {
               {selectedClient && (
                 <div className="flex flex-wrap gap-2">
                   <button onClick={() => startEditClient(selectedClient)} className={S.btnGhost}>Edit client</button>
+                  {selectedClient.email && (
+                    <button onClick={muteClientEmails} className={S.btnGhost} title="Cancel pending drip emails for this client">Mute emails</button>
+                  )}
                   <button onClick={deleteSelectedClient} className={S.btnDanger}>Delete client</button>
                 </div>
               )}

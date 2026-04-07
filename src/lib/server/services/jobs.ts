@@ -1,5 +1,11 @@
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { queueJobCompletionSummaryDraft } from "@/lib/server/services/communications";
+import {
+  createCalendarEvent,
+  updateCalendarEvent,
+  deleteCalendarEvent,
+  isCalendarConnected,
+} from "@/lib/server/services/google-calendar";
 import { asNonEmptyString, asOptionalString } from "@/lib/server/validation";
 
 type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
@@ -350,6 +356,8 @@ async function fetchJobRecord(organizationId: string, jobId: string) {
       j.source_key,
       j.source_plan_occurrence_date,
       j.plan_visit_modified,
+      j.gcal_event_id,
+      j.gcal_synced_at,
       j.created_at,
       j.updated_at,
       c.name AS client_name,
@@ -441,6 +449,8 @@ export async function listJobs(organizationId: string, filters: JobListFilters =
       j.source_key,
       j.source_plan_occurrence_date,
       j.plan_visit_modified,
+      j.gcal_event_id,
+      j.gcal_synced_at,
       j.created_at,
       j.updated_at,
       c.name AS client_name,
@@ -664,6 +674,10 @@ export async function createJob(
   if (saved && status === "COMPLETED") {
     await queueJobCompletionSummaryDraft(organizationId, id);
   }
+
+  // Push to Google Calendar (best-effort — never blocks job save)
+  void pushJobsToCalendar(organizationId, id, recurrenceEnabled);
+
   return saved;
 }
 
@@ -792,6 +806,10 @@ export async function updateJob(
     if (updatedJob && nextStatus === "COMPLETED") {
       await queueJobCompletionSummaryDraft(organizationId, jobId);
     }
+
+    // Push updated job to Google Calendar (best-effort)
+    void syncJobEventToCalendar(organizationId, jobId, updatedJob);
+
     return updatedJob;
   }
 
@@ -848,6 +866,10 @@ export async function updateJob(
     if (updatedJob && nextStatus === "COMPLETED") {
       await queueJobCompletionSummaryDraft(organizationId, jobId);
     }
+
+    // Sync updated series jobs to Google Calendar (best-effort)
+    void syncJobEventToCalendar(organizationId, jobId, updatedJob);
+
     return updatedJob;
   }
 
@@ -973,10 +995,17 @@ export async function deleteJob(
     } satisfies DeleteJobResult;
   }
 
+  // Grab gcal_event_id before deleting so we can clean up the calendar event
+  const gcalId = existing.gcal_event_id ? String(existing.gcal_event_id) : null;
+
   const result = await sql`
     DELETE FROM admin_jobs
     WHERE organization_id = ${organizationId} AND id = ${jobId}
   `;
+
+  if (gcalId) {
+    void deleteCalendarEvent(gcalId, organizationId);
+  }
 
   return {
     deleted: Number(result.count ?? 0) > 0,
@@ -985,4 +1014,137 @@ export async function deleteJob(
     skippedModifiedCount: 0,
     recurrenceScope: scope ?? "NONE",
   } satisfies DeleteJobResult;
+}
+
+// ── Google Calendar sync helpers ──────────────────────────────────────────────
+// All GCal operations are fire-and-forget (called with void).
+// A GCal failure never blocks a job from saving.
+
+/**
+ * After creating a job (and its recurring children), push all of them to GCal.
+ * Stores the returned gcal_event_id back on each job row.
+ */
+async function pushJobsToCalendar(
+  organizationId: string,
+  rootJobId: string,
+  isRecurring: boolean
+): Promise<void> {
+  try {
+    if (!(await isCalendarConnected(organizationId))) return;
+
+    // Fetch the root job + all recurring children in one query
+    const jobs = await sql<{
+      id: string;
+      title: string;
+      notes: string | null;
+      scheduled_for: string;
+      duration_minutes: number | null;
+      client_name: string | null;
+      property_address_line1: string | null;
+    }[]>`
+      SELECT
+        j.id,
+        j.title,
+        j.notes,
+        j.scheduled_for,
+        j.duration_minutes,
+        c.name AS client_name,
+        p.address_line1 AS property_address_line1
+      FROM admin_jobs j
+      LEFT JOIN admin_clients c ON c.id = j.client_id AND c.organization_id = j.organization_id
+      LEFT JOIN admin_properties p ON p.id = j.property_id AND p.organization_id = j.organization_id
+      WHERE j.organization_id = ${organizationId}
+        AND (
+          j.id = ${rootJobId}
+          ${isRecurring ? sql`OR j.recurring_series_id = ${rootJobId}` : sql``}
+        )
+      ORDER BY j.scheduled_for ASC
+    `;
+
+    for (const job of jobs) {
+      const description = [
+        job.client_name ? `Client: ${job.client_name}` : null,
+        job.property_address_line1 ? `Address: ${job.property_address_line1}` : null,
+        job.notes ? `Notes: ${job.notes}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      const gcalEventId = await createCalendarEvent({
+        organizationId,
+        title: job.title,
+        description,
+        scheduledFor: new Date(job.scheduled_for),
+        durationMinutes: job.duration_minutes,
+      });
+
+      if (gcalEventId) {
+        await sql`
+          UPDATE admin_jobs
+          SET gcal_event_id = ${gcalEventId}, gcal_synced_at = NOW()
+          WHERE organization_id = ${organizationId} AND id = ${job.id}
+        `;
+      }
+    }
+  } catch (err) {
+    console.error("[gcal] pushJobsToCalendar failed:", err);
+  }
+}
+
+/**
+ * After updating a single job, push the update to GCal.
+ * If no gcal_event_id exists yet (job created before GCal integration), creates a new event.
+ */
+async function syncJobEventToCalendar(
+  organizationId: string,
+  jobId: string,
+  job: Record<string, unknown> | null
+): Promise<void> {
+  try {
+    if (!job) return;
+    if (!(await isCalendarConnected(organizationId))) return;
+
+    const title = String(job.title ?? "");
+    const scheduledFor = new Date(String(job.scheduled_for ?? ""));
+    if (!title || isNaN(scheduledFor.getTime())) return;
+
+    const description = [
+      job.client_name ? `Client: ${String(job.client_name)}` : null,
+      job.property_address_line1 ? `Address: ${String(job.property_address_line1)}` : null,
+      job.notes ? `Notes: ${String(job.notes)}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const durationMinutes = job.duration_minutes ? Number(job.duration_minutes) : null;
+    const existingGcalId = job.gcal_event_id ? String(job.gcal_event_id) : null;
+
+    if (existingGcalId) {
+      await updateCalendarEvent(existingGcalId, {
+        organizationId,
+        title,
+        description,
+        scheduledFor,
+        durationMinutes,
+      });
+    } else {
+      // Job predates GCal integration — create an event and store the ID
+      const gcalEventId = await createCalendarEvent({
+        organizationId,
+        title,
+        description,
+        scheduledFor,
+        durationMinutes,
+      });
+      if (gcalEventId) {
+        await sql`
+          UPDATE admin_jobs
+          SET gcal_event_id = ${gcalEventId}, gcal_synced_at = NOW()
+          WHERE organization_id = ${organizationId} AND id = ${jobId}
+        `;
+      }
+    }
+  } catch (err) {
+    console.error("[gcal] syncJobEventToCalendar failed:", err);
+  }
 }

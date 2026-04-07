@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 24;
+const ADMIN_SCHEMA_VERSION = 25;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -1007,6 +1007,19 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
         );
       }
     }
+
+    // v25 — Google Calendar sync columns
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS gcal_event_id TEXT`;
+    await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS gcal_synced_at TIMESTAMPTZ`;
+
+    await tx`
+      CREATE TABLE IF NOT EXISTS google_tokens (
+        organization_id TEXT NOT NULL PRIMARY KEY,
+        refresh_token   TEXT NOT NULL,
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
   });
 
   globalForDb.adminSchemaReadyPromise = readyPromise;

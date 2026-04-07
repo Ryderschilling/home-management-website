@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import { siteData } from "@/data/siteData";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -109,7 +110,6 @@ const plans: Plan[] = [
             text: "<strong>3 on-call services/mo</strong> — up to 3 hrs, no charge",
             tag: "Free",
           },
-          { text: "<strong>Guaranteed 2-hour response</strong> — no queue, no wait" },
           { text: "<strong>24/7 emergency reach</strong> — Ryder's direct line" },
           {
             text: "<strong>Contractor liaison</strong> — your local point of contact for every trade",
@@ -212,6 +212,11 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         throw new Error(data?.error?.message || "Something went wrong");
       }
 
+      posthog.capture("pricing_inquiry_submitted", {
+        plan: plan.name,
+        tier: plan.tier,
+        price: plan.price,
+      });
       setState("success");
     } catch (err) {
       setState("error");
@@ -397,7 +402,7 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
         </div>
       ))}
 
-      <button className={`cta cta-${plan.tier}`} onClick={() => onSelect(plan)}>
+      <button className={`cta cta-${plan.tier}`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price: plan.price }); onSelect(plan); }}>
         {plan.cta}
       </button>
     </div>

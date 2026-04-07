@@ -83,6 +83,7 @@ export async function sendRockInstallationFollowUpEmail(opts: {
   const resend = new Resend(key);
   const rendered = renderRockInstallationFollowUpEmail({
     customerName: opts.customerName,
+    upsellUrl: env.UPSELL_URL,
   });
 
   return resend.emails.send({

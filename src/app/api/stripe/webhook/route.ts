@@ -12,6 +12,7 @@ import {
   QR_UPSELL_ADDON_PRICE_CENTS,
   parseBooleanFlag,
 } from "@/lib/qr-funnel";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 
@@ -415,6 +416,23 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
     existingOrder.length > 0 && !!existingOrder[0].paid_notification_sent_at;
 
   if (!alreadySentPaidNotification) {
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: email || stripeSessionId,
+      event: "order_completed",
+      properties: {
+        rock_color: rockColor,
+        product_key: productKey,
+        addon_selected: addonSelected,
+        addon_product_key: addonProductKey ?? null,
+        total_cents: totalCents,
+        campaign_code: campaignCode || null,
+        used_promotion_code: discountAmountCents > 0,
+        promotion_code: promotionCode || null,
+        stripe_session_id: stripeSessionId,
+      },
+    });
+
     await sendPipePhotoEmail({
       subject: `NEW PAID ORDER — ${rockColor.toUpperCase()}`,
       html: `

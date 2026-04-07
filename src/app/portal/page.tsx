@@ -228,14 +228,14 @@ export default function PortalDashboardPage() {
     return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
   }, [activePlans]);
 
-  // Compact KPI strip — label + number only, no descriptive subtext
+  // Compact KPI strip — ordered by daily priority: schedule → money → messages
   const kpis = [
     { label: "Today", value: todayJobs.length },
+    { label: "Outstanding", value: money(invoiceDashboard?.summary.outstandingBalanceCents), href: "/portal/invoices", accent: true },
+    { label: "Messages", value: awaitingApproval.length, href: "/portal/contacts", alert: awaitingApproval.length > 0 },
+    { label: "MRR", value: money(mrrCents), accent: true },
     { label: "This week", value: weekJobs.length },
     { label: "Active plans", value: activePlans.length },
-    { label: "Messages", value: awaitingApproval.length, href: "/portal/contacts", alert: awaitingApproval.length > 0 },
-    { label: "Outstanding", value: money(invoiceDashboard?.summary.outstandingBalanceCents), href: "/portal/invoices", accent: true },
-    { label: "MRR", value: money(mrrCents), accent: true },
   ];
 
   return (

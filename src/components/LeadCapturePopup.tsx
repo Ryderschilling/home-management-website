@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "chm_lead_popup_dismissed";
 
+// Safe PostHog capture — no-ops if PostHog isn't loaded yet
+function phCapture(event: string, props?: Record<string, unknown>) {
+  try {
+    const ph = (window as unknown as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } }).posthog;
+    ph?.capture(event, props);
+  } catch {}
+}
+
 export default function LeadCapturePopup() {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState<"idle" | "form" | "success">("idle");
@@ -23,6 +31,7 @@ export default function LeadCapturePopup() {
     const timer = setTimeout(() => {
       setVisible(true);
       setStep("form");
+      phCapture("lead_form_view", { source: "popup", page: window.location.pathname });
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -66,6 +75,7 @@ export default function LeadCapturePopup() {
       }
 
       sessionStorage.setItem(STORAGE_KEY, "1");
+      phCapture("chm_lead_submitted", { source: "popup", neighborhood: neighborhood || null });
       setStep("success");
     } catch {
       setError("Something went wrong. Please try again.");

@@ -5,6 +5,7 @@ import { resolveCampaignByCode } from "@/lib/server/campaigns";
 import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import { scheduleDripSequence } from "@/lib/server/lead-drip";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 
@@ -263,6 +264,17 @@ export async function POST(req: NextRequest) {
         `;
       }
 
+      const posthog = getPostHogClient();
+      posthog.capture({
+        distinctId: email,
+        event: "lead_captured",
+        properties: {
+          source_page: sourcePage,
+          campaign_code: normalizedCampaignCode || null,
+          is_new_lead: false,
+        },
+      });
+
       return NextResponse.json({
         ok: true,
         data: {
@@ -326,6 +338,17 @@ export async function POST(req: NextRequest) {
         )
       `;
     }
+
+    const posthog = getPostHogClient();
+    posthog.capture({
+      distinctId: email,
+      event: "lead_captured",
+      properties: {
+        source_page: sourcePage,
+        campaign_code: normalizedCampaignCode || null,
+        is_new_lead: true,
+      },
+    });
 
     // Fire welcome email + schedule drip sequence (non-blocking)
     await sendWelcomeEmail(firstName || null, email);

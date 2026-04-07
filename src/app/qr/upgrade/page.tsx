@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import posthog from "posthog-js";
 import {
   QR_MAIN_PRODUCT_NAME,
   QR_UPSELL_ADDON_COMPARE_AT_CENTS,
@@ -86,6 +87,11 @@ function QrUpgradePageInner() {
   const selectedColor = useMemo(() => getQrColorOption(color), [color]);
 
   useEffect(() => {
+    posthog.capture("qr_upgrade_viewed", {
+      color: selectedColor.id,
+      campaign_code: campaignCode || null,
+    });
+
     if (!campaignCode || !shouldTrackOnce(`page_view:/qr/upgrade:${campaignCode}:${sessionKey}`)) {
       return;
     }
@@ -99,6 +105,19 @@ function QrUpgradePageInner() {
   async function continueToCheckout(addAddon: boolean) {
     setAction(addAddon ? "add" : "skip");
     setError("");
+
+    if (addAddon) {
+      posthog.capture("qr_addon_selected", {
+        color: selectedColor.id,
+        campaign_code: campaignCode || null,
+        addon_product_key: QR_UPSELL_ADDON_KEY,
+      });
+    } else {
+      posthog.capture("qr_addon_declined", {
+        color: selectedColor.id,
+        campaign_code: campaignCode || null,
+      });
+    }
 
     try {
       if (
