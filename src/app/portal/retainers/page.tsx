@@ -245,20 +245,6 @@ export default function PortalRetainersPage() {
           </div>
         </div>
         <div className="mt-6"><input className={S.input} placeholder="Search plan, client, property, status..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-        <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
-          <div className={S.cardInner} style={{ padding: "14px 16px" }}>
-            <div className={S.label}>Billing cadence</div>
-            <div style={{ fontSize: 13, color: "var(--text-primary)", marginTop: 6 }}>Determines when invoices are generated from the plan.</div>
-          </div>
-          <div className={S.cardInner} style={{ padding: "14px 16px" }}>
-            <div className={S.label}>Visit cadence</div>
-            <div style={{ fontSize: 13, color: "var(--text-primary)", marginTop: 6 }}>Determines how future jobs are generated on the schedule.</div>
-          </div>
-          <div className={S.cardInner} style={{ padding: "14px 16px" }}>
-            <div className={S.label}>Example</div>
-            <div style={{ fontSize: 13, color: "var(--text-primary)", marginTop: 6 }}>Bill monthly while visits run weekly, then add extra billable jobs only when needed.</div>
-          </div>
-        </div>
         {error && <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>}
         {!error && notice && <div className="mt-5 rounded-xl border border-emerald-900/30 bg-emerald-900/10 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
       </section>

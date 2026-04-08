@@ -1,18 +1,14 @@
 "use client";
-
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   InvoiceCard,
   S,
-  formatDate,
   invoiceGroupLabel,
   money,
   type InvoiceDashboardData,
   type PortalClient,
   type PortalInvoice,
-  type QueueJob,
 } from "./_components/invoice-ui";
 import { InvoiceComposer } from "./_components/InvoiceComposer";
 
@@ -144,29 +140,18 @@ export default function PortalInvoicesPage() {
     ) as Record<string, PortalInvoice[]>;
   }, [clientFilter, dashboard, query]);
 
-  const filteredQueue = useMemo(() => {
-    if (!dashboard) {
-      return {
-        completedJobsWithoutInvoice: [] as QueueJob[],
-        agingCompletedJobsWithoutInvoice: [] as QueueJob[],
-        draftInvoices: [] as PortalInvoice[],
-        scheduledDueSoon: [] as PortalInvoice[],
-        overdueInvoices: [] as PortalInvoice[],
-      };
-    }
-
-    return {
-      completedJobsWithoutInvoice: dashboard.queue.completedJobsWithoutInvoice.filter((job) =>
-        clientFilter ? job.client_id === clientFilter : true
-      ),
-      agingCompletedJobsWithoutInvoice: dashboard.queue.agingCompletedJobsWithoutInvoice.filter(
-        (job) => (clientFilter ? job.client_id === clientFilter : true)
-      ),
-      draftInvoices: filterInvoices(dashboard.queue.draftInvoices, clientFilter, query),
-      scheduledDueSoon: filterInvoices(dashboard.queue.scheduledDueSoon, clientFilter, query),
-      overdueInvoices: filterInvoices(dashboard.queue.overdueInvoices, clientFilter, query),
-    };
-  }, [clientFilter, dashboard, query]);
+  const orderedGroups = useMemo(
+    () =>
+      [
+        "sentOutstanding",
+        "paid",
+        "overdue",
+        "drafts",
+        "readyToSend",
+        "scheduled",
+      ].map((groupKey) => [groupKey, filteredGroups[groupKey] ?? []] as const),
+    [filteredGroups]
+  );
 
   return (
     <div className="space-y-6">
@@ -183,13 +168,11 @@ export default function PortalInvoicesPage() {
         </div>
 
         {dashboard ? (
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {[
-              { label: "Draft invoices", value: dashboard.summary.totalDraftInvoices },
-              { label: "Ready to send", value: dashboard.summary.totalReadyToSend },
               { label: "Outstanding balance", value: money(dashboard.summary.outstandingBalanceCents) },
-              { label: "Overdue balance", value: money(dashboard.summary.overdueBalanceCents) },
               { label: "Paid this month", value: money(dashboard.summary.paidThisMonthCents) },
+              { label: "Overdue balance", value: money(dashboard.summary.overdueBalanceCents) },
             ].map((stat) => (
               <div key={stat.label} className={`${S.cardInner} px-4 py-4`}>
                 <div className={S.label}>{stat.label}</div>
@@ -237,202 +220,13 @@ export default function PortalInvoicesPage() {
         ) : null}
       </section>
 
-      <section className={`${S.card} p-5 sm:p-7`}>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className={S.label}>Needs invoice queue</div>
-            <h2
-              className="mt-2 text-[26px] text-[var(--text-primary)]"
-              style={{ fontFamily: "var(--font-serif), serif", lineHeight: 1.04 }}
-            >
-              What needs attention next
-            </h2>
-          </div>
-          <div className="text-sm text-[var(--text-muted)]">
-            Aging jobs are completed jobs older than 7 days without an invoice.
-          </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-2">
-          <div className={`${S.cardInner} p-4`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="text-sm font-medium text-[var(--text-primary)]">
-                Completed jobs with no invoice
-              </div>
-              <div className="text-xs text-[var(--text-muted)]">
-                {filteredQueue.completedJobsWithoutInvoice.length} visible
-              </div>
-            </div>
-            <div className="mt-4 space-y-3">
-              {filteredQueue.completedJobsWithoutInvoice.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">
-                  No completed uninvoiced jobs in the current filter.
-                </div>
-              ) : (
-                filteredQueue.completedJobsWithoutInvoice.map((job) => (
-                  <button
-                    key={job.id}
-                    type="button"
-                    onClick={() =>
-                      openComposer({
-                        clientId: job.client_id ?? undefined,
-                        propertyId: job.property_id ?? undefined,
-                        jobIds: [job.id],
-                      })
-                    }
-                    className="block w-full rounded-xl border border-[var(--border)] p-4 text-left transition hover:border-[var(--border-hover)]"
-                  >
-                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-[var(--text-primary)]">
-                          {job.title}
-                        </div>
-                        <div className="mt-1 text-xs text-[var(--text-secondary)]">
-                          {job.client_name || "No client"}
-                          {job.property_name ? ` • ${job.property_name}` : ""}
-                        </div>
-                        <div className="mt-1 text-xs text-[var(--text-muted)]">
-                          Completed {formatDate(job.completed_at ?? job.scheduled_for)}
-                        </div>
-                      </div>
-                      <div className="text-sm font-medium text-[var(--text-primary)]">
-                        {money(job.price_cents)}
-                      </div>
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className={`${S.cardInner} p-4`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="text-sm font-medium text-[var(--text-primary)]">
-                Aging completed jobs
-              </div>
-              <div className="text-xs text-[var(--text-muted)]">
-                {filteredQueue.agingCompletedJobsWithoutInvoice.length} visible
-              </div>
-            </div>
-            <div className="mt-4 space-y-3">
-              {filteredQueue.agingCompletedJobsWithoutInvoice.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">
-                  No aging uninvoiced jobs in the current filter.
-                </div>
-              ) : (
-                filteredQueue.agingCompletedJobsWithoutInvoice.map((job) => (
-                  <button
-                    key={job.id}
-                    type="button"
-                    onClick={() =>
-                      openComposer({
-                        clientId: job.client_id ?? undefined,
-                        propertyId: job.property_id ?? undefined,
-                        jobIds: [job.id],
-                      })
-                    }
-                    className="block w-full rounded-xl border border-[var(--border)] p-4 text-left transition hover:border-[var(--border-hover)]"
-                  >
-                    <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-[var(--text-primary)]">
-                          {job.title}
-                        </div>
-                        <div className="mt-1 text-xs text-[var(--text-secondary)]">
-                          {job.client_name || "No client"}
-                          {job.property_name ? ` • ${job.property_name}` : ""}
-                        </div>
-                        <div className="mt-1 text-xs text-red-300">
-                          Completed {formatDate(job.completed_at ?? job.scheduled_for)}
-                        </div>
-                      </div>
-                      <div className="text-sm font-medium text-[var(--text-primary)]">
-                        {money(job.price_cents)}
-                      </div>
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className={`${S.cardInner} p-4`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="text-sm font-medium text-[var(--text-primary)]">
-                Drafts not yet sent
-              </div>
-              <div className="text-xs text-[var(--text-muted)]">
-                {filteredQueue.draftInvoices.length} visible
-              </div>
-            </div>
-            <div className="mt-4 space-y-3">
-              {filteredQueue.draftInvoices.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">
-                  No unsent drafts in the current filter.
-                </div>
-              ) : (
-                filteredQueue.draftInvoices.map((invoice) => (
-                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className={`${S.cardInner} p-4`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="text-sm font-medium text-[var(--text-primary)]">
-                Scheduled to send soon
-              </div>
-              <div className="text-xs text-[var(--text-muted)]">
-                {filteredQueue.scheduledDueSoon.length} visible
-              </div>
-            </div>
-            <div className="mt-4 space-y-3">
-              {filteredQueue.scheduledDueSoon.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">
-                  No scheduled invoices due soon.
-                </div>
-              ) : (
-                filteredQueue.scheduledDueSoon.map((invoice) => (
-                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5">
-          <div className={`${S.cardInner} p-4`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="text-sm font-medium text-[var(--text-primary)]">
-                Overdue unpaid invoices
-              </div>
-              <div className="text-xs text-[var(--text-muted)]">
-                {filteredQueue.overdueInvoices.length} visible
-              </div>
-            </div>
-            <div className="mt-4 space-y-3">
-              {filteredQueue.overdueInvoices.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)]">
-                  No overdue invoices in the current filter.
-                </div>
-              ) : (
-                filteredQueue.overdueInvoices.map((invoice) => (
-                  <InvoiceCard key={invoice.id} invoice={invoice} compact />
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="space-y-5">
         {loading ? (
           <div className={`${S.card} p-6 text-sm text-[var(--text-muted)]`}>
             Loading invoices...
           </div>
         ) : (
-          Object.entries(filteredGroups).map(([groupKey, invoices]) => (
+          orderedGroups.map(([groupKey, invoices]) => (
             <div key={groupKey} className={`${S.card} p-5 sm:p-7`}>
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>

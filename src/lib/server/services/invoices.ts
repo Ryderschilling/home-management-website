@@ -120,10 +120,24 @@ function currentStripeModeLabel() {
 }
 
 function parseDateOnly(value: unknown, label: string) {
-  const stringValue = String(value ?? "").trim();
+  if (value === undefined || value === null || value === "") return null;
+
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      throw new Error(`Invalid ${label}`);
+    }
+
+    return value.toISOString().slice(0, 10);
+  }
+
+  const stringValue = String(value).trim();
   if (!stringValue) return null;
 
-  const date = new Date(`${stringValue}T00:00:00`);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(stringValue)) {
+    return stringValue;
+  }
+
+  const date = new Date(stringValue);
   if (Number.isNaN(date.getTime())) {
     throw new Error(`Invalid ${label}`);
   }
@@ -192,6 +206,16 @@ function toIsoString(value: unknown) {
   }
 
   return date.toISOString();
+}
+
+function asStoredOptionalString(value: unknown) {
+  if (value === undefined || value === null || value === "") return null;
+  if (typeof value === "string") return value.trim();
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "number" || typeof value === "bigint" || typeof value === "boolean") {
+    return String(value);
+  }
+  return null;
 }
 
 function asJsonArray<T>(value: unknown): T[] {
@@ -368,40 +392,6 @@ function getInvoiceDeletionState(
     };
   }
 
-  if (status === "SCHEDULED" || status === "OUTSTANDING" || status === "OVERDUE" || invoice.sent_at || invoice.send_at) {
-    return {
-      canDelete: false,
-      blockedReason: "Sent or scheduled invoices can't be deleted. Keep them for billing history.",
-    };
-  }
-
-  if (status === "VOID") {
-    return {
-      canDelete: false,
-      blockedReason: "Voided invoices are kept for billing history and can't be deleted.",
-    };
-  }
-
-  if (
-    status === "FINALIZATION_FAILED" ||
-    invoice.finalized_at ||
-    invoice.stripe_invoice_id ||
-    invoice.hosted_invoice_url ||
-    invoice.invoice_pdf_url
-  ) {
-    return {
-      canDelete: false,
-      blockedReason: "This invoice is already linked to Stripe and can't be hard-deleted.",
-    };
-  }
-
-  if (status !== "DRAFT" && status !== "READY_TO_SEND") {
-    return {
-      canDelete: false,
-      blockedReason: "Only local draft invoices can be deleted.",
-    };
-  }
-
   return {
     canDelete: true,
     blockedReason: null,
@@ -412,13 +402,13 @@ function withInvoiceDeletionState<T extends Partial<InvoiceRecord> & Record<stri
   const deletionState = getInvoiceDeletionState({
     status: String(invoice.status ?? "DRAFT"),
     amount_paid_cents: Number(invoice.amount_paid_cents ?? 0),
-    stripe_invoice_id: asOptionalString(invoice.stripe_invoice_id),
-    hosted_invoice_url: asOptionalString(invoice.hosted_invoice_url),
-    invoice_pdf_url: asOptionalString(invoice.invoice_pdf_url),
-    send_at: asOptionalString(invoice.send_at),
-    sent_at: asOptionalString(invoice.sent_at),
-    paid_at: asOptionalString(invoice.paid_at),
-    finalized_at: asOptionalString(invoice.finalized_at),
+    stripe_invoice_id: asStoredOptionalString(invoice.stripe_invoice_id),
+    hosted_invoice_url: asStoredOptionalString(invoice.hosted_invoice_url),
+    invoice_pdf_url: asStoredOptionalString(invoice.invoice_pdf_url),
+    send_at: asStoredOptionalString(invoice.send_at),
+    sent_at: asStoredOptionalString(invoice.sent_at),
+    paid_at: asStoredOptionalString(invoice.paid_at),
+    finalized_at: asStoredOptionalString(invoice.finalized_at),
   } as Pick<
     InvoiceRecord,
     | "status"
@@ -1263,12 +1253,12 @@ async function createStripeDraftInvoice(
   organizationId: string,
   invoiceRecord: Record<string, unknown>
 ) {
-  const clientId = asOptionalString(invoiceRecord.client_id);
+  const clientId = asStoredOptionalString(invoiceRecord.client_id);
   if (!clientId) {
     throw new Error("Invoice client is required");
   }
 
-  const clientEmail = asOptionalString(invoiceRecord.client_email);
+  const clientEmail = asStoredOptionalString(invoiceRecord.client_email);
   if (!clientEmail) {
     throw new Error("Client email is required before a Stripe invoice can be sent.");
   }
@@ -1306,8 +1296,8 @@ async function createStripeDraftInvoice(
     auto_advance: false,
     collection_method: "send_invoice",
     pending_invoice_items_behavior: "include",
-    description: asOptionalString(invoiceRecord.memo) ?? undefined,
-    footer: asOptionalString(invoiceRecord.internal_notes) ?? undefined,
+    description: asStoredOptionalString(invoiceRecord.memo) ?? undefined,
+    footer: asStoredOptionalString(invoiceRecord.internal_notes) ?? undefined,
     due_date: dueDate
       ? Math.floor(new Date(`${dueDate}T12:00:00.000Z`).getTime() / 1000)
       : undefined,
@@ -1395,7 +1385,7 @@ async function applyStripeInvoiceSnapshot(
   await sql`
     UPDATE admin_invoices
     SET
-      stripe_customer_id = ${asOptionalString(stripeInvoice.customer) ?? asOptionalString(existing.stripe_customer_id)},
+      stripe_customer_id = ${asStoredOptionalString(stripeInvoice.customer) ?? asStoredOptionalString(existing.stripe_customer_id)},
       stripe_invoice_id = ${stripeInvoice.id},
       stripe_status = ${stripeInvoice.status ?? null},
       status = ${status},
@@ -1408,9 +1398,9 @@ async function applyStripeInvoiceSnapshot(
         stripeInvoice.amount_remaining ?? existing.amount_remaining_cents ?? 0
       )},
       currency = ${String(stripeInvoice.currency ?? existing.currency ?? DEFAULT_CURRENCY)},
-      hosted_invoice_url = ${asOptionalString(stripeInvoice.hosted_invoice_url)},
-      invoice_pdf_url = ${asOptionalString(stripeInvoice.invoice_pdf)},
-      invoice_number = ${asOptionalString(stripeInvoice.number) ?? asOptionalString(existing.invoice_number)},
+      hosted_invoice_url = ${asStoredOptionalString(stripeInvoice.hosted_invoice_url)},
+      invoice_pdf_url = ${asStoredOptionalString(stripeInvoice.invoice_pdf)},
+      invoice_number = ${asStoredOptionalString(stripeInvoice.number) ?? asStoredOptionalString(existing.invoice_number)},
       send_at = ${status === "SCHEDULED" ? toIsoString(existing.send_at) : null},
       sent_at = ${sentAt},
       paid_at = ${paidAt},
@@ -1635,17 +1625,32 @@ export async function deleteInvoice(organizationId: string, invoiceId: string) {
     const deletionState = getInvoiceDeletionState({
       status: String(invoice.status ?? "DRAFT"),
       amount_paid_cents: Number(invoice.amount_paid_cents ?? 0),
-      stripe_invoice_id: asOptionalString(invoice.stripe_invoice_id),
-      hosted_invoice_url: asOptionalString(invoice.hosted_invoice_url),
-      invoice_pdf_url: asOptionalString(invoice.invoice_pdf_url),
-      send_at: asOptionalString(invoice.send_at),
-      sent_at: asOptionalString(invoice.sent_at),
-      paid_at: asOptionalString(invoice.paid_at),
-      finalized_at: asOptionalString(invoice.finalized_at),
+      stripe_invoice_id: asStoredOptionalString(invoice.stripe_invoice_id),
+      hosted_invoice_url: asStoredOptionalString(invoice.hosted_invoice_url),
+      invoice_pdf_url: asStoredOptionalString(invoice.invoice_pdf_url),
+      send_at: asStoredOptionalString(invoice.send_at),
+      sent_at: asStoredOptionalString(invoice.sent_at),
+      paid_at: asStoredOptionalString(invoice.paid_at),
+      finalized_at: asStoredOptionalString(invoice.finalized_at),
     });
 
     if (!deletionState.canDelete) {
       throw new Error(deletionState.blockedReason ?? "Invoice cannot be deleted.");
+    }
+
+    const stripeInvoiceId = asStoredOptionalString(invoice.stripe_invoice_id);
+    if (stripeInvoiceId) {
+      const stripeInvoice = await stripe.invoices.retrieve(stripeInvoiceId);
+
+      if (stripeInvoice.status === "paid") {
+        throw new Error("Paid invoices can't be deleted.");
+      }
+
+      if (stripeInvoice.status === "draft") {
+        await stripe.invoices.del(stripeInvoiceId);
+      } else if (stripeInvoice.status !== "void") {
+        await stripe.invoices.voidInvoice(stripeInvoiceId);
+      }
     }
 
     await tx`
@@ -1669,7 +1674,7 @@ export async function deleteInvoice(organizationId: string, invoiceId: string) {
     return {
       deleted: true,
       invoiceId,
-      invoiceNumber: asOptionalString(invoice.invoice_number),
+      invoiceNumber: asStoredOptionalString(invoice.invoice_number),
     };
   });
 

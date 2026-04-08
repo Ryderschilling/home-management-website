@@ -73,9 +73,10 @@ export function InvoiceDetailClient({ invoiceId }: { invoiceId: string }) {
       return;
     }
 
-    const confirmed = window.confirm(
-      `Delete ${invoice.invoice_number}? This permanently removes the invoice and its history.`
-    );
+    const confirmationMessage = invoice.stripe_invoice_id
+      ? `Delete ${invoice.invoice_number}? If it has already been sent, Stripe will void it first, then remove it from the portal. This permanently removes the invoice and its history.`
+      : `Delete ${invoice.invoice_number}? This permanently removes the invoice and its history.`;
+    const confirmed = window.confirm(confirmationMessage);
     if (!confirmed) return;
 
     setWorking("delete");

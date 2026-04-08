@@ -24,7 +24,6 @@ async function hogql(query: string): Promise<HogQLResult> {
         Authorization: `Bearer ${PH_PERSONAL_KEY}`,
       },
       body: JSON.stringify({ query: { kind: "HogQLQuery", query } }),
-      // @ts-expect-error — Next.js fetch cache option
       next: { revalidate: 300 },
     }
   );

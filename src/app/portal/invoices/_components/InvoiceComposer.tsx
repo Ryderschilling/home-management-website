@@ -73,6 +73,15 @@ function addDays(value: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
+function resolveShiftedDueDate(currentIssueDate: string, nextIssueDate: string, currentDueDate: string) {
+  if (!currentIssueDate || !currentDueDate) {
+    return addDays(nextIssueDate, 7);
+  }
+
+  const defaultCurrentDueDate = addDays(currentIssueDate, 7);
+  return currentDueDate === defaultCurrentDueDate ? addDays(nextIssueDate, 7) : currentDueDate;
+}
+
 function toDateTimeLocal(value: string | null | undefined) {
   if (!value) return "";
   const date = new Date(value);
@@ -604,7 +613,7 @@ export function InvoiceComposer({
             </div>
 
             <div className={`${S.cardInner} p-4 sm:p-5`}>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="space-y-2">
                   <label className={S.label}>Issue date</label>
                   <input
@@ -615,8 +624,23 @@ export function InvoiceComposer({
                       setDraft((current) => ({
                         ...current,
                         issueDate: event.target.value,
-                        dueDate: addDays(event.target.value, 7),
+                        dueDate: resolveShiftedDueDate(
+                          current.issueDate,
+                          event.target.value,
+                          current.dueDate
+                        ),
                       }))
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className={S.label}>Due date</label>
+                  <input
+                    className={S.input}
+                    type="date"
+                    value={draft.dueDate}
+                    onChange={(event) =>
+                      setDraft((current) => ({ ...current, dueDate: event.target.value }))
                     }
                   />
                 </div>

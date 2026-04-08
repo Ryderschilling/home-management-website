@@ -585,7 +585,9 @@ export default function PricingPage() {
         }
         @media (max-width: 900px) {
           .plans-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
-          .card-gold { order: -1; }
+          .card-gold   { order: 1; }
+          .card-silver { order: 2; }
+          .card-bronze { order: 3; }
         }
 
         /* ── Card ───────────────────────────────────────── */

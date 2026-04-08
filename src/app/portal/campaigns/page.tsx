@@ -59,6 +59,7 @@ export default function PortalCampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Create form state
   const [name, setName] = useState("");
@@ -105,6 +106,7 @@ export default function PortalCampaignsPage() {
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to create campaign");
       setName(""); setCampaignCode(""); setFlyersSent(""); setPrintCost(""); setDistributionCost(""); setNotes("");
+      setShowCreateModal(false);
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to create campaign"); }
     finally { setSaving(false); }
@@ -169,8 +171,66 @@ export default function PortalCampaignsPage() {
       { flyers: 0, visits: 0, orders: 0, revenue: 0 }
     ), [campaigns]);
 
+  const runningCampaigns = useMemo(
+    () => campaigns.filter((campaign) => campaign.active),
+    [campaigns]
+  );
+
   return (
     <div className="space-y-6">
+      {showCreateModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(4px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowCreateModal(false); }}
+        >
+          <div className={`${S.card} w-full max-w-3xl p-6 sm:p-8`} style={{ maxHeight: "90vh", overflowY: "auto" }}>
+            <div className="mb-6 flex items-start justify-between gap-4">
+              <div>
+                <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 22, color: "var(--text-primary)" }}>Create flyer campaign</h2>
+                <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4, fontWeight: 300 }}>
+                  Add a new campaign, generate its QR code link, and start tracking performance.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                style={{ fontSize: 22, color: "var(--text-muted)", lineHeight: 1, flexShrink: 0, background: "none", border: "none", cursor: "pointer" }}
+              >
+                ×
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {[
+                { label: "Campaign name", val: name, set: setName, placeholder: "Watersound Origins Flyer Drop" },
+                { label: "Campaign code", val: campaignCode, set: (v: string) => setCampaignCode(v.toLowerCase()), placeholder: "watersound-flyer-001" },
+                { label: "Flyers sent", val: flyersSent, set: setFlyersSent, placeholder: "500" },
+                { label: "Print cost ($)", val: printCost, set: setPrintCost, placeholder: "95" },
+                { label: "Distribution cost ($)", val: distributionCost, set: setDistributionCost, placeholder: "0" },
+              ].map((field) => (
+                <div key={field.label}>
+                  <div className={S.label} style={{ marginBottom: 6 }}>{field.label}</div>
+                  <input className={S.input} value={field.val} onChange={(e) => field.set(e.target.value)} placeholder={field.placeholder} />
+                </div>
+              ))}
+              <div className="md:col-span-2">
+                <div className={S.label} style={{ marginBottom: 6 }}>Notes</div>
+                <textarea className={`${S.input} min-h-[96px] resize-none`} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Neighborhood, print run, drop date, etc." />
+              </div>
+            </div>
+            {error ? (
+              <div className="mt-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>
+            ) : null}
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <button onClick={createCampaign} disabled={saving} className={S.btnPrimary}>
+                {saving ? "Saving…" : "Create campaign"}
+              </button>
+              <button onClick={() => setShowCreateModal(false)} className={S.btnGhost}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Modal */}
       {editCampaign && (
@@ -217,9 +277,18 @@ export default function PortalCampaignsPage() {
       {/* Header */}
       <section className={S.card}>
         <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
-          <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Marketing</div>
-          <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Campaigns</h1>
-          <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Create a flyer campaign, use its code in your QR URL, and track visits, checkout starts, paid orders, discount usage, revenue, CAC, and customer value.</p>
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div>
+              <div style={{ fontFamily: "var(--font-mono), monospace", fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 6 }}>Marketing</div>
+              <h1 style={{ fontFamily: "var(--font-serif), 'Instrument Serif', serif", fontSize: 32, color: "var(--text-primary)", letterSpacing: "-0.01em", lineHeight: 1.1 }}>Campaigns</h1>
+              <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Track live flyer performance here, and create a new campaign only when you need to launch another drop.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={() => setShowCreateModal(true)} className={S.btnPrimary}>
+                Create campaign
+              </button>
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-7 md:grid-cols-4">
           {([
@@ -234,50 +303,26 @@ export default function PortalCampaignsPage() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* Create Form */}
-      <section className={S.card}>
-        <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
-          <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 20, color: "var(--text-primary)" }}>Create flyer campaign</h2>
-        </div>
-        <div className="grid grid-cols-1 gap-4 px-5 py-6 sm:px-7 md:grid-cols-2">
-          {[
-            { label: "Campaign name", val: name, set: setName, placeholder: "Watersound Origins Flyer Drop" },
-            { label: "Campaign code", val: campaignCode, set: (v: string) => setCampaignCode(v.toLowerCase()), placeholder: "watersound-flyer-001" },
-            { label: "Flyers sent", val: flyersSent, set: setFlyersSent, placeholder: "500" },
-            { label: "Print cost ($)", val: printCost, set: setPrintCost, placeholder: "95" },
-            { label: "Distribution cost ($)", val: distributionCost, set: setDistributionCost, placeholder: "0" },
-          ].map((f) => (
-            <div key={f.label}>
-              <div className={S.label} style={{ marginBottom: 6 }}>{f.label}</div>
-              <input className={S.input} value={f.val} onChange={(e) => f.set(e.target.value)} placeholder={f.placeholder} />
-            </div>
-          ))}
-          <div className="md:col-span-2">
-            <div className={S.label} style={{ marginBottom: 6 }}>Notes</div>
-            <textarea className={`${S.input} min-h-[96px] resize-none`} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Neighborhood, print run, drop date, etc." />
+        {error ? (
+          <div className="px-5 pb-6 sm:px-7">
+            <div className="rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>
           </div>
-          <div className="md:col-span-2">
-            <button onClick={createCampaign} disabled={saving} className={S.btnPrimary}>{saving ? "Saving…" : "Create campaign"}</button>
-          </div>
-        </div>
+        ) : null}
       </section>
 
       {/* Live Performance */}
       <section className={S.card}>
         <div style={{ borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
-          <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 20, color: "var(--text-primary)" }}>Live campaign performance</h2>
+          <h2 style={{ fontFamily: "var(--font-serif), serif", fontSize: 20, color: "var(--text-primary)" }}>Current running campaigns</h2>
         </div>
         <div className="px-5 py-6 sm:px-7">
-          {error && <div className="mb-5 rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-400">{error}</div>}
           {loading ? (
             <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Loading campaigns…</div>
-          ) : campaigns.length === 0 ? (
-            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No campaigns yet.</div>
+          ) : runningCampaigns.length === 0 ? (
+            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>No running campaigns right now.</div>
           ) : (
             <div className="space-y-4">
-              {campaigns.map((campaign) => {
+              {runningCampaigns.map((campaign) => {
                 const totalCostCents = (campaign.print_cost_cents ?? 0) + (campaign.distribution_cost_cents ?? 0);
                 const cacCents = campaign.paid_orders > 0 ? Math.round(totalCostCents / campaign.paid_orders) : 0;
                 const customerValueCents = campaign.paid_orders > 0 ? Math.round((campaign.revenue_cents ?? 0) / campaign.paid_orders) : 0;
