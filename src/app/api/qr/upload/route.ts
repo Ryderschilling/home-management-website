@@ -56,10 +56,27 @@ function imageDataUrl(buffer: Buffer, mimeType: string) {
   return `data:${mimeType};base64,${buffer.toString("base64")}`;
 }
 
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+async function ensureUploadNotificationColumn() {
+  await sql`
+    ALTER TABLE admin_orders
+    ADD COLUMN IF NOT EXISTS upload_notification_sent_at TIMESTAMPTZ
+  `;
+}
+
 export async function POST(req: NextRequest) {
   try {
     await ensureAdminTables();
     await ensureQrAddonColumns();
+    await ensureUploadNotificationColumn();
 
     const form = await req.formData();
 
@@ -167,6 +184,7 @@ export async function POST(req: NextRequest) {
       SELECT
         id,
         electrical_box_photo_url,
+        upload_notification_sent_at,
         (
           SELECT url
           FROM admin_order_photos op
@@ -183,6 +201,7 @@ export async function POST(req: NextRequest) {
     const existingOrderRow = existingOrder[0] ?? null;
     const existingPipePhotoUrl = safe(existingOrderRow?.pipe_photo_url);
     const existingElectricalBoxPhotoUrl = safe(existingOrderRow?.electrical_box_photo_url);
+    const uploadNotificationSentAt = existingOrderRow?.upload_notification_sent_at ?? null;
 
     if (!(pipePhoto instanceof File) && !existingPipePhotoUrl) {
       return NextResponse.json(
@@ -320,18 +339,28 @@ export async function POST(req: NextRequest) {
 
     let pipePhotoBase64 = "";
     let pipePhotoUrl = existingPipePhotoUrl || null;
+    const emailAttachments: Array<{ filename: string; content: string }> = [];
 
     if (pipePhoto instanceof File) {
       const pipePhotoBuffer = Buffer.from(await pipePhoto.arrayBuffer());
       pipePhotoBase64 = pipePhotoBuffer.toString("base64");
       pipePhotoUrl = imageDataUrl(pipePhotoBuffer, pipePhoto.type);
+      emailAttachments.push({
+        filename: pipePhoto.name || "rock-photo.jpg",
+        content: pipePhotoBase64,
+      });
     }
 
     let electricalBoxPhotoUrl: string | null = existingElectricalBoxPhotoUrl || null;
 
     if (addonSelected && electricalBoxPhoto instanceof File) {
       const electricalBoxBuffer = Buffer.from(await electricalBoxPhoto.arrayBuffer());
+      const electricalBoxBase64 = electricalBoxBuffer.toString("base64");
       electricalBoxPhotoUrl = imageDataUrl(electricalBoxBuffer, electricalBoxPhoto.type);
+      emailAttachments.push({
+        filename: electricalBoxPhoto.name || "electrical-box-photo.jpg",
+        content: electricalBoxBase64,
+      });
     }
 
     const orderId = existingOrderRow?.id ?? crypto.randomUUID();
@@ -469,18 +498,7 @@ export async function POST(req: NextRequest) {
 
     const alreadySubmitted = Number(existingPhotos[0]?.photo_count ?? 0) > 0;
 
-    if (alreadySubmitted) {
-      return NextResponse.json({
-        ok: true,
-        data: {
-          clientId,
-          orderId,
-          alreadySubmitted: true,
-        },
-      });
-    }
-
-    if (pipePhotoUrl && pipePhoto instanceof File) {
+    if (!alreadySubmitted && pipePhotoUrl && pipePhoto instanceof File) {
       await sql`
         INSERT INTO admin_order_photos (
           id,
@@ -499,43 +517,61 @@ export async function POST(req: NextRequest) {
       `;
     }
 
-    if (pipePhotoBase64) {
+    if (!uploadNotificationSentAt && pipePhotoUrl) {
       await sendPipePhotoEmail({
         subject: `New Rock Order — ${rockColor.toUpperCase()}`,
         html: `
         <p><strong>Product:</strong> Artificial Rock Installation</p>
-        <p><strong>Color:</strong> ${rockColor}</p>
-        <p><strong>Name:</strong> ${fullName}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <p><strong>Pipe height:</strong> ${pipeHeight} in</p>
-        <p><strong>Pipe width:</strong> ${pipeWidth} in</p>
+        <p><strong>Color:</strong> ${escapeHtml(rockColor)}</p>
+        <p><strong>Name:</strong> ${escapeHtml(fullName)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+        <p><strong>Phone:</strong> ${escapeHtml(phone)}</p>
+        <p><strong>Pipe height:</strong> ${escapeHtml(pipeHeight)} in</p>
+        <p><strong>Pipe width:</strong> ${escapeHtml(pipeWidth)} in</p>
         ${
           addonSelected
             ? `
-        <p><strong>Add-on:</strong> ${addonProductName} ($${((addonPriceCents ?? 0) / 100).toFixed(2)})</p>
-        <p><strong>Electrical box width:</strong> ${electricalBoxWidth} in</p>
-        <p><strong>Electrical box depth:</strong> ${electricalBoxDepth} in</p>
-        <p><strong>Electrical box height:</strong> ${electricalBoxHeight} in</p>
-        <p><strong>Electrical box photo received:</strong> Yes</p>
+        <p><strong>Add-on:</strong> ${escapeHtml(addonProductName)} ($${((addonPriceCents ?? 0) / 100).toFixed(2)})</p>
+        <p><strong>Electrical box width:</strong> ${escapeHtml(electricalBoxWidth)} in</p>
+        <p><strong>Electrical box depth:</strong> ${escapeHtml(electricalBoxDepth)} in</p>
+        <p><strong>Electrical box height:</strong> ${escapeHtml(electricalBoxHeight)} in</p>
+        <p><strong>Electrical box photo received:</strong> ${electricalBoxPhotoUrl ? "Yes" : "No"}</p>
         `
             : ""
         }
-        <p><strong>Service address:</strong><br/>${serviceAddress.replaceAll(", ", "<br/>")}</p>
-        <p><strong>Stripe session:</strong> ${sessionId}</p>
-        <p><strong>Order id:</strong> ${orderId}</p>
-        <p><strong>Notes:</strong><br/>${notes ? notes.replaceAll("\n", "<br/>") : "—"}</p>
+        <p><strong>Service address:</strong><br/>${escapeHtml(serviceAddress).replaceAll(", ", "<br/>")}</p>
+        <p><strong>Stripe session:</strong> ${escapeHtml(sessionId)}</p>
+        <p><strong>Order id:</strong> ${escapeHtml(orderId)}</p>
+        <p><strong>Notes:</strong><br/>${notes ? escapeHtml(notes).replaceAll("\n", "<br/>") : "—"}</p>
         <hr/>
-        <p><strong>TOS accepted:</strong> ${tosAcceptedAtIso || "—"}</p>
-        <p><strong>TOS version:</strong> ${tosVersion || "—"}</p>
-        <p><strong>TOS url:</strong> ${tosUrl || "—"}</p>
-        <p><strong>TOS ip:</strong> ${tosIp || "—"}</p>
-        <p><strong>TOS user-agent:</strong> ${tosUserAgent || "—"}</p>
+        <p><strong>Pipe photo:</strong></p>
+        <p><img src="${pipePhotoUrl}" alt="Pipe photo" style="max-width:100%;height:auto;border-radius:12px;border:1px solid #ddd;" /></p>
+        ${
+          addonSelected && electricalBoxPhotoUrl
+            ? `
+        <p><strong>Electrical box photo:</strong></p>
+        <p><img src="${electricalBoxPhotoUrl}" alt="Electrical box photo" style="max-width:100%;height:auto;border-radius:12px;border:1px solid #ddd;" /></p>
+        `
+            : ""
+        }
+        <hr/>
+        <p><strong>TOS accepted:</strong> ${escapeHtml(tosAcceptedAtIso || "—")}</p>
+        <p><strong>TOS version:</strong> ${escapeHtml(tosVersion || "—")}</p>
+        <p><strong>TOS url:</strong> ${escapeHtml(tosUrl || "—")}</p>
+        <p><strong>TOS ip:</strong> ${escapeHtml(tosIp || "—")}</p>
+        <p><strong>TOS user-agent:</strong> ${escapeHtml(tosUserAgent || "—")}</p>
       `,
-        attachmentName:
-          pipePhoto instanceof File ? pipePhoto.name || "rock-photo.jpg" : "rock-photo.jpg",
-        attachmentBase64: pipePhotoBase64,
+        attachments: emailAttachments,
       });
+
+      await sql`
+        UPDATE admin_orders
+        SET
+          upload_notification_sent_at = NOW(),
+          updated_at = NOW()
+        WHERE organization_id = ${orgId}
+          AND id = ${orderId}
+      `;
     }
 
     await sql`

@@ -284,6 +284,9 @@ export default function PortalCampaignsPage() {
               <p style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 8, fontWeight: 300, maxWidth: 560 }}>Track live flyer performance here, and create a new campaign only when you need to launch another drop.</p>
             </div>
             <div className="flex flex-wrap gap-3">
+              <Link href="/api/admin/reset-stats" className={S.btnGhost}>
+                Reset stats
+              </Link>
               <button type="button" onClick={() => setShowCreateModal(true)} className={S.btnPrimary}>
                 Create campaign
               </button>

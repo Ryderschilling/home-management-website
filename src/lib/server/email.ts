@@ -9,14 +9,24 @@ function mustEnv(key: string) {
 export async function sendPipePhotoEmail(opts: {
   subject: string;
   html: string;
-  attachmentName: string;
-  attachmentBase64: string;
+  attachmentName?: string;
+  attachmentBase64?: string;
+  attachments?: Array<{
+    filename: string;
+    content: string;
+  }>;
 }) {
   const to = mustEnv("UPLOAD_NOTIFY_EMAIL");
   const from = mustEnv("FROM_EMAIL");
   const key = mustEnv("RESEND_API_KEY");
 
   const resend = new Resend(key);
+  const attachments = [
+    ...(opts.attachments ?? []),
+    ...(opts.attachmentName && opts.attachmentBase64
+      ? [{ filename: opts.attachmentName, content: opts.attachmentBase64 }]
+      : []),
+  ];
 
   await resend.emails.send({
     from,
@@ -24,9 +34,7 @@ export async function sendPipePhotoEmail(opts: {
     subject: opts.subject,
     html: opts.html,
     replyTo: process.env.REPLY_TO_EMAIL || undefined,
-    attachments: [
-      { filename: opts.attachmentName, content: opts.attachmentBase64 },
-    ],
+    attachments: attachments.length > 0 ? attachments : undefined,
   });
 }
 
