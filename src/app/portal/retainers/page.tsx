@@ -30,7 +30,7 @@ type Retainer = {
   archived_at?: string | null;
   status: "ACTIVE" | "PAUSED" | "CANCELED";
   notes?: string | null;
-  tier?: "STANDARD" | "ELITE";
+  tier?: "BRONZE" | "SILVER" | "ELITE" | "CUSTOM" | "STANDARD";
   created_at?: string | null;
   future_visit_count?: number | null;
   completed_visit_count?: number | null;
@@ -50,6 +50,23 @@ const S = {
 
 function money(cents: number | null | undefined) { return `$${((typeof cents === "number" ? cents : 0) / 100).toFixed(2)}`; }
 function fmtDate(value: string | null | undefined) { if (!value) return "—"; const d = new Date(value); return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString(); }
+function normalizeTierValue(tier: Retainer["tier"]) {
+  return tier === "STANDARD" || !tier ? "BRONZE" : tier;
+}
+function tierLabel(tier: Retainer["tier"]) {
+  const normalized = normalizeTierValue(tier);
+  if (normalized === "ELITE") return "Elite";
+  if (normalized === "SILVER") return "Silver";
+  if (normalized === "CUSTOM") return "Custom";
+  return "Bronze";
+}
+function tierStyle(tier: Retainer["tier"]): React.CSSProperties {
+  const normalized = normalizeTierValue(tier);
+  if (normalized === "ELITE") return { background: "rgba(201,184,154,0.15)", border: "1px solid rgba(201,184,154,0.4)", color: "#c9b89a", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (normalized === "SILVER") return { background: "rgba(148,163,184,0.12)", border: "1px solid rgba(148,163,184,0.32)", color: "#cbd5e1", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
+  if (normalized === "CUSTOM") return { background: "rgba(96,165,250,0.12)", border: "1px solid rgba(96,165,250,0.3)", color: "#93c5fd", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
+  return { background: "rgba(180,83,9,0.12)", border: "1px solid rgba(217,119,6,0.3)", color: "#fbbf24", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
+}
 
 function retainerStatusStyle(status: string): React.CSSProperties {
   if (status === "ACTIVE") return { background: "rgba(74,222,128,0.1)", border: "1px solid rgba(74,222,128,0.25)", color: "#4ade80", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" };
@@ -83,7 +100,7 @@ export default function PortalRetainersPage() {
   const [checklistTemplateText, setChecklistTemplateText] = useState("");
   const [autoGenerateJobs, setAutoGenerateJobs] = useState(true);
   const [notes, setNotes] = useState("");
-  const [tier, setTier] = useState<"STANDARD" | "ELITE">("STANDARD");
+  const [tier, setTier] = useState<"BRONZE" | "SILVER" | "ELITE" | "CUSTOM">("BRONZE");
   const [notice, setNotice] = useState("");
 
   async function load() {
@@ -151,7 +168,7 @@ export default function PortalRetainersPage() {
       const res = await fetch("/api/admin/retainers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: name.trim(), clientId, propertyId: propertyId || null, amountCents, billingFrequency, billingInterval: intervalNum, billingAnchorDate: billingAnchorDate || null, serviceFrequency, serviceInterval: serviceIntervalNum, serviceAnchorDate: serviceAnchorDate || billingAnchorDate || null, serviceType, billingModel, visitRateCents: visitRate ? Math.round(Number(visitRate) * 100) : null, onCallBaseFeeCents: onCallBaseFee ? Math.round(Number(onCallBaseFee) * 100) : null, hourlyRateCents: hourlyRate ? Math.round(Number(hourlyRate) * 100) : null, checklistTemplateText: checklistTemplateText || null, autoGenerateJobs, notes: notes.trim() || null, tier }) });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to create retainer");
-      setName(""); setClientId(""); setPropertyId(""); setAmount(""); setBillingFrequency("MONTHLY"); setBillingInterval("1"); setBillingAnchorDate(""); setServiceFrequency("WEEKLY"); setServiceInterval("1"); setServiceAnchorDate(""); setServiceType("HOME_MANAGEMENT"); setBillingModel("FIXED_RECURRING"); setVisitRate(""); setOnCallBaseFee(""); setHourlyRate(""); setChecklistTemplateText(""); setAutoGenerateJobs(true); setNotes(""); setTier("STANDARD"); setShowForm(false);
+      setName(""); setClientId(""); setPropertyId(""); setAmount(""); setBillingFrequency("MONTHLY"); setBillingInterval("1"); setBillingAnchorDate(""); setServiceFrequency("WEEKLY"); setServiceInterval("1"); setServiceAnchorDate(""); setServiceType("HOME_MANAGEMENT"); setBillingModel("FIXED_RECURRING"); setVisitRate(""); setOnCallBaseFee(""); setHourlyRate(""); setChecklistTemplateText(""); setAutoGenerateJobs(true); setNotes(""); setTier("BRONZE"); setShowForm(false);
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to create retainer"); }
   }
@@ -159,43 +176,12 @@ export default function PortalRetainersPage() {
   async function updateRetainerStatus(retainerId: string, status: "ACTIVE" | "PAUSED" | "CANCELED") {
     setError(""); setNotice("");
     try {
-      const res = await fetch(`/api/admin/retainers/${retainerId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      const archivedAt = status === "CANCELED" ? new Date().toISOString() : null;
+      const res = await fetch(`/api/admin/retainers/${retainerId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, archivedAt }) });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to update retainer");
       await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Failed to update retainer"); }
-  }
-
-  async function archiveRetainer(retainerId: string, archived: boolean) {
-    setError(""); setNotice("");
-    try {
-      const res = await fetch(`/api/admin/retainers/${retainerId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ archivedAt: archived ? new Date().toISOString() : null, status: archived ? "CANCELED" : "PAUSED" }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to update archive state");
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to update archive state");
-    }
-  }
-
-  async function regenerateFutureVisits(retainerId: string) {
-    setError(""); setNotice("");
-    try {
-      const res = await fetch(`/api/admin/retainers/${retainerId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "REGENERATE_FUTURE_VISITS" }),
-      });
-      const json = await res.json();
-      if (!res.ok || !json.ok) throw new Error(json?.error?.message ?? "Failed to regenerate future visits");
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to regenerate future visits");
-    }
   }
 
   async function deleteRetainerAction(retainer: Retainer) {
@@ -203,7 +189,7 @@ export default function PortalRetainersPage() {
     const confirmed = window.confirm(
       futureVisitCount > 0
         ? `Delete this plan? This will also remove ${futureVisitCount} future uncompleted plan-generated visit${futureVisitCount === 1 ? "" : "s"}. Completed history is preserved.`
-        : "Delete this plan? Completed history and invoiced plans cannot be deleted through this action."
+        : "Delete this plan? Historical jobs and invoice memory will stay saved."
     );
     if (!confirmed) return;
 
@@ -278,9 +264,24 @@ export default function PortalRetainersPage() {
               </select>
             </div>
             <div className="space-y-2"><label className={S.label}>Membership tier</label>
-              <div className="flex gap-3">
-                <button onClick={() => setTier("STANDARD")} style={{ background: tier === "STANDARD" ? "var(--surface-2)" : "transparent", border: tier === "STANDARD" ? "1px solid var(--border)" : "1px solid var(--border)", color: tier === "STANDARD" ? "var(--text-primary)" : "var(--text-secondary)" }} className="flex-1 rounded-lg px-4 py-3 text-sm font-medium uppercase tracking-[0.12em] transition hover:bg-[var(--surface-2)]">Standard</button>
-                <button onClick={() => setTier("ELITE")} style={{ background: tier === "ELITE" ? "rgba(201,184,154,0.15)" : "transparent", border: tier === "ELITE" ? "1px solid rgba(201,184,154,0.4)" : "1px solid var(--border)", color: tier === "ELITE" ? "#c9b89a" : "var(--text-secondary)" }} className="flex-1 rounded-lg px-4 py-3 text-sm font-medium uppercase tracking-[0.12em] transition hover:brightness-110">{tier === "ELITE" ? "✦ " : ""}Elite</button>
+              <div className="grid grid-cols-2 gap-3">
+                {(["BRONZE", "SILVER", "ELITE", "CUSTOM"] as const).map((option) => {
+                  const active = tier === option;
+                  const style =
+                    option === "ELITE"
+                      ? { background: active ? "rgba(201,184,154,0.15)" : "transparent", border: active ? "1px solid rgba(201,184,154,0.4)" : "1px solid var(--border)", color: active ? "#c9b89a" : "var(--text-secondary)" }
+                      : option === "SILVER"
+                        ? { background: active ? "rgba(148,163,184,0.12)" : "transparent", border: active ? "1px solid rgba(148,163,184,0.32)" : "1px solid var(--border)", color: active ? "#cbd5e1" : "var(--text-secondary)" }
+                        : option === "CUSTOM"
+                          ? { background: active ? "rgba(96,165,250,0.12)" : "transparent", border: active ? "1px solid rgba(96,165,250,0.3)" : "1px solid var(--border)", color: active ? "#93c5fd" : "var(--text-secondary)" }
+                          : { background: active ? "rgba(180,83,9,0.12)" : "transparent", border: active ? "1px solid rgba(217,119,6,0.3)" : "1px solid var(--border)", color: active ? "#fbbf24" : "var(--text-secondary)" };
+                  return (
+                    <button key={option} onClick={() => setTier(option)} style={style} className="rounded-lg px-4 py-3 text-sm font-medium uppercase tracking-[0.12em] transition hover:brightness-110">
+                      {option === "ELITE" && active ? "✦ " : ""}
+                      {tierLabel(option)}
+                    </button>
+                  );
+                })}
               </div>
             </div>
             <div className="space-y-2"><label className={S.label}>Billing model</label>
@@ -360,18 +361,15 @@ export default function PortalRetainersPage() {
                     <td className="px-5 py-5"><div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{r.property_name || "—"}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{r.property_address_line1 || ""}</div></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>{String(r.billing_model ?? "FIXED_RECURRING").replaceAll("_", " ")}</div><div style={{ fontSize: 12, fontWeight: 500, color: "var(--accent-warm, #c9b89a)", marginTop: 4 }}>{money(r.amount_cents)}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Visit rate {money(r.visit_rate_cents)}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Base {money(r.on_call_base_fee_cents)} • Hourly {money(r.hourly_rate_cents)}</div></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>Bill every {r.billing_interval} {r.billing_frequency.toLowerCase()}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Visits every {r.service_interval} {r.service_frequency.toLowerCase()}</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Auto-generate: {r.auto_generate_jobs ? "On" : "Off"}</div></td>
-                    <td className="px-5 py-5"><span style={r.tier === "ELITE" ? { background: "rgba(201,184,154,0.15)", border: "1px solid rgba(201,184,154,0.4)", color: "#c9b89a", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" } : { background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text-muted)", borderRadius: 999, padding: "3px 10px", fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase" }}>{r.tier === "ELITE" ? "✦ Elite" : "Standard"}</span></td>
+                    <td className="px-5 py-5"><span style={tierStyle(r.tier)}>{normalizeTierValue(r.tier) === "ELITE" ? "✦ Elite" : tierLabel(r.tier)}</span></td>
                     <td className="px-5 py-5"><div style={{ fontSize: 12, color: "var(--text-primary)" }}>{r.completed_visit_count ?? 0} completed</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{r.future_visit_count ?? 0} future in horizon</div><div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Last completed: {fmtDate(r.last_completed_at)}</div></td>
                     <td className="px-5 py-5" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{fmtDate(r.next_visit_at)}</td>
                     <td className="px-5 py-5"><span style={retainerStatusStyle(r.archived_at ? "CANCELED" : r.status)}>{r.archived_at ? "ARCHIVED" : r.status}</span></td>
                     <td className="px-5 py-5">
                       <div className="flex flex-wrap gap-2">
-                        <button onClick={() => regenerateFutureVisits(r.id)} className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)]">Regenerate future visits</button>
-                        {r.status !== "ACTIVE" && <button onClick={() => updateRetainerStatus(r.id, "ACTIVE")} className="rounded-lg border border-green-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-green-400 transition hover:bg-green-900/20">Activate</button>}
-                        {r.status !== "PAUSED" && <button onClick={() => updateRetainerStatus(r.id, "PAUSED")} className="rounded-lg border border-amber-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-amber-400 transition hover:bg-amber-900/20">Pause</button>}
-                        {r.status !== "CANCELED" && <button onClick={() => updateRetainerStatus(r.id, "CANCELED")} className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)]">Cancel</button>}
-                        {!r.archived_at ? <button onClick={() => archiveRetainer(r.id, true)} className="rounded-lg border border-[var(--border)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[var(--text-secondary)] transition hover:bg-[var(--surface-2)]">Archive</button> : <button onClick={() => archiveRetainer(r.id, false)} className="rounded-lg border border-sky-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-sky-300 transition hover:bg-sky-900/20">Restore</button>}
-                        <button onClick={() => deleteRetainerAction(r)} className={S.btnDanger}>Delete plan</button>
+                        <button onClick={() => updateRetainerStatus(r.id, "ACTIVE")} disabled={r.status === "ACTIVE" && !r.archived_at} className="rounded-lg border border-green-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-green-400 transition hover:bg-green-900/20 disabled:cursor-not-allowed disabled:opacity-45">Active</button>
+                        <button onClick={() => updateRetainerStatus(r.id, "PAUSED")} disabled={r.status === "PAUSED" && !r.archived_at} className="rounded-lg border border-amber-900/40 px-4 py-2 text-xs uppercase tracking-[0.18em] text-amber-400 transition hover:bg-amber-900/20 disabled:cursor-not-allowed disabled:opacity-45">Pause</button>
+                        <button onClick={() => deleteRetainerAction(r)} className={S.btnDanger}>Delete</button>
                       </div>
                     </td>
                   </tr>
