@@ -110,6 +110,51 @@ function SummaryLine({
   );
 }
 
+// Compress an image file to max 1600px on the longest side at 82% JPEG quality.
+// Keeps phone photos well under 500KB — avoids Vercel's 4.5MB body limit.
+async function compressImage(file: File, maxPx = 1600, quality = 0.82): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const { naturalWidth: w, naturalHeight: h } = img;
+      const scale = Math.min(1, maxPx / Math.max(w, h));
+      const tw = Math.round(w * scale);
+      const th = Math.round(h * scale);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = tw;
+      canvas.height = th;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve(file);
+      ctx.drawImage(img, 0, 0, tw, th);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return resolve(file);
+          const compressed = new File(
+            [blob],
+            file.name.replace(/\.[^.]+$/, ".jpg"),
+            { type: "image/jpeg" }
+          );
+          resolve(compressed);
+        },
+        "image/jpeg",
+        quality
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file); // fall back to original on any decode error
+    };
+
+    img.src = objectUrl;
+  });
+}
+
 function QrSuccessPageInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -347,6 +392,12 @@ function QrSuccessPageInner() {
     setStatus("uploading");
 
     try {
+      // Compress photos before upload — phone images can be 4-8MB and will
+      // exceed Vercel's serverless body limit. Canvas compress to ≤500KB each.
+      const compressedPipe = file ? await compressImage(file) : null;
+      const compressedElecBox =
+        hasAddon && electricalBoxPhoto ? await compressImage(electricalBoxPhoto) : null;
+
       const fd = new FormData();
       fd.append("sessionId", sessionId);
       fd.append("notes", notes);
@@ -364,12 +415,12 @@ function QrSuccessPageInner() {
       fd.append("state", stateRegion.trim());
       fd.append("postalCode", postalCode.trim());
 
-      if (file) {
-        fd.append("photo", file);
+      if (compressedPipe) {
+        fd.append("photo", compressedPipe);
       }
 
-      if (hasAddon && electricalBoxPhoto) {
-        fd.append("electricalBoxPhoto", electricalBoxPhoto);
+      if (compressedElecBox) {
+        fd.append("electricalBoxPhoto", compressedElecBox);
       }
 
       if (hasAddon) {
@@ -382,7 +433,7 @@ function QrSuccessPageInner() {
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok || !json.ok) {
-        throw new Error(json?.error?.message ?? "Upload failed");
+        throw new Error(json?.error?.message ?? "Upload failed. Please try again.");
       }
 
       posthog.capture("qr_order_details_submitted", {
@@ -393,9 +444,8 @@ function QrSuccessPageInner() {
 
       router.replace(`/qr/thanks?session_id=${encodeURIComponent(sessionId)}`);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Upload failed");
+      setError(submitError instanceof Error ? submitError.message : "Upload failed. Please try again.");
       setStatus("error");
-      setTimeout(() => setStatus("idle"), 250);
     }
   }
 
@@ -666,7 +716,7 @@ function QrSuccessPageInner() {
                 </div>
               ) : null}
 
-              {status === "error" && error ? (
+              {error ? (
                 <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                   {error}
                 </div>

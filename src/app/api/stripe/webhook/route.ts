@@ -3,8 +3,9 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/server/stripe";
 import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
-import { sendPipePhotoEmail } from "@/lib/server/email";
 import { syncInvoiceFromStripeEvent } from "@/lib/server/services/invoices";
+// sendPipePhotoEmail is intentionally not used here — see /api/qr/upload which
+// sends the full email (with photos + dimensions) after the customer uploads.
 import {
   QR_MAIN_PRODUCT_KEY,
   QR_UPSELL_ADDON_KEY,
@@ -412,6 +413,10 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
     `;
   }
 
+  // Fire PostHog analytics once per order (guard with paid_notification_sent_at).
+  // NOTE: Email notification is intentionally NOT sent here. The full order email
+  // (with photos + dimensions) is sent by /api/qr/upload after the customer
+  // completes their upload. Sending two emails was confusing.
   const alreadySentPaidNotification =
     existingOrder.length > 0 && !!existingOrder[0].paid_notification_sent_at;
 
@@ -431,34 +436,6 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         promotion_code: promotionCode || null,
         stripe_session_id: stripeSessionId,
       },
-    });
-
-    await sendPipePhotoEmail({
-      subject: `NEW PAID ORDER — ${rockColor.toUpperCase()}`,
-      html: `
-        <p><strong>Status:</strong> PAID (NEW)</p>
-        <p><strong>Product:</strong> ${productKey.replaceAll("_", " ")}</p>
-        <p><strong>Color:</strong> ${rockColor}</p>
-        <p><strong>Add-on:</strong> ${
-          addonSelected
-            ? `${addonProductName} ($${((addonPriceCents ?? 0) / 100).toFixed(2)})`
-            : "—"
-        }</p>
-        <p><strong>Name:</strong> ${fullName || "—"}</p>
-        <p><strong>Email:</strong> ${email || "—"}</p>
-        <p><strong>Phone:</strong> ${phone || "—"}</p>
-        <p><strong>Campaign:</strong> ${campaignCode || "—"}</p>
-        <p><strong>Discount used:</strong> ${discountAmountCents > 0 ? "Yes" : "No"}</p>
-        <p><strong>Promotion code:</strong> ${promotionCode || "—"}</p>
-        <p><strong>Service address:</strong><br/>${(serviceAddress || "—")
-          .replaceAll("\n", "<br/>")
-          .replaceAll(", ", "<br/>")}</p>
-        <p><strong>Total:</strong> $${(totalCents / 100).toFixed(2)}</p>
-        <p><strong>Stripe session:</strong> ${stripeSessionId}</p>
-        <p><strong>Payment intent:</strong> ${stripePaymentIntentId || "—"}</p>
-      `,
-      attachmentName: "no-attachment.txt",
-      attachmentBase64: Buffer.from("Paid order received.").toString("base64"),
     });
 
     await sql`
