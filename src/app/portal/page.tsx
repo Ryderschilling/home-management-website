@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { PortalDrawer } from "@/app/portal/_components/PortalDrawer";
 
 type Job = {
   id: string;
@@ -10,10 +11,19 @@ type Job = {
   status: string;
   scheduled_for: string;
   completed_at?: string | null;
+  notes?: string | null;
   client_name?: string | null;
   property_name?: string | null;
+  property_address_line1?: string | null;
   plan_name?: string | null;
   source_type?: string | null;
+  photo_count?: number | null;
+  photos?: Array<{
+    id: string;
+    url: string;
+    caption?: string | null;
+    uploaded_at?: string | null;
+  }> | null;
 };
 
 type Retainer = {
@@ -138,6 +148,49 @@ export default function PortalDashboardPage() {
   const [error, setError] = useState("");
   const [viewDate, setViewDate] = useState(new Date());
   const [selectedDayKey, setSelectedDayKey] = useState(toLocalDateKey(new Date()));
+  const [jobDrawerOpen, setJobDrawerOpen] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedJobDetail, setSelectedJobDetail] = useState<Job | null>(null);
+  const [jobDetailLoading, setJobDetailLoading] = useState(false);
+  const [jobActionLoading, setJobActionLoading] = useState(false);
+  const [jobActionError, setJobActionError] = useState("");
+  const [completionNotes, setCompletionNotes] = useState("");
+
+  async function loadJobs() {
+    const response = await fetch(
+      `/api/admin/jobs?includeCompleted=true&start=${encodeURIComponent(
+        new Date(Date.now() - 1000 * 60 * 60 * 24 * 31).toISOString()
+      )}&end=${encodeURIComponent(
+        new Date(Date.now() + 1000 * 60 * 60 * 24 * 90).toISOString()
+      )}`
+    );
+    const json = await response.json();
+    if (!response.ok || !json.ok) {
+      throw new Error(json?.error?.message ?? "Failed to load jobs");
+    }
+    setJobs(json.data ?? []);
+  }
+
+  async function loadJobDetail(jobId: string) {
+    setJobDetailLoading(true);
+    setJobActionError("");
+    try {
+      const response = await fetch(`/api/admin/jobs/${jobId}`);
+      const json = await response.json();
+      if (!response.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to load job details");
+      }
+      setSelectedJobDetail(json.data ?? null);
+      setCompletionNotes(String(json.data?.notes ?? ""));
+    } catch (detailError) {
+      setJobActionError(
+        detailError instanceof Error ? detailError.message : "Failed to load job details"
+      );
+      setSelectedJobDetail(null);
+    } finally {
+      setJobDetailLoading(false);
+    }
+  }
 
   async function load() {
     setLoading(true);
@@ -171,6 +224,53 @@ export default function PortalDashboardPage() {
   }
 
   useEffect(() => { load(); }, []);
+
+  async function openJobDrawer(jobId: string) {
+    setSelectedJobId(jobId);
+    setJobDrawerOpen(true);
+    await loadJobDetail(jobId);
+  }
+
+  function closeJobDrawer() {
+    setJobDrawerOpen(false);
+    setSelectedJobId(null);
+    setSelectedJobDetail(null);
+    setJobActionError("");
+    setCompletionNotes("");
+  }
+
+  async function markJobCompleted() {
+    if (!selectedJobId) return;
+    const trimmedNotes = completionNotes.trim();
+    if (!trimmedNotes) {
+      setJobActionError("Completion notes are required before a job can be marked completed.");
+      return;
+    }
+
+    setJobActionLoading(true);
+    setJobActionError("");
+    try {
+      const response = await fetch(`/api/admin/jobs/${selectedJobId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "COMPLETED",
+          notes: trimmedNotes,
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to complete job");
+      }
+
+      await loadJobs();
+      await loadJobDetail(selectedJobId);
+    } catch (actionError) {
+      setJobActionError(actionError instanceof Error ? actionError.message : "Failed to complete job");
+    } finally {
+      setJobActionLoading(false);
+    }
+  }
 
   const monthGrid = useMemo(() => buildMonthGrid(viewDate), [viewDate]);
   const jobsByDay = useMemo(() => {
@@ -339,12 +439,20 @@ export default function PortalDashboardPage() {
                 {selectedDayJobs.length === 0 ? (
                   <div className="text-sm text-[var(--text-muted)]">No jobs.</div>
                 ) : selectedDayJobs.map((job) => (
-                  <div key={job.id} className="rounded-xl border border-[var(--border)] px-3 py-3">
+                  <button
+                    key={job.id}
+                    type="button"
+                    onClick={() => openJobDrawer(job.id)}
+                    className="block w-full rounded-xl border border-[var(--border)] px-3 py-3 text-left transition hover:border-[var(--border-hover)] hover:bg-[var(--surface)]"
+                  >
                     <div className="text-sm font-medium text-[var(--text-primary)]">{job.title}</div>
                     <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
                       {job.client_name || "No client"}{job.property_name ? ` · ${job.property_name}` : ""}
                     </div>
-                  </div>
+                    <div className="mt-2 text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                      {fmtDate(job.scheduled_for)}
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -455,6 +563,151 @@ export default function PortalDashboardPage() {
         </SectionPanel>
 
       </div>
+
+      <PortalDrawer
+        open={jobDrawerOpen}
+        onClose={closeJobDrawer}
+        title={selectedJobDetail?.title || "Job details"}
+        subtitle="View the visit, mark it completed, or jump into the full jobs workspace for deeper edits."
+        footer={
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Link href="/portal/jobs" className={BUTTON_SMALL}>
+              Open jobs workspace
+            </Link>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={closeJobDrawer}
+                className={BUTTON_SMALL}
+              >
+                Close
+              </button>
+              {selectedJobDetail?.status !== "COMPLETED" ? (
+                <button
+                  type="button"
+                  onClick={markJobCompleted}
+                  disabled={jobActionLoading || jobDetailLoading}
+                  className="inline-flex items-center justify-center rounded-lg bg-[var(--accent)] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-[#0e0e0f] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {jobActionLoading ? "Completing..." : "Mark complete"}
+                </button>
+              ) : null}
+            </div>
+          </div>
+        }
+      >
+        {jobDetailLoading ? (
+          <div className="text-sm text-[var(--text-muted)]">Loading job details...</div>
+        ) : selectedJobDetail ? (
+          <div className="space-y-6">
+            {jobActionError ? (
+              <div className="rounded-xl border border-red-900/30 bg-red-900/10 px-4 py-3 text-sm text-red-300">
+                {jobActionError}
+              </div>
+            ) : null}
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className={PANEL_INNER} style={panelPadding()}>
+                <div className={LABEL}>Status</div>
+                <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                  {selectedJobDetail.status.replaceAll("_", " ")}
+                </div>
+              </div>
+              <div className={PANEL_INNER} style={panelPadding()}>
+                <div className={LABEL}>Scheduled</div>
+                <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                  {fmtDate(selectedJobDetail.scheduled_for)}
+                </div>
+              </div>
+              <div className={PANEL_INNER} style={panelPadding()}>
+                <div className={LABEL}>Source</div>
+                <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                  {selectedJobDetail.source_type === "PLAN"
+                    ? selectedJobDetail.plan_name || "Plan"
+                    : "One-off"}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <div className={PANEL_INNER} style={panelPadding()}>
+                <div className={LABEL}>Client</div>
+                <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                  {selectedJobDetail.client_name || "No client"}
+                </div>
+              </div>
+              <div className={PANEL_INNER} style={panelPadding()}>
+                <div className={LABEL}>Property</div>
+                <div className="mt-2 text-sm font-medium text-[var(--text-primary)]">
+                  {selectedJobDetail.property_name || "No property"}
+                </div>
+                {selectedJobDetail.property_address_line1 ? (
+                  <div className="mt-1 text-xs text-[var(--text-secondary)]">
+                    {selectedJobDetail.property_address_line1}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className={PANEL_INNER} style={panelPadding()}>
+              <div className={LABEL}>
+                {selectedJobDetail.status === "COMPLETED" ? "Job notes" : "Completion notes"}
+              </div>
+              {selectedJobDetail.status === "COMPLETED" ? (
+                <div className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
+                  {selectedJobDetail.notes?.trim() || "No notes recorded."}
+                </div>
+              ) : (
+                <>
+                  <textarea
+                    value={completionNotes}
+                    onChange={(event) => setCompletionNotes(event.target.value)}
+                    rows={5}
+                    className="mt-2 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-3 text-sm text-[var(--text-primary)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--border-hover)]"
+                    placeholder="Add what was done, anything completed, and any follow-up needed."
+                  />
+                  <div className="mt-2 text-xs text-[var(--text-muted)]">
+                    These notes are required before marking the job completed.
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className={PANEL_INNER} style={panelPadding()}>
+              <div className={LABEL}>Photos</div>
+              <div className="mt-2 text-sm text-[var(--text-secondary)]">
+                {selectedJobDetail.photo_count ?? selectedJobDetail.photos?.length ?? 0} attached
+              </div>
+              {Array.isArray(selectedJobDetail.photos) && selectedJobDetail.photos.length > 0 ? (
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {selectedJobDetail.photos.slice(0, 4).map((photo) => (
+                    <a
+                      key={photo.id}
+                      href={photo.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.caption || selectedJobDetail.title}
+                        className="h-32 w-full object-cover"
+                      />
+                      {photo.caption ? (
+                        <div className="px-3 py-2 text-xs text-[var(--text-secondary)]">
+                          {photo.caption}
+                        </div>
+                      ) : null}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm text-[var(--text-muted)]">Select a job to view its details.</div>
+        )}
+      </PortalDrawer>
     </div>
   );
 }

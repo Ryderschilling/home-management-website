@@ -25,22 +25,19 @@ interface Plan {
 const plans: Plan[] = [
   {
     tier: "bronze",
-    name: "Essential Watch",
-    tagline: "Mail, packages & peace of mind while you're away.",
-    price: 199,
-    priceNote: "1 on-call service included · month-to-month",
+    name: "Essential",
+    tagline: "Weekly home check-ins and mail grab while you're away.",
+    price: 149,
+    priceNote: "month-to-month · no contracts",
     badge: "Bronze",
     cta: "Get Started",
     sections: [
       {
         label: "What's Included",
         items: [
-          { text: "<strong>Weekly mail pickup</strong> & package collection" },
-          { text: "<strong>Trash out & in</strong> every visit while you're gone" },
-          {
-            text: "<strong>Exterior property walk</strong> — anything unusual flagged immediately",
-          },
-          { text: "<strong>1 on-call service/mo</strong> included", tag: "Included" },
+          { text: "<strong>Weekly interior & exterior house check</strong>" },
+          { text: "<strong>Mail grab</strong> every week" },
+          { text: "<strong>Trash taken out & brought in</strong> on request" },
           { text: "<strong>Secure key holding</strong> & access management" },
           { text: "<strong>Issue alerts</strong> — you hear about it immediately" },
         ],
@@ -50,7 +47,7 @@ const plans: Plan[] = [
   {
     tier: "silver",
     name: "Home Watch",
-    tagline: "Full weekly inspections, photo reports & 2 on-calls monthly.",
+    tagline: "Full weekly inspections with photo reports and personalized service.",
     price: 299,
     priceNote: "2 on-call services included · month-to-month",
     badge: "Silver",
@@ -59,13 +56,15 @@ const plans: Plan[] = [
       {
         label: "What's Included",
         items: [
-          { text: "<strong>Everything in Essential Watch</strong>, plus:" },
-          { text: "<strong>Full interior & exterior inspection</strong> every week" },
-          { text: "<strong>Photo report</strong> sent after every visit (4–6 photos)" },
-          { text: "<strong>Storm & weather monitoring</strong> with prep visits" },
-          { text: "<strong>2 on-call services/mo</strong> included", tag: "Included" },
-          { text: "<strong>Contractor coordination</strong> — meet & greet any trade" },
-          { text: "<strong>Plant & exterior upkeep</strong> monitoring" },
+          { text: "<strong>Everything in Essential</strong>, plus:" },
+          { text: "<strong>Appliance & piping checks</strong> every visit" },
+          { text: "<strong>Irrigation filter cleaning</strong>" },
+          { text: "<strong>Photo reports</strong> sent after every visit" },
+          { text: "<strong>Storm & weather monitoring</strong>" },
+          {
+            text: "<strong>2 on-call or contractor coordination</strong> services/month",
+            tag: "Included",
+          },
         ],
       },
     ],
@@ -73,9 +72,9 @@ const plans: Plan[] = [
   {
     tier: "gold",
     name: "Coastal Elite",
-    tagline: "Full home operations, priority access & arrival-ready service 2×/year.",
-    price: 699,
-    priceNote: "Founding rate — locks when spots fill. Limited to 8–10 members.",
+    tagline: "Full home operations, priority access & arrival-ready service.",
+    price: 599,
+    priceNote: "Founding rate — limited spots available.",
     badge: "Gold — Elite",
     cta: "Claim a Founding Spot",
     sections: [
@@ -84,10 +83,10 @@ const plans: Plan[] = [
         items: [
           { text: "<strong>Everything in Home Watch</strong>, plus:" },
           {
-            text: "<strong>Extra unscheduled checks</strong> as needed — no charge, no questions",
+            text: "<strong>Extra unscheduled tasks</strong> based on weather — no charge",
           },
           {
-            text: "<strong>Quarterly Property Condition Report</strong> — written, all systems",
+            text: "<strong>Quarterly Property Condition Report</strong>",
           },
         ],
       },
@@ -99,7 +98,7 @@ const plans: Plan[] = [
             tag: "Free",
           },
           {
-            text: "<strong>Freeze protection protocol</strong> — pipe checks, monitoring & prep when temps drop",
+            text: "<strong>Freeze protection</strong> — pipe checks, monitoring & prep when temps drop",
           },
         ],
       },
@@ -107,24 +106,23 @@ const plans: Plan[] = [
         label: "Priority & On-Call",
         items: [
           {
-            text: "<strong>3 on-call services/mo</strong> — up to 3 hrs, no charge",
+            text: "<strong>3 on-call or contractor coordination</strong> services/month",
             tag: "Free",
           },
-          { text: "<strong>24/7 emergency reach</strong> — Ryder's direct line" },
           {
             text: "<strong>Contractor liaison</strong> — your local point of contact for every trade",
           },
         ],
       },
       {
-        label: "Arrival Ready — 2×/Year",
+        label: "Arrival Ready",
         items: [
           {
-            text: "<strong>A/C pre-set</strong> to your preference 24 hrs before you arrive",
+            text: "<strong>A/C pre-set</strong> to your preference before you arrive",
           },
-          { text: "<strong>Fridge stocked</strong> with your basics — walk in, feel at home" },
+          { text: "<strong>Fridge stocked</strong> with your basics" },
           {
-            text: "<strong>Full pre-arrival walk-through</strong> — home ready, nothing to worry about",
+            text: "<strong>Pre-arrival walkthrough</strong> — home ready, nothing to worry about",
           },
         ],
       },
@@ -376,7 +374,7 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
       <div className={`price-note ${isGold ? "price-note-gold" : ""}`}>
         {isGold ? (
           <>
-            <strong>Founding rate — locks when spots fill.</strong> Limited to 8–10 members.
+            <strong>Founding rate — limited spots available.</strong>
           </>
         ) : (
           plan.priceNote
@@ -440,6 +438,11 @@ export default function PricingPage() {
       {/* Header */}
       <header className="pricing-header">
         <img src="/logo.png" alt="CHM" className="header-logo" />
+        <div className="trust-badge">
+          <span className="trust-dot" />
+          Your premium local &amp; insured home management company.
+          <span className="trust-dot" />
+        </div>
         <h1 className="header-h1">
           Service Plans <span className="header-accent">&amp; Pricing</span>
         </h1>
@@ -554,6 +557,29 @@ export default function PricingPage() {
           object-fit: contain;
           border-radius: 12px;
           margin-bottom: 20px;
+        }
+        .trust-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          background: rgba(192, 160, 96, 0.1);
+          border: 1px solid rgba(192, 160, 96, 0.35);
+          border-radius: 100px;
+          padding: 7px 18px;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #c0a060;
+          margin-bottom: 20px;
+        }
+        .trust-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #c0a060;
+          flex-shrink: 0;
+          opacity: 0.7;
         }
         .header-h1 {
           font-size: clamp(28px, 5vw, 46px);

@@ -39,6 +39,7 @@ type Kpis = {
 type VisitorData = {
   configured: boolean;
   range?: string;
+  resetAt?: string | null;
   kpis?: Kpis;
   daily?: DayPoint[];
   topPages?: PageRow[];
@@ -82,6 +83,12 @@ function fmtDay(iso: string) {
 function fmtPage(path: string) {
   if (path === "/" || path === "") return "/ (Homepage)";
   return path.length > 38 ? path.slice(0, 36) + "…" : path;
+}
+
+function fmtDateTime(value: string | null | undefined) {
+  if (!value) return "";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString();
 }
 
 // ─── Bar chart (SVG, no library) ─────────────────────────────────────────────
@@ -388,6 +395,8 @@ export default function VisitorAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [metric, setMetric] = useState<"uniqueVisitors" | "pageviews">("uniqueVisitors");
+  const [resetting, setResetting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -411,6 +420,43 @@ export default function VisitorAnalyticsPage() {
     return () => { cancelled = true; };
   }, [range]);
 
+  async function resetVisitorAnalytics() {
+    const confirmed = window.confirm(
+      "Reset visitor analytics to zero from right now? Old PostHog history will stay in PostHog, but this dashboard will start fresh."
+    );
+    if (!confirmed) return;
+
+    setResetting(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const response = await fetch("/api/admin/analytics/visitors", {
+        method: "POST",
+        headers: { "x-admin-token": "1" },
+      });
+      const json = await response.json();
+      if (!response.ok || !json.ok) {
+        throw new Error(json?.error?.message ?? "Failed to reset visitor analytics");
+      }
+
+      setNotice(`Visitor analytics reset. This dashboard is now counting fresh from ${fmtDateTime(json.data?.resetAt)}.`);
+      setLoading(true);
+      const refreshed = await fetch(`/api/admin/analytics/visitors?range=${range}`, {
+        headers: { "x-admin-token": "1" },
+      });
+      const refreshedJson = await refreshed.json();
+      if (!refreshed.ok || !refreshedJson.ok) {
+        throw new Error(refreshedJson?.error?.message ?? "Failed to reload visitor analytics");
+      }
+      setData(refreshedJson.data);
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : "Failed to reset visitor analytics");
+    } finally {
+      setResetting(false);
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[var(--background)] p-[var(--portal-shell-x)] pt-[var(--portal-shell-y)]">
       {/* Header */}
@@ -422,6 +468,14 @@ export default function VisitorAnalyticsPage() {
           </p>
         </div>
         <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={resetVisitorAnalytics}
+            disabled={resetting}
+            className="inline-flex items-center justify-center rounded-lg border border-red-900/40 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-red-400 transition hover:bg-red-900/20 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {resetting ? "Resetting..." : "Reset to Zero"}
+          </button>
           {RANGE_OPTIONS.map((o) => (
             <button key={o.key} className={S.rangeBtn(range === o.key)} onClick={() => setRange(o.key)}>
               {o.label}
@@ -429,6 +483,12 @@ export default function VisitorAnalyticsPage() {
           ))}
         </div>
       </div>
+
+      {notice && (
+        <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-300">
+          {notice}
+        </div>
+      )}
 
       {/* Not configured */}
       {!loading && data && !data.configured && <NotConfigured />}
@@ -444,6 +504,12 @@ export default function VisitorAnalyticsPage() {
       {(loading || (data && data.configured)) && (
         <div className="space-y-5">
           {/* KPI row */}
+          {!loading && data?.resetAt ? (
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+              Visitor analytics baseline was reset on {fmtDateTime(data.resetAt)}. All numbers on this page are counted from that reset point forward within the selected range.
+            </div>
+          ) : null}
+
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest } from "@/lib/server/auth";
 import { fail, ok } from "@/lib/server/api";
+import { ensureAdminTables, sql } from "@/lib/server/db";
+import { getOrganizationId } from "@/lib/server/request";
 
 export const runtime = "nodejs";
 
@@ -47,6 +49,17 @@ function sinceInterval(range: string) {
   }
 }
 
+async function getVisitorResetAt(organizationId: string) {
+  await ensureAdminTables();
+  const rows = await sql`
+    SELECT reset_at
+    FROM admin_visitor_analytics_resets
+    WHERE organization_id = ${organizationId}
+    LIMIT 1
+  `;
+  return (rows[0]?.reset_at as string | null | undefined) ?? null;
+}
+
 export async function GET(request: NextRequest) {
   if (!isAdminRequest(request)) {
     return NextResponse.json(fail("UNAUTHORIZED", "Admin authentication required."), { status: 401 });
@@ -57,10 +70,14 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
+  const organizationId = getOrganizationId(request);
   const range = searchParams.get("range") ?? "30D";
   const interval = sinceInterval(range);
 
   try {
+    const resetAt = await getVisitorResetAt(organizationId);
+    const resetFilter = resetAt ? `AND timestamp >= toDateTime('${resetAt.replace("'", "\\'")}')` : "";
+
     // Run all queries in parallel
     const [dailyResult, topPagesResult, funnelResult, referrersResult, kpiResult] =
       await Promise.all([
@@ -75,6 +92,7 @@ export async function GET(request: NextRequest) {
           FROM events
           WHERE event = '$pageview'
             AND timestamp >= now() - ${interval}
+            ${resetFilter}
           GROUP BY day
           ORDER BY day ASC
         `),
@@ -88,6 +106,7 @@ export async function GET(request: NextRequest) {
           FROM events
           WHERE event = '$pageview'
             AND timestamp >= now() - ${interval}
+            ${resetFilter}
             AND properties.$pathname IS NOT NULL
           GROUP BY page
           ORDER BY unique_visitors DESC
@@ -120,6 +139,7 @@ export async function GET(request: NextRequest) {
             ) AS step4_converted
           FROM events
           WHERE timestamp >= now() - ${interval}
+            ${resetFilter}
         `),
 
         // Traffic sources — bucket referrer into readable labels
@@ -140,6 +160,7 @@ export async function GET(request: NextRequest) {
           FROM events
           WHERE event = '$pageview'
             AND timestamp >= now() - ${interval}
+            ${resetFilter}
           GROUP BY source
           ORDER BY visitors DESC
           LIMIT 8
@@ -153,6 +174,7 @@ export async function GET(request: NextRequest) {
             uniqIf(distinct_id, event = '$pageview' AND toDate(timestamp) = today()) AS visitors_today
           FROM events
           WHERE timestamp >= now() - ${interval}
+            ${resetFilter}
         `),
       ]);
 
@@ -197,13 +219,43 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(
-      ok({ configured: true, range, kpis, daily, topPages, funnel, referrers })
+      ok({ configured: true, range, resetAt, kpis, daily, topPages, funnel, referrers })
     );
   } catch (error) {
     return NextResponse.json(
       fail(
         "ANALYTICS_FETCH_FAILED",
         error instanceof Error ? error.message : "Failed to fetch visitor analytics"
+      ),
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  if (!isAdminRequest(request)) {
+    return NextResponse.json(fail("UNAUTHORIZED", "Admin authentication required."), { status: 401 });
+  }
+
+  try {
+    await ensureAdminTables();
+    const organizationId = getOrganizationId(request);
+    const rows = await sql`
+      INSERT INTO admin_visitor_analytics_resets (organization_id, reset_at, updated_at)
+      VALUES (${organizationId}, NOW(), NOW())
+      ON CONFLICT (organization_id)
+      DO UPDATE SET
+        reset_at = NOW(),
+        updated_at = NOW()
+      RETURNING reset_at
+    `;
+
+    return NextResponse.json(ok({ resetAt: rows[0]?.reset_at ?? new Date().toISOString() }));
+  } catch (error) {
+    return NextResponse.json(
+      fail(
+        "VISITOR_ANALYTICS_RESET_FAILED",
+        error instanceof Error ? error.message : "Failed to reset visitor analytics"
       ),
       { status: 500 }
     );

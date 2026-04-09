@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 25;
+const ADMIN_SCHEMA_VERSION = 26;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -1018,6 +1018,16 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
         refresh_token   TEXT NOT NULL,
         created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `;
+
+    // v26 — visitor analytics reset baseline
+    await tx`
+      CREATE TABLE IF NOT EXISTS admin_visitor_analytics_resets (
+        organization_id TEXT NOT NULL PRIMARY KEY,
+        reset_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `;
   });
