@@ -57,7 +57,10 @@ async function getVisitorResetAt(organizationId: string) {
     WHERE organization_id = ${organizationId}
     LIMIT 1
   `;
-  return (rows[0]?.reset_at as string | null | undefined) ?? null;
+  const val = rows[0]?.reset_at;
+  if (!val) return null;
+  // NeonDB returns timestamp columns as Date objects at runtime; normalise to ISO string.
+  return val instanceof Date ? val.toISOString() : String(val);
 }
 
 export async function GET(request: NextRequest) {
@@ -76,7 +79,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const resetAt = await getVisitorResetAt(organizationId);
-    const resetFilter = resetAt ? `AND timestamp >= toDateTime('${resetAt.replace("'", "\\'")}')` : "";
+    const resetAtStr = resetAt ? String(resetAt) : null;
+    const resetFilter = resetAtStr ? `AND timestamp >= toDateTime('${resetAtStr.replace("'", "\\'")}')` : "";
 
     // Run all queries in parallel
     const [dailyResult, topPagesResult, funnelResult, referrersResult, kpiResult] =
