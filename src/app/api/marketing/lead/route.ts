@@ -181,6 +181,8 @@ export async function POST(req: NextRequest) {
 
     const firstName = safe(body.firstName);
     const email = safe(body.email).toLowerCase();
+    const phone = safe(body.phone) || null;
+    const neighborhood = safe(body.neighborhood) || null;
     const campaignCode = normalizeCampaignCode(body.campaignCode);
     const sessionKey = safe(body.sessionKey);
     const sourcePage = safe(body.sourcePage || "/qr") || "/qr";
@@ -227,6 +229,8 @@ export async function POST(req: NextRequest) {
         UPDATE marketing_email_leads
         SET
           first_name = COALESCE(${firstName || null}, first_name),
+          phone = COALESCE(${phone}, phone),
+          neighborhood = COALESCE(${neighborhood}, neighborhood),
           campaign_id = COALESCE(${campaignId}, campaign_id),
           campaign_code = COALESCE(${normalizedCampaignCode}, campaign_code),
           session_key = COALESCE(${sessionKey || null}, session_key),
@@ -294,6 +298,8 @@ export async function POST(req: NextRequest) {
         session_key,
         first_name,
         email,
+        phone,
+        neighborhood,
         consent_text,
         consent_at,
         source_page,
@@ -307,6 +313,8 @@ export async function POST(req: NextRequest) {
         ${sessionKey || null},
         ${firstName || null},
         ${email},
+        ${phone},
+        ${neighborhood},
         ${CONSENT_TEXT},
         NOW(),
         ${sourcePage},
@@ -350,9 +358,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Fire welcome email + schedule drip sequence (non-blocking)
-    await sendWelcomeEmail(firstName || null, email);
-    await scheduleDripSequence(
+    // Fire welcome email + schedule drip sequence — truly non-blocking.
+    // Do NOT await these. Return the 200 immediately; email delivery happens in the background.
+    // Errors are caught and logged inside each function — they will never block or fail the response.
+    void sendWelcomeEmail(firstName || null, email);
+    void scheduleDripSequence(
       firstName || null,
       email,
       env.APP_URL,

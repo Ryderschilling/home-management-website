@@ -1,7 +1,7 @@
 import postgres from "postgres";
 import { env } from "@/lib/server/env";
 
-const ADMIN_SCHEMA_VERSION = 26;
+const ADMIN_SCHEMA_VERSION = 27;
 const ADMIN_SCHEMA_LOCK_PRIMARY = 30;
 const ADMIN_SCHEMA_LOCK_SECONDARY = 1;
 const RECURRING_SERIES_BACKFILL_KEY = "admin_jobs_recurring_series_backfill_v1";
@@ -936,6 +936,19 @@ await tx`CREATE INDEX IF NOT EXISTS admin_retainers_active_generation_idx
   // Drip suppression — stores Resend scheduled email IDs so they can be cancelled on conversion
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_email_ids TEXT`;
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_suppressed_at TIMESTAMPTZ`;
+
+  // Lead qualification — neighborhood, answers JSON, computed score + grade
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS neighborhood TEXT`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS qualification_json JSONB`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS lead_score INTEGER`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS lead_grade TEXT`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS qualified_at TIMESTAMPTZ`;
+
+  // Phone + lead pipeline tracking
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS phone TEXT`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS pipeline_status TEXT NOT NULL DEFAULT 'new'`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS pipeline_notes TEXT`;
+  await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS pipeline_updated_at TIMESTAMPTZ`;
 
   await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_id TEXT`;
   await tx`ALTER TABLE admin_orders ADD COLUMN IF NOT EXISTS campaign_code TEXT`;

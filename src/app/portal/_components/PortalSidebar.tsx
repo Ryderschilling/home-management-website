@@ -28,6 +28,7 @@ const operationsNav: NavItem[] = [
 
 // GROWTH: analytics and marketing — visible, not hidden
 const growthNav: NavItem[] = [
+  { href: "/portal/leads", label: "Leads" },
   { href: "/portal/analytics", label: "Analytics" },
   { href: "/portal/analytics/visitors", label: "Visitors" },
   { href: "/portal/campaigns", label: "Campaigns" },

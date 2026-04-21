@@ -1,32 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import { siteData } from "@/data/siteData";
-import { useEffect } from "react";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
+import FadeInObserver from "@/components/FadeInObserver";
 
 export default function HomePage() {
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("fade-in");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -10% 0px" }
-    );
-
-    document
-      .querySelectorAll(".fade-section")
-      .forEach((el) => observer.observe(el));
-  }, []);
 
   return (
     <main className="min-h-screen font-sans bg-black text-black">
+      <FadeInObserver />
       <LeadCapturePopup />
       {/* Sticky nav */}
       <nav className="fixed top-0 w-full z-50 bg-transparent px-4 md:px-6 py-2 flex justify-between items-center">
@@ -34,7 +16,7 @@ export default function HomePage() {
           {/* Smaller logo */}
           <img
             src="/logo.png"
-            alt=""
+            alt="Coastal Home Management 30A logo"
             draggable={false}
             loading="eager"
             fetchPriority="high"
@@ -61,6 +43,12 @@ export default function HomePage() {
           >
             Pricing
           </Link>
+          <Link
+            href="/about"
+            className="text-[11px] uppercase tracking-widest hover:underline"
+          >
+            About
+          </Link>
           <a
             href="#contact"
             className="text-[11px] uppercase tracking-widest hover:underline"
@@ -75,7 +63,7 @@ export default function HomePage() {
         {/* Background image */}
         <img
           src="/img.png"
-          alt=""
+          alt="Luxury second home in Watersound Origins, Florida — managed by Coastal Home Management 30A"
           draggable={false}
           loading="eager"
           fetchPriority="high"
@@ -124,17 +112,19 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials (below hero, above services) */}
-      <div className="fade-section opacity-0 translate-y-12 transition-all duration-1000">
+      <div className="fade-section">
         <TestimonialsSection />
       </div>
 
 {/* Services */}
 <section
   id="services"
-  className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section opacity-0 translate-y-12 transition-all duration-1000"
+  className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section"
 >
   <div className="max-w-6xl mx-auto">
-    <h2 className="text-3xl md:text-4xl font-serif mb-8">Services</h2>
+    <h2 className="text-3xl md:text-4xl font-serif mb-8">
+      What Services Do We Offer for Second Homeowners on 30A?
+    </h2>
 
     {/* MOBILE: full-size swipe cards */}
 {/* MOBILE: full-size swipe cards */}
@@ -301,14 +291,217 @@ export default function HomePage() {
   </div>
 </section>
 
+      {/* FAQ */}
+      <section
+        id="faq"
+        className="bg-gray-50 px-4 md:px-6 py-20 md:py-28 fade-section"
+      >
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-serif mb-12">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="space-y-8">
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                What does Coastal Home Management 30A do?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                We provide regular, documented property care for second-home and vacation homeowners
+                in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A. Every visit
+                includes a full walk-through, photo documentation, and a summary report sent directly
+                to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination,
+                and arrival prep so your home is always in order — whether you&apos;re here or a thousand miles away.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                What areas do you serve?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                We serve Watersound Origins, Naturewalk, Inlet Beach, and surrounding communities
+                along scenic 30A in the Florida Panhandle. If you&apos;re not sure whether your property
+                falls within our coverage area, just reach out — we&apos;re happy to confirm.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                How much does second home management cost?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                Our monthly management plans start at $150/month (Standard) and go up to $650/month
+                for our Coastal Elite membership. We also offer on-call services at $85 base plus
+                $50/hour, and mail or trash handling at $35/day. Visit our{" "}
+                <Link href="/pricing" className="underline hover:text-black">
+                  pricing page
+                </Link>{" "}
+                for full details on what&apos;s included in each plan.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                What happens during a property visit?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                Every visit includes a full interior and exterior walk-through of your home. We check
+                for anything that needs attention — HVAC, irrigation, entry points, exterior condition,
+                signs of water intrusion, storm damage, or anything out of the ordinary. We photograph
+                each visit and send you a written summary by text or email so you always know exactly
+                what&apos;s going on at your property.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                Are you licensed and insured?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                Yes. Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025.
+                We take the responsibility of caring for your home seriously, and proper coverage
+                is part of that commitment. You can have confidence that your property is in professional hands.
+              </p>
+            </div>
+
+            <div className="border-b border-gray-200 pb-8">
+              <h3 className="text-lg font-serif mb-3">
+                What makes CHM different from a large property management company?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                You get Ryder — directly. No call centers, no rotating staff, no chasing someone down
+                for an update. When something happens at your property, it gets handled fast by someone
+                who knows your home personally. That&apos;s what it means to work with a local operator
+                rather than a large company that manages hundreds of properties.
+              </p>
+            </div>
+
+            <div className="pb-2">
+              <h3 className="text-lg font-serif mb-3">
+                How do I get started?
+              </h3>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                Send us an email or use the contact form on this page. We&apos;ll talk through your
+                property, your schedule, and what level of care makes sense for you. Most clients
+                are set up and receiving their first visit report within a few days of their first
+                conversation.
+              </p>
+            </div>
+          </div>
+
+          {/* External Authority Links */}
+          <div className="mt-16 pt-10 border-t border-gray-200">
+            <p className="text-xs uppercase tracking-widest text-gray-500 mb-5">
+              Useful Resources for 30A Homeowners
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
+              <a
+                href="https://www.co.walton.fl.us/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black underline transition"
+              >
+                Walton County, Florida (Official)
+              </a>
+              <a
+                href="https://www.30a.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black underline transition"
+              >
+                Scenic 30A Community
+              </a>
+              <a
+                href="https://www.myfloridalicense.com/intentions2.asp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black underline transition"
+              >
+                Florida Licensed Contractor Verification
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQPage JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "What does Coastal Home Management 30A do?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What areas do you serve?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "We serve Watersound Origins, Naturewalk, Inlet Beach, and surrounding communities along scenic 30A in the Florida Panhandle. Reach out to confirm your property falls within our coverage area.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How much does second home management cost?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Monthly management plans start at $150/month (Standard) and go up to $650/month for the Coastal Elite membership. On-call services are $85 base plus $50/hour. Mail or trash handling is $35/day.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What happens during a property visit?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Every visit includes a full interior and exterior walk-through checking HVAC, irrigation, entry points, exterior condition, and signs of water intrusion or storm damage. We photograph each visit and send a written summary by text or email.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Are you licensed and insured?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes. Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025. Your property is in professional, covered hands.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What makes CHM different from a large property management company?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "You get Ryder directly — no call centers, no rotating staff. When something happens at your property it gets handled fast by someone who knows your home personally. That's the difference between a local operator and a large company managing hundreds of properties.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How do I get started?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Send an email or use the contact form on the site. We'll discuss your property and what level of care fits your needs. Most clients receive their first visit report within a few days of signing up.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Contact */}
       <section
         id="contact"
-        className="px-6 py-32 bg-gray-900 text-white fade-section opacity-0 translate-y-12 transition-all duration-1000"
+        className="px-6 py-32 bg-gray-900 text-white fade-section"
       >
         <div className="max-w-4xl mx-auto space-y-6 text-center">
           <h2 className="text-3xl font-serif tracking-tight mb-2">
-            Get in Touch
+            Ready to Protect Your 30A Property? Let&apos;s Talk.
           </h2>
           <p className="text-gray-300">
             Reach out for availability and customized service plans.
@@ -327,7 +520,7 @@ export default function HomePage() {
       {/* About */}
       <section
         id="about"
-        className="about-section fade-section opacity-0 translate-y-12 transition-all duration-1000"
+        className="about-section fade-section"
       >
         <div className="about-bridge" aria-hidden="true" />
 
@@ -338,7 +531,7 @@ export default function HomePage() {
               <div className="about-media-frame">
                 <img
                   src="/profile-web.jpg"
-                  alt="Ryder Schilling"
+                  alt="Ryder Schilling, founder of Coastal Home Management 30A, at a Watersound Origins property"
                   className="about-media-img"
                   loading="lazy"
                   decoding="async"
@@ -349,7 +542,7 @@ export default function HomePage() {
             {/* About me */}
             <div className="about-copy">
               <h2 className="about-title">
-                Superior service, personalized attention
+                Why Do 30A Second&#8209;Home Owners Trust CHM?
               </h2>
 
               <p className="about-body">
@@ -431,8 +624,12 @@ export default function HomePage() {
           Company
         </div>
         <ul className="mt-4 space-y-3 text-sm text-gray-700">
-          <li>Local</li>
-          <li>Insured</li>
+          <li>
+            <Link href="/about" className="transition hover:text-black">
+              About CHM
+            </Link>
+          </li>
+          <li>Local &amp; Insured</li>
           <li>Serving Inlet Beach &amp; 30A</li>
           <li>Reliable, high-trust service</li>
         </ul>
@@ -469,427 +666,6 @@ export default function HomePage() {
   </div>
 </footer>
 
-      <style jsx>{`
-        .fade-in {
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-        }
-
-        /* =========================
-           MERCEDES-LIKE HERO MOTION
-           ========================= */
-
-        .hero-bg {
-          transform: none;
-          filter: none;
-          animation: none !important;
-          will-change: auto;
-          pointer-events: none;
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-
-        /* Delayed dim + vignette (Mercedes-style) */
-        .hero-overlay {
-          opacity: 0;
-          will-change: opacity;
-          background: radial-gradient(
-              1200px 600px at 50% 35%,
-              rgba(0, 0, 0, 0.15) 0%,
-              rgba(0, 0, 0, 0.38) 45%,
-              rgba(0, 0, 0, 0.65) 100%
-            ),
-            linear-gradient(
-              to bottom,
-              rgba(0, 0, 0, 0.30),
-              rgba(0, 0, 0, 0.72)
-            );
-          animation: heroOverlayIn 2400ms cubic-bezier(0.18, 0.82, 0.16, 1)
-            500ms forwards;
-        }
-
-        .hero-title {
-          margin: 0;
-          opacity: 0;
-          transform: translateY(18px);
-          will-change: opacity, transform;
-
-          text-transform: uppercase;
-          letter-spacing: 12px;
-          font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-          font-weight: 600;
-          line-height: 1.06;
-          font-size: clamp(22px, 3vw, 42px);
-          max-width: 92vw;
-          letter-spacing: clamp(3px, 1.4vw, 12px);
-
-          animation: heroTextIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 720ms
-            forwards;
-        }
-
-        @media (max-width: 420px) {
-  .hero-title {
-    font-size: 20px;
-    line-height: 1.12;
-    letter-spacing: 6px;
-    white-space: normal;
-    max-width: 92vw;
-  }
-}
-
-        .hero-divider {
-          width: min(440px, 74vw);
-          height: 1px;
-          margin: 18px 0 14px 0;
-          opacity: 0;
-          transform: translateY(10px);
-          will-change: opacity, transform;
-          background: rgba(255, 255, 255, 0.32);
-
-          animation: heroDividerIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1)
-            860ms forwards;
-        }
-
-        .hero-sub {
-          margin: 0;
-          opacity: 0;
-          transform: translateY(14px);
-          will-change: opacity, transform;
-
-          text-transform: uppercase;
-          letter-spacing: 4px;
-          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-            Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-          font-weight: 400;
-          color: rgba(255, 255, 255, 0.78);
-          font-size: clamp(12px, 1.2vw, 16px);
-
-          animation: heroTextIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 1020ms
-            forwards;
-        }
-
-        .hero-cta {
-          margin-top: 28px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-
-          height: 44px;
-          padding: 0 28px;
-
-          border: 1px solid rgba(255, 255, 255, 0.55);
-          background: rgba(0, 0, 0, 0.18);
-          backdrop-filter: blur(8px);
-
-          text-transform: uppercase;
-          letter-spacing: 3px;
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.92);
-          text-decoration: none;
-
-          opacity: 0;
-          transform: translateY(12px);
-          will-change: opacity, transform;
-
-          animation: heroTextIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 1240ms
-            forwards;
-
-          transition: background 250ms ease, border-color 250ms ease,
-            transform 250ms ease;
-        }
-
-        .hero-cta:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.75);
-          transform: translateY(-1px);
-        }
-
-        /* Bottom row */
-        .hero-bottom {
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 92px;
-          padding: 0 20px;
-        }
-
-        .hero-bottom-inner {
-          max-width: 1100px;
-          margin: 0 auto;
-          display: flex;
-          gap: 18px;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-
-          text-transform: uppercase;
-          letter-spacing: 5px;
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.72);
-
-          opacity: 0;
-          transform: translateY(12px);
-          will-change: opacity, transform;
-
-          animation: heroBottomIn 1100ms cubic-bezier(0.18, 0.82, 0.16, 1)
-            1500ms forwards;
-        }
-
-        .pipe {
-          opacity: 0.55;
-          letter-spacing: 0;
-        }
-
-        /* Keyframes */
-        @keyframes heroOverlayIn {
-          to {
-            opacity: 1;
-          }
-        }
-
-        @keyframes heroTextIn {
-          from {
-            opacity: 0;
-            transform: translateY(18px);
-            filter: blur(3px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-            filter: blur(0);
-          }
-        }
-
-        @keyframes heroDividerIn {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes heroBottomIn {
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          .hero-bg,
-          .hero-overlay,
-          .hero-title,
-          .hero-divider,
-          .hero-sub,
-          .hero-cta,
-          .hero-bottom-inner {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-          }
-          .hero-overlay {
-            opacity: 1;
-          }
-          .hero-bg {
-            transform: none;
-            filter: none;
-          }
-        }
-
-        /* =========================
-           Scroll cue: thin line + subtle down motion
-           ========================= */
-        .scroll-cue {
-          width: 1px;
-          height: 44px;
-          opacity: 0.55;
-          overflow: hidden;
-        }
-
-        .scroll-cue-line {
-          display: block;
-          width: 1px;
-          height: 100%;
-          background: rgba(255, 255, 255, 0.9);
-          transform: translateY(-60%);
-          animation: scrollCueDown 2.2s ease-in-out infinite;
-        }
-
-        @keyframes scrollCueDown {
-          0% {
-            transform: translateY(-70%);
-            opacity: 0.35;
-          }
-          40% {
-            opacity: 0.9;
-          }
-          100% {
-            transform: translateY(110%);
-            opacity: 0.35;
-          }
-        }
-
-        /* =========================
-           ABOUT SECTION (Mercedes-like slide-in)
-           ========================= */
-
-        .about-section {
-          position: relative;
-          background: #ffffff;
-          color: #0b0b0b;
-          padding: 120px 24px;
-        }
-
-        /* Soft transition from the dark contact section into white (prevents "hard cut") */
-        .about-bridge {
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: -80px;
-          height: 120px;
-          background: linear-gradient(
-            to bottom,
-            rgba(17, 24, 39, 1),
-            rgba(255, 255, 255, 0)
-          );
-          pointer-events: none;
-        }
-
-        .about-inner {
-          max-width: 1100px;
-          margin: 0 auto;
-        }
-
-        .about-grid {
-          display: grid;
-          grid-template-columns: 1fr 1.05fr;
-          gap: 72px;
-          align-items: center;
-        }
-
-        /* --- Media (slide-in like the G-Wagon panel) --- */
-        .about-media {
-          opacity: 0;
-          transform: translateX(-64px);
-          will-change: transform, opacity;
-        }
-
-        .about-media-frame {
-          overflow: hidden;
-          border-radius: 10px;
-          box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
-        }
-
-        .about-media-img {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
-
-        /* --- Copy (staggered resolve) --- */
-        .about-copy {
-          opacity: 0;
-          transform: translateY(18px);
-          filter: blur(2px);
-          will-change: transform, opacity, filter;
-        }
-
-        .about-title {
-          margin: 0 0 26px 0;
-          font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-          font-weight: 600;
-          letter-spacing: -0.02em;
-          line-height: 1.02;
-          font-size: clamp(34px, 4.2vw, 64px);
-        }
-
-        .about-body {
-          margin: 0 0 28px 0;
-          font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-          font-size: clamp(18px, 1.6vw, 26px);
-          line-height: 1.55;
-          color: rgba(10, 10, 10, 0.88);
-          max-width: 38ch;
-        }
-
-        .about-list {
-          list-style: none;
-          padding: 0;
-          margin: 0 0 34px 0;
-          font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-          font-size: clamp(18px, 1.6vw, 26px);
-          line-height: 1.5;
-        }
-
-        .about-list li {
-          margin: 10px 0;
-        }
-
-        .about-cta {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          height: 44px;
-          padding: 0 28px;
-          border: 1px solid rgba(0, 0, 0, 0.6);
-          background: transparent;
-          text-transform: uppercase;
-          letter-spacing: 3px;
-          font-size: 12px;
-          color: rgba(0, 0, 0, 0.9);
-          text-decoration: none;
-          transition: transform 250ms ease, background 250ms ease,
-            border-color 250ms ease;
-        }
-
-        .about-cta:hover {
-          transform: translateY(-1px);
-          background: rgba(0, 0, 0, 0.04);
-          border-color: rgba(0, 0, 0, 0.75);
-        }
-
-        /* When the section gets .fade-in (from your IntersectionObserver), run the premium reveal */
-        .fade-in .about-media {
-          opacity: 1;
-          transform: translateX(0);
-          transition: opacity 2100ms cubic-bezier(0.18, 0.82, 0.16, 1),
-            transform 2100ms cubic-bezier(0.18, 0.82, 0.16, 1);
-        }
-
-        .fade-in .about-copy {
-          opacity: 1;
-          transform: translateY(0);
-          filter: blur(0);
-          transition: opacity 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 120ms,
-            transform 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 120ms,
-            filter 1100ms cubic-bezier(0.18, 0.82, 0.16, 1) 120ms;
-        }
-
-        /* Responsive */
-        @media (max-width: 900px) {
-          .about-section {
-            padding: 96px 20px;
-          }
-          .about-grid {
-            grid-template-columns: 1fr;
-            gap: 34px;
-          }
-          .about-body {
-            max-width: none;
-          }
-        }
-
-        /* Reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-          .about-media,
-          .about-copy {
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-            transition: none !important;
-          }
-        }
-      `}</style>
     </main>
   );
 }

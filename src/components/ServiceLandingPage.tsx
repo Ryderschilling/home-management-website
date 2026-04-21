@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteData } from "@/data/siteData";
 import type { ServicePageData } from "@/data/servicePages";
+import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 export default function ServiceLandingPage({
   service,
@@ -36,10 +37,10 @@ export default function ServiceLandingPage({
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
-              href={`mailto:${siteData.contactEmail}`}
+              href="#lead-form"
               className="inline-flex min-w-[180px] items-center justify-center border border-black px-6 py-3 text-xs uppercase tracking-[0.18em] transition hover:bg-black hover:text-white"
             >
-              Contact
+              Get a Free Walkthrough
             </a>
             <Link
               href="/"
@@ -121,22 +122,8 @@ export default function ServiceLandingPage({
               </div>
             ))}
           </div>
-          <div className="mt-12 border border-gray-200 bg-[#f8f5ef] p-8 text-center md:p-10">
-            <div className="text-[11px] uppercase tracking-[0.22em] text-gray-500">
-              Ready to get started?
-            </div>
-            <h3 className="mt-3 text-2xl font-serif">
-              Talk with {siteData.businessName}
-            </h3>
-            <p className="mx-auto mt-4 max-w-2xl leading-7 text-gray-700">
-              Reach out to discuss your property, service needs, and whether this is the right fit.
-            </p>
-            <a
-              href={`mailto:${siteData.contactEmail}`}
-              className="mt-6 inline-flex min-w-[180px] items-center justify-center border border-black px-6 py-3 text-xs uppercase tracking-[0.18em] transition hover:bg-black hover:text-white"
-            >
-              Email Now
-            </a>
+          <div className="mt-12">
+            <ServiceLeadForm />
           </div>
         </div>
       </section>
