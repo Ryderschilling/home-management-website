@@ -476,6 +476,139 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* ─── Item 1: Pricing Comparison Table (Google Featured Snippet) ─── */}
+      <section className="compare-section">
+        <div className="compare-lbl">Plan Comparison</div>
+        <div className="compare-wrap">
+          <table className="compare-table">
+            <caption className="compare-caption">
+              Coastal Home Management 30A — Service Plan Comparison
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" className="compare-th compare-th-feature">Feature</th>
+                <th scope="col" className="compare-th compare-th-tier compare-th-bronze">
+                  Essential<br />
+                  <span className="compare-price">$149/mo</span>
+                </th>
+                <th scope="col" className="compare-th compare-th-tier compare-th-silver">
+                  Home Watch<br />
+                  <span className="compare-price">$299/mo</span>
+                </th>
+                <th scope="col" className="compare-th compare-th-tier compare-th-gold">
+                  Coastal Elite<br />
+                  <span className="compare-price">$599/mo</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="compare-td compare-td-feature">Weekly interior &amp; exterior inspection</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Mail pickup every visit</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Trash takeout &amp; return (on request)</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Secure key holding &amp; access management</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Immediate issue alerts</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Month-to-month — no contracts</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Appliance &amp; piping checks every visit</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Irrigation filter cleaning</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Photo report sent after every visit</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Storm &amp; weather monitoring</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">On-call / contractor coordination services</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-label compare-td-silver">2/month included</td>
+                <td className="compare-td compare-td-label compare-td-gold">3/month included</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">All HVAC filter changes — every unit</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-label compare-td-gold">Free</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Freeze protection &amp; pipe monitoring</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Contractor liaison for all trades</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature">Quarterly Property Condition Report</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Arrival Prep — A/C pre-set, fridge stocked, walkthrough</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
+                <td className="compare-td compare-td-price compare-td-bronze">$149</td>
+                <td className="compare-td compare-td-price compare-td-silver">$299</td>
+                <td className="compare-td compare-td-price compare-td-gold">$599</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       {/* Footer note */}
       <p className="footer-note">
         Questions? Call or text Ryder directly:{" "}
@@ -959,6 +1092,119 @@ export default function PricingPage() {
         @keyframes slideUp   { from { opacity:0; transform:translateY(32px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
         @keyframes pulse     { 0%,100% { opacity:0.6; transform:translateX(-50%) scale(1); } 50% { opacity:1; transform:translateX(-50%) scale(1.15); } }
         @keyframes shimmerBadge { 0% { transform:translateX(-100%); } 100% { transform:translateX(200%); } }
+
+        /* ── Compare Table ───────────────────────────────────── */
+        .compare-section {
+          max-width: 1160px;
+          margin: 56px auto 0;
+          padding: 0 20px;
+          overflow-x: auto;
+        }
+        .compare-lbl {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #333;
+          text-align: center;
+          margin-bottom: 20px;
+        }
+        .compare-wrap {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        .compare-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13px;
+          min-width: 600px;
+        }
+        .compare-caption {
+          font-size: 0;
+          position: absolute;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          height: 1px;
+          width: 1px;
+          margin: -1px;
+          padding: 0;
+          border: 0;
+        }
+        .compare-th {
+          padding: 14px 16px;
+          text-align: center;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          border-bottom: 1px solid #1a1a1a;
+          vertical-align: bottom;
+          line-height: 1.4;
+        }
+        .compare-th-feature {
+          text-align: left;
+          color: #444;
+          width: 44%;
+        }
+        .compare-th-tier {
+          width: 18%;
+          color: #888;
+        }
+        .compare-th-bronze { color: #cd7f32; }
+        .compare-th-silver { color: #c0c0c0; }
+        .compare-th-gold   { color: #d4af37; }
+
+        .compare-price {
+          display: block;
+          font-size: 15px;
+          font-weight: 900;
+          letter-spacing: -0.03em;
+          margin-top: 4px;
+          text-transform: none;
+        }
+
+        .compare-td {
+          padding: 11px 16px;
+          border-bottom: 1px solid #111;
+          vertical-align: middle;
+        }
+        .compare-td-feature {
+          color: #888;
+          text-align: left;
+          font-size: 12.5px;
+        }
+        .compare-td-price-row .compare-td-feature {
+          color: #ccc;
+          font-weight: 700;
+        }
+        .compare-row-alt td {
+          background: rgba(255,255,255,0.012);
+        }
+        .compare-td-check,
+        .compare-td-label,
+        .compare-td-none,
+        .compare-td-price {
+          text-align: center;
+          font-weight: 700;
+        }
+        .compare-td-none { color: #2a2a2a; font-size: 15px; }
+
+        .compare-td-check.compare-td-bronze { color: #cd7f32; }
+        .compare-td-check.compare-td-silver { color: #c0c0c0; }
+        .compare-td-check.compare-td-gold   { color: #d4af37; }
+
+        .compare-td-label.compare-td-bronze { color: #e8a96a; font-size: 11.5px; }
+        .compare-td-label.compare-td-silver { color: #c0c0c0; font-size: 11.5px; }
+        .compare-td-label.compare-td-gold   { color: #ffe066; font-size: 11.5px; }
+
+        .compare-td-price {
+          font-size: 16px;
+          font-weight: 900;
+          letter-spacing: -0.03em;
+        }
+        .compare-td-price.compare-td-bronze { color: #cd7f32; }
+        .compare-td-price.compare-td-silver { color: #c0c0c0; }
+        .compare-td-price.compare-td-gold   { color: #d4af37; }
       `}</style>
     </main>
   );

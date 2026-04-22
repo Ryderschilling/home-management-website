@@ -291,6 +291,167 @@ export default function HomePage() {
   </div>
 </section>
 
+      {/* ─── Item 4: How It Works Section + HowTo JSON-LD Schema ─────────── */}
+      <section
+        id="how-it-works"
+        className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section border-t border-gray-100"
+      >
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-serif mb-4">
+            How Does Second Home Management Work on 30A?
+          </h2>
+          <p className="text-gray-500 text-sm mb-14 max-w-xl">
+            Simple, transparent, and handled by one person who treats your property like it&apos;s their own.
+          </p>
+
+          <ol className="space-y-12" role="list">
+            <li className="flex gap-8 items-start">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
+                aria-hidden="true"
+              >
+                1
+              </div>
+              <div>
+                <h3 className="text-xl font-serif mb-2">Reach Out and Tell Us About Your Property</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                  Email or call Ryder directly. We&apos;ll talk through your property, your schedule, and what level of
+                  care makes sense for you. There&apos;s no pressure and no sales call — just a real conversation.
+                  Most clients are set up within a few days.
+                </p>
+              </div>
+            </li>
+
+            <li className="flex gap-8 items-start">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
+                aria-hidden="true"
+              >
+                2
+              </div>
+              <div>
+                <h3 className="text-xl font-serif mb-2">We Set Up Your Account and Collect Access Details</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                  We document your property details, key access, emergency contacts, HVAC preferences, and any specific
+                  concerns. Everything is logged so nothing gets missed. Ryder handles the setup personally — there&apos;s
+                  no one else involved.
+                </p>
+              </div>
+            </li>
+
+            <li className="flex gap-8 items-start">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
+                aria-hidden="true"
+              >
+                3
+              </div>
+              <div>
+                <h3 className="text-xl font-serif mb-2">Regular Inspections Begin on Your Schedule</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                  On a weekly or bi-weekly schedule, we walk your property inside and out. We check every system —
+                  HVAC, plumbing, irrigation, entry points, exterior condition — and photograph everything.
+                  Storm events trigger unscheduled visits at no extra charge on Elite plans.
+                </p>
+              </div>
+            </li>
+
+            <li className="flex gap-8 items-start">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
+                aria-hidden="true"
+              >
+                4
+              </div>
+              <div>
+                <h3 className="text-xl font-serif mb-2">You Receive a Report After Every Single Visit</h3>
+                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                  After each visit you get a written summary with photos by text or email. If anything needs attention,
+                  we handle it immediately or coordinate with the right contractor. You&apos;re always in the loop —
+                  without having to be here.
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <div className="mt-14">
+            <a
+              href="mailto:coastalhomemanagement30a@gmail.com"
+              className="inline-flex border border-black px-8 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"
+            >
+              Get Started
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* HowTo JSON-LD Schema — page-specific, lives here not in layout */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: "How Second Home Management Works on 30A — Coastal Home Management",
+            description:
+              "A step-by-step guide to how Coastal Home Management 30A handles property care for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach, Florida.",
+            image: {
+              "@type": "ImageObject",
+              url: "https://coastalhomemngt30a.com/img.png",
+              width: 1200,
+              height: 630,
+            },
+            totalTime: "P3D",
+            supply: [],
+            tool: [],
+            step: [
+              {
+                "@type": "HowToStep",
+                position: 1,
+                name: "Reach Out and Tell Us About Your Property",
+                text: "Email or call Ryder directly. We discuss your property, your schedule, and what level of care makes sense. No sales call — just a real conversation. Most clients are set up within a few days.",
+                url: "https://coastalhomemngt30a.com/#how-it-works",
+              },
+              {
+                "@type": "HowToStep",
+                position: 2,
+                name: "We Set Up Your Account and Collect Access Details",
+                text: "We document your property details, key access, emergency contacts, HVAC preferences, and specific concerns. Everything is logged so nothing gets missed. Ryder handles setup personally.",
+                url: "https://coastalhomemngt30a.com/#how-it-works",
+              },
+              {
+                "@type": "HowToStep",
+                position: 3,
+                name: "Regular Inspections Begin on Your Schedule",
+                text: "On a weekly or bi-weekly schedule, we walk your property inside and out — checking every system including HVAC, plumbing, irrigation, entry points, and exterior condition — and photograph everything. Storm events trigger unscheduled visits at no extra charge on Elite plans.",
+                url: "https://coastalhomemngt30a.com/#how-it-works",
+              },
+              {
+                "@type": "HowToStep",
+                position: 4,
+                name: "You Receive a Report After Every Single Visit",
+                text: "After each visit you receive a written summary with photos by text or email. If anything needs attention, we handle it immediately or coordinate with the right contractor. You are always in the loop without having to be there.",
+                url: "https://coastalhomemngt30a.com/#how-it-works",
+              },
+            ],
+            provider: {
+              "@type": "LocalBusiness",
+              name: "Coastal Home Management 30A",
+              url: "https://coastalhomemngt30a.com",
+              telephone: "+13094158793",
+              email: "coastalhomemanagement30a@gmail.com",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Inlet Beach",
+                addressRegion: "FL",
+                postalCode: "32461",
+                addressCountry: "US",
+              },
+            },
+          }),
+        }}
+      />
+
       {/* FAQ */}
       <section
         id="faq"
