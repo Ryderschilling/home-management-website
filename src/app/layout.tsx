@@ -248,6 +248,49 @@ const localBusinessSchema = {
   ],
 };
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": "https://coastalhomemngt30a.com/#org",
+  name: "Coastal Home Management 30A",
+  alternateName: "CHM 30A",
+  url: "https://coastalhomemngt30a.com",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://coastalhomemngt30a.com/logo.png",
+    width: 400,
+    height: 120,
+  },
+  image: "https://coastalhomemngt30a.com/img.png",
+  description:
+    "Local, owner-operated second home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida.",
+  telephone: "+13094158793",
+  email: "coastalhomemanagement30a@gmail.com",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Inlet Beach",
+    addressRegion: "FL",
+    postalCode: "32461",
+    addressCountry: "US",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+13094158793",
+    contactType: "customer service",
+    email: "coastalhomemanagement30a@gmail.com",
+    areaServed: "US",
+    availableLanguage: "English",
+  },
+  founder: {
+    "@type": "Person",
+    name: "Ryder Schilling",
+  },
+  foundingDate: "2025-10",
+  sameAs: [
+    "https://www.facebook.com/CoastalHomeManagement30A",
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -256,12 +299,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* LocalBusiness + Organization graph schema */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
+        {/* Standalone Organization schema — required by GEO scanners */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        {/* rel="author" — signals About page to GEO crawlers */}
+        <link rel="author" href="https://coastalhomemngt30a.com/about" />
       </head>
       <body>
         <PostHogProvider>{children}</PostHogProvider>

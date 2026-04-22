@@ -563,23 +563,23 @@ export default function HomePage() {
                 rel="noopener noreferrer"
                 className="hover:text-black underline transition"
               >
-                Walton County, Florida (Official)
+                Walton County, FL — Official Government Site
               </a>
               <a
-                href="https://www.30a.com/"
+                href="https://www.ready.gov/home"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-black underline transition"
               >
-                Scenic 30A Community
+                FEMA Ready.gov — Home Preparedness
               </a>
               <a
-                href="https://www.myfloridalicense.com/intentions2.asp"
+                href="https://www.floridadisaster.org/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-black underline transition"
               >
-                Florida Licensed Contractor Verification
+                Florida Division of Emergency Management
               </a>
             </div>
           </div>
