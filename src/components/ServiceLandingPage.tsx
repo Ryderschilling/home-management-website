@@ -128,6 +128,54 @@ export default function ServiceLandingPage({
         </div>
       </section>
 
+      {/* External Authority Links */}
+      <section className="border-t border-gray-100 bg-white px-6 py-12">
+        <div className="mx-auto max-w-4xl">
+          <p className="mb-4 text-[11px] uppercase tracking-[0.22em] text-gray-500">
+            Resources for 30A Property Owners
+          </p>
+          <div className="flex flex-col gap-3 text-sm text-gray-600 sm:flex-row sm:flex-wrap">
+            <a
+              href="https://www.co.walton.fl.us/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition hover:text-black"
+            >
+              Walton County, FL — Official Government Site
+            </a>
+            <a
+              href="https://www.floridadisaster.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition hover:text-black"
+            >
+              Florida Division of Emergency Management
+            </a>
+            <a
+              href="https://www.ready.gov/home"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition hover:text-black"
+            >
+              FEMA Ready.gov — Home Preparedness Guide
+            </a>
+            <a
+              href="https://www.myfloridalicense.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline transition hover:text-black"
+            >
+              Florida DBPR — License Verification
+            </a>
+          </div>
+          <div className="mt-6 border-t border-gray-100 pt-6 text-sm text-gray-600">
+            <Link href="/about" className="underline transition hover:text-black">
+              About Coastal Home Management 30A — company story, credentials, and team
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Structured Data */}
       <script
         type="application/ld+json"
