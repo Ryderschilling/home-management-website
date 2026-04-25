@@ -452,6 +452,92 @@ export default function HomePage() {
         }}
       />
 
+      {/* Pricing Comparison Table */}
+      <section
+        id="pricing"
+        className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section border-t border-gray-100"
+      >
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-serif mb-4">
+            Second Home Management Plans &amp; Pricing
+          </h2>
+          <p className="text-gray-500 text-sm mb-12 max-w-xl">
+            Choose the level of care that fits your property. All plans include weekly inspections, photo documentation, and written visit summaries.
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse" aria-label="Coastal Home Management 30A service plan comparison">
+              <caption className="sr-only">
+                Comparison of Standard, Premium, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
+              </caption>
+              <thead>
+                <tr className="border-b-2 border-black text-left">
+                  <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
+                    Standard<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span>
+                  </th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
+                    Premium<br /><span className="text-gray-500 text-xs font-sans">$275/mo</span>
+                  </th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
+                    Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$650/mo</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 text-gray-700">
+                {[
+                  ["Weekly property inspection",           true,  true,  true],
+                  ["Photo documentation every visit",      true,  true,  true],
+                  ["Written visit summary (text/email)",   true,  true,  true],
+                  ["Mail & package pickup",                true,  true,  true],
+                  ["Storm watch & freeze alerts",          true,  true,  true],
+                  ["Bi-weekly detailed photo report",      false, true,  true],
+                  ["Seasonal maintenance checks",          false, true,  true],
+                  ["1 on-call task/month included",        false, true,  true],
+                  ["Contractor coordination",              false, true,  true],
+                  ["Priority 4-hour response",             false, true,  true],
+                  ["Guaranteed 2-hour emergency response", false, false, true],
+                  ["3 on-call hours/month included",       false, false, true],
+                  ["Arrival Prep 2×/year",                 false, false, true],
+                  ["Quarterly Property Condition Report",  false, false, true],
+                  ["Direct line to Ryder — no queue",      false, false, true],
+                ].map(([feature, std, prem, elite]) => (
+                  <tr key={feature as string}>
+                    <td className="py-3 pr-6 text-gray-700">{feature as string}</td>
+                    <td className="py-3 px-4 text-center">{std   ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
+                    <td className="py-3 px-4 text-center">{prem  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
+                    <td className="py-3 px-4 text-center">{elite ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-black">
+                  <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$150</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$275</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$650</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/pricing"
+              className="inline-flex border border-black px-6 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"
+            >
+              Full Pricing Details
+            </Link>
+            <a
+              href={`mailto:${siteData.contactEmail}`}
+              className="inline-flex px-6 py-3 text-xs uppercase tracking-widest text-gray-500 hover:text-black transition"
+            >
+              Questions? Email Ryder →
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section
         id="faq"
