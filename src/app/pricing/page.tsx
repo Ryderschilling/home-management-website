@@ -609,6 +609,18 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Related Services */}
+      <section className="related-section">
+        <div className="related-lbl">Also See</div>
+        <div className="related-links">
+          <Link href="/second-home-management-inlet-beach" className="related-link">Second Home Management</Link>
+          <Link href="/concierge-services-inlet-beach" className="related-link">Concierge Services</Link>
+          <Link href="/mail-package-handling-inlet-beach" className="related-link">Mail &amp; Package Handling</Link>
+          <Link href="/home-check-services-30a" className="related-link">Home Check Services</Link>
+          <Link href="/" className="related-link">Home</Link>
+        </div>
+      </section>
+
       {/* Footer note */}
       <p className="footer-note">
         Questions? Call or text Ryder directly:{" "}
@@ -951,6 +963,13 @@ export default function PricingPage() {
         .addon-name  { font-size: 13px; font-weight: 700; color: #ccc; margin-bottom: 4px; }
         .addon-desc  { font-size: 12px; color: #555; line-height: 1.5; }
         .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: #c0c0c0; }
+
+        /* ── Related Services ────────────────────────────── */
+        .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #141414; padding-top: 40px; }
+        .related-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #333; margin-bottom: 16px; }
+        .related-links { display: flex; flex-wrap: wrap; gap: 10px; }
+        .related-link { border: 1px solid #222; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #555; text-decoration: none; border-radius: 4px; transition: border-color 0.2s, color 0.2s; }
+        .related-link:hover { border-color: #555; color: #f2f2f2; }
 
         /* ── Footer note ─────────────────────────────────── */
         .footer-note { text-align: center; font-size: 12px; color: #333; margin-top: 56px; line-height: 1.8; padding: 0 16px; }

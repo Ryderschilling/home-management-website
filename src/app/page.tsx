@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { siteData } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import FadeInObserver from "@/components/FadeInObserver";
+
+export const metadata: Metadata = {
+  description:
+    "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Request a free walkthrough.",
+};
 
 export default function HomePage() {
 
@@ -813,6 +819,47 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+{/* Related Services */}
+<section className="border-t border-gray-100 bg-white px-6 py-10">
+  <div className="mx-auto max-w-6xl">
+    <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-gray-500">
+      Our Services
+    </p>
+    <div className="flex flex-wrap gap-3">
+      <Link
+        href="/second-home-management-inlet-beach"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        Second Home Management
+      </Link>
+      <Link
+        href="/concierge-services-inlet-beach"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        Concierge Services
+      </Link>
+      <Link
+        href="/mail-package-handling-inlet-beach"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        Mail &amp; Package Handling
+      </Link>
+      <Link
+        href="/home-check-services-30a"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        Home Check Services
+      </Link>
+      <Link
+        href="/pricing"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        Service Plans &amp; Pricing
+      </Link>
+    </div>
+  </div>
+</section>
 
 {/* Footer */}
 <footer className="border-t border-gray-200 bg-white">

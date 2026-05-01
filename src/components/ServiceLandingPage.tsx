@@ -3,6 +3,15 @@ import { siteData } from "@/data/siteData";
 import type { ServicePageData } from "@/data/servicePages";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
 
+const relatedServiceLinks = [
+  { href: "/second-home-management-inlet-beach", label: "Second Home Management", slug: "second-home-management-inlet-beach" },
+  { href: "/concierge-services-inlet-beach", label: "Concierge Services", slug: "concierge-services-inlet-beach" },
+  { href: "/mail-package-handling-inlet-beach", label: "Mail & Package Handling", slug: "mail-package-handling-inlet-beach" },
+  { href: "/home-check-services-30a", label: "Home Check Services", slug: "home-check-services-30a" },
+  { href: "/pricing", label: "Service Plans & Pricing", slug: "pricing" },
+  { href: "/", label: "Home", slug: "home" },
+];
+
 export default function ServiceLandingPage({
   service,
 }: {
@@ -172,6 +181,28 @@ export default function ServiceLandingPage({
             <Link href="/about" className="underline transition hover:text-black">
               About Coastal Home Management 30A — company story, credentials, and team
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Services */}
+      <section className="border-t border-gray-100 bg-white px-6 py-12">
+        <div className="mx-auto max-w-4xl">
+          <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-gray-500">
+            Also See
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {relatedServiceLinks
+              .filter((link) => link.slug !== service.slug)
+              .map((link) => (
+                <Link
+                  key={link.slug}
+                  href={link.href}
+                  className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+                >
+                  {link.label}
+                </Link>
+              ))}
           </div>
         </div>
       </section>
