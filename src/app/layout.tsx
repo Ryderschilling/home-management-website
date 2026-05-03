@@ -212,6 +212,29 @@ const localBusinessSchema = {
           },
         ],
       },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "5.0",
+        bestRating: "5",
+        worstRating: "1",
+        reviewCount: "2",
+      },
+      review: [
+        {
+          "@type": "Review",
+          author: { "@type": "Person", name: "Beth Tedesco" },
+          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+          reviewBody:
+            "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
+        },
+        {
+          "@type": "Review",
+          author: { "@type": "Person", name: "Barbara Reed" },
+          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+          reviewBody:
+            "Ryder gives us peace of mind if we're out of town and need the house checked on. Very reliable. Would highly recommend using his services!",
+        },
+      ],
       founder: {
         "@type": "Person",
         name: "Ryder Schilling",
@@ -219,7 +242,10 @@ const localBusinessSchema = {
       },
       foundingDate: "2025-10",
       sameAs: [
-        "https://www.facebook.com/CoastalHomeManagement30A",
+        "https://www.facebook.com/profile.php?id=61575773416368",
+        // https://share.google/wrIyz05yZUebrtlCX
+        // Find it at: business.google.com → Share profile → Copy link
+        // "https://g.co/kgs/YOUR_GBP_SHORT_URL",
       ],
     },
     {
@@ -242,7 +268,8 @@ const localBusinessSchema = {
         availableLanguage: "English",
       },
       sameAs: [
-        "https://www.facebook.com/CoastalHomeManagement30A",
+        "https://www.facebook.com/profile.php?id=61575773416368",
+        // https://share.google/wrIyz05yZUebrtlCX
       ],
     },
   ],
@@ -287,7 +314,7 @@ const organizationSchema = {
   },
   foundingDate: "2025-10",
   sameAs: [
-    "https://www.facebook.com/CoastalHomeManagement30A",
+    "https://www.facebook.com/profile.php?id=61575773416368",
   ],
 };
 

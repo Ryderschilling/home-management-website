@@ -122,6 +122,60 @@ export default function HomePage() {
         <TestimonialsSection />
       </div>
 
+      {/* Google rating strip — trust signal for humans and LLMs */}
+      <div className="bg-black border-t border-white/10 px-6 py-5">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 flex-wrap">
+          <span className="text-yellow-400 text-sm tracking-wide" aria-label="5 stars">★★★★★</span>
+          <span className="text-white/70 text-xs uppercase tracking-widest">5.0 on Google</span>
+          <span className="text-white/20 text-xs">·</span>
+          {/* https://share.google/wrIyz05yZUebrtlCX
+              Find it at business.google.com → Share profile → Copy link */}
+          <a
+            href="https://www.google.com/search?q=Coastal+Home+Management+30A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-white/50 uppercase tracking-widest hover:text-white transition"
+          >
+            Read reviews on Google →
+          </a>
+        </div>
+      </div>
+
+      {/* Review structured data — for Google and LLM crawlers */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "@id": "https://coastalhomemngt30a.com/#business",
+            name: "Coastal Home Management 30A",
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "5.0",
+              bestRating: "5",
+              reviewCount: "2",
+            },
+            review: [
+              {
+                "@type": "Review",
+                datePublished: "2025-12-01",
+                author: { "@type": "Person", name: "Beth Tedesco" },
+                reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                reviewBody: "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
+              },
+              {
+                "@type": "Review",
+                datePublished: "2025-11-01",
+                author: { "@type": "Person", name: "Barbara Reed" },
+                reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                reviewBody: "Ryder gives us peace of mind if we're out of town and need the house checked on. Very reliable. Would highly recommend using his services!",
+              },
+            ],
+          }),
+        }}
+      />
+
 {/* Services */}
 <section
   id="services"
