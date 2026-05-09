@@ -243,6 +243,7 @@ const localBusinessSchema = {
       foundingDate: "2025-10",
       sameAs: [
         "https://www.facebook.com/profile.php?id=61575773416368",
+        "https://www.linkedin.com/company/113245630/",
         // https://share.google/wrIyz05yZUebrtlCX
         // Find it at: business.google.com → Share profile → Copy link
         // "https://g.co/kgs/YOUR_GBP_SHORT_URL",
@@ -269,6 +270,7 @@ const localBusinessSchema = {
       },
       sameAs: [
         "https://www.facebook.com/profile.php?id=61575773416368",
+        "https://www.linkedin.com/company/113245630/",
         // https://share.google/wrIyz05yZUebrtlCX
       ],
     },
@@ -315,6 +317,7 @@ const organizationSchema = {
   foundingDate: "2025-10",
   sameAs: [
     "https://www.facebook.com/profile.php?id=61575773416368",
+    "https://www.linkedin.com/company/113245630/",
   ],
 };
 

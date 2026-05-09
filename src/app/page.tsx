@@ -1005,6 +1005,34 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-gray-500">
+          Follow
+        </div>
+        <ul className="mt-4 space-y-3 text-sm text-gray-700">
+          <li>
+            <a
+              href="https://www.facebook.com/profile.php?id=61575773416368"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-black"
+            >
+              Facebook
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/company/113245630/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-black"
+            >
+              LinkedIn
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div className="mt-10 border-t border-gray-200 pt-6 text-xs text-gray-500">

@@ -626,6 +626,22 @@ export default function AboutPage() {
             <Link href="/" className="hover:text-black transition">Home</Link>
             <Link href="/pricing" className="hover:text-black transition">Pricing</Link>
             <Link href="/about" className="hover:text-black transition">About</Link>
+            <a
+              href="https://www.facebook.com/profile.php?id=61575773416368"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-black transition"
+            >
+              Facebook
+            </a>
+            <a
+              href="https://www.linkedin.com/company/113245630/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-black transition"
+            >
+              LinkedIn
+            </a>
           </div>
         </div>
         <div className="border-t border-gray-100 px-6 py-4 text-xs text-gray-400 max-w-6xl mx-auto">
