@@ -69,12 +69,12 @@ export default function HomePage() {
         {/* Background image */}
         <img
           src="/img.png"
-          alt="Luxury second home in Watersound Origins, Florida — managed by Coastal Home Management 30A"
+          alt="Coastal Home Management 30A — pool maintenance and home care services in Watersound Origins, Florida"
           draggable={false}
           loading="eager"
           fetchPriority="high"
           decoding="async"
-          className="hero-bg absolute inset-0 h-full w-full object-cover"
+          className="hero-bg absolute inset-0 h-full w-full object-cover object-top"
         />
 
         {/* Cinematic overlay (delayed dim + vignette) */}
