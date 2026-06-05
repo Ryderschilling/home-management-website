@@ -4,6 +4,7 @@ import { siteData } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import FadeInObserver from "@/components/FadeInObserver";
+import ServiceAreaMapWrapper from "@/components/ServiceAreaMapWrapper";
 
 export const metadata: Metadata = {
   description:
@@ -522,45 +523,44 @@ export default function HomePage() {
             Second Home Management Plans &amp; Pricing
           </h2>
           <p className="text-gray-500 text-sm mb-12 max-w-xl">
-            Choose the level of care that fits your property. All plans include weekly inspections, photo documentation, and written visit summaries.
+            Choose the level of care that fits your property. All plans include weekly inspections and immediate issue alerts. No contracts, no cancellation fees.
           </p>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse" aria-label="Coastal Home Management 30A service plan comparison">
               <caption className="sr-only">
-                Comparison of Standard, Premium, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
+                Comparison of Essential, Home Watch, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
               </caption>
               <thead>
                 <tr className="border-b-2 border-black text-left">
                   <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Standard<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span>
+                    Essential<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Premium<br /><span className="text-gray-500 text-xs font-sans">$275/mo</span>
+                    Home Watch<br /><span className="text-gray-500 text-xs font-sans">$275/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$650/mo</span>
+                    Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$599/mo</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
                 {[
-                  ["Weekly property inspection",           true,  true,  true],
-                  ["Photo documentation every visit",      true,  true,  true],
-                  ["Written visit summary (text/email)",   true,  true,  true],
-                  ["Mail & package pickup",                true,  true,  true],
-                  ["Storm watch & freeze alerts",          true,  true,  true],
-                  ["Bi-weekly detailed photo report",      false, true,  true],
-                  ["Seasonal maintenance checks",          false, true,  true],
-                  ["1 on-call task/month included",        false, true,  true],
-                  ["Contractor coordination",              false, true,  true],
-                  ["Priority 4-hour response",             false, true,  true],
-                  ["Guaranteed 2-hour emergency response", false, false, true],
-                  ["3 on-call hours/month included",       false, false, true],
-                  ["Arrival Prep 2×/year",                 false, false, true],
-                  ["Quarterly Property Condition Report",  false, false, true],
-                  ["Direct line to Ryder — no queue",      false, false, true],
+                  ["Weekly walkthrough — interior & exterior", true,  true,  true],
+                  ["Issue alerts sent immediately",            true,  true,  true],
+                  ["Mail pickup every visit",                  true,  true,  true],
+                  ["Trash out & return (on request)",          true,  true,  true],
+                  ["Secure key holding & access coordination", true,  true,  true],
+                  ["Photo documentation after every visit",    false, true,  true],
+                  ["Written visit report",                     false, true,  true],
+                  ["Appliance & piping checks each visit",     false, true,  true],
+                  ["Irrigation filter cleaning",               false, true,  true],
+                  ["Storm & freeze monitoring",                false, false, true],
+                  ["HVAC filter changes — every unit",         false, false, true],
+                  ["Pre-arrival walkthrough & A/C pre-set",    false, false, true],
+                  ["Post-departure secure check",              false, false, true],
+                  ["Contractor coordination & on-call access", false, false, true],
                 ].map(([feature, std, prem, elite]) => (
                   <tr key={feature as string}>
                     <td className="py-3 pr-6 text-gray-700">{feature as string}</td>
@@ -575,7 +575,7 @@ export default function HomePage() {
                   <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$150</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$275</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$650</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$599</td>
                 </tr>
               </tfoot>
             </table>
@@ -638,9 +638,9 @@ export default function HomePage() {
                 How much does second home management cost?
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
-                Our monthly management plans start at $150/month (Standard) and go up to $650/month
-                for our Coastal Elite membership. We also offer on-call services at $85 base plus
-                $50/hour, and mail or trash handling at $35/day. Visit our{" "}
+                Our monthly management plans start at $150/month (Essential) and go up to $599/month
+                for our Coastal Elite membership. We also offer on-call services at $75 base plus
+                $45/hour, and mail or trash handling at $35/day. Visit our{" "}
                 <Link href="/pricing" className="underline hover:text-black">
                   pricing page
                 </Link>{" "}
@@ -761,7 +761,7 @@ export default function HomePage() {
                 name: "How much does second home management cost?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Monthly management plans start at $150/month (Standard) and go up to $650/month for the Coastal Elite membership. On-call services are $85 base plus $50/hour. Mail or trash handling is $35/day.",
+                  text: "Monthly management plans start at $150/month (Essential) and go up to $599/month for the Coastal Elite membership. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
                 },
               },
               {
@@ -800,6 +800,19 @@ export default function HomePage() {
           }),
         }}
       />
+
+      {/* Service Area Map */}
+      <section className="bg-white px-6 py-20 fade-section">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-3xl font-serif tracking-tight text-black">
+            Our Service Area
+          </h2>
+          <p className="text-gray-500 text-sm uppercase tracking-widest">
+            Watersound Origins · Naturewalk · Scenic 30A
+          </p>
+          <ServiceAreaMapWrapper />
+        </div>
+      </section>
 
       {/* Contact */}
       <section

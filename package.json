@@ -18,6 +18,8 @@
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.0",
     "@stripe/stripe-js": "^8.6.4",
+    "@types/leaflet": "^1.9.21",
+    "leaflet": "^1.9.4",
     "nanoid": "^5.1.7",
     "next": "16.1.5",
     "pg": "^8.18.0",
@@ -26,6 +28,7 @@
     "posthog-node": "^5.28.11",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-leaflet": "^5.0.0",
     "resend": "^6.9.3",
     "stripe": "^20.4.1",
     "ws": "^8.19.0"

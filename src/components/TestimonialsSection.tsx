@@ -46,7 +46,7 @@ export default function TestimonialsSection() {
 
   return (
     <section
-      className="relative w-full bg-black text-white px-4 md:px-6 pt-0 pb-16 md:pb-24"
+      className="relative w-full bg-black text-white px-4 md:px-6 pt-16 md:pt-24 pb-16 md:pb-24"
       aria-label="Testimonials"
     >
       <div className="mx-auto max-w-6xl">

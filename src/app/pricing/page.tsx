@@ -26,8 +26,8 @@ const plans: Plan[] = [
   {
     tier: "bronze",
     name: "Essential",
-    tagline: "Weekly home check-ins and mail grab while you're away.",
-    price: 149,
+    tagline: "Simple, reliable home checks while you're away. Nothing missed.",
+    price: 150,
     priceNote: "month-to-month · no contracts",
     badge: "Bronze",
     cta: "Get Started",
@@ -35,11 +35,11 @@ const plans: Plan[] = [
       {
         label: "What's Included",
         items: [
-          { text: "<strong>Weekly interior & exterior house check</strong>" },
-          { text: "<strong>Mail grab</strong> every week" },
-          { text: "<strong>Trash taken out & brought in</strong> on request" },
-          { text: "<strong>Secure key holding</strong> & access management" },
-          { text: "<strong>Issue alerts</strong> — you hear about it immediately" },
+          { text: "<strong>Weekly walkthrough</strong> — interior & exterior" },
+          { text: "<strong>Issue alerts</strong> sent immediately if anything needs attention" },
+          { text: "<strong>Mail pickup</strong> every visit" },
+          { text: "<strong>Trash out & return</strong> on request" },
+          { text: "<strong>Secure key holding</strong> & access coordination" },
         ],
       },
     ],
@@ -47,9 +47,9 @@ const plans: Plan[] = [
   {
     tier: "silver",
     name: "Home Watch",
-    tagline: "Full weekly inspections with photo reports and personalized service.",
-    price: 299,
-    priceNote: "2 on-call services included · month-to-month",
+    tagline: "Everything in Essential plus photo reports and hands-on property care.",
+    price: 275,
+    priceNote: "month-to-month · no contracts",
     badge: "Silver",
     cta: "Get Started",
     sections: [
@@ -57,14 +57,10 @@ const plans: Plan[] = [
         label: "What's Included",
         items: [
           { text: "<strong>Everything in Essential</strong>, plus:" },
-          { text: "<strong>Appliance & piping checks</strong> every visit" },
+          { text: "<strong>Photo documentation</strong> sent after every visit" },
+          { text: "<strong>Written visit report</strong> — what was checked, what was found" },
+          { text: "<strong>Appliance & piping checks</strong> each visit" },
           { text: "<strong>Irrigation filter cleaning</strong>" },
-          { text: "<strong>Photo reports</strong> sent after every visit" },
-          { text: "<strong>Storm & weather monitoring</strong>" },
-          {
-            text: "<strong>2 on-call or contractor coordination</strong> services/month",
-            tag: "Included",
-          },
         ],
       },
     ],
@@ -72,58 +68,33 @@ const plans: Plan[] = [
   {
     tier: "gold",
     name: "Coastal Elite",
-    tagline: "Full home operations, priority access & arrival-ready service.",
+    tagline: "Full-service home management. Your property runs itself while you're gone.",
     price: 599,
     priceNote: "Founding rate — limited spots available.",
     badge: "Gold — Elite",
     cta: "Claim a Founding Spot",
     sections: [
       {
-        label: "Inspections & Visits",
+        label: "Full Watch + Reports",
         items: [
           { text: "<strong>Everything in Home Watch</strong>, plus:" },
-          {
-            text: "<strong>Extra unscheduled tasks</strong> based on weather — no charge",
-          },
-          {
-            text: "<strong>Quarterly Property Condition Report</strong>",
-          },
-        ],
-      },
-      {
-        label: "HVAC & Protection",
-        items: [
-          {
-            text: "<strong>All HVAC filter changes</strong> — every unit, every time",
-            tag: "Free",
-          },
-          {
-            text: "<strong>Freeze protection</strong> — pipe checks, monitoring & prep when temps drop",
-          },
-        ],
-      },
-      {
-        label: "Priority & On-Call",
-        items: [
-          {
-            text: "<strong>3 on-call or contractor coordination</strong> services/month",
-            tag: "Free",
-          },
-          {
-            text: "<strong>Contractor liaison</strong> — your local point of contact for every trade",
-          },
+          { text: "<strong>Storm & freeze monitoring</strong> — active checks when weather moves in" },
+          { text: "<strong>HVAC filter changes</strong> — every unit, every time", tag: "Free" },
         ],
       },
       {
         label: "Arrival Ready",
         items: [
-          {
-            text: "<strong>A/C pre-set</strong> to your preference before you arrive",
-          },
-          { text: "<strong>Fridge stocked</strong> with your basics" },
-          {
-            text: "<strong>Pre-arrival walkthrough</strong> — home ready, nothing to worry about",
-          },
+          { text: "<strong>Pre-arrival walkthrough</strong> — home ready before you land" },
+          { text: "<strong>A/C pre-set</strong> to your preference" },
+          { text: "<strong>Post-departure secure check</strong> after you leave" },
+        ],
+      },
+      {
+        label: "Contractor & On-Call",
+        items: [
+          { text: "<strong>Contractor coordination</strong> — Ryder is your on-the-ground point of contact" },
+          { text: "<strong>Priority response</strong> — you're first in line, always" },
         ],
       },
     ],
@@ -489,11 +460,11 @@ export default function PricingPage() {
                 <th scope="col" className="compare-th compare-th-feature">Feature</th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-bronze">
                   Essential<br />
-                  <span className="compare-price">$149/mo</span>
+                  <span className="compare-price">$150/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-silver">
                   Home Watch<br />
-                  <span className="compare-price">$299/mo</span>
+                  <span className="compare-price">$275/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-gold">
                   Coastal Elite<br />
@@ -503,105 +474,93 @@ export default function PricingPage() {
             </thead>
             <tbody>
               <tr>
-                <td className="compare-td compare-td-feature">Weekly interior &amp; exterior inspection</td>
+                <td className="compare-td compare-td-feature">Weekly walkthrough — interior &amp; exterior</td>
                 <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Issue alerts sent immediately</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
                 <td className="compare-td compare-td-feature">Mail pickup every visit</td>
                 <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Trash out &amp; return (on request)</td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
               <tr>
-                <td className="compare-td compare-td-feature">Trash takeout &amp; return (on request)</td>
+                <td className="compare-td compare-td-feature">Secure key holding &amp; access coordination</td>
                 <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Secure key holding &amp; access management</td>
-                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
+                <td className="compare-td compare-td-feature">Photo documentation after every visit</td>
+                <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
-                <td className="compare-td compare-td-feature">Immediate issue alerts</td>
-                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
-                <td className="compare-td compare-td-check compare-td-silver">✓</td>
-                <td className="compare-td compare-td-check compare-td-gold">✓</td>
-              </tr>
-              <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Month-to-month — no contracts</td>
-                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
-                <td className="compare-td compare-td-check compare-td-silver">✓</td>
-                <td className="compare-td compare-td-check compare-td-gold">✓</td>
-              </tr>
-              <tr>
-                <td className="compare-td compare-td-feature">Appliance &amp; piping checks every visit</td>
+                <td className="compare-td compare-td-feature">Written visit report</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Appliance &amp; piping checks each visit</td>
+                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
                 <td className="compare-td compare-td-feature">Irrigation filter cleaning</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
-              <tr>
-                <td className="compare-td compare-td-feature">Photo report sent after every visit</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-check compare-td-silver">✓</td>
-                <td className="compare-td compare-td-check compare-td-gold">✓</td>
-              </tr>
               <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Storm &amp; weather monitoring</td>
+                <td className="compare-td compare-td-feature">Storm &amp; freeze monitoring</td>
                 <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-check compare-td-silver">✓</td>
+                <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
-                <td className="compare-td compare-td-feature">On-call / contractor coordination services</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-label compare-td-silver">2/month included</td>
-                <td className="compare-td compare-td-label compare-td-gold">3/month included</td>
-              </tr>
-              <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">All HVAC filter changes — every unit</td>
+                <td className="compare-td compare-td-feature">HVAC filter changes — every unit</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-label compare-td-gold">Free</td>
               </tr>
-              <tr>
-                <td className="compare-td compare-td-feature">Freeze protection &amp; pipe monitoring</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-check compare-td-gold">✓</td>
-              </tr>
               <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Contractor liaison for all trades</td>
+                <td className="compare-td compare-td-feature">Pre-arrival walkthrough &amp; A/C pre-set</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
-                <td className="compare-td compare-td-feature">Quarterly Property Condition Report</td>
+                <td className="compare-td compare-td-feature">Post-departure secure check</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Arrival Prep — A/C pre-set, fridge stocked, walkthrough</td>
+                <td className="compare-td compare-td-feature">Contractor coordination &amp; on-call access</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-none">—</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
-                <td className="compare-td compare-td-price compare-td-bronze">$149</td>
-                <td className="compare-td compare-td-price compare-td-silver">$299</td>
+                <td className="compare-td compare-td-price compare-td-bronze">$150</td>
+                <td className="compare-td compare-td-price compare-td-silver">$275</td>
                 <td className="compare-td compare-td-price compare-td-gold">$599</td>
               </tr>
             </tbody>
