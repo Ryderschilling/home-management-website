@@ -97,11 +97,11 @@ export default function HomePage() {
         {/* Bottom row */}
         <div className="hero-bottom relative z-10">
         <div className="hero-bottom-inner">
-  <span>SECOND HOME MANAGEMENT</span>
+  <span>WATERSOUND ORIGINS</span>
   <span className="pipe">|</span>
-  <span>CONCIERGE</span>
+  <span>NATUREWALK</span>
   <span className="pipe">|</span>
-  <span>LOCAL</span>
+  <span>INLET BEACH</span>
   <span className="pipe">|</span>
   <span>INSURED</span>
 </div>
@@ -155,7 +155,7 @@ export default function HomePage() {
               "@type": "AggregateRating",
               ratingValue: "5.0",
               bestRating: "5",
-              reviewCount: "2",
+              reviewCount: "5",
             },
             review: [
               {
@@ -176,6 +176,33 @@ export default function HomePage() {
           }),
         }}
       />
+
+{/* Meet Ryder — personal intro strip */}
+<section className="bg-white border-t border-gray-100 px-4 md:px-6 py-14 md:py-20 fade-section">
+  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
+    <div className="flex-shrink-0">
+      <img
+        src="/profile-web.jpg"
+        alt="Ryder Schilling, founder of Coastal Home Management 30A"
+        className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover shadow-md"
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div>
+      <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Who You&apos;re Hiring</p>
+      <h2 className="text-2xl md:text-3xl font-serif mb-4 leading-snug">
+        I live in Watersound Origins.<br className="hidden md:block" /> This is my neighborhood too.
+      </h2>
+      <p className="text-gray-600 text-sm leading-relaxed max-w-xl">
+        I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they could actually trust — not a company, a person. I&apos;m here full-time, I know the streets, I know this community, and I&apos;m the one who shows up to your house. Every single time.
+      </p>
+      <Link href="/about" className="mt-6 inline-flex text-xs uppercase tracking-widest border-b border-gray-300 pb-0.5 hover:border-black transition">
+        More about Ryder →
+      </Link>
+    </div>
+  </div>
+</section>
 
 {/* Services */}
 <section
@@ -513,6 +540,45 @@ export default function HomePage() {
         }}
       />
 
+      {/* Why CHM — 3 differentiators */}
+      <section className="bg-black text-white px-4 md:px-6 py-20 md:py-28 fade-section">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Why Homeowners Choose CHM</p>
+          <h2 className="text-3xl md:text-4xl font-serif mb-14 text-center">What makes CHM different.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
+            <div>
+              <div className="text-3xl mb-5">⌖</div>
+              <h3 className="font-serif text-xl mb-3">Your neighbor, not a company</h3>
+              <p className="text-white/65 text-sm leading-relaxed">
+                I live in Watersound Origins. I&apos;m not dispatched from an office — I&apos;m down the street. That means faster response, community knowledge, and a face you&apos;ll actually recognize.
+              </p>
+            </div>
+            <div>
+              <div className="text-3xl mb-5">◻</div>
+              <h3 className="font-serif text-xl mb-3">Photos after every single visit</h3>
+              <p className="text-white/65 text-sm leading-relaxed">
+                Every visit is documented. You get photos and a written summary by text or email. No guessing whether someone showed up — you see exactly what I saw.
+              </p>
+            </div>
+            <div>
+              <div className="text-3xl mb-5">✓</div>
+              <h3 className="font-serif text-xl mb-3">One person. Full accountability.</h3>
+              <p className="text-white/65 text-sm leading-relaxed">
+                No rotating staff, no subcontractors, no &quot;I&apos;ll have someone look at it.&quot; You have my number. I&apos;m the one who shows up, and I&apos;m the one you call.
+              </p>
+            </div>
+          </div>
+          <div className="mt-14 text-center">
+            <a
+              href="#contact"
+              className="inline-flex border border-white/30 px-8 py-3 text-xs uppercase tracking-widest text-white hover:bg-white hover:text-black transition"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Comparison Table */}
       <section
         id="pricing"
@@ -549,11 +615,11 @@ export default function HomePage() {
                 {[
                   ["Weekly walkthrough — interior & exterior", true,  true,  true],
                   ["Issue alerts sent immediately",            true,  true,  true],
+                  ["Photo documentation after every visit",    true,  true,  true],
+                  ["Written visit report",                     true,  true,  true],
                   ["Mail pickup every visit",                  true,  true,  true],
                   ["Trash out & return (on request)",          true,  true,  true],
                   ["Secure key holding & access coordination", true,  true,  true],
-                  ["Photo documentation after every visit",    false, true,  true],
-                  ["Written visit report",                     false, true,  true],
                   ["Appliance & piping checks each visit",     false, true,  true],
                   ["Irrigation filter cleaning",               false, true,  true],
                   ["Storm & freeze monitoring",                false, false, true],
