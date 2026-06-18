@@ -1048,9 +1048,16 @@ export default function HomePage() {
       </div>
     </div>
 
-    <div className="mt-10 border-t border-gray-200 pt-6 text-xs text-gray-500">
-      © {new Date().getFullYear()} Coastal Home Management 30A. All rights
-      reserved.
+    <div className="mt-10 border-t border-gray-200 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-500">
+      <span>© {new Date().getFullYear()} Coastal Home Management 30A. All rights reserved.</span>
+      <a
+        href="https://sourceatrade.com/contractors/coastal-home-management-30a-3"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 transition-colors"
+      >
+        sourceatrade.com
+      </a>
     </div>
   </div>
 </footer>
