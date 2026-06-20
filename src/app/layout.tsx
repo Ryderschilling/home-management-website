@@ -1,7 +1,22 @@
 // src/app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
+import Script from "next/script";
 import { PostHogProvider } from "@/providers/PostHogProvider";
+
+/**
+ * Google Ads Conversion Tracking
+ * ─────────────────────────────────────────────────────────────────────────────
+ * After creating your Google Ads account and setting up a conversion action:
+ *   1. Go to ads.google.com → Tools → Measurement → Conversions
+ *   2. Create a conversion action → "Website" → fill out the form
+ *   3. Click "Use Google Tag" — copy the two values:
+ *        • GOOGLE_ADS_ID     = AW-XXXXXXXXXX   (your account tag)
+ *        • CONVERSION_LABEL  = the label string from the conversion snippet
+ *   4. Replace the placeholders below AND in HomeWatchLeadForm.tsx
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+const GOOGLE_ADS_ID = "AW-XXXXXXXXXX"; // ← replace after creating Google Ads account
 
 const appUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
@@ -329,6 +344,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Ads global site tag */}
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GOOGLE_ADS_ID}');
+        `}</Script>
+
         {/* LocalBusiness + Organization graph schema */}
         <script
           type="application/ld+json"

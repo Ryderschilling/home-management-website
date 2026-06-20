@@ -186,16 +186,16 @@ export async function POST(req: NextRequest) {
     const message = safe(body.message);
     const source = safe(body.source) || "/home-watch";
 
-    // Minimal validation — need a way to reach them.
+    // Validation — name + phone are required; email is optional
     if (!name) {
       return NextResponse.json(
         { ok: false, error: { message: "Please enter your name." } },
         { status: 400 }
       );
     }
-    if (!email && !phone) {
+    if (!phone) {
       return NextResponse.json(
-        { ok: false, error: { message: "Please enter an email or phone so we can reach you." } },
+        { ok: false, error: { message: "Please enter your phone number so we can reach you." } },
         { status: 400 }
       );
     }

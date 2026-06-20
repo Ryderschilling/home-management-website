@@ -2,6 +2,24 @@
 
 import { useState } from "react";
 
+/**
+ * Google Ads conversion tracking
+ * Replace CONVERSION_LABEL below with the label from your conversion action:
+ *   ads.google.com → Tools → Measurement → Conversions → [your action] → Tag setup → "Use Google Tag"
+ * The label looks like: "AbCdEfGhIj1234"
+ */
+const GOOGLE_ADS_ID = "AW-XXXXXXXXXX";       // ← same ID as in layout.tsx
+const CONVERSION_LABEL = "CONVERSION_LABEL"; // ← replace with your conversion label
+
+function fireGtagConversion() {
+  try {
+    const w = window as unknown as {
+      gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
+    };
+    w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+  } catch {}
+}
+
 function phCapture(event: string, props?: Record<string, unknown>) {
   try {
     const ph = (window as unknown as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } })
@@ -15,7 +33,6 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [neighborhood, setNeighborhood] = useState("");
-  const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -28,8 +45,8 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
       setError("Please enter your name.");
       return;
     }
-    if (!email.trim() && !phone.trim()) {
-      setError("Add an email or phone number so I can reach you.");
+    if (!phone.trim()) {
+      setError("Please enter your phone number so I can reach you.");
       return;
     }
 
@@ -43,7 +60,6 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
           email: email.trim().toLowerCase(),
           phone: phone.trim(),
           neighborhood,
-          message: message.trim(),
           source,
         }),
       });
@@ -53,7 +69,9 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
         setSubmitting(false);
         return;
       }
-      phCapture("chm_home_watch_lead", { neighborhood: neighborhood || null, has_phone: !!phone.trim() });
+      // Fire Google Ads conversion + PostHog
+      fireGtagConversion();
+      phCapture("chm_home_watch_lead", { neighborhood: neighborhood || null, has_email: !!email.trim() });
       setSubmitted(true);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -87,6 +105,7 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
         </p>
 
         <form onSubmit={handleSubmit} noValidate>
+          {/* Name */}
           <div style={{ marginBottom: "12px" }}>
             <label style={labelStyle}>Name <span style={{ color: "#b91c1c" }}>*</span></label>
             <input
@@ -101,21 +120,23 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
             />
           </div>
 
+          {/* Phone (required) + Email (optional) side by side */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "12px" }}>
             <div>
-              <label style={labelStyle}>Phone</label>
+              <label style={labelStyle}>Phone <span style={{ color: "#b91c1c" }}>*</span></label>
               <input
                 type="tel"
                 placeholder="(555) 000-0000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                required
                 style={inputStyle}
                 onFocus={(e) => Object.assign(e.target.style, inputFocusStyle)}
                 onBlur={(e) => Object.assign(e.target.style, inputStyle)}
               />
             </div>
             <div>
-              <label style={labelStyle}>Email</label>
+              <label style={labelStyle}>Email <span style={{ color: "rgba(0,0,0,0.3)", fontWeight: 400 }}>(optional)</span></label>
               <input
                 type="email"
                 placeholder="you@email.com"
@@ -128,7 +149,8 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
             </div>
           </div>
 
-          <div style={{ marginBottom: "12px" }}>
+          {/* Neighborhood */}
+          <div style={{ marginBottom: "24px" }}>
             <label style={labelStyle}>Where&apos;s your home?</label>
             <select
               value={neighborhood}
@@ -145,19 +167,6 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
               <option value="Inlet Beach">Inlet Beach</option>
               <option value="Other 30A">Other 30A Community</option>
             </select>
-          </div>
-
-          <div style={{ marginBottom: "24px" }}>
-            <label style={labelStyle}>Anything I should know? (optional)</label>
-            <textarea
-              placeholder="e.g. I'm out of state and need eyes on the place monthly."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={3}
-              style={{ ...inputStyle, height: "auto", padding: "10px 12px", resize: "vertical" }}
-              onFocus={(e) => Object.assign(e.target.style, { ...inputFocusStyle, height: "auto", padding: "10px 12px" })}
-              onBlur={(e) => Object.assign(e.target.style, { ...inputStyle, height: "auto", padding: "10px 12px" })}
-            />
           </div>
 
           {error && <p style={errorStyle}>{error}</p>}

@@ -38,7 +38,7 @@ export default function HomeWatchPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
       {/* ── Nav ──────────────────────────────────────────────── */}
-      <nav className="border-b border-black/10 px-5 py-3">
+      <nav className="border-b border-black/10 px-5 py-3 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">
           <img
             src="/logo.png"
@@ -47,6 +47,12 @@ export default function HomeWatchPage() {
             draggable={false}
           />
         </Link>
+        <a
+          href="tel:3094158793"
+          className="text-sm font-medium text-black hover:text-black/70 transition"
+        >
+          (309) 415-8793
+        </a>
       </nav>
 
       {/* ── Hero ─────────────────────────────────────────────── */}
@@ -112,6 +118,33 @@ export default function HomeWatchPage() {
               <p className="text-sm leading-relaxed text-black/60">{p.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ── Testimonials ─────────────────────────────────────── */}
+      <section className="border-t border-black/10 bg-[#fafaf8]">
+        <div className="mx-auto max-w-6xl px-5 py-16 md:py-20">
+          <p className="mb-10 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40">
+            What homeowners say
+          </p>
+          <div className="grid gap-8 md:grid-cols-2">
+            <blockquote className="border border-black/10 bg-white p-8">
+              <p className="mb-6 text-base leading-relaxed text-black/70">
+                &ldquo;Ryder gives us peace of mind if we&apos;re out of town and need the house checked on. Very reliable. Would highly recommend using his services!&rdquo;
+              </p>
+              <footer className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">
+                Barbara Reed &mdash; Naturewalk, Inlet Beach
+              </footer>
+            </blockquote>
+            <blockquote className="border border-black/10 bg-white p-8">
+              <p className="mb-6 text-base leading-relaxed text-black/70">
+                &ldquo;Excellent service and communication! Very helpful and Ryder goes out of his way to help.&rdquo;
+              </p>
+              <footer className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">
+                Beth Tedesco &mdash; Inlet Beach
+              </footer>
+            </blockquote>
+          </div>
         </div>
       </section>
 
@@ -237,11 +270,6 @@ export default function HomeWatchPage() {
                 >
                   {siteData.contactEmail}
                 </a>
-                <div>
-                  <a href="/admin/login" className="text-gray-500 transition hover:text-black">
-                    Admin
-                  </a>
-                </div>
               </div>
             </div>
 
