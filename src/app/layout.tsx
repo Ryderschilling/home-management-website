@@ -16,7 +16,7 @@ import { PostHogProvider } from "@/providers/PostHogProvider";
  *   4. Replace the placeholders below AND in HomeWatchLeadForm.tsx
  * ─────────────────────────────────────────────────────────────────────────────
  */
-const GOOGLE_ADS_ID = "AW-XXXXXXXXXX"; // ← replace after creating Google Ads account
+const GOOGLE_ADS_ID = "AW-18257719328";
 
 const appUrl =
   process.env.NEXT_PUBLIC_APP_URL ||

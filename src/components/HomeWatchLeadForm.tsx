@@ -8,8 +8,8 @@ import { useState } from "react";
  *   ads.google.com → Tools → Measurement → Conversions → [your action] → Tag setup → "Use Google Tag"
  * The label looks like: "AbCdEfGhIj1234"
  */
-const GOOGLE_ADS_ID = "AW-XXXXXXXXXX";       // ← same ID as in layout.tsx
-const CONVERSION_LABEL = "CONVERSION_LABEL"; // ← replace with your conversion label
+const GOOGLE_ADS_ID = "AW-18257719328";
+const CONVERSION_LABEL = "DaWcCJ-i2sIcEKDg-oFE";
 
 function fireGtagConversion() {
   try {
