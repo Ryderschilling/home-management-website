@@ -9,7 +9,7 @@ import { useState } from "react";
  * The label looks like: "AbCdEfGhIj1234"
  */
 const GOOGLE_ADS_ID = "AW-18257719328";
-const CONVERSION_LABEL = "DaWcCJ-i2sIcEKDg-oFE";
+const CONVERSION_LABEL = "EBWYcK696sMcEKDg-oFE";
 
 function fireGtagConversion() {
   try {
