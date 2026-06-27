@@ -199,6 +199,88 @@ export const servicePages: Record<string, ServicePageData> = {
     ],
   },
 
+  "second-home-management-watersound-origins": {
+    slug: "second-home-management-watersound-origins",
+    title: "Second Home Management in Watersound Origins",
+    metaTitle: "Second Home Management in Watersound Origins, FL",
+    metaDescription:
+      "Trusted second home management in Watersound Origins and Naturewalk. Weekly property checks, issue coordination, and reliable local oversight while you're away.",
+    intro:
+      "Coastal Home Management 30A provides dedicated second home management for homeowners in Watersound Origins, Naturewalk, and surrounding Inlet Beach communities. We keep your property protected, monitored, and cared for while you're not there.",
+    image: "/img.png",
+    highlights: [
+      "Weekly or bi-weekly property checks in Watersound Origins",
+      "Detailed visit reports with photos and issue notes",
+      "Vendor and maintenance coordination",
+      "Trusted local presence in Watersound and Naturewalk",
+    ],
+    idealFor: [
+      "Watersound Origins homeowners who live out of state",
+      "Second-home owners in Naturewalk who want consistent oversight",
+      "Homeowners who want a reliable local contact in the community",
+    ],
+    process: [
+      "We walk the property, learn your priorities, and set your check schedule.",
+      "We perform regular visits, document the condition, and flag anything that needs attention.",
+      "We coordinate follow-up quickly so small issues don't become expensive problems.",
+    ],
+    faqs: [
+      {
+        q: "Do you serve Watersound Origins and Naturewalk specifically?",
+        a: "Yes. Watersound Origins and Naturewalk are our primary service areas. We know these communities well and can get to your property quickly.",
+      },
+      {
+        q: "What happens when you find an issue at my property?",
+        a: "We contact you immediately, document it clearly, and coordinate the next step — whether that's a vendor, a repair, or just a watchful eye until you return.",
+      },
+      {
+        q: "How often can you check on my home?",
+        a: "Most homeowners in Watersound choose weekly visits. We can also do bi-weekly or adjust based on season and vacancy.",
+      },
+    ],
+  },
+
+  "vacation-home-care-30a": {
+    slug: "vacation-home-care-30a",
+    title: "Vacation Home Care on 30A",
+    metaTitle: "Vacation Home Care Services on Scenic 30A, Florida",
+    metaDescription:
+      "Vacation home care on scenic 30A and Inlet Beach. Property checks, pre-arrival prep, issue response, and trusted local management for second homeowners.",
+    intro:
+      "Vacation home care on 30A means having someone local who knows your property and can respond fast. Coastal Home Management 30A provides reliable, personal care for second homes and vacation properties across Inlet Beach, Watersound Origins, and Naturewalk.",
+    image: "/img.png",
+    highlights: [
+      "Pre-arrival property preparation",
+      "Routine property checks between visits",
+      "Fast issue response and vendor coordination",
+      "Ongoing communication and photo updates",
+    ],
+    idealFor: [
+      "Vacation homeowners who visit 30A seasonally",
+      "Second-home owners who want their property guest-ready on arrival",
+      "Owners who want a local operator they can text when something comes up",
+    ],
+    process: [
+      "We learn the property, your visit schedule, and what matters most to you.",
+      "We check in regularly and prepare the home ahead of your arrivals.",
+      "We handle any issues that come up so you arrive to a property that's ready.",
+    ],
+    faqs: [
+      {
+        q: "What does pre-arrival prep include?",
+        a: "We walk the property before you arrive, confirm everything is in order, check systems, and make sure the home is ready for your stay.",
+      },
+      {
+        q: "What areas of 30A do you cover?",
+        a: "We primarily serve Inlet Beach, Watersound Origins, and Naturewalk. Contact us to confirm availability for your specific address.",
+      },
+      {
+        q: "Can you respond if something goes wrong while I'm away?",
+        a: "Yes. That's the core of what we do. You call or text, we're on it — whether it's a vendor coordination, a check-in, or something more urgent.",
+      },
+    ],
+  },
+
   "artificial-rock-installation-inlet-beach": {
     slug: "artificial-rock-installation-inlet-beach",
     title: "Artificial Rock Installation in Inlet Beach",

@@ -18,6 +18,10 @@ export const siteData = {
   // IMPORTANT: replace this with your real email
   contactEmail: "coastalhomemanagement30a@gmail.com",
 
+  // Google Business Profile — update with your direct review link from GBP dashboard
+  // Format: https://g.page/r/YOUR_PLACE_ID/review  (find it in Google Business Profile > Get more reviews)
+  gbpUrl: "https://g.page/r/CbwjKOQ5enwWEBM/review",
+
   services: [
     {
       id: "second-home-management",

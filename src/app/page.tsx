@@ -8,7 +8,7 @@ import ServiceAreaMapWrapper from "@/components/ServiceAreaMapWrapper";
 
 export const metadata: Metadata = {
   description:
-    "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Request a free walkthrough.",
+    "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Request a walkthrough.",
 };
 
 export default function HomePage() {
@@ -1037,6 +1037,22 @@ export default function HomePage() {
     </li>
     <li>
       <Link
+        href="/second-home-management-watersound-origins"
+        className="transition hover:text-black"
+      >
+        Watersound Origins
+      </Link>
+    </li>
+    <li>
+      <Link
+        href="/vacation-home-care-30a"
+        className="transition hover:text-black"
+      >
+        Vacation Home Care
+      </Link>
+    </li>
+    <li>
+      <Link
         href="/pricing"
         className="transition hover:text-black font-medium"
       >
@@ -1108,6 +1124,16 @@ export default function HomePage() {
               className="transition hover:text-black"
             >
               LinkedIn
+            </a>
+          </li>
+          <li>
+            <a
+              href={siteData.gbpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-black"
+            >
+              Google Reviews
             </a>
           </li>
         </ul>
