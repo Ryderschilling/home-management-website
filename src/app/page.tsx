@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { siteData } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
@@ -67,15 +68,15 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="hero relative h-screen overflow-hidden text-white">
-        {/* Background image */}
-        <img
+        {/* Background image — Next.js Image for automatic WebP + responsive sizing */}
+        <Image
           src="/img.png"
           alt="Coastal Home Management 30A — pool maintenance and home care services in Watersound Origins, Florida"
-          draggable={false}
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          className="hero-bg absolute inset-0 h-full w-full object-cover object-top"
+          fill
+          priority
+          quality={85}
+          sizes="100vw"
+          className="hero-bg object-cover object-top"
         />
 
         {/* Cinematic overlay (delayed dim + vignette) */}
@@ -1142,14 +1143,19 @@ export default function HomePage() {
 
     <div className="mt-10 border-t border-gray-200 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-gray-500">
       <span>© {new Date().getFullYear()} Coastal Home Management 30A. All rights reserved.</span>
-      <a
-        href="https://sourceatrade.com/contractors/coastal-home-management-30a-3"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 transition-colors"
-      >
-        sourceatrade.com
-      </a>
+      <div className="flex items-center gap-4">
+        <Link href="/privacy-policy" className="text-gray-400 hover:text-gray-600 transition-colors">
+          Privacy Policy
+        </Link>
+        <a
+          href="https://sourceatrade.com/contractors/coastal-home-management-30a-3"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          sourceatrade.com
+        </a>
+      </div>
     </div>
   </div>
 </footer>

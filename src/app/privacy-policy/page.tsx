@@ -1,96 +1,109 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Coastal Home Management 30A",
-  description: "Privacy policy for Coastal Home Management 30A — how we collect, use, and protect your information.",
+  description:
+    "Privacy policy for Coastal Home Management 30A. How we collect, use, and protect your information.",
 };
 
 export default function PrivacyPolicyPage() {
   return (
-    <main className="min-h-screen bg-white text-black px-6 py-16 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Privacy Policy</h1>
-      <p className="text-sm text-gray-500 mb-8">Last updated: June 2026</p>
+    <main className="min-h-screen bg-white text-black">
+      <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
+        <div className="text-[11px] uppercase tracking-[0.24em] text-gray-500">
+          Coastal Home Management 30A
+        </div>
+        <h1 className="mt-5 text-4xl font-serif leading-tight md:text-5xl">
+          Privacy Policy
+        </h1>
+        <p className="mt-4 text-sm text-gray-500">Last updated: June 2025</p>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">1. Information We Collect</h2>
-        <p className="text-gray-700 leading-relaxed">
-          When you submit a contact form, request a quote, or reach out through our website or ads,
-          we collect information you provide including your name, email address, and phone number.
-          We may also collect general usage data through Google Analytics and Google Ads tracking
-          to understand how visitors interact with our site.
-        </p>
-      </section>
+        <div className="mt-12 space-y-10 text-gray-700 leading-8">
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">1. Who We Are</h2>
+            <p>
+              Coastal Home Management 30A is a second-home property management service
+              operating in Watersound Origins, Naturewalk, Inlet Beach, and surrounding
+              30A communities in Florida. Our website is coastalhomemngt30a.com.
+              You can reach us at coastalhomemanagement30a@gmail.com.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">2. How We Use Your Information</h2>
-        <p className="text-gray-700 leading-relaxed">
-          We use the information you provide solely to respond to your inquiry, schedule a
-          consultation, or provide home management services. We do not sell, rent, or share your
-          personal information with third parties for marketing purposes.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">2. Information We Collect</h2>
+            <p>
+              We collect information you provide directly when you submit a contact form,
+              request a walkthrough, or communicate with us. This may include your name,
+              email address, phone number, property address, and message content.
+            </p>
+            <p className="mt-4">
+              We also collect standard website analytics data through anonymized tools.
+              We do not collect or store payment information directly — all payments are
+              processed securely through Stripe.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">3. Google Ads & Lead Forms</h2>
-        <p className="text-gray-700 leading-relaxed">
-          If you submit a lead form through a Google ad, your information is collected by Google
-          and shared with Coastal Home Management 30A in accordance with Google&apos;s privacy
-          policy. We use that information only to follow up with you about our services.
-          Google&apos;s privacy policy is available at{" "}
-          <a
-            href="https://policies.google.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-blue-700"
-          >
-            policies.google.com/privacy
-          </a>
-          .
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">3. How We Use Your Information</h2>
+            <p>We use the information you provide to respond to inquiries and service requests,
+            schedule property visits and coordinate services, send service updates and relevant
+            communications, and improve our services and website experience.</p>
+            <p className="mt-4">
+              We do not sell, rent, or share your personal information with third parties
+              for marketing purposes.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">4. Cookies & Tracking</h2>
-        <p className="text-gray-700 leading-relaxed">
-          Our website uses Google Analytics and Google Ads conversion tracking. These tools may
-          place cookies on your device to help us understand site usage and measure the
-          effectiveness of our advertising. You can opt out of Google Analytics tracking at{" "}
-          <a
-            href="https://tools.google.com/dlpage/gaoptout"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-blue-700"
-          >
-            tools.google.com/dlpage/gaoptout
-          </a>
-          .
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">4. Cookies</h2>
+            <p>
+              Our website uses essential cookies required for core functionality and analytics
+              cookies to understand site usage. You can disable cookies in your browser
+              settings, though some features may not function as expected.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">5. Data Security</h2>
-        <p className="text-gray-700 leading-relaxed">
-          We take reasonable precautions to protect your information. Contact form submissions are
-          transmitted securely. We store minimal personal data and retain it only as long as
-          necessary to provide services or respond to your inquiry.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">5. Data Retention</h2>
+            <p>
+              We retain your information for as long as necessary to provide services or as
+              required by law. You may request deletion of your data at any time by
+              contacting us.
+            </p>
+          </section>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-semibold mb-3">6. Contact Us</h2>
-        <p className="text-gray-700 leading-relaxed">
-          If you have any questions about this privacy policy or how your information is used,
-          please contact us at{" "}
-          <a href="mailto:coastalhomemanagement30a@gmail.com" className="underline text-blue-700">
-            coastalhomemanagement30a@gmail.com
-          </a>{" "}
-          or by phone at (309) 415-8793.
-        </p>
-      </section>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">6. Your Rights</h2>
+            <p>
+              You have the right to access, correct, or request deletion of your personal
+              information. To make a request, email coastalhomemanagement30a@gmail.com.
+            </p>
+          </section>
 
-      <p className="text-sm text-gray-400 mt-12">
-        Coastal Home Management 30A &mdash; Watersound Origins &amp; Inlet Beach, FL
-      </p>
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">7. Third-Party Services</h2>
+            <p>
+              We use the following third-party services: Stripe (payment processing),
+              Resend (transactional email), Clerk (secure authentication), and Vercel
+              (hosting). Each has its own privacy policy governing their data practices.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-serif text-black mb-3">8. Contact</h2>
+            <p>
+              Questions about this policy? Email coastalhomemanagement30a@gmail.com.
+            </p>
+          </section>
+        </div>
+
+        <div className="mt-16 border-t border-gray-200 pt-8">
+          <Link href="/" className="text-sm text-gray-500 underline hover:text-black">
+            Back to Home
+          </Link>
+        </div>
+      </div>
     </main>
   );
 }
