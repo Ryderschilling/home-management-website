@@ -17,6 +17,7 @@ import { PostHogProvider } from "@/providers/PostHogProvider";
  * ─────────────────────────────────────────────────────────────────────────────
  */
 const GOOGLE_ADS_ID = "AW-18257719328";
+const GA4_ID = "G-6DV3V7B7RR";
 
 const appUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
@@ -355,6 +356,7 @@ export default function RootLayout({
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${GOOGLE_ADS_ID}');
+          gtag('config', '${GA4_ID}');
         `}</Script>
 
         {/* LocalBusiness + Organization graph schema */}
