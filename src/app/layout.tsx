@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { PostHogProvider } from "@/providers/PostHogProvider";
+import PublicShell from "@/components/PublicShell";
 
 /**
  * Google Ads Conversion Tracking
@@ -377,7 +378,9 @@ export default function RootLayout({
         <link rel="author" href="https://coastalhomemngt30a.com/about" />
       </head>
       <body>
-        <PostHogProvider>{children}</PostHogProvider>
+        <PostHogProvider>
+          <PublicShell>{children}</PublicShell>
+        </PostHogProvider>
       </body>
     </html>
   );

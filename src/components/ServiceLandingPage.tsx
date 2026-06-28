@@ -36,7 +36,7 @@ export default function ServiceLandingPage({
     <main className="min-h-screen bg-white text-black">
       {/* Hero Section */}
       <section className="border-b border-gray-200 bg-[#f8f5ef]">
-        <div className="mx-auto max-w-4xl px-6 py-20 md:py-28 text-center">
+        <div className="mx-auto max-w-4xl px-6 pt-32 pb-20 md:pt-40 md:pb-28 text-center">
           <div className="text-[11px] uppercase tracking-[0.24em] text-gray-500">
             {siteData.businessName}
           </div>

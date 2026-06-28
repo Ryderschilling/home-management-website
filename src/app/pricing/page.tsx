@@ -393,19 +393,6 @@ export default function PricingPage() {
 
   return (
     <main className="pricing-page">
-      {/* Nav */}
-      <nav className="pricing-nav">
-        <Link href="/" className="nav-logo-link">
-          <img src="/logo.png" alt="CHM" className="nav-logo" />
-          <span className="nav-brand">{siteData.businessName}</span>
-        </Link>
-        <div className="nav-links">
-          <Link href="/#services" className="nav-link">Services</Link>
-          <Link href="/pricing" className="nav-link nav-link-active">Pricing</Link>
-          <Link href="/#contact" className="nav-link">Contact</Link>
-        </div>
-      </nav>
-
       {/* Header */}
       <header className="pricing-header">
         <img src="/logo.png" alt="CHM" className="header-logo" />

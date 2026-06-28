@@ -129,36 +129,6 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
       />
 
-      {/* ── Nav ─────────────────────────────────────────────────────────────── */}
-      <nav
-        aria-label="Main navigation"
-        className="fixed top-0 w-full z-50 bg-white border-b border-gray-100 px-4 md:px-6 py-3 flex justify-between items-center"
-      >
-        <Link href="/" className="flex items-center space-x-3" aria-label="Coastal Home Management 30A — Home">
-          <img
-            src="/logo.png"
-            alt="Coastal Home Management 30A logo"
-            className="h-10 w-auto"
-          />
-          <span className="hidden md:inline text-base font-serif">
-            Coastal Home Management 30A
-          </span>
-        </Link>
-        <div className="space-x-6">
-          <Link href="/#services" className="text-[11px] uppercase tracking-widest hover:underline">
-            Services
-          </Link>
-          <Link href="/pricing" className="text-[11px] uppercase tracking-widest hover:underline">
-            Pricing
-          </Link>
-          <Link href="/about" className="text-[11px] uppercase tracking-widest underline" aria-current="page">
-            About
-          </Link>
-          <Link href="/#contact" className="text-[11px] uppercase tracking-widest hover:underline">
-            Contact
-          </Link>
-        </div>
-      </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
       <section aria-labelledby="about-hero-heading" className="pt-36 pb-20 px-6 bg-white">
@@ -609,45 +579,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-14 flex flex-col md:flex-row justify-between items-start gap-8">
-          <div className="text-sm text-gray-600">
-            <div className="font-serif text-black mb-2">Coastal Home Management 30A</div>
-            <div>Inlet Beach, FL 32461</div>
-            <a
-              href="mailto:coastalhomemanagement30a@gmail.com"
-              className="hover:text-black transition"
-            >
-              coastalhomemanagement30a@gmail.com
-            </a>
-          </div>
-          <div className="flex gap-8 text-sm text-gray-600">
-            <Link href="/" className="hover:text-black transition">Home</Link>
-            <Link href="/pricing" className="hover:text-black transition">Pricing</Link>
-            <Link href="/about" className="hover:text-black transition">About</Link>
-            <a
-              href="https://www.facebook.com/profile.php?id=61575773416368"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-black transition"
-            >
-              Facebook
-            </a>
-            <a
-              href="https://www.linkedin.com/company/113245630/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-black transition"
-            >
-              LinkedIn
-            </a>
-          </div>
-        </div>
-        <div className="border-t border-gray-100 px-6 py-4 text-xs text-gray-400 max-w-6xl mx-auto">
-          © {new Date().getFullYear()} Coastal Home Management 30A LLC. All rights reserved.
-        </div>
-      </footer>
 
     </main>
   );
