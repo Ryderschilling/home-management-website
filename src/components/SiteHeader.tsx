@@ -17,7 +17,7 @@ export default function SiteHeader() {
   return (
     <nav
       aria-label="Main navigation"
-      className="fixed top-0 w-full z-50 bg-white border-b border-gray-100 px-4 md:px-6 py-3 flex justify-between items-center"
+      className="fixed top-0 w-full z-50 bg-transparent px-4 md:px-6 py-2 flex justify-between items-center"
     >
       <Link
         href="/"
@@ -27,6 +27,8 @@ export default function SiteHeader() {
         <img
           src="/logo.png"
           alt="Coastal Home Management 30A logo"
+          draggable={false}
+          loading="eager"
           className="h-10 w-auto"
         />
         <span className="hidden md:inline text-base font-serif">
@@ -37,8 +39,8 @@ export default function SiteHeader() {
       <div className="space-x-6">
         {navLinks.map(({ href, label }) => {
           const isActive =
-            href === "/about" && pathname === "/about" ||
-            href === "/pricing" && pathname === "/pricing";
+            (href === "/about" && pathname === "/about") ||
+            (href === "/pricing" && pathname === "/pricing");
           return (
             <Link
               key={href}
