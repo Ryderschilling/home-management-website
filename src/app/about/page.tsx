@@ -561,6 +561,12 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
+              href="/#contact"
+              className="inline-flex bg-black text-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-gray-800 transition"
+            >
+              Get a Free Walkthrough
+            </a>
+            <a
               href="mailto:coastalhomemanagement30a@gmail.com"
               className="inline-flex border border-black px-8 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"
             >
