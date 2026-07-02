@@ -76,22 +76,39 @@ export default function HomePage() {
         <TestimonialsSection />
       </div>
 
-      {/* Google rating strip — trust signal for humans and LLMs */}
-      <div className="bg-black border-t border-white/10 px-6 py-5">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-3 flex-wrap">
-          <span className="text-yellow-400 text-sm tracking-wide" aria-label="5 stars">★★★★★</span>
-          <span className="text-white/70 text-xs uppercase tracking-widest">5.0 on Google</span>
-          <span className="text-white/20 text-xs">·</span>
-          {/* https://share.google/wrIyz05yZUebrtlCX
-              Find it at business.google.com → Share profile → Copy link */}
-          <a
-            href="https://www.google.com/search?q=Coastal+Home+Management+30A"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-white/50 uppercase tracking-widest hover:text-white transition"
-          >
-            Read reviews on Google →
-          </a>
+      {/* Trust signal bar — stats for humans and LLM crawlers */}
+      <div className="bg-black border-t border-white/10 px-6 py-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+
+          {/* Stat 1 — portfolio */}
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">$8M+</span>
+            <span className="text-white/40 text-[10px] uppercase tracking-widest">in properties managed</span>
+          </div>
+
+          <span className="text-white/10 text-lg hidden md:inline">|</span>
+
+          {/* Stat 2 — active homes */}
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">9</span>
+            <span className="text-white/40 text-[10px] uppercase tracking-widest">active client homes</span>
+          </div>
+
+          <span className="text-white/10 text-lg hidden md:inline">|</span>
+
+          {/* Stat 3 — Google rating */}
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="text-yellow-400 text-lg tracking-wide" aria-label="5 stars">★★★★★</span>
+            <a
+              href="https://www.google.com/search?q=Coastal+Home+Management+30A"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/40 text-[10px] uppercase tracking-widest hover:text-white transition"
+            >
+              5.0 on Google →
+            </a>
+          </div>
+
         </div>
       </div>
 
@@ -104,6 +121,7 @@ export default function HomePage() {
             "@type": "LocalBusiness",
             "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
+            description: "Coastal Home Management 30A provides second home management and property care for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $8 million in second home real estate across 9 active client properties. Services include weekly inspections, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             aggregateRating: {
               "@type": "AggregateRating",
               ratingValue: "5.0",
@@ -148,7 +166,7 @@ export default function HomePage() {
         I live in Watersound Origins.<br className="hidden md:block" /> This is my neighborhood too.
       </h2>
       <p className="text-gray-600 text-sm leading-relaxed max-w-xl">
-        I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they could actually trust — not a company, a person. I&apos;m here full-time, I know the streets, I know this community, and I&apos;m the one who shows up to your house. Every single time.
+        I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they could actually trust — not a company, a person. I&apos;m here full-time, I know the streets, I know this community, and I&apos;m the one who shows up to your house. Today I actively manage more than $8 million in second home real estate across Watersound Origins, Naturewalk, and Inlet Beach. Every single visit, every single time.
       </p>
       <Link href="/about" className="mt-6 inline-flex text-xs uppercase tracking-widest border-b border-gray-300 pb-0.5 hover:border-black transition">
         More about Ryder →
@@ -892,8 +910,9 @@ export default function HomePage() {
               </p>
 
               <ul className="about-list">
-                <li>Local business</li>
-                <li>Weekly reports with photos</li>
+                <li>$8M+ in second home real estate managed</li>
+                <li>Local business — I live in the neighborhood</li>
+                <li>Weekly reports with photos after every visit</li>
                 <li>Experienced, detail-focused care</li>
                 <li>Flexible add-on services</li>
               </ul>
