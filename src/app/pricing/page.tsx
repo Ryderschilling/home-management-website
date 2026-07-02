@@ -5,6 +5,18 @@ import Link from "next/link";
 import posthog from "posthog-js";
 import { siteData } from "@/data/siteData";
 
+const GOOGLE_ADS_ID = "AW-18257719328";
+const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
+
+function fireGtagConversion() {
+  try {
+    const w = window as unknown as {
+      gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
+    };
+    w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+  } catch {}
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Tier = "bronze" | "silver" | "gold";
@@ -186,6 +198,7 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         tier: plan.tier,
         price: plan.price,
       });
+      fireGtagConversion();
       setState("success");
     } catch (err) {
       setState("error");

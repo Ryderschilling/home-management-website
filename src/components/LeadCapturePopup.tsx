@@ -4,6 +4,18 @@ import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "chm_lead_popup_dismissed";
 
+const GOOGLE_ADS_ID = "AW-18257719328";
+const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
+
+function fireGtagConversion() {
+  try {
+    const w = window as unknown as {
+      gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
+    };
+    w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+  } catch {}
+}
+
 // Safe PostHog capture — no-ops if PostHog isn't loaded yet
 function phCapture(event: string, props?: Record<string, unknown>) {
   try {
@@ -93,6 +105,7 @@ export default function LeadCapturePopup() {
 
       sessionStorage.setItem(STORAGE_KEY, "1");
       phCapture("chm_lead_submitted", { source: "popup", neighborhood: neighborhood || null });
+      fireGtagConversion();
 
       // Advance to qualification step
       setStep("qualify");

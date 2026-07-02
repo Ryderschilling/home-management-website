@@ -3,6 +3,18 @@
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+const GOOGLE_ADS_ID = "AW-18257719328";
+const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
+
+function fireGtagConversion() {
+  try {
+    const w = window as unknown as {
+      gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
+    };
+    w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+  } catch {}
+}
+
 function phCapture(event: string, props?: Record<string, unknown>) {
   try {
     const ph = (window as unknown as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } }).posthog;
@@ -60,6 +72,7 @@ export default function ServiceLeadForm() {
         neighborhood: neighborhood || null,
         has_phone: !!phone.trim(),
       });
+      fireGtagConversion();
 
       setSubmitted(true);
     } catch {
