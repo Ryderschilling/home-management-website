@@ -40,6 +40,12 @@ export default function TestimonialsSection() {
         name: "Stacy Williams",
         meta: "WSO Homeowners",
       },
+      {
+        quote:
+          "Ryder did that for me and it looks great! He's the best and has done a great job looking after my house when I am not in town. Highly recommend!",
+        name: "Becky Cowart Portera",
+        meta: "Facebook",
+      },
     ],
     []
   );
