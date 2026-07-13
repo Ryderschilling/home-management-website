@@ -595,65 +595,19 @@ export default function PricingPage() {
         /* ── Reset / base ─────────────────────────────── */
         .pricing-page {
           font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-          background: #000;
-          color: #f2f2f2;
+          background: #f0f6ff;
+          color: #0f172a;
           min-height: 100vh;
           padding-bottom: 80px;
         }
-
-        /* ── Nav ───────────────────────────────────────── */
-        .pricing-nav {
-          position: fixed;
-          top: 0;
-          width: 100%;
-          z-index: 50;
-          background: rgba(0, 0, 0, 0.85);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid #141414;
-          padding: 10px 28px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .nav-logo-link {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          text-decoration: none;
-        }
-        .nav-logo {
-          height: 36px;
-          width: auto;
-        }
-        .nav-brand {
-          font-family: ui-serif, Georgia, serif;
-          font-size: 14px;
-          color: #f2f2f2;
-          display: none;
-        }
-        @media (min-width: 640px) {
-          .nav-brand { display: inline; }
-        }
-        .nav-links {
-          display: flex;
-          gap: 24px;
-        }
-        .nav-link {
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 0.16em;
-          color: #666;
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-        .nav-link:hover { color: #f2f2f2; }
-        .nav-link-active { color: #c0a060; }
 
         /* ── Header ─────────────────────────────────────── */
         .pricing-header {
           text-align: center;
           padding: 120px 24px 56px;
           animation: fadeDown 0.7s ease both;
+          background: linear-gradient(180deg, #e8f0fe 0%, #f0f6ff 100%);
+          border-bottom: 1px solid #d0e2ff;
         }
         .header-logo {
           width: 80px;
@@ -666,22 +620,22 @@ export default function PricingPage() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: rgba(192, 160, 96, 0.1);
-          border: 1px solid rgba(192, 160, 96, 0.35);
+          background: rgba(37, 99, 235, 0.08);
+          border: 1px solid rgba(37, 99, 235, 0.25);
           border-radius: 100px;
           padding: 7px 18px;
           font-size: 12px;
           font-weight: 600;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #c0a060;
+          color: #1d4ed8;
           margin-bottom: 20px;
         }
         .trust-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #c0a060;
+          background: #2563eb;
           flex-shrink: 0;
           opacity: 0.7;
         }
@@ -689,13 +643,13 @@ export default function PricingPage() {
           font-size: clamp(28px, 5vw, 46px);
           font-weight: 900;
           letter-spacing: -0.03em;
-          color: #fff;
+          color: #0f172a;
           margin: 0 0 12px;
         }
-        .header-accent { color: #c0a060; }
+        .header-accent { color: #2563eb; }
         .header-sub {
           font-size: 15px;
-          color: #666;
+          color: #64748b;
           line-height: 1.7;
           max-width: 440px;
           margin: 0 auto;
@@ -722,12 +676,12 @@ export default function PricingPage() {
 
         /* ── Card ───────────────────────────────────────── */
         .card {
-          background: #0a0a0a;
+          background: #ffffff;
           border-radius: 20px;
           padding: 36px 28px 40px;
           position: relative;
           overflow: hidden;
-          border: 1px solid #1a1a1a;
+          border: 1px solid #d0e2ff;
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           animation: fadeUp 0.7s ease both;
         }
@@ -736,12 +690,12 @@ export default function PricingPage() {
         .card:nth-child(3) { animation-delay: 0.42s; }
         .card:hover { transform: translateY(-6px); }
 
-        /* metallic top edge */
+        /* top accent edge */
         .card::before {
           content: "";
           position: absolute;
           top: 0; left: 0; right: 0;
-          height: 2px;
+          height: 3px;
         }
         /* shimmer sweep */
         .card::after {
@@ -749,52 +703,52 @@ export default function PricingPage() {
           position: absolute;
           top: 0; left: -120%;
           width: 60%; height: 100%;
-          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+          background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%);
           transition: left 0.55s ease;
           pointer-events: none;
         }
         .card:hover::after { left: 160%; }
 
-        /* Bronze */
-        .card-bronze { border-color: #7a4a18; }
-        .card-bronze::before { background: linear-gradient(90deg, transparent, #cd7f32, transparent); }
-        .card-bronze:hover { box-shadow: 0 20px 60px rgba(205,127,50,0.18), 0 0 0 1px #7a4a18; }
+        /* Sky / Essential */
+        .card-bronze { border-color: #bae0fd; }
+        .card-bronze::before { background: linear-gradient(90deg, transparent, #38bdf8, transparent); }
+        .card-bronze:hover { box-shadow: 0 20px 60px rgba(56,189,248,0.18), 0 0 0 1px #7dd3fc; }
 
-        /* Silver */
-        .card-silver { border-color: #2a2a2a; }
-        .card-silver::before { background: linear-gradient(90deg, transparent, #c0c0c0, transparent); }
-        .card-silver:hover { box-shadow: 0 20px 60px rgba(192,192,192,0.12), 0 0 0 1px #444; }
+        /* Ocean / Home Watch */
+        .card-silver { border-color: #bfdbfe; }
+        .card-silver::before { background: linear-gradient(90deg, transparent, #3b82f6, transparent); }
+        .card-silver:hover { box-shadow: 0 20px 60px rgba(59,130,246,0.16), 0 0 0 1px #93c5fd; }
 
-        /* Gold */
-        .card-gold { background: linear-gradient(160deg, #0d0b00 0%, #0a0a0a 100%); border-color: #7a6010; }
-        .card-gold::before { background: linear-gradient(90deg, transparent, #d4af37, transparent); }
-        .card-gold:hover { box-shadow: 0 24px 80px rgba(212,175,55,0.22), 0 0 0 1px #7a6010; }
+        /* Navy / Coastal Elite */
+        .card-gold { background: linear-gradient(160deg, #eff6ff 0%, #ffffff 100%); border-color: #93c5fd; }
+        .card-gold::before { background: linear-gradient(90deg, transparent, #1d4ed8, transparent); }
+        .card-gold:hover { box-shadow: 0 24px 80px rgba(29,78,216,0.18), 0 0 0 1px #60a5fa; }
 
-        /* Gold pulse */
+        /* Elite pulse glow */
         .gold-pulse {
           position: absolute;
           top: -40%; left: 50%;
           transform: translateX(-50%);
           width: 200px; height: 200px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
           animation: pulse 3s ease-in-out infinite;
           pointer-events: none;
         }
 
-        /* Hot tag */
+        /* Most Complete tag */
         .hot-tag {
           position: absolute;
           top: -1px; right: 28px;
-          background: linear-gradient(135deg, #d4af37, #ffe066);
-          color: #000;
+          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+          color: #fff;
           font-size: 9px;
           font-weight: 900;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           padding: 5px 14px 4px;
           border-radius: 0 0 8px 8px;
-          box-shadow: 0 4px 12px rgba(212,175,55,0.4);
+          box-shadow: 0 4px 12px rgba(29,78,216,0.35);
         }
 
         /* ── Badge ──────────────────────────────────────── */
@@ -816,7 +770,7 @@ export default function PricingPage() {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
+          background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.4) 50%, transparent 70%);
           animation: shimmerBadge 2.5s ease-in-out infinite;
         }
         .badge-dot {
@@ -825,42 +779,42 @@ export default function PricingPage() {
           background: currentColor;
           flex-shrink: 0;
         }
-        .badge-bronze { background: linear-gradient(135deg,#3a1e08,#5a3015); border: 1px solid #7a4a18; color: #e8a96a; }
-        .badge-silver { background: linear-gradient(135deg,#1a1a1a,#2a2a2a); border: 1px solid #3a3a3a; color: #f0f0f0; }
-        .badge-gold   { background: linear-gradient(135deg,#2a1e00,#3d2e00); border: 1px solid #7a6010; color: #ffe066; }
+        .badge-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
+        .badge-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+        .badge-gold   { background: #eff6ff; border: 1px solid #60a5fa; color: #1e40af; }
 
         /* ── Plan text ──────────────────────────────────── */
-        .plan-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #fff; margin-bottom: 5px; }
-        .plan-sub  { font-size: 13px; color: #777; margin-bottom: 26px; line-height: 1.55; }
+        .plan-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #0f172a; margin-bottom: 5px; }
+        .plan-sub  { font-size: 13px; color: #64748b; margin-bottom: 26px; line-height: 1.55; }
 
         /* ── Price ──────────────────────────────────────── */
         .price-row { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4px; }
         .price-sym { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .price-num { font-size: 56px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; }
-        .price-period { font-size: 13px; color: #666; margin-bottom: 8px; }
-        .price-note { font-size: 11.5px; color: #333; margin-bottom: 30px; min-height: 18px; }
-        .price-note-gold strong { color: #d4af37; }
+        .price-period { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
+        .price-note { font-size: 11.5px; color: #94a3b8; margin-bottom: 30px; min-height: 18px; }
+        .price-note-gold strong { color: #1d4ed8; }
 
-        .card-bronze .price-num,.card-bronze .price-sym { background: linear-gradient(135deg,#e8a96a,#cd7f32); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .card-silver .price-num,.card-silver .price-sym { background: linear-gradient(135deg,#f0f0f0,#c0c0c0); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .card-gold   .price-num,.card-gold   .price-sym { background: linear-gradient(135deg,#ffe066,#d4af37); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-bronze .price-num,.card-bronze .price-sym { background: linear-gradient(135deg,#38bdf8,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-silver .price-num,.card-silver .price-sym { background: linear-gradient(135deg,#3b82f6,#2563eb); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-gold   .price-num,.card-gold   .price-sym { background: linear-gradient(135deg,#1d4ed8,#1e40af); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
         /* ── Divider ────────────────────────────────────── */
         .divider { height: 1px; margin-bottom: 22px; }
-        .divider-bronze { background: linear-gradient(90deg,transparent,#7a4a18,transparent); }
-        .divider-silver { background: linear-gradient(90deg,transparent,#2a2a2a,transparent); }
-        .divider-gold   { background: linear-gradient(90deg,transparent,#7a6010,transparent); }
+        .divider-bronze { background: linear-gradient(90deg,transparent,#7dd3fc,transparent); }
+        .divider-silver { background: linear-gradient(90deg,transparent,#93c5fd,transparent); }
+        .divider-gold   { background: linear-gradient(90deg,transparent,#60a5fa,transparent); }
 
         /* ── Section label ──────────────────────────────── */
         .section-lbl { font-size: 9.5px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 12px; }
-        .card-bronze .section-lbl { color: #7a4a18; }
-        .card-silver .section-lbl { color: #555; }
-        .card-gold   .section-lbl { color: #7a6010; }
+        .card-bronze .section-lbl { color: #0284c7; }
+        .card-silver .section-lbl { color: #2563eb; }
+        .card-gold   .section-lbl { color: #1e40af; }
 
         /* ── Features ───────────────────────────────────── */
         .features { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 11px; margin-bottom: 22px; }
-        .fi { display: flex; align-items: flex-start; gap: 11px; font-size: 13.5px; color: #888; line-height: 1.5; }
-        .fi strong { color: #ddd; font-weight: 600; }
+        .fi { display: flex; align-items: flex-start; gap: 11px; font-size: 13.5px; color: #475569; line-height: 1.5; }
+        .fi strong { color: #0f172a; font-weight: 600; }
 
         .fi-check {
           flex-shrink: 0;
@@ -871,9 +825,9 @@ export default function PricingPage() {
         }
         .fi-check svg { width: 9px; height: 9px; }
 
-        .fi-check-bronze { background: rgba(205,127,50,0.1); border: 1px solid #7a4a18; color: #cd7f32; }
-        .fi-check-silver { background: rgba(192,192,192,0.07); border: 1px solid #2a2a2a; color: #c0c0c0; }
-        .fi-check-gold   { background: rgba(212,175,55,0.1);  border: 1px solid #7a6010; color: #d4af37; }
+        .fi-check-bronze { background: rgba(14,165,233,0.1);  border: 1px solid #7dd3fc; color: #0ea5e9; }
+        .fi-check-silver { background: rgba(59,130,246,0.1);  border: 1px solid #93c5fd; color: #3b82f6; }
+        .fi-check-gold   { background: rgba(29,78,216,0.1);   border: 1px solid #60a5fa; color: #1d4ed8; }
 
         /* ── Tag chips ──────────────────────────────────── */
         .tag {
@@ -885,9 +839,9 @@ export default function PricingPage() {
           margin-left: 6px;
           vertical-align: middle;
         }
-        .tag-bronze { background: rgba(205,127,50,0.12); color: #e8a96a; border: 1px solid #7a4a18; }
-        .tag-silver { background: rgba(192,192,192,0.07); color: #c0c0c0; border: 1px solid #2a2a2a; }
-        .tag-gold   { background: rgba(212,175,55,0.12);  color: #ffe066; border: 1px solid #7a6010; }
+        .tag-bronze { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
+        .tag-silver { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .tag-gold   { background: #eff6ff; color: #1e40af; border: 1px solid #60a5fa; }
 
         /* ── CTA ────────────────────────────────────────── */
         .cta {
@@ -905,42 +859,42 @@ export default function PricingPage() {
           margin-top: 28px;
           font-family: inherit;
         }
-        .cta-bronze { background: transparent; border: 1px solid #7a4a18; color: #e8a96a; }
-        .cta-bronze:hover { background: rgba(205,127,50,0.08); border-color: #cd7f32; box-shadow: 0 0 20px rgba(205,127,50,0.18); }
-        .cta-silver { background: transparent; border: 1px solid #2a2a2a; color: #f0f0f0; }
-        .cta-silver:hover { background: rgba(192,192,192,0.06); border-color: #555; box-shadow: 0 0 20px rgba(192,192,192,0.12); }
-        .cta-gold   { background: linear-gradient(135deg,#d4af37,#ffe066); color: #000; }
-        .cta-gold:hover { background: linear-gradient(135deg,#ffe066,#fff0a0); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(212,175,55,0.45); }
+        .cta-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
+        .cta-bronze:hover { background: #bae6fd; border-color: #38bdf8; box-shadow: 0 4px 16px rgba(14,165,233,0.2); }
+        .cta-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+        .cta-silver:hover { background: #bfdbfe; border-color: #60a5fa; box-shadow: 0 4px 16px rgba(59,130,246,0.2); }
+        .cta-gold   { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; border: none; }
+        .cta-gold:hover { background: linear-gradient(135deg,#1e40af,#2563eb); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(29,78,216,0.35); }
 
         /* ── Add-ons ─────────────────────────────────────── */
         .addons-section { max-width: 1160px; margin: 64px auto 0; padding: 0 20px; }
-        .addons-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #333; text-align: center; margin-bottom: 18px; }
+        .addons-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #94a3b8; text-align: center; margin-bottom: 18px; }
         .addons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
         @media (max-width: 700px) { .addons-grid { grid-template-columns: repeat(2,1fr); } }
-        .addon { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s; }
-        .addon:hover { border-color: #2a2a2a; }
-        .addon-name  { font-size: 13px; font-weight: 700; color: #ccc; margin-bottom: 4px; }
-        .addon-desc  { font-size: 12px; color: #555; line-height: 1.5; }
-        .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: #c0c0c0; }
+        .addon { background: #ffffff; border: 1px solid #d0e2ff; border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s, box-shadow 0.2s; }
+        .addon:hover { border-color: #93c5fd; box-shadow: 0 4px 20px rgba(59,130,246,0.1); }
+        .addon-name  { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+        .addon-desc  { font-size: 12px; color: #64748b; line-height: 1.5; }
+        .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: #1d4ed8; }
 
         /* ── Related Services ────────────────────────────── */
-        .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #141414; padding-top: 40px; }
-        .related-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #333; margin-bottom: 16px; }
+        .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #dbeafe; padding-top: 40px; }
+        .related-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #94a3b8; margin-bottom: 16px; }
         .related-links { display: flex; flex-wrap: wrap; gap: 10px; }
-        .related-link { border: 1px solid #222; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #555; text-decoration: none; border-radius: 4px; transition: border-color 0.2s, color 0.2s; }
-        .related-link:hover { border-color: #555; color: #f2f2f2; }
+        .related-link { border: 1px solid #bfdbfe; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #3b82f6; text-decoration: none; border-radius: 4px; transition: border-color 0.2s, background 0.2s, color 0.2s; }
+        .related-link:hover { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
 
         /* ── Footer note ─────────────────────────────────── */
-        .footer-note { text-align: center; font-size: 12px; color: #333; margin-top: 56px; line-height: 1.8; padding: 0 16px; }
-        .footer-note a { color: #555; text-decoration: none; }
-        .footer-note a:hover { color: #c0c0c0; }
+        .footer-note { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 56px; line-height: 1.8; padding: 0 16px; }
+        .footer-note a { color: #3b82f6; text-decoration: none; }
+        .footer-note a:hover { color: #1d4ed8; text-decoration: underline; }
 
         /* ── Modal ───────────────────────────────────────── */
         .modal-backdrop {
           position: fixed;
           inset: 0;
           z-index: 100;
-          background: rgba(0,0,0,0.85);
+          background: rgba(15,23,42,0.6);
           backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
@@ -949,20 +903,20 @@ export default function PricingPage() {
           animation: fadeIn 0.2s ease both;
         }
         .modal-card {
-          background: #0d0d0d;
+          background: #ffffff;
           border-radius: 20px;
           padding: 40px 36px;
           max-width: 500px;
           width: 100%;
           position: relative;
-          border: 1px solid #1a1a1a;
+          border: 1px solid #d0e2ff;
           animation: slideUp 0.3s cubic-bezier(0.18,0.82,0.16,1) both;
           max-height: 90vh;
           overflow-y: auto;
         }
-        .modal-card-bronze { border-color: #7a4a18; box-shadow: 0 0 60px rgba(205,127,50,0.12); }
-        .modal-card-silver { border-color: #2a2a2a; box-shadow: 0 0 60px rgba(192,192,192,0.06); }
-        .modal-card-gold   { border-color: #7a6010; box-shadow: 0 0 80px rgba(212,175,55,0.15); }
+        .modal-card-bronze { border-color: #7dd3fc; box-shadow: 0 0 60px rgba(14,165,233,0.12); }
+        .modal-card-silver { border-color: #93c5fd; box-shadow: 0 0 60px rgba(59,130,246,0.12); }
+        .modal-card-gold   { border-color: #60a5fa; box-shadow: 0 0 80px rgba(29,78,216,0.15); }
 
         .modal-close {
           position: absolute;
@@ -970,13 +924,13 @@ export default function PricingPage() {
           background: transparent;
           border: none;
           cursor: pointer;
-          color: #444;
+          color: #94a3b8;
           padding: 6px;
           display: flex;
           transition: color 0.15s;
         }
         .modal-close svg { width: 14px; height: 14px; }
-        .modal-close:hover { color: #888; }
+        .modal-close:hover { color: #475569; }
 
         .modal-plan-badge {
           display: inline-block;
@@ -988,40 +942,40 @@ export default function PricingPage() {
           text-transform: uppercase;
           margin-bottom: 14px;
         }
-        .modal-plan-badge-bronze { background: rgba(205,127,50,0.1); border: 1px solid #7a4a18; color: #e8a96a; }
-        .modal-plan-badge-silver { background: rgba(192,192,192,0.06); border: 1px solid #2a2a2a; color: #c0c0c0; }
-        .modal-plan-badge-gold   { background: rgba(212,175,55,0.1);  border: 1px solid #7a6010; color: #ffe066; }
+        .modal-plan-badge-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
+        .modal-plan-badge-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
+        .modal-plan-badge-gold   { background: #eff6ff; border: 1px solid #60a5fa; color: #1e40af; }
 
-        .modal-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #fff; margin: 0 0 6px; }
-        .modal-sub   { font-size: 13px; color: #666; margin: 0 0 28px; line-height: 1.5; }
+        .modal-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #0f172a; margin: 0 0 6px; }
+        .modal-sub   { font-size: 13px; color: #64748b; margin: 0 0 28px; line-height: 1.5; }
 
         /* ── Form ───────────────────────────────────────── */
         .modal-form { display: flex; flex-direction: column; gap: 18px; }
         .form-row { display: flex; flex-direction: column; gap: 6px; }
-        .form-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #555; }
-        .req { color: #c04040; margin-left: 2px; }
-        .opt { color: #333; font-weight: 400; text-transform: none; letter-spacing: 0; }
+        .form-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #475569; }
+        .req { color: #dc2626; margin-left: 2px; }
+        .opt { color: #94a3b8; font-weight: 400; text-transform: none; letter-spacing: 0; }
 
         .form-input {
-          background: #111;
-          border: 1px solid #1e1e1e;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
           border-radius: 8px;
           padding: 11px 14px;
           font-size: 14px;
-          color: #f2f2f2;
+          color: #0f172a;
           font-family: inherit;
           outline: none;
-          transition: border-color 0.2s;
+          transition: border-color 0.2s, box-shadow 0.2s;
           width: 100%;
         }
-        .form-input::placeholder { color: #333; }
+        .form-input::placeholder { color: #cbd5e1; }
         .form-textarea { resize: vertical; min-height: 80px; }
 
-        .form-input-bronze:focus { border-color: #7a4a18; box-shadow: 0 0 0 2px rgba(205,127,50,0.1); }
-        .form-input-silver:focus { border-color: #333;    box-shadow: 0 0 0 2px rgba(192,192,192,0.06); }
-        .form-input-gold:focus   { border-color: #7a6010; box-shadow: 0 0 0 2px rgba(212,175,55,0.1); }
+        .form-input-bronze:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(14,165,233,0.12); }
+        .form-input-silver:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        .form-input-gold:focus   { border-color: #1d4ed8; box-shadow: 0 0 0 2px rgba(29,78,216,0.12); }
 
-        .form-error { font-size: 13px; color: #c04040; padding: 10px 14px; background: rgba(192,64,64,0.08); border: 1px solid rgba(192,64,64,0.2); border-radius: 8px; }
+        .form-error { font-size: 13px; color: #dc2626; padding: 10px 14px; background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; }
 
         .modal-submit {
           width: 100%;
@@ -1036,13 +990,13 @@ export default function PricingPage() {
           transition: all 0.2s ease;
           margin-top: 4px;
         }
-        .modal-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-        .modal-submit-bronze { background: rgba(205,127,50,0.12); border: 1px solid #7a4a18; color: #e8a96a; }
-        .modal-submit-bronze:hover:not(:disabled) { background: rgba(205,127,50,0.2); }
-        .modal-submit-silver { background: rgba(192,192,192,0.08); border: 1px solid #333; color: #f0f0f0; }
-        .modal-submit-silver:hover:not(:disabled) { background: rgba(192,192,192,0.14); }
-        .modal-submit-gold   { background: linear-gradient(135deg,#d4af37,#ffe066); color: #000; }
-        .modal-submit-gold:hover:not(:disabled) { background: linear-gradient(135deg,#ffe066,#fff0a0); box-shadow: 0 6px 24px rgba(212,175,55,0.35); }
+        .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .modal-submit-bronze { background: #0ea5e9; color: #fff; }
+        .modal-submit-bronze:hover:not(:disabled) { background: #0284c7; box-shadow: 0 4px 16px rgba(14,165,233,0.3); }
+        .modal-submit-silver { background: #3b82f6; color: #fff; }
+        .modal-submit-silver:hover:not(:disabled) { background: #2563eb; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+        .modal-submit-gold   { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
+        .modal-submit-gold:hover:not(:disabled) { background: linear-gradient(135deg,#1e40af,#1d4ed8); box-shadow: 0 6px 24px rgba(29,78,216,0.3); }
 
         /* ── Success ────────────────────────────────────── */
         .modal-success { text-align: center; padding: 20px 0; }
@@ -1056,12 +1010,12 @@ export default function PricingPage() {
           font-weight: 900;
           margin-bottom: 20px;
         }
-        .success-icon-bronze { background: rgba(205,127,50,0.12); color: #e8a96a; border: 1px solid #7a4a18; }
-        .success-icon-silver { background: rgba(192,192,192,0.08); color: #c0c0c0; border: 1px solid #2a2a2a; }
-        .success-icon-gold   { background: rgba(212,175,55,0.12);  color: #ffe066; border: 1px solid #7a6010; }
-        .modal-success h3 { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 10px; }
-        .modal-success p  { font-size: 14px; color: #666; line-height: 1.6; margin: 0 0 28px; }
-        .modal-success strong { color: #c0a060; }
+        .success-icon-bronze { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
+        .success-icon-silver { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+        .success-icon-gold   { background: #eff6ff; color: #1e40af; border: 1px solid #60a5fa; }
+        .modal-success h3 { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 10px; }
+        .modal-success p  { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 28px; }
+        .modal-success strong { color: #1d4ed8; }
 
         /* ── Animations ─────────────────────────────────── */
         @keyframes fadeDown  { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
@@ -1083,13 +1037,17 @@ export default function PricingPage() {
           font-weight: 800;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #333;
+          color: #94a3b8;
           text-align: center;
           margin-bottom: 20px;
         }
         .compare-wrap {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
+          background: #ffffff;
+          border: 1px solid #dbeafe;
+          border-radius: 16px;
+          overflow: hidden;
         }
         .compare-table {
           width: 100%;
@@ -1115,22 +1073,23 @@ export default function PricingPage() {
           font-weight: 800;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          border-bottom: 1px solid #1a1a1a;
+          border-bottom: 1px solid #dbeafe;
           vertical-align: bottom;
           line-height: 1.4;
+          background: #f0f6ff;
         }
         .compare-th-feature {
           text-align: left;
-          color: #444;
+          color: #64748b;
           width: 44%;
         }
         .compare-th-tier {
           width: 18%;
-          color: #888;
+          color: #94a3b8;
         }
-        .compare-th-bronze { color: #cd7f32; }
-        .compare-th-silver { color: #c0c0c0; }
-        .compare-th-gold   { color: #d4af37; }
+        .compare-th-bronze { color: #0284c7; }
+        .compare-th-silver { color: #2563eb; }
+        .compare-th-gold   { color: #1e40af; }
 
         .compare-price {
           display: block;
@@ -1143,20 +1102,20 @@ export default function PricingPage() {
 
         .compare-td {
           padding: 11px 16px;
-          border-bottom: 1px solid #111;
+          border-bottom: 1px solid #f0f6ff;
           vertical-align: middle;
         }
         .compare-td-feature {
-          color: #888;
+          color: #475569;
           text-align: left;
           font-size: 12.5px;
         }
         .compare-td-price-row .compare-td-feature {
-          color: #ccc;
+          color: #0f172a;
           font-weight: 700;
         }
         .compare-row-alt td {
-          background: rgba(255,255,255,0.012);
+          background: #f8fbff;
         }
         .compare-td-check,
         .compare-td-label,
@@ -1165,24 +1124,24 @@ export default function PricingPage() {
           text-align: center;
           font-weight: 700;
         }
-        .compare-td-none { color: #2a2a2a; font-size: 15px; }
+        .compare-td-none { color: #cbd5e1; font-size: 15px; }
 
-        .compare-td-check.compare-td-bronze { color: #cd7f32; }
-        .compare-td-check.compare-td-silver { color: #c0c0c0; }
-        .compare-td-check.compare-td-gold   { color: #d4af37; }
+        .compare-td-check.compare-td-bronze { color: #0ea5e9; }
+        .compare-td-check.compare-td-silver { color: #3b82f6; }
+        .compare-td-check.compare-td-gold   { color: #1d4ed8; }
 
-        .compare-td-label.compare-td-bronze { color: #e8a96a; font-size: 11.5px; }
-        .compare-td-label.compare-td-silver { color: #c0c0c0; font-size: 11.5px; }
-        .compare-td-label.compare-td-gold   { color: #ffe066; font-size: 11.5px; }
+        .compare-td-label.compare-td-bronze { color: #0284c7; font-size: 11.5px; }
+        .compare-td-label.compare-td-silver { color: #1d4ed8; font-size: 11.5px; }
+        .compare-td-label.compare-td-gold   { color: #1e40af; font-size: 11.5px; }
 
         .compare-td-price {
           font-size: 16px;
           font-weight: 900;
           letter-spacing: -0.03em;
         }
-        .compare-td-price.compare-td-bronze { color: #cd7f32; }
-        .compare-td-price.compare-td-silver { color: #c0c0c0; }
-        .compare-td-price.compare-td-gold   { color: #d4af37; }
+        .compare-td-price.compare-td-bronze { color: #0ea5e9; }
+        .compare-td-price.compare-td-silver { color: #2563eb; }
+        .compare-td-price.compare-td-gold   { color: #1d4ed8; }
       `}</style>
     </main>
   );
