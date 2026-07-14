@@ -1,6 +1,7 @@
 // src/app/about/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
+import { businessContact, siteData } from "@/data/siteData";
 
 export const metadata: Metadata = {
   title: "About Coastal Home Management 30A | Property Management Experts",
@@ -43,15 +44,15 @@ const organizationSchema = {
   image: "https://coastalhomemngt30a.com/profile-web.jpg",
   description:
     "Coastal Home Management 30A is a local, owner-operated, fully insured Florida LLC providing second-home management, property inspections, and concierge services for vacation homeowners along scenic 30A in the Florida Panhandle. Founded by Ryder Schilling in October 2025, the company serves Watersound Origins, Naturewalk at Seagrove, Inlet Beach, Rosemary Beach, WaterColor, Seaside, and surrounding 30A communities.",
-  foundingDate: "2025-10",
-  telephone: "+13094158793",
+  foundingDate: businessContact.foundingDate,
+  telephone: businessContact.phone,
   email: "coastalhomemanagement30a@gmail.com",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Inlet Beach",
-    addressRegion: "FL",
-    postalCode: "32461",
-    addressCountry: "US",
+    addressLocality: businessContact.address.locality,
+    addressRegion: businessContact.address.region,
+    postalCode: businessContact.address.postalCode,
+    addressCountry: businessContact.address.country,
   },
   areaServed: [
     { "@type": "Place", name: "Watersound Origins" },
@@ -67,7 +68,7 @@ const organizationSchema = {
   ],
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+13094158793",
+    telephone: businessContact.phone,
     contactType: "customer service",
     email: "coastalhomemanagement30a@gmail.com",
     areaServed: "US",
@@ -79,7 +80,7 @@ const organizationSchema = {
     name: "Ryder Schilling",
     jobTitle: "Founder & Owner",
   },
-  sameAs: ["https://www.facebook.com/CoastalHomeManagement30A"],
+  sameAs: [businessContact.facebookUrl, businessContact.linkedinUrl, siteData.gbpUrl],
 };
 
 const personSchema = {
@@ -97,18 +98,18 @@ const personSchema = {
     "@id": "https://coastalhomemngt30a.com/#organization",
     name: "Coastal Home Management 30A",
   },
-  telephone: "+13094158793",
+  telephone: businessContact.phone,
   email: "coastalhomemanagement30a@gmail.com",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Inlet Beach",
-    addressRegion: "FL",
-    postalCode: "32461",
-    addressCountry: "US",
+    addressLocality: businessContact.address.locality,
+    addressRegion: businessContact.address.region,
+    postalCode: businessContact.address.postalCode,
+    addressCountry: businessContact.address.country,
   },
   url: "https://coastalhomemngt30a.com/about",
   image: "https://coastalhomemngt30a.com/profile-web.jpg",
-  sameAs: ["https://www.facebook.com/CoastalHomeManagement30A"],
+  sameAs: [businessContact.facebookUrl, businessContact.linkedinUrl],
 };
 
 // ─── Page ───────────────────────────────────────────────────────────────────
@@ -560,12 +561,12 @@ export default function AboutPage() {
             level of care makes sense. Most clients are set up within a few days.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
+            <Link
               href="/#contact"
               className="inline-flex bg-black text-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-gray-800 transition"
             >
               Get a Free Walkthrough
-            </a>
+            </Link>
             <a
               href="mailto:coastalhomemanagement30a@gmail.com"
               className="inline-flex border border-black px-8 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"

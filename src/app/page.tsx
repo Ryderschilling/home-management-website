@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { siteData } from "@/data/siteData";
+import { siteData, trustStats, testimonials, businessContact } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import FadeInObserver from "@/components/FadeInObserver";
@@ -82,7 +82,7 @@ export default function HomePage() {
 
           {/* Stat 1 — portfolio */}
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">$8M+</span>
+            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">{trustStats.propertiesManaged}</span>
             <span className="text-white/40 text-[10px] uppercase tracking-widest">in properties managed</span>
           </div>
 
@@ -90,7 +90,7 @@ export default function HomePage() {
 
           {/* Stat 2 — active homes */}
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">9</span>
+            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">{trustStats.activeHomes}</span>
             <span className="text-white/40 text-[10px] uppercase tracking-widest">active client homes</span>
           </div>
 
@@ -124,26 +124,17 @@ export default function HomePage() {
             description: "Coastal Home Management 30A provides second home management and property care for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $8 million in second home real estate across 9 active client properties. Services include weekly inspections, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             aggregateRating: {
               "@type": "AggregateRating",
-              ratingValue: "5.0",
-              bestRating: "5",
-              reviewCount: "5",
+              ratingValue: trustStats.ratingValue,
+              bestRating: trustStats.bestRating,
+              reviewCount: trustStats.reviewCount,
             },
-            review: [
-              {
-                "@type": "Review",
-                datePublished: "2025-12-01",
-                author: { "@type": "Person", name: "Beth Tedesco" },
-                reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-                reviewBody: "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
-              },
-              {
-                "@type": "Review",
-                datePublished: "2025-11-01",
-                author: { "@type": "Person", name: "Barbara Reed" },
-                reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-                reviewBody: "Ryder gives us peace of mind if we're out of town and need the house checked on. Very reliable. Would highly recommend using his services!",
-              },
-            ],
+            review: testimonials.map((t) => ({
+              "@type": "Review",
+              datePublished: t.datePublished,
+              author: { "@type": "Person", name: t.author },
+              reviewRating: { "@type": "Rating", ratingValue: t.rating, bestRating: "5" },
+              reviewBody: t.body,
+            })),
           }),
         }}
       />
@@ -497,14 +488,14 @@ export default function HomePage() {
               "@type": "LocalBusiness",
               name: "Coastal Home Management 30A",
               url: "https://coastalhomemngt30a.com",
-              telephone: "+13094158793",
+              telephone: businessContact.phone,
               email: "coastalhomemanagement30a@gmail.com",
               address: {
                 "@type": "PostalAddress",
-                addressLocality: "Inlet Beach",
-                addressRegion: "FL",
-                postalCode: "32461",
-                addressCountry: "US",
+                addressLocality: businessContact.address.locality,
+                addressRegion: businessContact.address.region,
+                postalCode: businessContact.address.postalCode,
+                addressCountry: businessContact.address.country,
               },
             },
           }),

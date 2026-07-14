@@ -46,7 +46,15 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "Do you provide updates after visits?",
-        a: "Yes. Clear communication and issue reporting are part of the service.",
+        a: "Yes. Clear communication and issue reporting are part of every visit, with a text or email summary and photos after each check.",
+      },
+      {
+        q: "Who actually checks on my house in Inlet Beach when I'm not there?",
+        a: "Coastal Home Management 30A does. It's a local, owner-operated service, not a call center, so the same person who checks your property is the one you talk to on the phone.",
+      },
+      {
+        q: "What does second home management cost in Inlet Beach?",
+        a: "Plans start at $150/month for weekly checks with photo reports. Pricing depends on visit frequency and what's included; see our pricing page for the full breakdown.",
       },
     ],
   },
@@ -79,11 +87,19 @@ export const servicePages: Record<string, ServicePageData> = {
     faqs: [
       {
         q: "What kinds of concierge requests do you handle?",
-        a: "Requests vary by homeowner, but typically include coordination, property-related errands, and support tasks that need a trusted local contact.",
+        a: "Requests vary by homeowner, but typically include coordination, property-related errands, meeting contractors on-site, and support tasks that need a trusted local contact.",
       },
       {
         q: "Is this only for recurring clients?",
         a: "No. Some homeowners use concierge support occasionally, while others use it as part of ongoing home management.",
+      },
+      {
+        q: "How much does a one-off concierge task cost?",
+        a: "On-call property tasks, like meeting a contractor or handling an errand, are $85 flat with no recurring commitment required.",
+      },
+      {
+        q: "Can I request concierge help the same week I need it?",
+        a: "In most cases, yes. Because we're locally based in Inlet Beach, we can usually accommodate requests within a few days depending on the task.",
       },
     ],
   },
@@ -115,12 +131,20 @@ export const servicePages: Record<string, ServicePageData> = {
     ],
     faqs: [
       {
+        q: "How much does mail and trash handling cost on 30A?",
+        a: "Mail and trash handling is $35/day, and it's often bundled into a recurring home management plan for homeowners who want it every visit.",
+      },
+      {
         q: "Can this be combined with home checks?",
-        a: "Yes. Mail and package handling pairs naturally with second home management visits.",
+        a: "Yes. Mail and package handling pairs naturally with second home management visits, so it's checked at the same time as the rest of the property.",
       },
       {
         q: "Do you handle both short-term and ongoing needs?",
-        a: "Yes. Some homeowners need this seasonally, while others need ongoing support.",
+        a: "Yes. Some homeowners need this seasonally, while others need ongoing support for as long as the property sits vacant.",
+      },
+      {
+        q: "What happens to packages if no one is home for weeks?",
+        a: "We collect and secure mail and packages according to your preferences so nothing sits exposed on a porch or overflows a mailbox while you're away.",
       },
     ],
   },
@@ -152,12 +176,20 @@ export const servicePages: Record<string, ServicePageData> = {
     ],
     faqs: [
       {
+        q: "How often should someone check on a vacation home in Florida?",
+        a: "Most second homeowners on 30A choose weekly checks, especially during hurricane season and after storms. Bi-weekly works for homes with fewer systems to monitor, like a house without a pool.",
+      },
+      {
         q: "Why are routine home checks important?",
-        a: "Regular checks help catch issues sooner and reduce the chance of a problem sitting unnoticed for weeks.",
+        a: "Regular checks help catch issues sooner and reduce the chance of a problem sitting unnoticed for weeks, which is what turns a small repair into an expensive one.",
       },
       {
         q: "Do you serve only Inlet Beach?",
         a: `We serve ${siteData.serviceArea} and nearby 30A areas based on fit and logistics.`,
+      },
+      {
+        q: "What's included in a standard home check?",
+        a: "A walk-through of the interior and exterior, a check of major systems, storm and weather-related inspection, and a photo report sent to you after each visit.",
       },
     ],
   },
@@ -190,11 +222,19 @@ export const servicePages: Record<string, ServicePageData> = {
     faqs: [
       {
         q: "What is the difference between property care and home checks?",
-        a: "Home checks are one part of property care. Property care is broader and can include oversight, coordination, and concierge support.",
+        a: "Home checks are one part of property care. Property care is broader and can include oversight, coordination, maintenance scheduling, and concierge support.",
       },
       {
         q: "Is this service customized?",
-        a: "Yes. The exact service mix depends on the property, owner needs, and visit frequency.",
+        a: "Yes. The exact service mix depends on the property, owner needs, and visit frequency, and can be adjusted as your needs change.",
+      },
+      {
+        q: "Do I need a full-time property manager or just property care?",
+        a: "Most second-home owners on 30A don't need full-time management. Property care gives you consistent local oversight and a trusted point of contact without the cost of a full-time manager.",
+      },
+      {
+        q: "How do you communicate what's happening at my property?",
+        a: "You get a text or email summary and photos after every visit, plus a direct call if anything needs your immediate attention.",
       },
     ],
   },
@@ -309,11 +349,15 @@ export const servicePages: Record<string, ServicePageData> = {
     faqs: [
       {
         q: "What does artificial rock installation help with?",
-        a: "It helps cover exposed utility areas and gives the home a cleaner, more finished exterior look.",
+        a: "It helps cover exposed utility areas, like backflow preventers and irrigation valves, and gives the home a cleaner, more finished exterior look.",
       },
       {
         q: "Can this be combined with other exterior upkeep services?",
-        a: "Yes. It can pair well with broader property care and second-home oversight.",
+        a: "Yes. It can pair well with broader property care and second-home oversight, and is often added as a one-time upgrade alongside a recurring plan.",
+      },
+      {
+        q: "Is artificial rock installation a one-time service or ongoing?",
+        a: "It's a one-time installation. Once it's placed, it requires no ongoing maintenance beyond occasional cleaning.",
       },
     ],
   },

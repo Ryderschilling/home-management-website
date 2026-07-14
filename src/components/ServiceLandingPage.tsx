@@ -32,6 +32,22 @@ export default function ServiceLandingPage({
     },
   };
 
+  // FAQPage schema — this is the single highest-leverage tag for AI citation
+  // (ChatGPT/Perplexity/Gemini/AI Overviews). Every landing page emits this
+  // automatically from its `faqs` array in servicePages.ts.
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: service.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-white text-black">
       {/* Hero Section */}
@@ -213,6 +229,10 @@ export default function ServiceLandingPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
     </main>
   );

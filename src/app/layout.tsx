@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { PostHogProvider } from "@/providers/PostHogProvider";
 import PublicShell from "@/components/PublicShell";
+import { trustStats, testimonials, businessContact, siteData, offerings } from "@/data/siteData";
 
 /**
  * Google Ads Conversion Tracking
@@ -86,7 +87,7 @@ const localBusinessSchema = {
       description:
         "Local, owner-operated second home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida.",
       url: "https://coastalhomemngt30a.com",
-      telephone: "+13094158793",
+      telephone: businessContact.phone,
       email: "coastalhomemanagement30a@gmail.com",
       logo: {
         "@type": "ImageObject",
@@ -98,10 +99,10 @@ const localBusinessSchema = {
       paymentAccepted: "Credit Card, Stripe",
       address: {
         "@type": "PostalAddress",
-        addressLocality: "Inlet Beach",
-        addressRegion: "FL",
-        postalCode: "32461",
-        addressCountry: "US",
+        addressLocality: businessContact.address.locality,
+        addressRegion: businessContact.address.region,
+        postalCode: businessContact.address.postalCode,
+        addressCountry: businessContact.address.country,
       },
       geo: {
         "@type": "GeoCoordinates",
@@ -147,123 +148,51 @@ const localBusinessSchema = {
       hasOfferCatalog: {
         "@type": "OfferCatalog",
         name: "Second Home Management Services",
-        itemListElement: [
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Standard Home Management",
-              description:
-                "Weekly property inspection, photo documentation, storm watch, mail pickup, and text/email summary after each visit.",
-            },
-            price: "150.00",
-            priceCurrency: "USD",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: "150.00",
-              priceCurrency: "USD",
-              unitText: "month",
-            },
+        itemListElement: offerings.map((offer) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: offer.name,
+            description: offer.description,
           },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Premium Home Management",
-              description:
-                "Everything in Standard plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.",
-            },
-            price: "275.00",
-            priceCurrency: "USD",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: "275.00",
-              priceCurrency: "USD",
-              unitText: "month",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Coastal Elite Membership",
-              description:
-                "Our highest tier — guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line.",
-            },
-            price: "650.00",
-            priceCurrency: "USD",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: "650.00",
-              priceCurrency: "USD",
-              unitText: "month",
-            },
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "On-Call Property Tasks",
-              description:
-                "One-off requests — contractor meeting, errands, random jobs. No recurring commitment required.",
-            },
-            price: "85.00",
-            priceCurrency: "USD",
-          },
-          {
-            "@type": "Offer",
-            itemOffered: {
-              "@type": "Service",
-              name: "Mail & Trash Handling",
-              description:
-                "Mail collection and/or trash takeout and return while you're away from your 30A property.",
-            },
-            price: "35.00",
-            priceCurrency: "USD",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: "35.00",
-              priceCurrency: "USD",
-              unitText: "day",
-            },
-          },
-        ],
+          price: offer.price,
+          priceCurrency: "USD",
+          ...(offer.unitText
+            ? {
+                priceSpecification: {
+                  "@type": "UnitPriceSpecification",
+                  price: offer.price,
+                  priceCurrency: "USD",
+                  unitText: offer.unitText,
+                },
+              }
+            : {}),
+        })),
       },
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: "5.0",
-        bestRating: "5",
+        ratingValue: trustStats.ratingValue,
+        bestRating: trustStats.bestRating,
         worstRating: "1",
-        reviewCount: "2",
+        reviewCount: trustStats.reviewCount,
       },
-      review: [
-        {
-          "@type": "Review",
-          author: { "@type": "Person", name: "Beth Tedesco" },
-          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-          reviewBody:
-            "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
-        },
-        {
-          "@type": "Review",
-          author: { "@type": "Person", name: "Barbara Reed" },
-          reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-          reviewBody:
-            "Ryder gives us peace of mind if we're out of town and need the house checked on. Very reliable. Would highly recommend using his services!",
-        },
-      ],
+      review: testimonials.map((t) => ({
+        "@type": "Review",
+        datePublished: t.datePublished,
+        author: { "@type": "Person", name: t.author },
+        reviewRating: { "@type": "Rating", ratingValue: t.rating, bestRating: "5" },
+        reviewBody: t.body,
+      })),
       founder: {
         "@type": "Person",
         name: "Ryder Schilling",
         jobTitle: "Founder & Owner",
       },
-      foundingDate: "2025-10",
+      foundingDate: businessContact.foundingDate,
       sameAs: [
-        "https://www.facebook.com/profile.php?id=61575773416368",
-        "https://www.linkedin.com/company/113245630/",
-        // https://share.google/wrIyz05yZUebrtlCX
-        // Find it at: business.google.com → Share profile → Copy link
-        // "https://g.co/kgs/YOUR_GBP_SHORT_URL",
+        businessContact.facebookUrl,
+        businessContact.linkedinUrl,
+        siteData.gbpUrl,
       ],
     },
     {
@@ -279,16 +208,16 @@ const localBusinessSchema = {
       },
       contactPoint: {
         "@type": "ContactPoint",
-        telephone: "+13094158793",
+        telephone: businessContact.phone,
         contactType: "customer service",
         email: "coastalhomemanagement30a@gmail.com",
         areaServed: "US",
         availableLanguage: "English",
       },
       sameAs: [
-        "https://www.facebook.com/profile.php?id=61575773416368",
-        "https://www.linkedin.com/company/113245630/",
-        // https://share.google/wrIyz05yZUebrtlCX
+        businessContact.facebookUrl,
+        businessContact.linkedinUrl,
+        siteData.gbpUrl,
       ],
     },
   ],
@@ -310,18 +239,18 @@ const organizationSchema = {
   image: "https://coastalhomemngt30a.com/img.png",
   description:
     "Local, owner-operated second home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida.",
-  telephone: "+13094158793",
+  telephone: businessContact.phone,
   email: "coastalhomemanagement30a@gmail.com",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Inlet Beach",
-    addressRegion: "FL",
-    postalCode: "32461",
-    addressCountry: "US",
+    addressLocality: businessContact.address.locality,
+    addressRegion: businessContact.address.region,
+    postalCode: businessContact.address.postalCode,
+    addressCountry: businessContact.address.country,
   },
   contactPoint: {
     "@type": "ContactPoint",
-    telephone: "+13094158793",
+    telephone: businessContact.phone,
     contactType: "customer service",
     email: "coastalhomemanagement30a@gmail.com",
     areaServed: "US",
@@ -331,10 +260,11 @@ const organizationSchema = {
     "@type": "Person",
     name: "Ryder Schilling",
   },
-  foundingDate: "2025-10",
+  foundingDate: businessContact.foundingDate,
   sameAs: [
-    "https://www.facebook.com/profile.php?id=61575773416368",
-    "https://www.linkedin.com/company/113245630/",
+    businessContact.facebookUrl,
+    businessContact.linkedinUrl,
+    siteData.gbpUrl,
   ],
 };
 

@@ -1,9 +1,25 @@
 // src/app/sitemap.ts
 import { MetadataRoute } from "next";
+import { allBlogPosts } from "@/data/blogPosts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://coastalhomemngt30a.com";
   const lastModified = new Date("2026-06-27");
+
+  const blogUrls: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/blog`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...allBlogPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.dateModified || post.datePublished),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  ];
 
   return [
     {
@@ -78,5 +94,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    ...blogUrls,
   ];
 }
