@@ -19,6 +19,12 @@ export default function TestimonialsSection() {
       },
       {
         quote:
+          "Coastal Home Management is doing a really expert and professional job looking after my home. Ryder is easy to work with and has communicated with me exceptionally well (even sending pictures) on every task I have needed. They cover a wide range of services at a good price.",
+        name: "Buddy Norman",
+        meta: "Google review",
+      },
+      {
+        quote:
           "Excellent service and communication! Very helpful and Ryder goes out of his way to help.",
         name: "Beth Tedesco",
         meta: "Google review",

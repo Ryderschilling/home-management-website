@@ -65,6 +65,9 @@ function buildLlmsTxt(): string {
   lines.push(`- [About / Meet the Founder](${BASE_URL}/about)`);
   lines.push(`- [Pricing](${BASE_URL}/pricing)`);
   lines.push(`- [Blog / Guides](${BASE_URL}/blog)`);
+  lines.push(
+    `- [How to Choose a Home Watch Company on 30A](${BASE_URL}/choosing-a-home-watch-company-30a): A comparison of hyperlocal vs. regional home watch providers on 30A, covering service area, pricing transparency, and documentation.`
+  );
   lines.push("");
 
   lines.push("## Contact");

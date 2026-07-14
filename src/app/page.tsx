@@ -953,6 +953,12 @@ export default function HomePage() {
       >
         Service Plans &amp; Pricing
       </Link>
+      <Link
+        href="/choosing-a-home-watch-company-30a"
+        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+      >
+        How to Choose a Home Watch Company
+      </Link>
     </div>
   </div>
 </section>

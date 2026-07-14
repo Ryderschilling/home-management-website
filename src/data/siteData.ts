@@ -22,12 +22,18 @@ export type Service = {
 export const trustStats = {
   ratingValue: "5.0",
   bestRating: "5",
-  reviewCount: "5",
+  reviewCount: "6",
   propertiesManaged: "$8 million+",
   activeHomes: "9",
 };
 
 export const testimonials = [
+  {
+    author: "Buddy Norman",
+    datePublished: "2026-07-14",
+    rating: "5",
+    body: "Coastal Home Management is doing a really expert and professional job looking after my home. Ryder is easy to work with and has communicated with me exceptionally well (even sending pictures) on every task I have needed. They cover a wide range of services at a good price.",
+  },
   {
     author: "Beth Tedesco",
     datePublished: "2025-12-01",
