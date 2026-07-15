@@ -16,16 +16,16 @@ export type ServicePageData = {
 export const servicePages: Record<string, ServicePageData> = {
   "second-home-management-inlet-beach": {
     slug: "second-home-management-inlet-beach",
-    title: "Second Home Management in Inlet Beach",
-    metaTitle: "Second Home Management in Inlet Beach, Florida",
+    title: "Home Watch & Second Home Management in Inlet Beach",
+    metaTitle: "Home Watch & Second Home Management in Inlet Beach, Florida",
     metaDescription:
-      "Reliable second home management in Inlet Beach and along 30A. Home checks, issue coordination, updates, and trusted local oversight while you're away.",
+      "Local home watch and second home management in Inlet Beach and along 30A. Weekly home watch checks with photo proof, issue coordination, and trusted oversight while you're away.",
     intro:
-      "Coastal Home Management 30A provides second home management for homeowners in Inlet Beach and surrounding 30A communities. We help keep your property protected, checked, and cared for while you are away.",
+      "Coastal Home Management 30A provides home watch and second home management for homeowners in Inlet Beach and surrounding 30A communities. Our home watch service puts a trusted local person at your property on a set schedule, checking it inside and out and sending photo proof after every visit, so your second home stays protected while you are away.",
     image: "/img.png",
     highlights: [
-      "Weekly or bi-weekly home checks",
-      "Detailed updates and issue reporting",
+      "Weekly or bi-weekly home watch checks in Inlet Beach",
+      "Detailed updates, photo proof, and issue reporting",
       "Coordination for maintenance and vendors",
       "Trusted local oversight while you are away",
     ],
@@ -40,6 +40,10 @@ export const servicePages: Record<string, ServicePageData> = {
       "We coordinate the next step quickly so small issues do not become expensive problems.",
     ],
     faqs: [
+      {
+        q: "Do you provide home watch services in Inlet Beach?",
+        a: "Yes. Home watch is exactly what we do in Inlet Beach. On a weekly or bi-weekly schedule we check your home inside and out, watch for leaks, pests, AC issues, and storm damage, and send a photo report after every visit. Because the owner lives here on 30A, the same local person who checks your home is the one you talk to, not a call center.",
+      },
       {
         q: "How often can you check on my home?",
         a: "Most homeowners choose weekly or bi-weekly visits, but frequency can be adjusted based on the property and season.",
@@ -151,12 +155,12 @@ export const servicePages: Record<string, ServicePageData> = {
 
   "home-check-services-30a": {
     slug: "home-check-services-30a",
-    title: "Home Check Services on 30A",
-    metaTitle: "Home Check Services for 30A Homeowners",
+    title: "Home Watch & Home Check Services on 30A",
+    metaTitle: "Home Watch & Home Check Services on 30A",
     metaDescription:
-      "Professional home check services for second-home owners on 30A. Routine visits, issue detection, and trusted local oversight.",
+      "Home watch and home check services for second-home owners on 30A. Routine visits with photo proof, early issue detection, and trusted local oversight while you're away.",
     intro:
-      "Home check services are designed to catch issues early, maintain visibility, and reduce risk while your home is vacant. We provide consistent checks for second homeowners across the 30A area.",
+      "Home watch, sometimes called a home check, means having someone local visit your vacant home on a set schedule to catch issues early and reduce risk. Coastal Home Management 30A provides consistent home watch visits with photo proof for second homeowners across the 30A area.",
     image: "/img.png",
     highlights: [
       "Routine home visits",
@@ -175,6 +179,10 @@ export const servicePages: Record<string, ServicePageData> = {
       "We report findings and coordinate follow-up when needed.",
     ],
     faqs: [
+      {
+        q: "How much does home watch cost on 30A?",
+        a: "Home watch plans with Coastal Home Management 30A start at $150/month for weekly visits with photo reports. The exact price depends on visit frequency and add-ons like mail handling; see our pricing page for the full breakdown.",
+      },
       {
         q: "How often should someone check on a vacation home in Florida?",
         a: "Most second homeowners on 30A choose weekly checks, especially during hurricane season and after storms. Bi-weekly works for homes with fewer systems to monitor, like a house without a pool.",
@@ -241,15 +249,15 @@ export const servicePages: Record<string, ServicePageData> = {
 
   "second-home-management-watersound-origins": {
     slug: "second-home-management-watersound-origins",
-    title: "Second Home Management in Watersound Origins",
-    metaTitle: "Second Home Management in Watersound Origins, FL",
+    title: "Home Watch & Second Home Management in Watersound Origins",
+    metaTitle: "Home Watch & Second Home Management in Watersound Origins, FL",
     metaDescription:
-      "Trusted second home management in Watersound Origins and Naturewalk. Weekly property checks, issue coordination, and reliable local oversight while you're away.",
+      "Local home watch and second home management in Watersound Origins and Naturewalk. Weekly property checks with photo proof, issue coordination, and trusted oversight while you're away.",
     intro:
-      "Coastal Home Management 30A provides dedicated second home management for homeowners in Watersound Origins, Naturewalk, and surrounding Inlet Beach communities. We keep your property protected, monitored, and cared for while you're not there.",
+      "Coastal Home Management 30A provides home watch and second home management for homeowners in Watersound Origins, Naturewalk, and surrounding Inlet Beach communities. Our home watch service means someone local checks on your property on a set schedule, sends photo proof every visit, and catches small problems before they turn expensive, so your home stays protected while you're not there.",
     image: "/img.png",
     highlights: [
-      "Weekly or bi-weekly property checks in Watersound Origins",
+      "Weekly or bi-weekly home watch visits in Watersound Origins",
       "Detailed visit reports with photos and issue notes",
       "Vendor and maintenance coordination",
       "Trusted local presence in Watersound and Naturewalk",
@@ -265,6 +273,10 @@ export const servicePages: Record<string, ServicePageData> = {
       "We coordinate follow-up quickly so small issues don't become expensive problems.",
     ],
     faqs: [
+      {
+        q: "Do you provide home watch services in Watersound Origins?",
+        a: "Yes. Home watch is the core of what we do in Watersound Origins. On a weekly or bi-weekly schedule we walk your home inside and out, check systems and storm exposure, and send a photo report after every visit, so an empty second home always has a trusted local set of eyes on it.",
+      },
       {
         q: "Do you serve Watersound Origins and Naturewalk specifically?",
         a: "Yes. Watersound Origins and Naturewalk are our primary service areas. We know these communities well and can get to your property quickly.",

@@ -4,12 +4,12 @@ import type { ServicePageData } from "@/data/servicePages";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 const relatedServiceLinks = [
-  { href: "/second-home-management-inlet-beach", label: "Second Home Management — Inlet Beach", slug: "second-home-management-inlet-beach" },
-  { href: "/second-home-management-watersound-origins", label: "Second Home Management — Watersound Origins", slug: "second-home-management-watersound-origins" },
+  { href: "/second-home-management-inlet-beach", label: "Home Watch — Inlet Beach", slug: "second-home-management-inlet-beach" },
+  { href: "/second-home-management-watersound-origins", label: "Home Watch — Watersound Origins", slug: "second-home-management-watersound-origins" },
   { href: "/vacation-home-care-30a", label: "Vacation Home Care — 30A", slug: "vacation-home-care-30a" },
   { href: "/concierge-services-inlet-beach", label: "Concierge Services", slug: "concierge-services-inlet-beach" },
   { href: "/mail-package-handling-inlet-beach", label: "Mail & Package Handling", slug: "mail-package-handling-inlet-beach" },
-  { href: "/home-check-services-30a", label: "Home Check Services", slug: "home-check-services-30a" },
+  { href: "/home-check-services-30a", label: "Home Watch & Home Checks — 30A", slug: "home-check-services-30a" },
   { href: "/pricing", label: "Service Plans & Pricing", slug: "pricing" },
   { href: "/", label: "Home", slug: "home" },
 ];
