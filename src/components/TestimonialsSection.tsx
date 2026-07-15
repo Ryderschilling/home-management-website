@@ -58,29 +58,35 @@ export default function TestimonialsSection() {
 
   return (
     <section
-      className="relative w-full bg-black text-white px-4 md:px-6 pt-16 md:pt-24 pb-16 md:pb-24"
+      className="relative w-full bg-[#f6f9fc] text-[#0f172a] px-4 md:px-6 pt-20 md:pt-28 pb-16 md:pb-24"
       aria-label="Testimonials"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-10 text-center">
-          <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">
+        <div className="mb-12 text-center">
+          <p className="ch-eyebrow ch-eyebrow--center">What Owners Say</p>
+          <h2 className="ch-display ch-display--sm">
             Testimonials
           </h2>
-          <div className="mt-6 mx-auto h-px w-20 bg-white/20" />
         </div>
 
         <div className="overflow-x-auto no-scrollbar">
-          <div className="flex gap-6 md:gap-8 px-1">
+          <div className="flex gap-6 md:gap-8 px-1 pb-6">
             {testimonials.map((t, i) => (
               <article
                 key={i}
-                className="w-[88vw] sm:w-[70vw] md:w-[560px] shrink-0 rounded-2xl border border-white/10 bg-white/5 p-8 md:p-10 text-center"
+                className="w-[88vw] sm:w-[70vw] md:w-[560px] shrink-0 rounded-2xl border border-[rgba(15,23,42,0.08)] bg-white p-8 md:p-12 text-center shadow-[0_24px_60px_-44px_rgba(15,23,42,0.35)]"
               >
-                <div className="text-[18px] sm:text-[20px] md:text-[24px] leading-[1.55] text-white/90">
-                  <span className="italic">“{t.quote}”</span>
+                <div
+                  className="mx-auto mb-6 font-serif text-5xl leading-none text-[#1d4ed8]/30 select-none"
+                  aria-hidden="true"
+                >
+                  “
+                </div>
+                <div className="font-serif text-[19px] sm:text-[21px] md:text-[25px] leading-[1.5] text-[#1e293b]">
+                  <span className="italic">{t.quote}</span>
                 </div>
 
-                <div className="mt-6 text-sm uppercase tracking-[0.18em] text-white/55">
+                <div className="mt-8 text-xs uppercase tracking-[0.22em] text-[#93a3b5]">
                   {t.name}
                   {t.meta ? ` • ${t.meta}` : ""}
                 </div>

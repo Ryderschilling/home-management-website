@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
 
   return (
-    <main className="min-h-screen font-sans bg-black text-black">
+    <main className="min-h-screen font-sans bg-[#f6f9fc] text-[#0f172a]">
       <FadeInObserver />
       <LeadCapturePopup />
       {/* Hero */}
@@ -77,33 +77,33 @@ export default function HomePage() {
       </div>
 
       {/* Trust signal bar — stats for humans and LLM crawlers */}
-      <div className="bg-black border-t border-white/10 px-6 py-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+      <div className="bg-[#f6f9fc] border-b border-[rgba(15,23,42,0.08)] px-6 py-8">
+        <div className="max-w-6xl mx-auto flex items-center justify-center gap-8 md:gap-14 flex-wrap">
 
           {/* Stat 1 — portfolio */}
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">{trustStats.propertiesManaged}</span>
-            <span className="text-white/40 text-[10px] uppercase tracking-widest">in properties managed</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[#0f172a] text-2xl md:text-3xl font-serif tracking-tight">{trustStats.propertiesManaged}</span>
+            <span className="text-[#93a3b5] text-[10px] uppercase tracking-[0.24em]">in properties managed</span>
           </div>
 
-          <span className="text-white/10 text-lg hidden md:inline">|</span>
+          <span className="hidden md:inline h-8 w-px bg-[rgba(15,23,42,0.1)]" aria-hidden="true" />
 
           {/* Stat 2 — active homes */}
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="text-white text-xl md:text-2xl font-serif tracking-tight">{trustStats.activeHomes}</span>
-            <span className="text-white/40 text-[10px] uppercase tracking-widest">active client homes</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-[#0f172a] text-2xl md:text-3xl font-serif tracking-tight">{trustStats.activeHomes}</span>
+            <span className="text-[#93a3b5] text-[10px] uppercase tracking-[0.24em]">active client homes</span>
           </div>
 
-          <span className="text-white/10 text-lg hidden md:inline">|</span>
+          <span className="hidden md:inline h-8 w-px bg-[rgba(15,23,42,0.1)]" aria-hidden="true" />
 
           {/* Stat 3 — Google rating */}
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="text-yellow-400 text-lg tracking-wide" aria-label="5 stars">★★★★★</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="text-amber-400 text-xl tracking-wide" aria-label="5 stars">★★★★★</span>
             <a
               href="https://www.google.com/search?q=Coastal+Home+Management+30A"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/40 text-[10px] uppercase tracking-widest hover:text-white transition"
+              className="text-[#93a3b5] text-[10px] uppercase tracking-[0.24em] hover:text-[#1d4ed8] transition"
             >
               5.0 on Google →
             </a>
@@ -140,28 +140,33 @@ export default function HomePage() {
       />
 
 {/* Meet Ryder — personal intro strip */}
-<section className="bg-white border-t border-gray-100 px-4 md:px-6 py-14 md:py-20 fade-section">
-  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
-    <div className="flex-shrink-0">
-      <img
-        src="/profile-web.jpg"
-        alt="Ryder Schilling, founder of Coastal Home Management 30A"
-        className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover shadow-md"
-        loading="lazy"
-        decoding="async"
-      />
+<section className="bg-[#f6f9fc] px-4 md:px-6 py-20 md:py-28 fade-section">
+  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-20">
+    <div className="flex-shrink-0 reveal-item">
+      <div className="relative">
+        <div className="absolute -inset-3 rounded-full border border-[rgba(15,23,42,0.1)]" aria-hidden="true" />
+        <img
+          src="/profile-web.jpg"
+          alt="Ryder Schilling, founder of Coastal Home Management 30A"
+          className="w-32 h-32 md:w-44 md:h-44 rounded-full object-cover shadow-[0_24px_60px_-28px_rgba(15,23,42,0.35)]"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
     </div>
     <div>
-      <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Who You&apos;re Hiring</p>
-      <h2 className="text-2xl md:text-3xl font-serif mb-4 leading-snug">
+      <p className="ch-eyebrow reveal-item">Who You&apos;re Hiring</p>
+      <h2 className="ch-display ch-display--sm mb-6 reveal-item">
         I live in Watersound Origins.<br className="hidden md:block" /> This is my neighborhood too.
       </h2>
-      <p className="text-gray-600 text-sm leading-relaxed max-w-xl">
+      <p className="ch-lede max-w-xl reveal-item">
         I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they could actually trust — not a company, a person. I&apos;m here full-time, I know the streets, I know this community, and I&apos;m the one who shows up to your house. Today I actively manage more than $8 million in second home real estate across Watersound Origins, Naturewalk, and Inlet Beach. Every single visit, every single time.
       </p>
-      <Link href="/about" className="mt-6 inline-flex text-xs uppercase tracking-widest border-b border-gray-300 pb-0.5 hover:border-black transition">
-        More about Ryder →
-      </Link>
+      <div className="reveal-item">
+        <Link href="/about" className="ch-link mt-8">
+          More about Ryder →
+        </Link>
+      </div>
     </div>
   </div>
 </section>
@@ -169,202 +174,131 @@ export default function HomePage() {
 {/* Services */}
 <section
   id="services"
-  className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section"
+  className="bg-[#edf3f9] px-4 md:px-6 py-24 md:py-32 fade-section"
 >
   <div className="max-w-6xl mx-auto">
-    <h2 className="text-3xl md:text-4xl font-serif mb-8">
+    <p className="ch-eyebrow reveal-item">01 — Services</p>
+    <h2 className="ch-display mb-12 md:mb-16 max-w-3xl reveal-item">
       What Services Do We Offer for Second Homeowners on 30A?
     </h2>
 
-    {/* MOBILE: full-size swipe cards */}
-{/* MOBILE: full-size swipe cards */}
-<div className="md:hidden -mx-4 px-4">
-  <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 no-scrollbar">
-    {/* Card 1 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
-      <div className="h-64 w-full mb-5 overflow-hidden">
-        <img
-          src="/img.png"
-          alt="Second Home Management"
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <h3 className="text-2xl font-serif mb-2">Second Home Management</h3>
-      <p className="text-base text-gray-700 mb-6">
-        Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
-        full property inspections, issue coordination, and proactive care to keep
-        your home in top condition.
-      </p>
-      <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-    </div>
+    {(() => {
+      const services = [
+        {
+          img: "/img.png",
+          alt: "Second Home Management",
+          title: <>Second Home Management</>,
+          body: (
+            <>
+              Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
+              full property inspections, issue coordination, and proactive care to keep
+              your home in top condition.
+            </>
+          ),
+        },
+        {
+          img: "/service2.png",
+          alt: "Mail & Package Handling",
+          title: <>Mail &amp; Package Handling</>,
+          body: (
+            <>
+              Receive and manage all mail and deliveries while you’re away. Packages
+              are collected, secured, and handled according to your preferences so
+              nothing is missed.
+            </>
+          ),
+        },
+        {
+          img: "/service3.png",
+          alt: "Concierge Services",
+          title: <>Concierge Services</>,
+          body: (
+            <>
+              Anything you may need as a homeowner. From one-off requests to ongoing
+              assistance, we handle the details so you don’t have to.
+            </>
+          ),
+        },
+      ];
 
-    {/* Card 2 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
-      <div className="h-64 w-full mb-5 overflow-hidden">
-        <img
-          src="/service2.png"
-          alt="Mail & Package Handling"
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <h3 className="text-2xl font-serif mb-2">Mail &amp; Package Handling</h3>
-      <p className="text-base text-gray-700 mb-6">
-        Receive and manage all mail and deliveries while you’re away. Packages
-        are collected, secured, and handled according to your preferences so
-        nothing is missed.
-      </p>
-      <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-    </div>
-
-    {/* Card 3 */}
-    <div className="snap-center shrink-0 w-[92vw] border border-gray-200 bg-white p-6 flex flex-col">
-      <div className="h-64 w-full mb-5 overflow-hidden">
-        <img
-          src="/service3.png"
-          alt="Concierge Services"
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <h3 className="text-2xl font-serif mb-2">Concierge Services</h3>
-      <p className="text-base text-gray-700 mb-6">
-        Anything you may need as a homeowner. From one-off requests to ongoing
-        assistance, we handle the details so you don’t have to.
-      </p>
-      <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-    </div>
-  </div>
-
-  {/* Mobile swipe cue */}
-  <div className="mt-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-widest text-gray-500">
-    <span>Swipe</span>
-    <span className="swipe-chevron">›</span>
-  </div>
-</div>
-
-    {/* DESKTOP: 3-column grid */}
-    <div className="hidden md:grid grid-cols-3 gap-12">
-      {/* Card 1 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
-        <div className="h-60 w-full mb-4 overflow-hidden">
-          <img
-            src="/img.png"
-            alt="Second Home Management"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+      const Card = ({ s, wide }: { s: (typeof services)[number]; wide?: boolean }) => (
+        <div
+          className={`ch-card group flex flex-col ${
+            wide ? "snap-center shrink-0 w-[88vw]" : "h-full"
+          }`}
+        >
+          <div className={`${wide ? "h-64" : "h-64"} w-full overflow-hidden`}>
+            <img
+              src={s.img}
+              alt={s.alt}
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+            />
+          </div>
+          <div className="p-7 md:p-8 flex flex-col flex-1">
+            <h3 className="text-2xl font-serif mb-3 text-[#0f172a]">{s.title}</h3>
+            <p className="text-sm leading-relaxed text-[#5b6b7f] mb-7">{s.body}</p>
+            <div className="mt-auto">
+              <a href={`mailto:${siteData.contactEmail}`} className="ch-link">
+                Learn more →
+              </a>
+            </div>
+          </div>
         </div>
-        <h3 className="text-xl font-serif mb-2">Second Home Management</h3>
-        <p className="text-sm text-gray-700 mb-5">
-          Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins,
-          full property inspections, issue coordination, and proactive care to keep
-          your home in top condition.
-        </p>
-        <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-      </div>
+      );
 
-      {/* Card 2 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
-        <div className="h-60 w-full mb-4 overflow-hidden">
-          <img
-            src="/service2.png"
-            alt="Mail & Package Handling"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
-        <h3 className="text-xl font-serif mb-2">Mail &amp; Package Handling</h3>
-        <p className="text-sm text-gray-700 mb-5">
-          Receive and manage all mail and deliveries while you’re away. Packages
-          are collected, secured, and handled according to your preferences so
-          nothing is missed.
-        </p>
-        <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-      </div>
+      return (
+        <>
+          {/* MOBILE: full-size swipe cards */}
+          <div className="md:hidden -mx-4 px-4">
+            <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 no-scrollbar">
+              {services.map((s) => (
+                <Card key={s.alt} s={s} wide />
+              ))}
+            </div>
 
-      {/* Card 3 */}
-      <div className="relative group overflow-hidden border border-gray-200 p-6 flex flex-col h-full">
-        <div className="h-60 w-full mb-4 overflow-hidden">
-          <img
-            src="/service3.png"
-            alt="Concierge Services"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
-        <h3 className="text-xl font-serif mb-2">Concierge Services</h3>
-        <p className="text-sm text-gray-700 mb-5">
-          Anything you may need as a homeowner. From one-off requests to ongoing
-          assistance, we handle the details so you don’t have to.
-        </p>
-        <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Learn more
-  </a>
-</div>
-      </div>
-    </div>
+            {/* Mobile swipe cue */}
+            <div className="mt-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-widest text-[#93a3b5]">
+              <span>Swipe</span>
+              <span className="swipe-chevron">›</span>
+            </div>
+          </div>
+
+          {/* DESKTOP: 3-column grid */}
+          <div className="hidden md:grid grid-cols-3 gap-8 lg:gap-10">
+            {services.map((s) => (
+              <div key={s.alt} className="reveal-item h-full">
+                <Card s={s} />
+              </div>
+            ))}
+          </div>
+        </>
+      );
+    })()}
   </div>
 </section>
 
       {/* ─── Item 4: How It Works Section + HowTo JSON-LD Schema ─────────── */}
       <section
         id="how-it-works"
-        className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section border-t border-gray-100"
+        className="bg-[#f6f9fc] px-4 md:px-6 py-24 md:py-32 fade-section"
       >
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-serif mb-4">
+          <p className="ch-eyebrow reveal-item">02 — The Process</p>
+          <h2 className="ch-display mb-5 reveal-item">
             How Does Second Home Management Work on 30A?
           </h2>
-          <p className="text-gray-500 text-sm mb-14 max-w-xl">
+          <p className="ch-lede mb-16 md:mb-20 max-w-xl reveal-item">
             Simple, transparent, and handled by one person who treats your property like it&apos;s their own.
           </p>
 
-          <ol className="space-y-12" role="list">
-            <li className="flex gap-8 items-start">
-              <div
-                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
-                aria-hidden="true"
-              >
-                1
+          <ol className="space-y-14 md:space-y-16" role="list">
+            <li className="flex gap-6 md:gap-8 items-start reveal-item">
+              <div className="ch-numeral" aria-hidden="true">
+                01
               </div>
               <div>
-                <h3 className="text-xl font-serif mb-2">Reach Out and Tell Us About Your Property</h3>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                <h3 className="text-2xl font-serif mb-3 text-[#0f172a]">Reach Out and Tell Us About Your Property</h3>
+                <p className="text-[#5b6b7f] text-sm leading-[1.8] max-w-lg">
                   Email or call Ryder directly. We&apos;ll talk through your property, your schedule, and what level of
                   care makes sense for you. There&apos;s no pressure and no sales call — just a real conversation.
                   Most clients are set up within a few days.
@@ -372,16 +306,13 @@ export default function HomePage() {
               </div>
             </li>
 
-            <li className="flex gap-8 items-start">
-              <div
-                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
-                aria-hidden="true"
-              >
-                2
+            <li className="flex gap-6 md:gap-8 items-start reveal-item">
+              <div className="ch-numeral" aria-hidden="true">
+                02
               </div>
               <div>
-                <h3 className="text-xl font-serif mb-2">We Set Up Your Account and Collect Access Details</h3>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                <h3 className="text-2xl font-serif mb-3 text-[#0f172a]">We Set Up Your Account and Collect Access Details</h3>
+                <p className="text-[#5b6b7f] text-sm leading-[1.8] max-w-lg">
                   We document your property details, key access, emergency contacts, HVAC preferences, and any specific
                   concerns. Everything is logged so nothing gets missed. Ryder handles the setup personally — there&apos;s
                   no one else involved.
@@ -389,16 +320,13 @@ export default function HomePage() {
               </div>
             </li>
 
-            <li className="flex gap-8 items-start">
-              <div
-                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
-                aria-hidden="true"
-              >
-                3
+            <li className="flex gap-6 md:gap-8 items-start reveal-item">
+              <div className="ch-numeral" aria-hidden="true">
+                03
               </div>
               <div>
-                <h3 className="text-xl font-serif mb-2">Regular Inspections Begin on Your Schedule</h3>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                <h3 className="text-2xl font-serif mb-3 text-[#0f172a]">Regular Inspections Begin on Your Schedule</h3>
+                <p className="text-[#5b6b7f] text-sm leading-[1.8] max-w-lg">
                   On a weekly or bi-weekly schedule, we walk your property inside and out. We check every system —
                   HVAC, plumbing, irrigation, entry points, exterior condition — and photograph everything.
                   Storm events trigger unscheduled visits at no extra charge on Elite plans.
@@ -406,16 +334,13 @@ export default function HomePage() {
               </div>
             </li>
 
-            <li className="flex gap-8 items-start">
-              <div
-                className="flex-shrink-0 w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center text-sm font-serif text-gray-500"
-                aria-hidden="true"
-              >
-                4
+            <li className="flex gap-6 md:gap-8 items-start reveal-item">
+              <div className="ch-numeral" aria-hidden="true">
+                04
               </div>
               <div>
-                <h3 className="text-xl font-serif mb-2">You Receive a Report After Every Single Visit</h3>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-lg">
+                <h3 className="text-2xl font-serif mb-3 text-[#0f172a]">You Receive a Report After Every Single Visit</h3>
+                <p className="text-[#5b6b7f] text-sm leading-[1.8] max-w-lg">
                   After each visit you get a written summary with photos by text or email. If anything needs attention,
                   we handle it immediately or coordinate with the right contractor. You&apos;re always in the loop —
                   without having to be here.
@@ -424,10 +349,10 @@ export default function HomePage() {
             </li>
           </ol>
 
-          <div className="mt-14">
+          <div className="mt-16 reveal-item">
             <a
               href="mailto:coastalhomemanagement30a@gmail.com"
-              className="inline-flex border border-black px-8 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"
+              className="ch-btn ch-btn--solid"
             >
               Get Started
             </a>
@@ -503,38 +428,35 @@ export default function HomePage() {
       />
 
       {/* Why CHM — 3 differentiators */}
-      <section className="bg-black text-white px-4 md:px-6 py-20 md:py-28 fade-section">
+      <section className="ch-deep-band text-white px-4 md:px-6 py-24 md:py-32 fade-section">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs uppercase tracking-widest text-white/40 mb-4 text-center">Why Homeowners Choose CHM</p>
-          <h2 className="text-3xl md:text-4xl font-serif mb-14 text-center">What makes CHM different.</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
-            <div>
-              <div className="text-3xl mb-5">⌖</div>
-              <h3 className="font-serif text-xl mb-3">Your neighbor, not a company</h3>
-              <p className="text-white/65 text-sm leading-relaxed">
+          <p className="ch-eyebrow ch-eyebrow--center ch-eyebrow--light reveal-item">Why Homeowners Choose CHM</p>
+          <h2 className="ch-display ch-display--light mb-16 md:mb-20 text-center reveal-item">What makes CHM different.</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+            <div className="reveal-item">
+              <div className="text-2xl mb-6 text-[#7ba3f0]" aria-hidden="true">⌖</div>
+              <h3 className="font-serif text-2xl mb-3">Your neighbor, not a company</h3>
+              <p className="text-white/60 text-sm leading-[1.8]">
                 I live in Watersound Origins. I&apos;m not dispatched from an office — I&apos;m down the street. That means faster response, community knowledge, and a face you&apos;ll actually recognize.
               </p>
             </div>
-            <div>
-              <div className="text-3xl mb-5">◻</div>
-              <h3 className="font-serif text-xl mb-3">Photos after every single visit</h3>
-              <p className="text-white/65 text-sm leading-relaxed">
+            <div className="reveal-item">
+              <div className="text-2xl mb-6 text-[#7ba3f0]" aria-hidden="true">◻</div>
+              <h3 className="font-serif text-2xl mb-3">Photos after every single visit</h3>
+              <p className="text-white/60 text-sm leading-[1.8]">
                 Every visit is documented. You get photos and a written summary by text or email. No guessing whether someone showed up — you see exactly what I saw.
               </p>
             </div>
-            <div>
-              <div className="text-3xl mb-5">✓</div>
-              <h3 className="font-serif text-xl mb-3">One person. Full accountability.</h3>
-              <p className="text-white/65 text-sm leading-relaxed">
+            <div className="reveal-item">
+              <div className="text-2xl mb-6 text-[#7ba3f0]" aria-hidden="true">✓</div>
+              <h3 className="font-serif text-2xl mb-3">One person. Full accountability.</h3>
+              <p className="text-white/60 text-sm leading-[1.8]">
                 No rotating staff, no subcontractors, no &quot;I&apos;ll have someone look at it.&quot; You have my number. I&apos;m the one who shows up, and I&apos;m the one you call.
               </p>
             </div>
           </div>
-          <div className="mt-14 text-center">
-            <a
-              href="#contact"
-              className="inline-flex border border-white/30 px-8 py-3 text-xs uppercase tracking-widest text-white hover:bg-white hover:text-black transition"
-            >
+          <div className="mt-16 text-center reveal-item">
+            <a href="#contact" className="ch-btn ch-btn--light">
               Get in Touch
             </a>
           </div>
@@ -544,36 +466,37 @@ export default function HomePage() {
       {/* Pricing Comparison Table */}
       <section
         id="pricing"
-        className="bg-white px-4 md:px-6 py-20 md:py-28 fade-section border-t border-gray-100"
+        className="bg-[#f6f9fc] px-4 md:px-6 py-24 md:py-32 fade-section"
       >
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-serif mb-4">
+          <p className="ch-eyebrow reveal-item">03 — Plans</p>
+          <h2 className="ch-display mb-5 reveal-item">
             Second Home Management Plans &amp; Pricing
           </h2>
-          <p className="text-gray-500 text-sm mb-12 max-w-xl">
+          <p className="ch-lede mb-14 max-w-xl reveal-item">
             Choose the level of care that fits your property. All plans include weekly inspections and immediate issue alerts. No contracts, no cancellation fees.
           </p>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto reveal-item rounded-2xl border border-[rgba(15,23,42,0.1)] bg-white p-4 md:p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.25)]">
             <table className="w-full text-sm border-collapse" aria-label="Coastal Home Management 30A service plan comparison">
               <caption className="sr-only">
                 Comparison of Essential, Home Watch, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
               </caption>
               <thead>
-                <tr className="border-b-2 border-black text-left">
+                <tr className="border-b border-[rgba(15,23,42,0.35)] text-left">
                   <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Essential<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span>
+                    Essential<br /><span className="text-[#5b6b7f] text-xs font-sans">$150/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Home Watch<br /><span className="text-gray-500 text-xs font-sans">$275/mo</span>
+                    Home Watch<br /><span className="text-[#5b6b7f] text-xs font-sans">$275/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$599/mo</span>
+                    Coastal Elite<br /><span className="text-[#5b6b7f] text-xs font-sans">$599/mo</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-gray-700">
+              <tbody className="divide-y divide-[rgba(15,23,42,0.06)] text-[#334155]">
                 {[
                   ["Weekly walkthrough — interior & exterior", true,  true,  true],
                   ["Issue alerts sent immediately",            true,  true,  true],
@@ -591,15 +514,15 @@ export default function HomePage() {
                   ["Contractor coordination & on-call access", false, false, true],
                 ].map(([feature, std, prem, elite]) => (
                   <tr key={feature as string}>
-                    <td className="py-3 pr-6 text-gray-700">{feature as string}</td>
-                    <td className="py-3 px-4 text-center">{std   ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
-                    <td className="py-3 px-4 text-center">{prem  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
-                    <td className="py-3 px-4 text-center">{elite ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
+                    <td className="py-3 pr-6 text-[#334155]">{feature as string}</td>
+                    <td className="py-3 px-4 text-center">{std   ? <span aria-label="Included" className="text-[#1d4ed8]">✓</span> : <span aria-label="Not included" className="text-[#cbd5e1]">—</span>}</td>
+                    <td className="py-3 px-4 text-center">{prem  ? <span aria-label="Included" className="text-[#1d4ed8]">✓</span> : <span aria-label="Not included" className="text-[#cbd5e1]">—</span>}</td>
+                    <td className="py-3 px-4 text-center">{elite ? <span aria-label="Included" className="text-[#1d4ed8]">✓</span> : <span aria-label="Not included" className="text-[#cbd5e1]">—</span>}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-black">
+                <tr className="border-t border-[rgba(15,23,42,0.35)]">
                   <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$150</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$275</td>
@@ -609,16 +532,13 @@ export default function HomePage() {
             </table>
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/pricing"
-              className="inline-flex border border-black px-6 py-3 text-xs uppercase tracking-widest hover:bg-black hover:text-white transition"
-            >
+          <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-6 reveal-item">
+            <Link href="/pricing" className="ch-btn">
               Full Pricing Details
             </Link>
             <a
               href={`mailto:${siteData.contactEmail}`}
-              className="inline-flex px-6 py-3 text-xs uppercase tracking-widest text-gray-500 hover:text-black transition"
+              className="inline-flex px-2 py-3 text-xs uppercase tracking-widest text-[#5b6b7f] hover:text-[#1d4ed8] transition"
             >
               Questions? Email Ryder →
             </a>
@@ -629,19 +549,20 @@ export default function HomePage() {
       {/* FAQ */}
       <section
         id="faq"
-        className="bg-gray-50 px-4 md:px-6 py-20 md:py-28 fade-section"
+        className="bg-[#edf3f9] px-4 md:px-6 py-24 md:py-32 fade-section"
       >
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-serif mb-12">
+          <p className="ch-eyebrow reveal-item">04 — Questions</p>
+          <h2 className="ch-display mb-14 reveal-item">
             Frequently Asked Questions
           </h2>
 
-          <div className="space-y-8">
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+          <div className="space-y-10">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 What does Coastal Home Management 30A do?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 We provide regular, documented property care for second-home and vacation homeowners
                 in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A. Every visit
                 includes a full walk-through, photo documentation, and a summary report sent directly
@@ -650,22 +571,22 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 What areas do you serve?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 We serve Watersound Origins, Naturewalk, Inlet Beach, and surrounding communities
                 along scenic 30A in the Florida Panhandle. If you&apos;re not sure whether your property
                 falls within our coverage area, just reach out — we&apos;re happy to confirm.
               </p>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 How much does second home management cost?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 Our monthly management plans start at $150/month (Essential) and go up to $599/month
                 for our Coastal Elite membership. We also offer on-call services at $75 base plus
                 $45/hour, and mail or trash handling at $35/day. Visit our{" "}
@@ -676,11 +597,11 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 What happens during a property visit?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 Every visit includes a full interior and exterior walk-through of your home. We check
                 for anything that needs attention — HVAC, irrigation, entry points, exterior condition,
                 signs of water intrusion, storm damage, or anything out of the ordinary. We photograph
@@ -689,22 +610,22 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 Are you licensed and insured?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 Yes. Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025.
                 We take the responsibility of caring for your home seriously, and proper coverage
                 is part of that commitment. You can have confidence that your property is in professional hands.
               </p>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="border-b border-[rgba(15,23,42,0.1)] pb-10 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 What makes CHM different from a large property management company?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 You get Ryder — directly. No call centers, no rotating staff, no chasing someone down
                 for an update. When something happens at your property, it gets handled fast by someone
                 who knows your home personally. That&apos;s what it means to work with a local operator
@@ -712,11 +633,11 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="pb-2">
-              <h3 className="text-lg font-serif mb-3">
+            <div className="pb-2 reveal-item">
+              <h3 className="text-xl md:text-2xl font-serif mb-3 text-[#0f172a]">
                 How do I get started?
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-[#5b6b7f] text-sm leading-[1.8]">
                 Send us an email or use the contact form on this page. We&apos;ll talk through your
                 property, your schedule, and what level of care makes sense for you. Most clients
                 are set up and receiving their first visit report within a few days of their first
@@ -726,16 +647,16 @@ export default function HomePage() {
           </div>
 
           {/* External Authority Links */}
-          <div className="mt-16 pt-10 border-t border-gray-200">
-            <p className="text-xs uppercase tracking-widest text-gray-500 mb-5">
+          <div className="mt-16 pt-10 border-t border-[rgba(15,23,42,0.1)] reveal-item">
+            <p className="text-xs uppercase tracking-[0.24em] text-[#93a3b5] mb-5">
               Useful Resources for 30A Homeowners
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row gap-4 text-sm text-[#5b6b7f]">
               <a
                 href="https://www.co.walton.fl.us/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-black underline transition"
+                className="hover:text-[#1d4ed8] underline underline-offset-4 decoration-[rgba(15,23,42,0.25)] transition"
               >
                 Walton County, FL — Official Government Site
               </a>
@@ -743,7 +664,7 @@ export default function HomePage() {
                 href="https://www.ready.gov/home"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-black underline transition"
+                className="hover:text-[#1d4ed8] underline underline-offset-4 decoration-[rgba(15,23,42,0.25)] transition"
               >
                 FEMA Ready.gov — Home Preparedness
               </a>
@@ -751,7 +672,7 @@ export default function HomePage() {
                 href="https://www.floridadisaster.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-black underline transition"
+                className="hover:text-[#1d4ed8] underline underline-offset-4 decoration-[rgba(15,23,42,0.25)] transition"
               >
                 Florida Division of Emergency Management
               </a>
@@ -830,12 +751,13 @@ export default function HomePage() {
       />
 
       {/* Service Area Map */}
-      <section className="bg-white px-6 py-20 fade-section">
+      <section className="bg-[#f6f9fc] px-6 py-24 md:py-28 fade-section">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h2 className="text-3xl font-serif tracking-tight text-black">
+          <p className="ch-eyebrow ch-eyebrow--center reveal-item">Coverage</p>
+          <h2 className="ch-display ch-display--sm reveal-item">
             Our Service Area
           </h2>
-          <p className="text-gray-500 text-sm uppercase tracking-widest">
+          <p className="text-[#93a3b5] text-xs uppercase tracking-[0.24em] reveal-item">
             Watersound Origins · Naturewalk · Scenic 30A
           </p>
           <ServiceAreaMapWrapper />
@@ -845,23 +767,24 @@ export default function HomePage() {
       {/* Contact */}
       <section
         id="contact"
-        className="px-6 py-32 bg-gray-900 text-white fade-section"
+        className="ch-deep-band px-6 py-28 md:py-36 text-white fade-section"
       >
         <div className="max-w-4xl mx-auto space-y-6 text-center">
-          <h2 className="text-3xl font-serif tracking-tight mb-2">
+          <p className="ch-eyebrow ch-eyebrow--center ch-eyebrow--light reveal-item">Get Started</p>
+          <h2 className="ch-display ch-display--light reveal-item">
             Ready to Protect Your 30A Property? Let&apos;s Talk.
           </h2>
-          <p className="text-gray-300">
+          <p className="text-white/60 reveal-item">
             Reach out for availability and customized service plans.
           </p>
-          <div className="mt-auto pt-2">
-  <a
-    href={`mailto:${siteData.contactEmail}`}
-    className="inline-flex border border-black px-5 py-3 text-xs uppercase tracking-wide hover:bg-black hover:text-white transition"
-  >
-    Message to inquire
-  </a>
-</div>
+          <div className="pt-4 reveal-item">
+            <a
+              href={`mailto:${siteData.contactEmail}`}
+              className="ch-btn ch-btn--light"
+            >
+              Message to inquire
+            </a>
+          </div>
         </div>
       </section>
 
@@ -917,45 +840,45 @@ export default function HomePage() {
       </section>
 
 {/* Related Services */}
-<section className="border-t border-gray-100 bg-white px-6 py-10">
+<section className="border-t border-[rgba(15,23,42,0.08)] bg-[#f6f9fc] px-6 py-12">
   <div className="mx-auto max-w-6xl">
-    <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-gray-500">
+    <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-[#93a3b5]">
       Our Services
     </p>
     <div className="flex flex-wrap gap-3">
       <Link
         href="/second-home-management-inlet-beach"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         Second Home Management
       </Link>
       <Link
         href="/concierge-services-inlet-beach"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         Concierge Services
       </Link>
       <Link
         href="/mail-package-handling-inlet-beach"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         Mail &amp; Package Handling
       </Link>
       <Link
         href="/home-check-services-30a"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         Home Check Services
       </Link>
       <Link
         href="/pricing"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         Service Plans &amp; Pricing
       </Link>
       <Link
         href="/choosing-a-home-watch-company-30a"
-        className="border border-gray-300 px-4 py-2 text-xs uppercase tracking-[0.16em] text-gray-700 transition hover:border-black hover:text-black"
+        className="rounded-full border border-[rgba(15,23,42,0.14)] bg-white px-5 py-2.5 text-xs uppercase tracking-[0.16em] text-[#334155] transition hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       >
         How to Choose a Home Watch Company
       </Link>
