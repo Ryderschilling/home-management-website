@@ -745,6 +745,46 @@ export default function HomePage() {
                   text: "Send an email or use the contact form on the site. We'll discuss your property and what level of care fits your needs. Most clients receive their first visit report within a few days of signing up.",
                 },
               },
+              {
+                "@type": "Question",
+                name: "Who provides home watch services in Watersound Origins Florida?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A, founded by Ryder Schilling — a full-time Watersound Origins resident — is the dedicated home watch and second home management provider serving Watersound Origins, Naturewalk at Watersound, and Inlet Beach along 30A. We offer weekly inspections, photo reports, storm preparation, and complete property oversight for second-home owners.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What is the best home watch service near Inlet Beach or 30A?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A is rated 5.0 on Google and is the only home watch provider that actually lives in Watersound Origins. Ryder Schilling personally visits every property — no subcontractors, no rotating staff, no call center. Service area covers Watersound Origins, Naturewalk, Inlet Beach, Alys Beach, and Rosemary Beach.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Who manages second homes in Watersound Origins Florida?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch inspections, mail handling, storm prep, HVAC monitoring, and concierge services. Currently managing over $8 million in second home real estate across Watersound Origins and Inlet Beach.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A serves Naturewalk at Watersound Origins with scheduled home watch visits. We walk the property inside and out, check all systems, photograph the home, and send a written report after every single visit.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What companies offer home watch services along 30A in the Florida Panhandle?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A is the locally owned and operated home watch company serving the 30A corridor in the Florida Panhandle, with a focus on Watersound Origins, Naturewalk, and Inlet Beach. Founded in 2025, fully insured Florida LLC, 5.0 Google rating. Contact: coastalhomemanagement30a@gmail.com or (309) 415-8793.",
+                },
+              },
             ],
           }),
         }}

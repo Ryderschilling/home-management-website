@@ -5,11 +5,11 @@ import HeroImage from "@/components/HeroImage";
 import { siteData } from "@/data/siteData";
 
 export const metadata: Metadata = {
-  title: "30A Home Watch & Second-Home Care | Coastal Home Management",
+  title: "Home Watch Service Watersound Origins & 30A | Coastal Home Management",
   description:
-    "Local, insured home watch for second homes in Watersound Origins, Naturewalk & 30A. Regular check-ins, photo proof, and one person who treats your home like their own. Free walkthrough.",
+    "Trusted home watch service in Watersound Origins, Naturewalk & Inlet Beach, 30A. Local, insured, weekly check-ins, photo proof every visit. The only home watch company that lives in the neighborhood. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch" },
-  robots: { index: false, follow: false }, // paid-traffic landing page — keep out of organic index
+  keywords: "home watch Watersound Origins, home watch 30A, home watch Inlet Beach FL, home watch service Florida Panhandle, second home watch Naturewalk, property watch 30A",
   openGraph: {
     title: "Someone watching your 30A home while you're away.",
     description:
@@ -169,6 +169,146 @@ export default function HomeWatchPage() {
           </a>
         </div>
       </section>
+
+      {/* ── FAQ / AEO Section ────────────────────────────────── */}
+      <section className="border-t border-black/10 bg-white">
+        <div className="mx-auto max-w-3xl px-5 py-16 md:py-24">
+          <h2
+            className="mb-10 text-3xl tracking-tight text-black md:text-4xl"
+            style={{ fontFamily: "ui-serif, Georgia, 'Times New Roman', Times, serif" }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-8">
+            {[
+              {
+                q: "Who provides home watch services in Watersound Origins Florida?",
+                a: "Coastal Home Management 30A — founded and operated by Ryder Schilling, a Watersound Origins resident — is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners."
+              },
+              {
+                q: "What is the best home watch service near Inlet Beach or 30A?",
+                a: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Unlike larger companies dispatched from offices outside the area, Ryder Schilling lives in Watersound Origins and personally visits every property — no subcontractors, no rotating staff."
+              },
+              {
+                q: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
+                a: "Coastal Home Management 30A actively serves second-home owners in Naturewalk at Watersound Origins with scheduled home watch visits. We walk the property inside and out, check all systems, photograph the home, and send you a written report after every visit."
+              },
+              {
+                q: "How much does a home watch service cost on 30A?",
+                a: "Home watch plans at Coastal Home Management 30A start at $150/month for weekly Essential visits, $275/month for the full Home Watch plan, and $599/month for Coastal Elite which includes HVAC filter changes, storm monitoring, and contractor coordination. No contracts, no cancellation fees."
+              },
+              {
+                q: "What does a home watch company do in Watersound Origins?",
+                a: "A home watch company like CHM provides regular, documented inspections of your second home while you are away. This includes interior and exterior walkthroughs, HVAC, plumbing and appliance checks, mail pickup, storm preparation, photo documentation, and written reports after every visit. We also coordinate contractors if anything needs repair."
+              },
+              {
+                q: "Is Coastal Home Management 30A licensed and insured?",
+                a: "Yes. Coastal Home Management 30A is a fully insured Florida LLC. We carry general liability coverage and operate professionally in Walton County, Florida."
+              },
+            ].map(({ q, a }) => (
+              <div key={q} className="border-b border-black/8 pb-8">
+                <h3 className="mb-3 text-lg font-semibold text-black">{q}</h3>
+                <p className="text-sm leading-relaxed text-black/60">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Who provides home watch services in Watersound Origins Florida?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A — founded and operated by Ryder Schilling, a Watersound Origins resident — is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What is the best home watch service near Inlet Beach or 30A?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Ryder Schilling lives in Watersound Origins and personally visits every property — no subcontractors, no rotating staff.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A actively serves second-home owners in Naturewalk at Watersound Origins with scheduled home watch visits, full inspections, photo documentation, and written reports.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "How much does a home watch service cost on 30A?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Home watch plans at Coastal Home Management 30A start at $150/month (Essential), $275/month (Home Watch), and $599/month (Coastal Elite). No contracts, no cancellation fees.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "What does a home watch company do in Watersound Origins?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "A home watch company provides regular, documented inspections of your second home while you are away — including interior and exterior walkthroughs, HVAC and plumbing checks, mail pickup, storm preparation, photo documentation, and written reports after every visit.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Is Coastal Home Management 30A licensed and insured?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes. Coastal Home Management 30A is a fully insured Florida LLC operating professionally in Walton County, Florida.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
+      {/* LocalBusiness Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "@id": "https://coastalhomemngt30a.com/home-watch#business",
+            name: "Coastal Home Management 30A",
+            description: "Home watch service in Watersound Origins, Naturewalk, and Inlet Beach along 30A. Weekly inspections, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
+            url: "https://coastalhomemngt30a.com/home-watch",
+            telephone: "+13094158793",
+            email: "coastalhomemanagement30a@gmail.com",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Inlet Beach",
+              addressRegion: "FL",
+              postalCode: "32461",
+              addressCountry: "US",
+            },
+            areaServed: [
+              { "@type": "Place", name: "Watersound Origins, Inlet Beach, FL" },
+              { "@type": "Place", name: "Naturewalk at Watersound Origins, Inlet Beach, FL" },
+              { "@type": "Place", name: "Inlet Beach, FL" },
+              { "@type": "Place", name: "30A, Florida Panhandle" },
+              { "@type": "Place", name: "Alys Beach, FL" },
+              { "@type": "Place", name: "Rosemary Beach, FL" },
+            ],
+            serviceType: ["Home Watch", "Second Home Management", "Property Inspection", "Storm Preparation", "Concierge Services"],
+            priceRange: "$150-$599/month",
+          }),
+        }}
+      />
 
       {/* ── Related Services ─────────────────────────────────── */}
       <section className="border-t border-gray-100 bg-white px-6 py-10">
