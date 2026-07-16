@@ -36,8 +36,23 @@ export default function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/vacation-home-care-30a" className="transition hover:text-[#1d4ed8]">
-                  Vacation Home Care
+                <Link href="/home-watch" className="transition hover:text-[#1d4ed8]">
+                  Home Watch
+                </Link>
+              </li>
+              <li>
+                <Link href="/home-watch-watersound-origins" className="transition hover:text-[#1d4ed8]">
+                  Home Watch — Watersound
+                </Link>
+              </li>
+              <li>
+                <Link href="/home-watch-naturewalk" className="transition hover:text-[#1d4ed8]">
+                  Home Watch — Naturewalk
+                </Link>
+              </li>
+              <li>
+                <Link href="/home-watch-inlet-beach" className="transition hover:text-[#1d4ed8]">
+                  Home Watch — Inlet Beach
                 </Link>
               </li>
               <li>
@@ -81,8 +96,48 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <div className="text-xs uppercase tracking-[0.22em] text-[#93a3b5]">Follow</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-[#93a3b5]">Find Us</div>
             <ul className="mt-4 space-y-3 text-sm text-[#475569]">
+              <li>
+                <a
+                  href={siteData.gbpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-[#1d4ed8]"
+                >
+                  Google Reviews
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.yelp.com/biz/coastal-home-management-30a-inlet-beach"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-[#1d4ed8]"
+                >
+                  Yelp
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.destinflorida.com/30a/services/home-watch-concierge/coastal-home-management-30a"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-[#1d4ed8]"
+                >
+                  DestinFlorida.com
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-[#1d4ed8]"
+                >
+                  Nextdoor
+                </a>
+              </li>
               <li>
                 <a
                   href="https://www.facebook.com/profile.php?id=61575773416368"
@@ -101,16 +156,6 @@ export default function SiteFooter() {
                   className="transition hover:text-[#1d4ed8]"
                 >
                   LinkedIn
-                </a>
-              </li>
-              <li>
-                <a
-                  href={siteData.gbpUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition hover:text-[#1d4ed8]"
-                >
-                  Google Reviews
                 </a>
               </li>
             </ul>

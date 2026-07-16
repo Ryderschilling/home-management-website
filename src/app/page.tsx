@@ -122,6 +122,15 @@ export default function HomePage() {
             "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
             description: "Coastal Home Management 30A provides second home management and property care for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $8 million in second home real estate across 9 active client properties. Services include weekly inspections, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
+            sameAs: [
+              "https://www.google.com/maps/place/Coastal+Home+Management+30A",
+              "https://www.facebook.com/profile.php?id=61575773416368",
+              "https://www.linkedin.com/company/113245630/",
+              "https://www.yelp.com/biz/coastal-home-management-30a-inlet-beach",
+              "https://www.destinflorida.com/30a/services/home-watch-concierge/coastal-home-management-30a",
+              "https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl",
+              "https://sourceatrade.com/contractors/coastal-home-management-30a-3",
+            ],
             aggregateRating: {
               "@type": "AggregateRating",
               ratingValue: trustStats.ratingValue,
