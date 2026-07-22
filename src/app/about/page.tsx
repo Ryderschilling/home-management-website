@@ -212,8 +212,8 @@ export default function AboutPage() {
                 <tr className="border-b-2 border-black text-left">
                   <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Standard<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span></th>
-                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Premium<br /><span className="text-gray-500 text-xs font-sans">$275/mo</span></th>
-                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$650/mo</span></th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Premium<br /><span className="text-gray-500 text-xs font-sans">$300/mo</span></th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$600/mo</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
@@ -246,8 +246,8 @@ export default function AboutPage() {
                 <tr className="border-t-2 border-black">
                   <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$150</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$275</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$650</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$300</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$600</td>
                 </tr>
               </tfoot>
             </table>

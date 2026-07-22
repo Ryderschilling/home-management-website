@@ -195,7 +195,7 @@ export default function HomeWatchPage() {
               },
               {
                 q: "How much does a home watch service cost on 30A?",
-                a: "Home watch plans at Coastal Home Management 30A start at $150/month for weekly Essential visits, $275/month for the full Home Watch plan, and $599/month for Coastal Elite which includes HVAC filter changes, storm monitoring, and contractor coordination. No contracts, no cancellation fees."
+                a: "Home watch plans at Coastal Home Management 30A start at $150/month for weekly Essential visits, $300/month for the full Home Watch plan, and $600/month for Coastal Elite which includes HVAC filter changes, storm monitoring, and contractor coordination. No contracts, no cancellation fees."
               },
               {
                 q: "What does a home watch company do in Watersound Origins?",
@@ -252,7 +252,7 @@ export default function HomeWatchPage() {
                 name: "How much does a home watch service cost on 30A?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Home watch plans at Coastal Home Management 30A start at $150/month (Essential), $275/month (Home Watch), and $599/month (Coastal Elite). No contracts, no cancellation fees.",
+                  text: "Home watch plans at Coastal Home Management 30A start at $150/month (Essential), $300/month (Home Watch), and $600/month (Coastal Elite). No contracts, no cancellation fees.",
                 },
               },
               {
@@ -305,7 +305,7 @@ export default function HomeWatchPage() {
               { "@type": "Place", name: "Rosemary Beach, FL" },
             ],
             serviceType: ["Home Watch", "Second Home Management", "Property Inspection", "Storm Preparation", "Concierge Services"],
-            priceRange: "$150-$599/month",
+            priceRange: "$150-$600/month",
           }),
         }}
       />

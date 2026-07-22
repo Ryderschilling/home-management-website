@@ -60,7 +60,7 @@ const plans: Plan[] = [
     tier: "silver",
     name: "Home Watch",
     tagline: "Everything in Essential plus photo reports and hands-on property care.",
-    price: 275,
+    price: 300,
     priceNote: "month-to-month · no contracts",
     badge: "Silver",
     cta: "Get Started",
@@ -81,7 +81,7 @@ const plans: Plan[] = [
     tier: "gold",
     name: "Coastal Elite",
     tagline: "Full-service home management. Your property runs itself while you're gone.",
-    price: 599,
+    price: 600,
     priceNote: "Founding rate — limited spots available.",
     badge: "Gold — Elite",
     cta: "Claim a Founding Spot",
@@ -464,11 +464,11 @@ export default function PricingPage() {
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-silver">
                   Home Watch<br />
-                  <span className="compare-price">$275/mo</span>
+                  <span className="compare-price">$300/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-gold">
                   Coastal Elite<br />
-                  <span className="compare-price">$599/mo</span>
+                  <span className="compare-price">$600/mo</span>
                 </th>
               </tr>
             </thead>
@@ -560,8 +560,8 @@ export default function PricingPage() {
               <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
                 <td className="compare-td compare-td-price compare-td-bronze">$150</td>
-                <td className="compare-td compare-td-price compare-td-silver">$275</td>
-                <td className="compare-td compare-td-price compare-td-gold">$599</td>
+                <td className="compare-td compare-td-price compare-td-silver">$300</td>
+                <td className="compare-td compare-td-price compare-td-gold">$600</td>
               </tr>
             </tbody>
           </table>

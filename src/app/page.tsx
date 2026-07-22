@@ -498,10 +498,10 @@ export default function HomePage() {
                     Essential<br /><span className="text-[#5b6b7f] text-xs font-sans">$150/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Home Watch<br /><span className="text-[#5b6b7f] text-xs font-sans">$275/mo</span>
+                    Home Watch<br /><span className="text-[#5b6b7f] text-xs font-sans">$300/mo</span>
                   </th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">
-                    Coastal Elite<br /><span className="text-[#5b6b7f] text-xs font-sans">$599/mo</span>
+                    Coastal Elite<br /><span className="text-[#5b6b7f] text-xs font-sans">$600/mo</span>
                   </th>
                 </tr>
               </thead>
@@ -534,8 +534,8 @@ export default function HomePage() {
                 <tr className="border-t border-[rgba(15,23,42,0.35)]">
                   <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$150</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$275</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$599</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$300</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$600</td>
                 </tr>
               </tfoot>
             </table>
@@ -596,7 +596,7 @@ export default function HomePage() {
                 How much does second home management cost?
               </h3>
               <p className="text-[#5b6b7f] text-sm leading-[1.8]">
-                Our monthly management plans start at $150/month (Essential) and go up to $599/month
+                Our monthly management plans start at $150/month (Essential) and go up to $600/month
                 for our Coastal Elite membership. We also offer on-call services at $75 base plus
                 $45/hour, and mail or trash handling at $35/day. Visit our{" "}
                 <Link href="/pricing" className="underline hover:text-black">
@@ -719,7 +719,7 @@ export default function HomePage() {
                 name: "How much does second home management cost?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Monthly management plans start at $150/month (Essential) and go up to $599/month for the Coastal Elite membership. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
+                  text: "Monthly management plans start at $150/month (Essential) and go up to $600/month for the Coastal Elite membership. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
                 },
               },
               {

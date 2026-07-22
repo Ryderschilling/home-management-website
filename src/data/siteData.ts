@@ -95,14 +95,14 @@ export const offerings: {
     name: "Premium Home Management",
     description:
       "Everything in Standard plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.",
-    price: "275.00",
+    price: "300.00",
     unitText: "month",
   },
   {
     name: "Coastal Elite Membership",
     description:
       "Our highest tier — guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members.",
-    price: "650.00",
+    price: "600.00",
     unitText: "month",
   },
   {

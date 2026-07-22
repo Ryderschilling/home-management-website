@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Watersound Origins?",
-    a: "Plans start at $150/month for weekly Essential visits, $275/month for the full Home Watch plan with appliance and plumbing checks, and $599/month for Coastal Elite with HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination. No contracts or cancellation fees.",
+    a: "Plans start at $150/month for weekly Essential visits, $300/month for the full Home Watch plan with appliance and plumbing checks, and $600/month for Coastal Elite with HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination. No contracts or cancellation fees.",
   },
   {
     q: "Is Coastal Home Management 30A insured?",
@@ -152,13 +152,13 @@ export default function HomeWatchWatersoundPage() {
               },
               {
                 name: "Home Watch",
-                price: "$275/mo",
+                price: "$300/mo",
                 features: ["Everything in Essential", "Appliance & plumbing checks", "Irrigation filter cleaning", "Bi-weekly or weekly schedule"],
                 featured: true,
               },
               {
                 name: "Coastal Elite",
-                price: "$599/mo",
+                price: "$600/mo",
                 features: ["Everything in Home Watch", "HVAC filter changes", "Storm & freeze monitoring", "Pre-arrival prep", "Contractor coordination"],
               },
             ].map((plan) => (
@@ -232,7 +232,7 @@ export default function HomeWatchWatersoundPage() {
             url: "https://coastalhomemngt30a.com/home-watch-watersound-origins",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
-            priceRange: "$150-$599/month",
+            priceRange: "$150-$600/month",
             areaServed: [
               { "@type": "Place", name: "Watersound Origins, Inlet Beach, FL 32461" },
               { "@type": "Place", name: "Naturewalk at Watersound Origins, FL" },
