@@ -6,6 +6,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import FadeInObserver from "@/components/FadeInObserver";
 import ServiceAreaMapWrapper from "@/components/ServiceAreaMapWrapper";
+import CalBookingButton from "@/components/CalBookingButton";
 
 export const metadata: Metadata = {
   description:
@@ -826,7 +827,8 @@ export default function HomePage() {
           <p className="text-white/60 reveal-item">
             Reach out for availability and customized service plans.
           </p>
-          <div className="pt-4 reveal-item">
+          <div className="pt-4 reveal-item flex flex-col sm:flex-row items-center justify-center gap-4">
+            <CalBookingButton />
             <a
               href={`mailto:${siteData.contactEmail}`}
               className="ch-btn ch-btn--light"
