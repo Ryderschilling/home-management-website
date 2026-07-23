@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import SiteHeader from "./SiteHeader";
 import SiteFooter from "./SiteFooter";
+import CalFloatingWidget from "./CalFloatingWidget";
 
 // Routes that should NOT get the public header/footer
 const EXCLUDED_PREFIXES = ["/admin", "/portal"];
@@ -20,6 +21,7 @@ export default function PublicShell({ children }: { children: React.ReactNode })
       <SiteHeader />
       {children}
       <SiteFooter />
+      <CalFloatingWidget />
     </>
   );
 }
