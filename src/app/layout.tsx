@@ -2,9 +2,37 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Archivo, Instrument_Sans } from "next/font/google";
 import { PostHogProvider } from "@/providers/PostHogProvider";
 import PublicShell from "@/components/PublicShell";
 import { trustStats, testimonials, businessContact, siteData, offerings } from "@/data/siteData";
+
+/**
+ * ── Typefaces ────────────────────────────────────────────────────────────────
+ * Archivo is a variable font with a real width axis (62–125), which is what
+ * lets the display type sit wide and heavy like NORD without paying for a
+ * licence. If you buy NORD later this is a two-line swap: drop the .woff2 in
+ * /public/fonts, add an @font-face, and point --font-display at it in
+ * globals.css. Nothing else changes.
+ *
+ * next/font downloads both faces at build time and serves them from our own
+ * origin. That kills a third-party round trip and removes layout shift, both
+ * of which feed Core Web Vitals, and Core Web Vitals feed rankings, which is
+ * where this business actually gets its leads.
+ * ────────────────────────────────────────────────────────────────────────────
+ */
+const archivo = Archivo({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  display: "swap",
+  variable: "--font-archivo",
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-instrument",
+});
 
 /**
  * Google Ads Conversion Tracking
@@ -12,7 +40,7 @@ import { trustStats, testimonials, businessContact, siteData, offerings } from "
  * After creating your Google Ads account and setting up a conversion action:
  *   1. Go to ads.google.com → Tools → Measurement → Conversions
  *   2. Create a conversion action → "Website" → fill out the form
- *   3. Click "Use Google Tag" — copy the two values:
+ *   3. Click "Use Google Tag", copy the two values:
  *        • GOOGLE_ADS_ID     = AW-XXXXXXXXXX   (your account tag)
  *        • CONVERSION_LABEL  = the label string from the conversion snippet
  *   4. Replace the placeholders below AND in HomeWatchLeadForm.tsx
@@ -52,7 +80,7 @@ export const metadata: Metadata = {
         url: "https://coastalhomemngt30a.com/img.png",
         width: 1200,
         height: 630,
-        alt: "Coastal Home Management 30A — Second home management in Watersound Origins and Inlet Beach, Florida",
+        alt: "Coastal Home Management 30A, Second home management in Watersound Origins and Inlet Beach, Florida",
       },
     ],
     locale: "en_US",
@@ -274,7 +302,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${archivo.variable} ${instrumentSans.variable}`}>
       <head>
         {/* Google Ads global site tag */}
         <Script
@@ -297,14 +325,14 @@ export default function RootLayout({
             __html: JSON.stringify(localBusinessSchema),
           }}
         />
-        {/* Standalone Organization schema — required by GEO scanners */}
+        {/* Standalone Organization schema, required by GEO scanners */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationSchema),
           }}
         />
-        {/* rel="author" — signals About page to GEO crawlers */}
+        {/* rel="author", signals About page to GEO crawlers */}
         <link rel="author" href="https://coastalhomemngt30a.com/about" />
       </head>
       <body>

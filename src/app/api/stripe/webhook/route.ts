@@ -4,7 +4,7 @@ import { stripe } from "@/lib/server/stripe";
 import { ensureAdminTables, ensureQrAddonColumns, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import { syncInvoiceFromStripeEvent } from "@/lib/server/services/invoices";
-// sendPipePhotoEmail is intentionally not used here — see /api/qr/upload which
+// sendPipePhotoEmail is intentionally not used here, see /api/qr/upload which
 // sends the full email (with photos + dimensions) after the customer uploads.
 import {
   QR_MAIN_PRODUCT_KEY,
@@ -204,7 +204,7 @@ async function upsertClientAndOrderFromSession(session: Stripe.Checkout.Session)
         VALUES (
           ${clientId},
           ${orgId},
-          ${fullName || "—"},
+          ${fullName || ", "},
           ${email},
           ${phone || null},
           ${null},

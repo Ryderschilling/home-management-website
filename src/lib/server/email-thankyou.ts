@@ -60,7 +60,7 @@ export async function sendThankYouEmail(opts: {
     .replaceAll("{{CUSTOMER_NAME}}", opts.customerName || "there")
     .replaceAll("{{PRODUCT_LABEL}}", opts.productLabel || "your service");
 
-  const subject = "Thank you — your installation is complete";
+  const subject = "Thank you, your installation is complete";
 
   const result = await resend.emails.send({
     from,

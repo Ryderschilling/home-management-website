@@ -13,9 +13,9 @@ function safe(v: unknown): string {
 }
 
 const TIER_COLORS: Record<string, { accent: string; label: string }> = {
-  bronze: { accent: "#cd7f32", label: "Bronze — Essential Watch" },
-  silver: { accent: "#c0c0c0", label: "Silver — Home Watch" },
-  gold:   { accent: "#d4af37", label: "Gold — Coastal Elite" },
+  bronze: { accent: "#cd7f32", label: "Bronze, Essential Watch" },
+  silver: { accent: "#c0c0c0", label: "Silver, Home Watch" },
+  gold:   { accent: "#d4af37", label: "Gold, Coastal Elite" },
 };
 
 function buildOwnerEmail(data: {
@@ -78,7 +78,7 @@ function buildOwnerEmail(data: {
             <td style="padding:20px 36px 0;">
               <div style="display:inline-block;padding:6px 16px;border-radius:100px;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);">
                 <span style="font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:${tier.accent};">
-                  ${tier.label} — $${data.price}/mo
+                  ${tier.label}, $${data.price}/mo
                 </span>
               </div>
             </td>
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       from: env.FROM_EMAIL,
       to: OWNER_EMAIL,
       replyTo: email,
-      subject: `New Inquiry: ${tierLabel} — ${name}`,
+      subject: `New Inquiry: ${tierLabel}, ${name}`,
       html: buildOwnerEmail({ plan, tier, price, name, email, phone, address, message }),
     });
 

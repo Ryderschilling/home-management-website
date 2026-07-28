@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const POINTS: { title: string; body: string }[] = [
   {
     title: "Regular check-ins",
-    body: "I walk your home inside and out on a set schedule — catching leaks, pests, AC issues, and storm damage before they become expensive.",
+    body: "I walk your home inside and out on a set schedule, catching leaks, pests, AC issues, and storm damage before they become expensive.",
   },
   {
     title: "Photo proof every visit",
@@ -80,7 +80,7 @@ export default function HomeWatchPage() {
               {/* Until that file exists, it falls back to the existing founder photo automatically. */}
               <HeroImage />
             </div>
-            <p className="text-xs text-black/40">Ryder Schilling — owner, Coastal Home Management 30A</p>
+            <p className="text-xs text-black/40">Ryder Schilling, owner, Coastal Home Management 30A</p>
           </div>
 
           {/* Right: form */}
@@ -183,11 +183,11 @@ export default function HomeWatchPage() {
             {[
               {
                 q: "Who provides home watch services in Watersound Origins Florida?",
-                a: "Coastal Home Management 30A — founded and operated by Ryder Schilling, a Watersound Origins resident — is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners."
+                a: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners."
               },
               {
                 q: "What is the best home watch service near Inlet Beach or 30A?",
-                a: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Unlike larger companies dispatched from offices outside the area, Ryder Schilling lives in Watersound Origins and personally visits every property — no subcontractors, no rotating staff."
+                a: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Unlike larger companies dispatched from offices outside the area, Ryder Schilling lives in Watersound Origins and personally visits every property, no subcontractors, no rotating staff."
               },
               {
                 q: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
@@ -228,7 +228,7 @@ export default function HomeWatchPage() {
                 name: "Who provides home watch services in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A — founded and operated by Ryder Schilling, a Watersound Origins resident — is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners.",
+                  text: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners.",
                 },
               },
               {
@@ -236,7 +236,7 @@ export default function HomeWatchPage() {
                 name: "What is the best home watch service near Inlet Beach or 30A?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Ryder Schilling lives in Watersound Origins and personally visits every property — no subcontractors, no rotating staff.",
+                  text: "Coastal Home Management 30A is a locally operated, fully insured home watch service based in Inlet Beach. Ryder Schilling lives in Watersound Origins and personally visits every property, no subcontractors, no rotating staff.",
                 },
               },
               {
@@ -260,7 +260,7 @@ export default function HomeWatchPage() {
                 name: "What does a home watch company do in Watersound Origins?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "A home watch company provides regular, documented inspections of your second home while you are away — including interior and exterior walkthroughs, HVAC and plumbing checks, mail pickup, storm preparation, photo documentation, and written reports after every visit.",
+                  text: "A home watch company provides regular, documented inspections of your second home while you are away, including interior and exterior walkthroughs, HVAC and plumbing checks, mail pickup, storm preparation, photo documentation, and written reports after every visit.",
                 },
               },
               {

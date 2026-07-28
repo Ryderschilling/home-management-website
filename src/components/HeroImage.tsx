@@ -9,7 +9,7 @@ export default function HeroImage() {
   return (
     <img
       src="/ryder-at-work.jpg"
-      alt="Ryder Schilling checking on a 30A home — Coastal Home Management"
+      alt="Ryder Schilling checking on a 30A home, Coastal Home Management"
       className="h-full w-full object-cover"
       style={{ maxHeight: "360px" }}
       loading="eager"

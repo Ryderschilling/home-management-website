@@ -17,7 +17,7 @@ export default function ServiceAreaMap() {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Guard against double-init from HMR — check the DOM directly
+    // Guard against double-init from HMR, check the DOM directly
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((mapRef.current as any)._leaflet_id) return;
 
@@ -55,15 +55,15 @@ export default function ServiceAreaMap() {
 
       L.circle(CENTER, {
         radius: RADIUS_METERS,
-        color: "#2563eb",
+        color: "var(--ch-teal)",
         weight: 2,
         opacity: 0.6,
-        fillColor: "#3b82f6",
+        fillColor: "var(--ch-teal)",
         fillOpacity: 0.12,
       }).addTo(map);
 
       L.marker(CENTER, {
-        title: "Watersound Origins — CHM Service Area",
+        title: "Watersound Origins · CHM Service Area",
       })
         .addTo(map)
         .bindPopup(

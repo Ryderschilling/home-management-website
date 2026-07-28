@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
             ${resetFilter}
         `),
 
-        // Traffic sources — bucket referrer into readable labels
+        // Traffic sources, bucket referrer into readable labels
         hogql(`
           SELECT
             multiIf(

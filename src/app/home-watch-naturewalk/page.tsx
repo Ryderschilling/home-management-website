@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-naturewalk" },
   keywords: "home watch Naturewalk, Naturewalk Watersound Origins home watch, property watch Naturewalk Florida, second home care Naturewalk Inlet Beach, home management Naturewalk 30A",
   openGraph: {
-    title: "Home Watch — Naturewalk at Watersound Origins | CHM 30A",
+    title: "Home Watch, Naturewalk at Watersound Origins | CHM 30A",
     description: "Local, insured home watch for Naturewalk at Watersound Origins. Weekly inspections, photo proof, storm checks. Free walkthrough.",
     url: "https://coastalhomemngt30a.com/home-watch-naturewalk",
     images: ["/img.png"],
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
-    a: "Coastal Home Management 30A provides dedicated home watch services for second-home owners in Naturewalk at Watersound Origins. Ryder Schilling — a full-time resident of the Watersound Origins community — personally conducts every inspection, photographs the property, and sends a written report after each visit.",
+    a: "Coastal Home Management 30A provides dedicated home watch services for second-home owners in Naturewalk at Watersound Origins. Ryder Schilling, a full-time resident of the Watersound Origins community, personally conducts every inspection, photographs the property, and sends a written report after each visit.",
   },
   {
     q: "Does CHM serve Naturewalk at Watersound Origins specifically?",
@@ -105,7 +105,7 @@ export default function HomeWatchNaturewalkPage() {
           <p>
             Every visit to your Naturewalk property includes a full interior and exterior walkthrough. We check HVAC, plumbing, irrigation,
             entry points, window seals, exterior condition, and anything that could become a problem if left unaddressed.
-            Everything is photographed. You receive the photos and a written summary by text or email — every single time.
+            Everything is photographed. You receive the photos and a written summary by text or email, every single time.
           </p>
           <p>
             Naturewalk homes sit in a community with HOA standards, mature landscaping, and Florida coastal exposure.
@@ -113,7 +113,7 @@ export default function HomeWatchNaturewalkPage() {
             Ryder knows this community specifically, knows the contractors who do quality work here, and knows who to call when something needs fixing.
           </p>
           <p>
-            We also handle mail pickup, trash service, and can coordinate arrival prep — turning on the AC, doing a walkthrough before you arrive,
+            We also handle mail pickup, trash service, and can coordinate arrival prep, turning on the AC, doing a walkthrough before you arrive,
             and making sure the home is exactly how you left it.
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function HomeWatchNaturewalkPage() {
               &ldquo;Ryder gives us peace of mind if we&apos;re out of town and need the house checked on. Very reliable. Would highly recommend using his services!&rdquo;
             </p>
             <footer className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">
-              Barbara Reed — Naturewalk, Inlet Beach
+              Barbara Reed · Naturewalk, Inlet Beach
             </footer>
           </blockquote>
         </div>
@@ -223,9 +223,9 @@ export default function HomeWatchNaturewalkPage() {
         <div className="mx-auto max-w-4xl">
           <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-black/40">Related</p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — All Areas</Link>
-            <Link href="/home-watch-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — Watersound Origins</Link>
-            <Link href="/home-watch-inlet-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — Inlet Beach</Link>
+            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, All Areas</Link>
+            <Link href="/home-watch-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Watersound Origins</Link>
+            <Link href="/home-watch-inlet-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Inlet Beach</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
           </div>
         </div>

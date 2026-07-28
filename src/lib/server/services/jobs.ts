@@ -675,7 +675,7 @@ export async function createJob(
     await queueJobCompletionSummaryDraft(organizationId, id);
   }
 
-  // Push to Google Calendar (best-effort — never blocks job save)
+  // Push to Google Calendar (best-effort, never blocks job save)
   void pushJobsToCalendar(organizationId, id, recurrenceEnabled);
 
   return saved;
@@ -1128,7 +1128,7 @@ async function syncJobEventToCalendar(
         durationMinutes,
       });
     } else {
-      // Job predates GCal integration — create an event and store the ID
+      // Job predates GCal integration, create an event and store the ID
       const gcalEventId = await createCalendarEvent({
         organizationId,
         title,

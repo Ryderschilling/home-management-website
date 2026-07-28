@@ -12,19 +12,19 @@ export type Service = {
 
 // ─── Single source of truth for trust/review signals ───────────────────────
 // EVERY file that emits review/rating schema (layout.tsx, page.tsx) must pull
-// from here. Do NOT hardcode a reviewCount anywhere else — a mismatch between
+// from here. Do NOT hardcode a reviewCount anywhere else, a mismatch between
 // what's in your schema and your real Google Business Profile is a trust/spam
 // signal to Google, not a harmless typo.
 //
 // reviewCount = live Google reviews ONLY (confirmed 4 as of 2026-07-14 after
 // Buddy Norman's review). Testimonials sent privately (text/email/Facebook)
-// do NOT count here — only what shows on the GBP listing.
+// do NOT count here, only what shows on the GBP listing.
 export const trustStats = {
   ratingValue: "5.0",
   bestRating: "5",
   reviewCount: "4",
-  propertiesManaged: "$8 million+",
-  activeHomes: "9",
+  propertiesManaged: "$10 million+",
+  activeHomes: "15+",
 };
 
 export const testimonials = [
@@ -58,7 +58,7 @@ export const businessContact = {
     country: "US",
   },
   foundingDate: "2025-10",
-  // Canonical social profiles — used for every `sameAs` block on the site.
+  // Canonical social profiles, used for every `sameAs` block on the site.
   // NOTE: about/page.tsx previously pointed at a different (vanity) Facebook
   // URL than layout.tsx/page.tsx. Standardized on the profile.php link since
   // it's what's used in two of the three schema blocks. If the vanity URL
@@ -68,15 +68,72 @@ export const businessContact = {
   linkedinUrl: "https://www.linkedin.com/company/113245630/",
 };
 
+// ─── Phone / booking configuration ─────────────────────────────────────────
+// One switch controls every "answered 24/7" claim on the site. Until a real
+// always-on number exists, the site says "Ryder answers personally" instead.
+// A homeowner who calls at 2am after reading "24/7" and gets voicemail
+// is a worse first impression than never having made the claim.
+//
+// TO GO LIVE once Reece has the agent provisioned:
+//   1. set enabled: true
+//   2. paste the number in E.164 (+1XXXXXXXXXX) and its display form
+// Nothing else needs to change. Every component reads from here.
+export const contactChannels = {
+  /** Ryder's direct line. Shown publicly today. */
+  directPhone: "+13094158793",
+  directPhoneDisplay: "(309) 415-8793",
+
+  answeringService: {
+    enabled: false,
+    phone: "",
+    phoneDisplay: "",
+  },
+};
+
+/** The number the site should actually dial, given what's live. */
+export function primaryPhone() {
+  return contactChannels.answeringService.enabled
+    ? contactChannels.answeringService.phone
+    : contactChannels.directPhone;
+}
+
+export function primaryPhoneDisplay() {
+  return contactChannels.answeringService.enabled
+    ? contactChannels.answeringService.phoneDisplay
+    : contactChannels.directPhoneDisplay;
+}
+
+// ─── Booking ───────────────────────────────────────────────────────────────
+export const bookingConfig = {
+  /** Neighborhoods offered in the booking flow. */
+  neighborhoods: [
+    "Watersound Origins",
+    "Naturewalk",
+    "Inlet Beach",
+    "Rosemary Beach",
+    "Alys Beach",
+    "Seacrest",
+    "Somewhere else on 30A",
+  ],
+  /** Arrival windows Ryder actually works. */
+  windows: [
+    { id: "morning", label: "Morning", detail: "8am – 11am" },
+    { id: "midday", label: "Midday", detail: "11am – 2pm" },
+    { id: "afternoon", label: "Afternoon", detail: "2pm – 5pm" },
+    { id: "flexible", label: "Flexible", detail: "Whatever works" },
+  ],
+  plans: ["Essential ($150/mo)", "Home Watch ($300/mo)", "Coastal Elite ($600/mo)", "Not sure yet"],
+};
+
 // ─── Single source of truth for pricing / service catalog ──────────────────
 // Used to build the `hasOfferCatalog` schema in layout.tsx AND the /llms.txt
-// feed. Edit prices here — everywhere else should reference this array.
+// feed. Edit prices here, everywhere else should reference this array.
 //
 // ⚠️ PRICING FLAG: your CHM master context doc lists Premium at $300/mo and
 // On-Call Tasks at $100 flat. The live site code (below, pulled from the
 // original layout.tsx) has Premium at $275/mo and On-Call at $85 flat. I used
 // the live code as the source of truth since that's what's actually deployed
-// and quoted to customers — but confirm which numbers are current and correct
+// and quoted to customers, but confirm which numbers are current and correct
 // the other doc so they don't drift again.
 export const offerings: {
   name: string;
@@ -101,14 +158,14 @@ export const offerings: {
   {
     name: "Coastal Elite Membership",
     description:
-      "Our highest tier — guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members.",
+      "Our highest tier, guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members.",
     price: "600.00",
     unitText: "month",
   },
   {
     name: "On-Call Property Tasks",
     description:
-      "One-off requests — contractor meeting, errands, random jobs. No recurring commitment required.",
+      "One-off requests, contractor meeting, errands, random jobs. No recurring commitment required.",
     price: "85.00",
   },
   {
@@ -128,7 +185,7 @@ export const siteData = {
   // IMPORTANT: replace this with your real email
   contactEmail: "coastalhomemanagement30a@gmail.com",
 
-  // Google Business Profile — update with your direct review link from GBP dashboard
+  // Google Business Profile, update with your direct review link from GBP dashboard
   // Format: https://g.page/r/YOUR_PLACE_ID/review  (find it in Google Business Profile > Get more reviews)
   gbpUrl: "https://g.page/r/CbwjKOQ5enwWEBM/review",
 

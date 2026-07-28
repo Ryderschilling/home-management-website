@@ -118,13 +118,13 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
 
-      {/* JSON-LD — Organization */}
+      {/* JSON-LD, Organization */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
       />
 
-      {/* JSON-LD — Person (owner) */}
+      {/* JSON-LD, Person (owner) */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
@@ -156,7 +156,7 @@ export default function AboutPage() {
             <p className="text-gray-700 leading-relaxed mb-4">
               We provide weekly property inspections, photo documentation, and written reports so
               that second-home and vacation rental owners along 30A always know exactly what&apos;s
-              happening at their property — even when they&apos;re a thousand miles away.
+              happening at their property, even when they&apos;re a thousand miles away.
             </p>
             <p className="text-gray-700 leading-relaxed">
               Beyond routine check-ins, we handle contractor coordination, storm response, mail and
@@ -169,19 +169,19 @@ export default function AboutPage() {
             <ul className="space-y-4 text-sm text-gray-700">
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Monthly Management Plans</strong> — Standard, Premium, and Coastal Elite tiers with weekly or bi-weekly inspections and photo reports</span>
+                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Standard, Premium, and Coastal Elite tiers with weekly or bi-weekly inspections and photo reports</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">On-Call Property Tasks</strong> — contractor meetings, one-off errands, anything that comes up</span>
+                <span><strong className="font-medium text-black">On-Call Property Tasks</strong>, contractor meetings, one-off errands, anything that comes up</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Mail &amp; Trash Handling</strong> — mail pickup and trash service while you&apos;re away</span>
+                <span><strong className="font-medium text-black">Mail &amp; Trash Handling</strong>, mail pickup and trash service while you&apos;re away</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Arrival Prep</strong> — A/C set, walk-through completed, and your home ready 24 hours before you arrive</span>
+                <span><strong className="font-medium text-black">Arrival Prep</strong>, A/C set, walk-through completed, and your home ready 24 hours before you arrive</span>
               </li>
             </ul>
             <div className="mt-8">
@@ -232,13 +232,13 @@ export default function AboutPage() {
                   ["3 on-call hours/month included",       false, false, true],
                   ["Arrival Prep 2×/year",                 false, false, true],
                   ["Quarterly Property Condition Report",  false, false, true],
-                  ["Direct line to Ryder — no queue",      false, false, true],
+                  ["Direct line to Ryder, no queue",      false, false, true],
                 ].map(([feature, std, prem, elite]) => (
                   <tr key={feature as string}>
                     <td className="py-3 pr-6 text-gray-700">{feature as string}</td>
-                    <td className="py-3 px-4 text-center">{std  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
-                    <td className="py-3 px-4 text-center">{prem ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
-                    <td className="py-3 px-4 text-center">{elite? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">—</span>}</td>
+                    <td className="py-3 px-4 text-center">{std  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
+                    <td className="py-3 px-4 text-center">{prem ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
+                    <td className="py-3 px-4 text-center">{elite? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -287,12 +287,12 @@ export default function AboutPage() {
             <p className="text-gray-700 leading-relaxed mb-5">
               Coastal Home Management 30A grew out of something simple: neighbors in Watersound Origins
               needed someone they could trust to keep an eye on their homes while they were away. Starting
-              around 2022, Ryder Schilling began doing exactly that — checking in, photographing, handling
+              around 2022, Ryder Schilling began doing exactly that, checking in, photographing, handling
               what came up, and reporting back. People kept asking, so he kept showing up.
             </p>
             <p className="text-gray-700 leading-relaxed mb-5">
               In October 2025, CHM was formally incorporated as a licensed, insured Florida LLC. The business
-              is the same thing it always was — one local person doing this right — now backed by a proper
+              is the same thing it always was, one local person doing this right, now backed by a proper
               structure, documented systems, and a dedicated platform for managing client properties and
               visit reports.
             </p>
@@ -326,16 +326,16 @@ export default function AboutPage() {
             </div>
             <div>
               <h3 className="text-2xl font-serif mb-1">Ryder Schilling</h3>
-              <p className="text-xs uppercase tracking-widest text-gray-400 mb-5">Founder &amp; Owner — Coastal Home Management 30A</p>
+              <p className="text-xs uppercase tracking-widest text-gray-400 mb-5">Founder &amp; Owner, Coastal Home Management 30A</p>
               <p className="text-gray-700 leading-relaxed mb-4">
                 Ryder has been providing property care for second-home owners in Watersound Origins
                 since 2022. He started by helping neighbors who needed someone reliable on the ground
-                in Florida when they couldn&apos;t be there — someone to check in, catch problems early,
+                in Florida when they couldn&apos;t be there, someone to check in, catch problems early,
                 and communicate clearly.
               </p>
               <p className="text-gray-700 leading-relaxed mb-4">
                 He formally launched Coastal Home Management 30A as a Florida LLC in October 2025.
-                He handles every client personally — no subcontractors, no middlemen — and operates
+                He handles every client personally, with no subcontractors and no middlemen, and operates
                 out of the same communities he serves. Ryder is the one who answers the phone, does
                 the walk-through, takes the photos, and sends the report.
               </p>
@@ -371,7 +371,7 @@ export default function AboutPage() {
               <div className="text-4xl font-serif mb-3">3+</div>
               <h3 className="text-base font-serif mb-2">Years of Local Property Experience</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Ryder has been providing property care for Watersound Origins homeowners since 2022 —
+                Ryder has been providing property care for Watersound Origins homeowners since 2022
                 well before CHM was formally incorporated. He knows these neighborhoods, these homes,
                 and the local trade network.
               </p>
@@ -391,7 +391,7 @@ export default function AboutPage() {
               <p className="text-sm text-gray-600 leading-relaxed">
                 Every client works directly with Ryder. No call centers, no rotating employees,
                 no one else walking through your home. The person you hire is the person who
-                shows up — every time.
+                shows up, every time.
               </p>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function AboutPage() {
               <h3 className="text-base font-serif mb-2">Photo-Documented Every Visit</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Every property inspection is photographed and reported in writing. You receive a
-                visit summary after every check-in — a verifiable record of your home&apos;s condition
+                visit summary after every check-in, a verifiable record of your home&apos;s condition
                 that no large management company consistently provides.
               </p>
             </div>
@@ -417,7 +417,7 @@ export default function AboutPage() {
               <h3 className="text-base font-serif mb-2">Local Contractor Network</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Ryder serves as the on-the-ground point of contact for all trades. When your property
-                needs a repair, he coordinates the contractor, oversees the visit, and reports back —
+                needs a repair, he coordinates the contractor, oversees the visit, and reports back
                 so you never have to manage logistics from out of state.
               </p>
             </div>
@@ -459,7 +459,7 @@ export default function AboutPage() {
           </ul>
 
           <p className="text-gray-400 text-sm mb-8">
-            Not sure if your property falls within our coverage area? Reach out — we&apos;re happy to confirm.
+            Not sure if your property falls within our coverage area? Reach out, we&apos;re happy to confirm.
           </p>
           <a
             href="mailto:coastalhomemanagement30a@gmail.com"
@@ -483,14 +483,14 @@ export default function AboutPage() {
               <p className="text-sm text-gray-600 leading-relaxed">
                 No call centers. No rotating staff. When you reach out, you reach Ryder. When
                 something needs attention at your property, it gets handled by someone who knows
-                your home personally — not a dispatched employee seeing it for the first time.
+                your home personally, not a dispatched employee seeing it for the first time.
               </p>
             </div>
             <div>
               <h3 className="text-lg font-serif mb-3">Documented Every Visit</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Every property visit is photographed and reported in writing. You get a visit
-                summary after every check-in so you always know exactly what&apos;s going on —
+                summary after every check-in so you always know exactly what&apos;s going on
                 even when you&apos;re in Chicago, Indianapolis, or Nashville.
               </p>
             </div>
@@ -498,7 +498,7 @@ export default function AboutPage() {
               <h3 className="text-lg font-serif mb-3">Local, Insured, and Accountable</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 CHM is a fully insured Florida LLC operating in the communities it serves. Ryder
-                lives and works here — this isn&apos;t a remote operation or a franchise. Your
+                lives and works here. This isn&apos;t a remote operation or a franchise. Your
                 property is covered and your care is consistent.
               </p>
             </div>
@@ -520,7 +520,7 @@ export default function AboutPage() {
               rel="noopener noreferrer"
               className="hover:text-black underline transition"
             >
-              Walton County, FL — Official Government Site
+              Walton County, FL Government Site
             </a>
             <a
               href="https://www.floridadisaster.org/"
@@ -536,7 +536,7 @@ export default function AboutPage() {
               rel="noopener noreferrer"
               className="hover:text-black underline transition"
             >
-              FEMA Ready.gov — Home Preparedness Guide
+              FEMA Ready.gov Home Preparedness Guide
             </a>
             <a
               href="https://www.myfloridalicense.com/"
@@ -544,7 +544,7 @@ export default function AboutPage() {
               rel="noopener noreferrer"
               className="hover:text-black underline transition"
             >
-              Florida DBPR — License Verification
+              Florida DBPR License Verification
             </a>
           </div>
         </div>

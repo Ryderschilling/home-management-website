@@ -4,7 +4,7 @@ import type { BlogPost } from "@/data/blogPosts";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 export default function BlogPostLayout({ post }: { post: BlogPost }) {
-  // Article schema — tells Google/AI engines this is timely, authored content.
+  // Article schema, tells Google/AI engines this is timely, authored content.
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -31,7 +31,7 @@ export default function BlogPostLayout({ post }: { post: BlogPost }) {
     },
   };
 
-  // FAQPage schema — highest-leverage tag for AI citation.
+  // FAQPage schema, highest-leverage tag for AI citation.
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -69,7 +69,7 @@ export default function BlogPostLayout({ post }: { post: BlogPost }) {
         </div>
       </section>
 
-      {/* Direct answer — front-loaded for GEO, styled as a callout */}
+      {/* Direct answer, front-loaded for GEO, styled as a callout */}
       <section className="px-6 pt-14 md:pt-20">
         <div className="mx-auto max-w-3xl">
           <div className="border-l-2 border-black bg-[#faf8f3] p-6 md:p-8">

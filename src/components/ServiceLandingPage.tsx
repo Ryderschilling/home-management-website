@@ -4,12 +4,12 @@ import type { ServicePageData } from "@/data/servicePages";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 const relatedServiceLinks = [
-  { href: "/second-home-management-inlet-beach", label: "Home Watch — Inlet Beach", slug: "second-home-management-inlet-beach" },
-  { href: "/second-home-management-watersound-origins", label: "Home Watch — Watersound Origins", slug: "second-home-management-watersound-origins" },
-  { href: "/vacation-home-care-30a", label: "Vacation Home Care — 30A", slug: "vacation-home-care-30a" },
+  { href: "/second-home-management-inlet-beach", label: "Home Watch, Inlet Beach", slug: "second-home-management-inlet-beach" },
+  { href: "/second-home-management-watersound-origins", label: "Home Watch, Watersound Origins", slug: "second-home-management-watersound-origins" },
+  { href: "/vacation-home-care-30a", label: "Vacation Home Care, 30A", slug: "vacation-home-care-30a" },
   { href: "/concierge-services-inlet-beach", label: "Concierge Services", slug: "concierge-services-inlet-beach" },
   { href: "/mail-package-handling-inlet-beach", label: "Mail & Package Handling", slug: "mail-package-handling-inlet-beach" },
-  { href: "/home-check-services-30a", label: "Home Watch & Home Checks — 30A", slug: "home-check-services-30a" },
+  { href: "/home-check-services-30a", label: "Home Watch & Home Checks, 30A", slug: "home-check-services-30a" },
   { href: "/pricing", label: "Service Plans & Pricing", slug: "pricing" },
   { href: "/", label: "Home", slug: "home" },
 ];
@@ -32,7 +32,7 @@ export default function ServiceLandingPage({
     },
   };
 
-  // FAQPage schema — this is the single highest-leverage tag for AI citation
+  // FAQPage schema, this is the single highest-leverage tag for AI citation
   // (ChatGPT/Perplexity/Gemini/AI Overviews). Every landing page emits this
   // automatically from its `faqs` array in servicePages.ts.
   const faqJsonLd = {
@@ -168,7 +168,7 @@ export default function ServiceLandingPage({
               rel="noopener noreferrer"
               className="underline transition hover:text-black"
             >
-              Walton County, FL — Official Government Site
+              Walton County, FL Government Site
             </a>
             <a
               href="https://www.floridadisaster.org/"
@@ -184,7 +184,7 @@ export default function ServiceLandingPage({
               rel="noopener noreferrer"
               className="underline transition hover:text-black"
             >
-              FEMA Ready.gov — Home Preparedness Guide
+              FEMA Ready.gov Home Preparedness Guide
             </a>
             <a
               href="https://www.myfloridalicense.com/"
@@ -192,12 +192,12 @@ export default function ServiceLandingPage({
               rel="noopener noreferrer"
               className="underline transition hover:text-black"
             >
-              Florida DBPR — License Verification
+              Florida DBPR License Verification
             </a>
           </div>
           <div className="mt-6 border-t border-gray-100 pt-6 text-sm text-gray-600">
             <Link href="/about" className="underline transition hover:text-black">
-              About Coastal Home Management 30A — company story, credentials, and team
+              About Coastal Home Management 30A: company story, credentials, and team
             </Link>
           </div>
         </div>

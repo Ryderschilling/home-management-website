@@ -3,13 +3,13 @@
  *
  * Fires 5 scheduled follow-up emails after a new lead opts in.
  * Uses Resend's `scheduledAt` to queue each email at the right delay.
- * Errors are caught and logged — a failed schedule never blocks lead capture.
+ * Errors are caught and logged, a failed schedule never blocks lead capture.
  *
  * Sequence:
- *   Email 2 — Day 1  : "5 things that go wrong while you're away" (education/value)
- *   Email 3 — Day 3  : "The furnace was out. The freeze was two days away." (real story / social proof)
- *   Email 4 — Day 5  : "Here's exactly what a plan looks like" (soft close)
- *   Email 5 — Day 7  : "Your backflow pipes may be exposed" (rock install + photo + QR order link)
+ *   Email 2, Day 1  : "5 things that go wrong while you're away" (education/value)
+ *   Email 3, Day 3  : "The furnace was out. The freeze was two days away." (real story / social proof)
+ *   Email 4, Day 5  : "Here's exactly what a plan looks like" (soft close)
+ *   Email 5, Day 7  : "Your backflow pipes may be exposed" (rock install + photo + QR order link)
  */
 
 import { Resend } from "resend";
@@ -110,7 +110,7 @@ function wrap(inner: string): string {
           <tr>
             <td style="padding:24px 44px 36px;border-top:1px solid rgba(0,0,0,0.08);">
               <p style="${sig}">
-                — Ryder<br/>
+, Ryder<br/>
                 <span style="font-size:12px;color:rgba(0,0,0,0.4);">Coastal Home Management 30A</span><br/>
                 <a href="tel:3094158793" style="font-size:12px;color:rgba(0,0,0,0.4);text-decoration:none;">(309) 415-8793</a>
               </p>
@@ -132,7 +132,7 @@ function wrap(inner: string): string {
 </html>`;
 }
 
-// ─── Email 2 — Day 1: Education/value ─────────────────────────────────────────
+// ─── Email 2, Day 1: Education/value ─────────────────────────────────────────
 
 function email2(name: string): string {
   const items = [
@@ -161,7 +161,7 @@ function email2(name: string): string {
     </tr>
     <tr>
       <td style="padding:0 44px 32px;">
-        <p style="${bodyText}">Hey ${name} — I've been doing this for years in Watersound Origins and Naturewalk, and the same problems come up over and over.</p>
+        <p style="${bodyText}">Hey ${name}, I've been doing this for years in Watersound Origins and Naturewalk, and the same problems come up over and over.</p>
         <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 24px 0;">
           ${listRows}
         </table>
@@ -181,7 +181,7 @@ function email2(name: string): string {
   `);
 }
 
-// ─── Email 3 — Day 3: Social proof ────────────────────────────────────────────
+// ─── Email 3, Day 3: Social proof ────────────────────────────────────────────
 
 function email3(name: string): string {
   return wrap(`
@@ -195,7 +195,7 @@ function email3(name: string): string {
     <tr>
       <td style="padding:0 44px 32px;">
         <p style="${bodyText}">Hey ${name},</p>
-        <p style="${bodyText}">One of my clients — Scott and his family, out of Illinois — were away from their Watersound property when I came in for a routine check a couple days before a hard freeze was forecast for the area.</p>
+        <p style="${bodyText}">One of my clients, Scott and his family, out of Illinois, were away from their Watersound property when I came in for a routine check a couple days before a hard freeze was forecast for the area.</p>
         <p style="${bodyText}">The heating system wasn't running. Something had failed while they were gone, and with temperatures about to drop hard, an unheated home in those conditions means burst pipes, water damage, potentially tens of thousands of dollars in repairs.</p>
         <p style="${bodyText}">I caught it, called a technician that same day, and we had it back up and running before the cold hit. The house came through the freeze without a single issue.</p>
         <p style="${bodyText}">That's exactly the point of having someone local keeping eyes on your property.</p>
@@ -203,7 +203,7 @@ function email3(name: string): string {
           <tr>
             <td style="padding:16px 20px;">
               <p style="margin:0 0 8px 0;font-size:15px;font-style:italic;line-height:1.6;color:rgba(0,0,0,0.75);">"Ryder has helped us with our home for years and has always been reliable, professional, and great to work with. He consistently does an excellent job and is someone we truly trust."</p>
-              <p style="margin:0;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.4);">Scott Clark — Homeowner, Watersound Origins</p>
+              <p style="margin:0;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(0,0,0,0.4);">Scott Clark, Homeowner, Watersound Origins</p>
             </td>
           </tr>
         </table>
@@ -222,7 +222,7 @@ function email3(name: string): string {
   `);
 }
 
-// ─── Email 4 — Day 5: Soft close / services breakdown ─────────────────────────
+// ─── Email 4, Day 5: Soft close / services breakdown ─────────────────────────
 
 function email4(name: string): string {
   const tiers = [
@@ -260,7 +260,7 @@ function email4(name: string): string {
     </tr>
     <tr>
       <td style="padding:0 44px 32px;">
-        <p style="${bodyText}">Hey ${name} — in case it helps to see specifics before we talk:</p>
+        <p style="${bodyText}">Hey ${name}, in case it helps to see specifics before we talk:</p>
         <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 24px 0;">
           ${rows}
         </table>
@@ -280,7 +280,7 @@ function email4(name: string): string {
   `);
 }
 
-// ─── Email 5 — Day 7: Rock installation ──────────────────────────────────────
+// ─── Email 5, Day 7: Rock installation ──────────────────────────────────────
 
 function email5(name: string, appUrl: string): string {
   const qrUrl = `${appUrl}/qr`;
@@ -297,7 +297,7 @@ function email5(name: string, appUrl: string): string {
     <tr>
       <td style="padding:0 44px 32px;">
         <p style="${bodyText}">Hey ${name},</p>
-        <p style="${bodyText}">If your home is in Watersound Origins or Naturewalk, there's a good chance you have exposed backflow prevention pipes in your yard — grey pipe sticking up out of the ground, sometimes with a green or black box around it. Many properties in these neighborhoods have them.</p>
+        <p style="${bodyText}">If your home is in Watersound Origins or Naturewalk, there's a good chance you have exposed backflow prevention pipes in your yard, grey pipe sticking up out of the ground, sometimes with a green or black box around it. Many properties in these neighborhoods have them.</p>
         <p style="${bodyText}">Most homeowners leave them as-is. I install custom-measured decorative rock covers that fit directly over the pipe assembly. They look intentional, they match the landscaping, and they take maybe 30 minutes to install.</p>
         <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;width:100%;">
           <tr>
@@ -325,13 +325,13 @@ function email5(name: string, appUrl: string): string {
                   <td style="padding:4px 0;font-size:13px;color:rgba(0,0,0,0.65);">✓ &nbsp; $350 per rock, fully installed</td>
                 </tr>
                 <tr>
-                  <td style="padding:4px 0;font-size:13px;color:rgba(0,0,0,0.65);">✓ &nbsp; Neighbors ask about them — they've turned into leads</td>
+                  <td style="padding:4px 0;font-size:13px;color:rgba(0,0,0,0.65);">✓ &nbsp; Neighbors ask about them, they've turned into leads</td>
                 </tr>
               </table>
             </td>
           </tr>
         </table>
-        <p style="${bodyText}">You can see more photos and place an order directly online — takes two minutes.</p>
+        <p style="${bodyText}">You can see more photos and place an order directly online, takes two minutes.</p>
         <table cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td>
@@ -384,7 +384,7 @@ export async function scheduleDripSequence(
       delayMs: 5 * 24 * 60 * 60 * 1000, // Day 5
     },
     {
-      subject: "Your backflow pipes may be exposed — quick fix for Watersound homeowners",
+      subject: "Your backflow pipes may be exposed, quick fix for Watersound homeowners",
       html: email5(name, appUrl),
       delayMs: 7 * 24 * 60 * 60 * 1000, // Day 7
     },
@@ -458,7 +458,7 @@ export async function suppressLeadDrip(
         await resend.emails.cancel(id);
         cancelled++;
       } catch (err) {
-        // Email may have already sent — that's fine
+        // Email may have already sent, that's fine
         console.warn(`[CHM] Could not cancel drip email ${id}:`, err);
         errors++;
       }

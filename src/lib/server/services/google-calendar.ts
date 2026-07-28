@@ -6,7 +6,7 @@
  *  2. Every job create/update/delete pushes to Google Calendar (using the stored refresh token).
  *  3. A cron (/api/cron/gcal-sync) runs every 30 min to pull GCal changes back into the CRM.
  *
- * Token is refreshed on every request — short-lived access tokens, long-lived refresh token.
+ * Token is refreshed on every request, short-lived access tokens, long-lived refresh token.
  */
 
 import { sql } from "@/lib/server/db";
@@ -55,7 +55,7 @@ export async function isCalendarConnected(organizationId: string): Promise<boole
   return token !== null;
 }
 
-// ── Access token (fresh on every call — no caching needed at this scale) ─────
+// ── Access token (fresh on every call, no caching needed at this scale) ─────
 
 async function getAccessToken(organizationId: string): Promise<string> {
   const refreshToken = await getRefreshToken(organizationId);
@@ -122,7 +122,7 @@ function buildEventBody(input: CalendarEventInput) {
 
 /**
  * Creates a Google Calendar event. Returns the GCal event ID or null on failure.
- * Failures are logged and swallowed — GCal sync is best-effort; it should never
+ * Failures are logged and swallowed, GCal sync is best-effort; it should never
  * block a job from saving.
  */
 export async function createCalendarEvent(
@@ -206,7 +206,7 @@ export async function deleteCalendarEvent(
       }
     );
 
-    // 404 = already deleted, 410 = gone — both are fine
+    // 404 = already deleted, 410 = gone, both are fine
     if (!res.ok && res.status !== 404 && res.status !== 410) {
       console.error("[gcal] deleteCalendarEvent HTTP", res.status);
     }

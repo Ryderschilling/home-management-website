@@ -283,7 +283,7 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "What happens when you find an issue at my property?",
-        a: "We contact you immediately, document it clearly, and coordinate the next step — whether that's a vendor, a repair, or just a watchful eye until you return.",
+        a: "We contact you immediately, document it clearly, and coordinate the next step, whether that's a vendor, a repair, or just a watchful eye until you return.",
       },
       {
         q: "How often can you check on my home?",
@@ -328,7 +328,7 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "Can you respond if something goes wrong while I'm away?",
-        a: "Yes. That's the core of what we do. You call or text, we're on it — whether it's a vendor coordination, a check-in, or something more urgent.",
+        a: "Yes. That's the core of what we do. You call or text, we're on it, whether it's a vendor coordination, a check-in, or something more urgent.",
       },
     ],
   },

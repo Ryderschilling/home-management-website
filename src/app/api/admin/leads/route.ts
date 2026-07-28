@@ -1,7 +1,7 @@
 /**
- * GET   /api/admin/leads               — list all marketing email leads
- * POST  /api/admin/leads               — suppress a lead's drip sequence  { email: string }
- * PATCH /api/admin/leads               — update pipeline status / notes  { id, pipeline_status, pipeline_notes? }
+ * GET   /api/admin/leads, list all marketing email leads
+ * POST  /api/admin/leads, suppress a lead's drip sequence  { email: string }
+ * PATCH /api/admin/leads, update pipeline status / notes  { id, pipeline_status, pipeline_notes? }
  */
 
 import { NextRequest, NextResponse } from "next/server";

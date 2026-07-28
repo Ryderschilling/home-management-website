@@ -1,5 +1,5 @@
 // src/data/blogPosts.ts
-// Single source of truth for all blog content. Add new posts to this array —
+// Single source of truth for all blog content. Add new posts to this array
 // the /blog index, /blog/[slug] pages, sitemap.ts, and llms.txt all read from
 // here automatically. No other file needs to be touched to publish a post.
 
@@ -13,7 +13,7 @@ export type BlogPost = {
   category: "seasonal" | "direct-answer" | "local-authority" | "proof-story";
   datePublished: string; // ISO date, e.g. "2026-07-14"
   dateModified?: string;
-  // GEO-formatted direct answer — 40-60 words, front-loaded, no fluff.
+  // GEO-formatted direct answer, 40-60 words, front-loaded, no fluff.
   // This is what AI engines (ChatGPT, Perplexity, Gemini, AI Overviews) pull
   // first when citing the page.
   directAnswer: string;

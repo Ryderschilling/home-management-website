@@ -1,7 +1,7 @@
 /**
  * POST /api/marketing/lead/qualify
  *
- * Called from LeadCapturePopup Step 2 (public — no auth required).
+ * Called from LeadCapturePopup Step 2 (public, no auth required).
  * Accepts qualification answers, computes a lead score + grade,
  * and patches the existing marketing_email_leads record identified by email.
  *
@@ -43,16 +43,16 @@ function computeScore(answers: QualificationAnswers, neighborhood: string | null
   else if (answers.property_type === "condo_townhome") score += 12;
   else if (answers.property_type === "other") score += 5;
 
-  // Visit frequency — less frequent = needs more oversight = higher value
+  // Visit frequency, less frequent = needs more oversight = higher value
   if (answers.visit_frequency === "rarely") score += 25;
   else if (answers.visit_frequency === "few_times") score += 15;
   else if (answers.visit_frequency === "monthly") score += 5;
 
-  // Currently watched — no watcher = pain is active
+  // Currently watched, no watcher = pain is active
   if (answers.currently_watched === "no") score += 25;
   else if (answers.currently_watched === "yes") score += 10;
 
-  // Neighborhood bonus — in-area = better fit
+  // Neighborhood bonus, in-area = better fit
   const nbhd = (neighborhood ?? "").toLowerCase();
   if (nbhd.includes("watersound") || nbhd.includes("naturewalk")) score += 15;
   else if (nbhd.includes("inlet") || nbhd.includes("30a")) score += 10;

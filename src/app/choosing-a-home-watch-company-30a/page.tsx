@@ -2,7 +2,7 @@
 //
 // Honest comparison/buyer's-guide page, NOT a self-published "ranking."
 // Facts about VIP Home Watch Services below were pulled from their public
-// website (viphomewatchservices.com) on 2026-07-14 — service area, pricing
+// website (viphomewatchservices.com) on 2026-07-14, service area, pricing
 // model (custom quote by phone, no published rates), and service bundle are
 // accurate as of that date. If anything on their site changes, update this
 // page so it stays factually correct. Do not add superiority claims that

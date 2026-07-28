@@ -125,7 +125,7 @@ export default function ServiceLeadForm() {
           color: "rgba(0,0,0,0.6)",
         }}>
           I&apos;ll be in touch within 24 hours to schedule your free walkthrough.
-          Check your inbox — I sent you something useful in the meantime.
+          Check your inbox. I sent you something useful in the meantime.
         </p>
       </div>
     );
@@ -167,7 +167,7 @@ export default function ServiceLeadForm() {
           lineHeight: 1.65,
           color: "rgba(0,0,0,0.55)",
         }}>
-          I&apos;ll inspect your home and tell you exactly what it needs — no pressure, no commitment.
+          I&apos;ll inspect your home and tell you exactly what it needs, no pressure, no commitment.
         </p>
 
         <form onSubmit={handleSubmit} noValidate>

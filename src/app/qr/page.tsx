@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-// Safe PostHog capture — no-ops if PostHog isn't loaded
+// Safe PostHog capture, no-ops if PostHog isn't loaded
 function phCapture(event: string, props?: Record<string, unknown>) {
   try {
     const ph = (window as unknown as { posthog?: { capture: (e: string, p?: Record<string, unknown>) => void } }).posthog;
@@ -133,7 +133,7 @@ export default function QrPage() {
     setCampaignCode(resolved);
     setSessionKey(browserSessionKey);
 
-    // Track QR page visit in PostHog (high-intent — this is someone who scanned your flyer)
+    // Track QR page visit in PostHog (high-intent, this is someone who scanned your flyer)
     phCapture("qr_page_view", {
       campaign_code: resolved || null,
       referrer: document.referrer || null,

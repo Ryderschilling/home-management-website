@@ -100,7 +100,7 @@ function ThanksPageInner() {
             ) : (
               <div className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 px-4 py-4">
                 <div className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-2xl font-semibold tracking-wide text-white">
-                  {code || "—"}
+                  {code || ", "}
                 </div>
 
                 <button

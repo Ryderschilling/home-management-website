@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
  *
  * What is NOT touched:
  *  - admin_orders themselves (orders, clients, invoices all stay intact)
- *  - PostHog visitor data     (external — use the 7D date filter to see
+ *  - PostHog visitor data     (external, use the 7D date filter to see
  *                              fresh visitor stats after the reset)
  */
 export async function POST(request: NextRequest) {

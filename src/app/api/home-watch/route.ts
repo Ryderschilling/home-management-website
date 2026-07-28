@@ -56,7 +56,7 @@ function buildOwnerEmail(data: {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>New Lead — Home Watch</title>
+  <title>New Lead, Home Watch</title>
 </head>
 <body style="margin:0;padding:0;background:#f0efed;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0efed;padding:32px 16px;">
@@ -68,7 +68,7 @@ function buildOwnerEmail(data: {
           <tr>
             <td style="padding:28px 36px 0;">
               <p style="margin:0 0 6px;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#c9b89a;font-weight:700;">
-                New Lead — Free Home Check
+                New Lead, Free Home Check
               </p>
               <h1 style="margin:0 0 6px;font-size:22px;font-weight:800;color:#0b0b0b;letter-spacing:-0.02em;">
                 ${data.name || "New inquiry"}
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
     const message = safe(body.message);
     const source = safe(body.source) || "/home-watch";
 
-    // Validation — name + phone are required; email is optional
+    // Validation, name + phone are required; email is optional
     if (!name) {
       return NextResponse.json(
         { ok: false, error: { message: "Please enter your name." } },
@@ -206,23 +206,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1) Instant owner notification — this is the must-have.
+    // 1) Instant owner notification, this is the must-have.
     await resend.emails.send({
       from: env.FROM_EMAIL,
       to: NOTIFY_EMAILS,
       replyTo: email || env.REPLY_TO_EMAIL || undefined,
-      subject: `New Lead — ${name}${neighborhood ? ` (${neighborhood})` : ""}`,
+      subject: `New Lead, ${name}${neighborhood ? ` (${neighborhood})` : ""}`,
       html: buildOwnerEmail({ name, email, phone, neighborhood, message, source }),
     });
 
-    // 2) Confirmation to the lead — don't let a failure here block the response.
+    // 2) Confirmation to the lead, don't let a failure here block the response.
     if (email) {
       try {
         await resend.emails.send({
           from: env.FROM_EMAIL,
           to: email,
           replyTo: env.REPLY_TO_EMAIL || undefined,
-          subject: "Got your message — Coastal Home Management 30A",
+          subject: "Got your message, Coastal Home Management 30A",
           html: buildLeadConfirmation(name.split(" ")[0]),
         });
       } catch (e) {

@@ -52,7 +52,7 @@ export async function sendCustomerThankYouEmail(opts: {
   const name = (opts.name || "").trim();
   const greeting = name ? `Hi ${name},` : "Hi there,";
 
-  const subject = "Thank you — your installation is complete";
+  const subject = "Thank you, your installation is complete";
 
   const html = `
     <div style="font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; line-height: 1.55; color: #111;">
@@ -79,7 +79,7 @@ export async function sendCustomerThankYouEmail(opts: {
       }
 
       <p style="margin-top: 18px;">If you have any questions, just reply to this email.</p>
-      <p>— Coastal Home Management 30A</p>
+      <p>, Coastal Home Management 30A</p>
     </div>
   `;
 

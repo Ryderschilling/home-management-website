@@ -8,7 +8,7 @@ export type TemplateDefinition = {
   description: string;
   previewRoute: string;
   status: TemplateStatus;
-  /** Email subject line — only for email templates */
+  /** Email subject line, only for email templates */
   subject?: string;
   /** When the email fires relative to signup or trigger event */
   trigger?: string;
@@ -50,7 +50,7 @@ export const templateRegistry: TemplateDefinition[] = [
     name: "Welcome Email",
     category: "email",
     description: "Immediate welcome sent when a lead opts in via the QR page or lead capture form.",
-    subject: "You're on the list — here's what's next",
+    subject: "You're on the list, here's what's next",
     trigger: "Immediate on opt-in",
     previewRoute: "/portal/templates/drip-welcome",
     status: "live",
@@ -69,7 +69,7 @@ export const templateRegistry: TemplateDefinition[] = [
     slug: "drip-day3-proof",
     name: "The Furnace Was Out",
     category: "email",
-    description: "Real story social proof — caught a heating failure at a Watersound property two days before a hard freeze. Includes client testimonial from Scott Clark.",
+    description: "Real story social proof, caught a heating failure at a Watersound property two days before a hard freeze. Includes client testimonial from Scott Clark.",
     subject: "The furnace was out. The freeze was two days away.",
     trigger: "Day 3 after opt-in",
     previewRoute: "/portal/templates/drip-day3-proof",
@@ -89,7 +89,7 @@ export const templateRegistry: TemplateDefinition[] = [
     slug: "drip-day7-rock",
     name: "Backflow Pipe Install",
     category: "email",
-    description: "Final drip email — shows the rock installation product, photo, and links to the QR order page for backflow pipe cover installations.",
+    description: "Final drip email, shows the rock installation product, photo, and links to the QR order page for backflow pipe cover installations.",
     subject: "Your backflow pipes may be exposed.",
     trigger: "Day 7 after opt-in",
     previewRoute: "/portal/templates/drip-day7-rock",
@@ -102,7 +102,7 @@ export const templateRegistry: TemplateDefinition[] = [
     name: "Rock Order Thank You",
     category: "email",
     description: "Sent immediately after a rock installation order is marked complete. Includes Google review link and upsell to ongoing home management services.",
-    subject: "Thank you — your installation is complete",
+    subject: "Thank you, your installation is complete",
     trigger: "Immediate after order marked Installed",
     previewRoute: "/portal/templates/rock-order-thank-you",
     status: "live",

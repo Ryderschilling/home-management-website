@@ -47,7 +47,7 @@ const plans: Plan[] = [
       {
         label: "What's Included",
         items: [
-          { text: "<strong>Weekly walkthrough</strong> — interior & exterior" },
+          { text: "<strong>Weekly walkthrough</strong>, interior & exterior" },
           { text: "<strong>Issue alerts</strong> sent immediately if anything needs attention" },
           { text: "<strong>Mail pickup</strong> every visit" },
           { text: "<strong>Trash out & return</strong> on request" },
@@ -70,7 +70,7 @@ const plans: Plan[] = [
         items: [
           { text: "<strong>Everything in Essential</strong>, plus:" },
           { text: "<strong>Photo documentation</strong> sent after every visit" },
-          { text: "<strong>Written visit report</strong> — what was checked, what was found" },
+          { text: "<strong>Written visit report</strong>, what was checked, what was found" },
           { text: "<strong>Appliance & piping checks</strong> each visit" },
           { text: "<strong>Irrigation filter cleaning</strong>" },
         ],
@@ -82,22 +82,22 @@ const plans: Plan[] = [
     name: "Coastal Elite",
     tagline: "Full-service home management. Your property runs itself while you're gone.",
     price: 600,
-    priceNote: "Founding rate — limited spots available.",
-    badge: "Gold — Elite",
+    priceNote: "Founding rate. Limited spots available.",
+    badge: "Gold, Elite",
     cta: "Claim a Founding Spot",
     sections: [
       {
         label: "Full Watch + Reports",
         items: [
           { text: "<strong>Everything in Home Watch</strong>, plus:" },
-          { text: "<strong>Storm & freeze monitoring</strong> — active checks when weather moves in" },
-          { text: "<strong>HVAC filter changes</strong> — every unit, every time", tag: "Free" },
+          { text: "<strong>Storm & freeze monitoring</strong>, active checks when weather moves in" },
+          { text: "<strong>HVAC filter changes</strong>, every unit, every time", tag: "Free" },
         ],
       },
       {
         label: "Arrival Ready",
         items: [
-          { text: "<strong>Pre-arrival walkthrough</strong> — home ready before you land" },
+          { text: "<strong>Pre-arrival walkthrough</strong>, home ready before you land" },
           { text: "<strong>A/C pre-set</strong> to your preference" },
           { text: "<strong>Post-departure secure check</strong> after you leave" },
         ],
@@ -105,8 +105,8 @@ const plans: Plan[] = [
       {
         label: "Contractor & On-Call",
         items: [
-          { text: "<strong>Contractor coordination</strong> — Ryder is your on-the-ground point of contact" },
-          { text: "<strong>Priority response</strong> — you're first in line, always" },
+          { text: "<strong>Contractor coordination</strong>, Ryder is your on-the-ground point of contact" },
+          { text: "<strong>Priority response</strong>, you're first in line, always" },
         ],
       },
     ],
@@ -116,7 +116,7 @@ const plans: Plan[] = [
 const addons = [
   {
     name: "Extra On-Call Service",
-    desc: "One task, one visit — beyond included services on any plan.",
+    desc: "One task, one visit, beyond included services on any plan.",
     price: "$75 + $45/hr",
   },
   {
@@ -232,7 +232,7 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         ) : (
           <>
             <div className={`modal-plan-badge modal-plan-badge-${plan.tier}`}>
-              {plan.badge} — ${plan.price}/mo
+              {plan.badge} · ${plan.price}/mo
             </div>
             <h2 className="modal-title">Get Started with {plan.name}</h2>
             <p className="modal-sub">
@@ -306,7 +306,7 @@ function InquiryModal({ plan, onClose }: ModalProps) {
                 <textarea
                   id="inq-message"
                   className={`form-input form-textarea form-input-${plan.tier}`}
-                  placeholder="Tell Ryder anything that would help — specific needs, timing, concerns..."
+                  placeholder="Tell Ryder anything that would help, specific needs, timing, concerns..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={3}
@@ -358,7 +358,7 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
       <div className={`price-note ${isGold ? "price-note-gold" : ""}`}>
         {isGold ? (
           <>
-            <strong>Founding rate — limited spots available.</strong>
+            <strong>Founding rate. Limited spots available.</strong>
           </>
         ) : (
           plan.priceNote
@@ -453,7 +453,7 @@ export default function PricingPage() {
         <div className="compare-wrap">
           <table className="compare-table">
             <caption className="compare-caption">
-              Coastal Home Management 30A — Service Plan Comparison
+              Coastal Home Management 30A Service Plan Comparison
             </caption>
             <thead>
               <tr>
@@ -474,7 +474,7 @@ export default function PricingPage() {
             </thead>
             <tbody>
               <tr>
-                <td className="compare-td compare-td-feature">Weekly walkthrough — interior &amp; exterior</td>
+                <td className="compare-td compare-td-feature">Weekly walkthrough, interior &amp; exterior</td>
                 <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
@@ -505,56 +505,56 @@ export default function PricingPage() {
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Photo documentation after every visit</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Written visit report</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Appliance &amp; piping checks each visit</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Irrigation filter cleaning</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Storm &amp; freeze monitoring</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
-                <td className="compare-td compare-td-feature">HVAC filter changes — every unit</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-feature">HVAC filter changes, every unit</td>
+                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-label compare-td-gold">Free</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Pre-arrival walkthrough &amp; A/C pre-set</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Post-departure secure check</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Contractor coordination &amp; on-call access</td>
-                <td className="compare-td compare-td-none">—</td>
-                <td className="compare-td compare-td-none">—</td>
+                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none">, </td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
@@ -595,8 +595,8 @@ export default function PricingPage() {
         /* ── Reset / base ─────────────────────────────── */
         .pricing-page {
           font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-          background: #f0f6ff;
-          color: #0f172a;
+          background: #f2faf9;
+          color: var(--ch-ink);
           min-height: 100vh;
           padding-bottom: 80px;
         }
@@ -606,8 +606,8 @@ export default function PricingPage() {
           text-align: center;
           padding: 120px 24px 56px;
           animation: fadeDown 0.7s ease both;
-          background: linear-gradient(180deg, #e8f0fe 0%, #f0f6ff 100%);
-          border-bottom: 1px solid #d0e2ff;
+          background: linear-gradient(180deg, #e8f0fe 0%, #f2faf9 100%);
+          border-bottom: 1px solid #cfeae7;
         }
         .header-logo {
           width: 80px;
@@ -628,14 +628,14 @@ export default function PricingPage() {
           font-weight: 600;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #1d4ed8;
+          color: var(--ch-teal);
           margin-bottom: 20px;
         }
         .trust-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: #2563eb;
+          background: var(--ch-teal);
           flex-shrink: 0;
           opacity: 0.7;
         }
@@ -643,13 +643,13 @@ export default function PricingPage() {
           font-size: clamp(28px, 5vw, 46px);
           font-weight: 900;
           letter-spacing: -0.03em;
-          color: #0f172a;
+          color: var(--ch-ink);
           margin: 0 0 12px;
         }
-        .header-accent { color: #2563eb; }
+        .header-accent { color: var(--ch-teal); }
         .header-sub {
           font-size: 15px;
-          color: #64748b;
+          color: var(--ch-muted);
           line-height: 1.7;
           max-width: 440px;
           margin: 0 auto;
@@ -681,7 +681,7 @@ export default function PricingPage() {
           padding: 36px 28px 40px;
           position: relative;
           overflow: hidden;
-          border: 1px solid #d0e2ff;
+          border: 1px solid #cfeae7;
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           animation: fadeUp 0.7s ease both;
         }
@@ -711,18 +711,18 @@ export default function PricingPage() {
 
         /* Sky / Essential */
         .card-bronze { border-color: #bae0fd; }
-        .card-bronze::before { background: linear-gradient(90deg, transparent, #38bdf8, transparent); }
-        .card-bronze:hover { box-shadow: 0 20px 60px rgba(56,189,248,0.18), 0 0 0 1px #7dd3fc; }
+        .card-bronze::before { background: linear-gradient(90deg, transparent, var(--ch-teal-bright), transparent); }
+        .card-bronze:hover { box-shadow: 0 20px 60px rgba(56,189,248,0.18), 0 0 0 1px var(--ch-teal-bright); }
 
         /* Ocean / Home Watch */
-        .card-silver { border-color: #bfdbfe; }
-        .card-silver::before { background: linear-gradient(90deg, transparent, #3b82f6, transparent); }
-        .card-silver:hover { box-shadow: 0 20px 60px rgba(59,130,246,0.16), 0 0 0 1px #93c5fd; }
+        .card-silver { border-color: #b9e5e0; }
+        .card-silver::before { background: linear-gradient(90deg, transparent, var(--ch-teal), transparent); }
+        .card-silver:hover { box-shadow: 0 20px 60px rgba(59,130,246,0.16), 0 0 0 1px var(--ch-teal-bright); }
 
         /* Navy / Coastal Elite */
-        .card-gold { background: linear-gradient(160deg, #eff6ff 0%, #ffffff 100%); border-color: #93c5fd; }
-        .card-gold::before { background: linear-gradient(90deg, transparent, #1d4ed8, transparent); }
-        .card-gold:hover { box-shadow: 0 24px 80px rgba(29,78,216,0.18), 0 0 0 1px #60a5fa; }
+        .card-gold { background: linear-gradient(160deg, #f0faf8 0%, #ffffff 100%); border-color: var(--ch-teal-bright); }
+        .card-gold::before { background: linear-gradient(90deg, transparent, var(--ch-teal), transparent); }
+        .card-gold:hover { box-shadow: 0 24px 80px rgba(29,78,216,0.18), 0 0 0 1px var(--ch-teal-bright); }
 
         /* Elite pulse glow */
         .gold-pulse {
@@ -740,7 +740,7 @@ export default function PricingPage() {
         .hot-tag {
           position: absolute;
           top: -1px; right: 28px;
-          background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+          background: linear-gradient(135deg, var(--ch-teal), var(--ch-teal));
           color: #fff;
           font-size: 9px;
           font-weight: 900;
@@ -779,42 +779,42 @@ export default function PricingPage() {
           background: currentColor;
           flex-shrink: 0;
         }
-        .badge-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
-        .badge-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
-        .badge-gold   { background: #eff6ff; border: 1px solid #60a5fa; color: #1e40af; }
+        .badge-bronze { background: #ddf3f0; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .badge-silver { background: #d7efec; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .badge-gold   { background: #f0faf8; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal-deep); }
 
         /* ── Plan text ──────────────────────────────────── */
-        .plan-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #0f172a; margin-bottom: 5px; }
-        .plan-sub  { font-size: 13px; color: #64748b; margin-bottom: 26px; line-height: 1.55; }
+        .plan-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--ch-ink); margin-bottom: 5px; }
+        .plan-sub  { font-size: 13px; color: var(--ch-muted); margin-bottom: 26px; line-height: 1.55; }
 
         /* ── Price ──────────────────────────────────────── */
         .price-row { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 4px; }
         .price-sym { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .price-num { font-size: 56px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; }
-        .price-period { font-size: 13px; color: #94a3b8; margin-bottom: 8px; }
-        .price-note { font-size: 11.5px; color: #94a3b8; margin-bottom: 30px; min-height: 18px; }
-        .price-note-gold strong { color: #1d4ed8; }
+        .price-period { font-size: 13px; color: var(--ch-soft); margin-bottom: 8px; }
+        .price-note { font-size: 11.5px; color: var(--ch-soft); margin-bottom: 30px; min-height: 18px; }
+        .price-note-gold strong { color: var(--ch-teal); }
 
-        .card-bronze .price-num,.card-bronze .price-sym { background: linear-gradient(135deg,#38bdf8,#0ea5e9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .card-silver .price-num,.card-silver .price-sym { background: linear-gradient(135deg,#3b82f6,#2563eb); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .card-gold   .price-num,.card-gold   .price-sym { background: linear-gradient(135deg,#1d4ed8,#1e40af); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-bronze .price-num,.card-bronze .price-sym { background: linear-gradient(135deg,var(--ch-teal-bright),var(--ch-teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-silver .price-num,.card-silver .price-sym { background: linear-gradient(135deg,var(--ch-teal),var(--ch-teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .card-gold   .price-num,.card-gold   .price-sym { background: linear-gradient(135deg,var(--ch-teal),var(--ch-teal-deep)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
         /* ── Divider ────────────────────────────────────── */
         .divider { height: 1px; margin-bottom: 22px; }
-        .divider-bronze { background: linear-gradient(90deg,transparent,#7dd3fc,transparent); }
-        .divider-silver { background: linear-gradient(90deg,transparent,#93c5fd,transparent); }
-        .divider-gold   { background: linear-gradient(90deg,transparent,#60a5fa,transparent); }
+        .divider-bronze { background: linear-gradient(90deg,transparent,var(--ch-teal-bright),transparent); }
+        .divider-silver { background: linear-gradient(90deg,transparent,var(--ch-teal-bright),transparent); }
+        .divider-gold   { background: linear-gradient(90deg,transparent,var(--ch-teal-bright),transparent); }
 
         /* ── Section label ──────────────────────────────── */
         .section-lbl { font-size: 9.5px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 12px; }
-        .card-bronze .section-lbl { color: #0284c7; }
-        .card-silver .section-lbl { color: #2563eb; }
-        .card-gold   .section-lbl { color: #1e40af; }
+        .card-bronze .section-lbl { color: var(--ch-teal); }
+        .card-silver .section-lbl { color: var(--ch-teal); }
+        .card-gold   .section-lbl { color: var(--ch-teal-deep); }
 
         /* ── Features ───────────────────────────────────── */
         .features { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 11px; margin-bottom: 22px; }
-        .fi { display: flex; align-items: flex-start; gap: 11px; font-size: 13.5px; color: #475569; line-height: 1.5; }
-        .fi strong { color: #0f172a; font-weight: 600; }
+        .fi { display: flex; align-items: flex-start; gap: 11px; font-size: 13.5px; color: var(--ch-muted); line-height: 1.5; }
+        .fi strong { color: var(--ch-ink); font-weight: 600; }
 
         .fi-check {
           flex-shrink: 0;
@@ -825,9 +825,9 @@ export default function PricingPage() {
         }
         .fi-check svg { width: 9px; height: 9px; }
 
-        .fi-check-bronze { background: rgba(14,165,233,0.1);  border: 1px solid #7dd3fc; color: #0ea5e9; }
-        .fi-check-silver { background: rgba(59,130,246,0.1);  border: 1px solid #93c5fd; color: #3b82f6; }
-        .fi-check-gold   { background: rgba(29,78,216,0.1);   border: 1px solid #60a5fa; color: #1d4ed8; }
+        .fi-check-bronze { background: rgba(14,165,233,0.1);  border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .fi-check-silver { background: rgba(59,130,246,0.1);  border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .fi-check-gold   { background: rgba(29,78,216,0.1);   border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
 
         /* ── Tag chips ──────────────────────────────────── */
         .tag {
@@ -839,9 +839,9 @@ export default function PricingPage() {
           margin-left: 6px;
           vertical-align: middle;
         }
-        .tag-bronze { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
-        .tag-silver { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
-        .tag-gold   { background: #eff6ff; color: #1e40af; border: 1px solid #60a5fa; }
+        .tag-bronze { background: #ddf3f0; color: var(--ch-teal); border: 1px solid var(--ch-teal-bright); }
+        .tag-silver { background: #d7efec; color: var(--ch-teal); border: 1px solid var(--ch-teal-bright); }
+        .tag-gold   { background: #f0faf8; color: var(--ch-teal-deep); border: 1px solid var(--ch-teal-bright); }
 
         /* ── CTA ────────────────────────────────────────── */
         .cta {
@@ -859,42 +859,42 @@ export default function PricingPage() {
           margin-top: 28px;
           font-family: inherit;
         }
-        .cta-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
-        .cta-bronze:hover { background: #bae6fd; border-color: #38bdf8; box-shadow: 0 4px 16px rgba(14,165,233,0.2); }
-        .cta-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
-        .cta-silver:hover { background: #bfdbfe; border-color: #60a5fa; box-shadow: 0 4px 16px rgba(59,130,246,0.2); }
-        .cta-gold   { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; border: none; }
-        .cta-gold:hover { background: linear-gradient(135deg,#1e40af,#2563eb); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(29,78,216,0.35); }
+        .cta-bronze { background: #ddf3f0; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .cta-bronze:hover { background: #bae6fd; border-color: var(--ch-teal-bright); box-shadow: 0 4px 16px rgba(14,165,233,0.2); }
+        .cta-silver { background: #d7efec; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .cta-silver:hover { background: #b9e5e0; border-color: var(--ch-teal-bright); box-shadow: 0 4px 16px rgba(59,130,246,0.2); }
+        .cta-gold   { background: linear-gradient(135deg,var(--ch-teal),var(--ch-teal)); color: #fff; border: none; }
+        .cta-gold:hover { background: linear-gradient(135deg,var(--ch-teal-deep),var(--ch-teal)); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(29,78,216,0.35); }
 
         /* ── Add-ons ─────────────────────────────────────── */
         .addons-section { max-width: 1160px; margin: 64px auto 0; padding: 0 20px; }
-        .addons-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #94a3b8; text-align: center; margin-bottom: 18px; }
+        .addons-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ch-soft); text-align: center; margin-bottom: 18px; }
         .addons-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
         @media (max-width: 700px) { .addons-grid { grid-template-columns: repeat(2,1fr); } }
-        .addon { background: #ffffff; border: 1px solid #d0e2ff; border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s, box-shadow 0.2s; }
-        .addon:hover { border-color: #93c5fd; box-shadow: 0 4px 20px rgba(59,130,246,0.1); }
-        .addon-name  { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
-        .addon-desc  { font-size: 12px; color: #64748b; line-height: 1.5; }
-        .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: #1d4ed8; }
+        .addon { background: #ffffff; border: 1px solid #cfeae7; border-radius: 12px; padding: 18px 20px; transition: border-color 0.2s, box-shadow 0.2s; }
+        .addon:hover { border-color: var(--ch-teal-bright); box-shadow: 0 4px 20px rgba(59,130,246,0.1); }
+        .addon-name  { font-size: 13px; font-weight: 700; color: var(--ch-ink); margin-bottom: 4px; }
+        .addon-desc  { font-size: 12px; color: var(--ch-muted); line-height: 1.5; }
+        .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: var(--ch-teal); }
 
         /* ── Related Services ────────────────────────────── */
-        .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #dbeafe; padding-top: 40px; }
-        .related-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: #94a3b8; margin-bottom: 16px; }
+        .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #d7efec; padding-top: 40px; }
+        .related-lbl { font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ch-soft); margin-bottom: 16px; }
         .related-links { display: flex; flex-wrap: wrap; gap: 10px; }
-        .related-link { border: 1px solid #bfdbfe; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #3b82f6; text-decoration: none; border-radius: 4px; transition: border-color 0.2s, background 0.2s, color 0.2s; }
-        .related-link:hover { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
+        .related-link { border: 1px solid #b9e5e0; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ch-teal); text-decoration: none; border-radius: 4px; transition: border-color 0.2s, background 0.2s, color 0.2s; }
+        .related-link:hover { border-color: var(--ch-teal); background: #f0faf8; color: var(--ch-teal); }
 
         /* ── Footer note ─────────────────────────────────── */
-        .footer-note { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 56px; line-height: 1.8; padding: 0 16px; }
-        .footer-note a { color: #3b82f6; text-decoration: none; }
-        .footer-note a:hover { color: #1d4ed8; text-decoration: underline; }
+        .footer-note { text-align: center; font-size: 12px; color: var(--ch-soft); margin-top: 56px; line-height: 1.8; padding: 0 16px; }
+        .footer-note a { color: var(--ch-teal); text-decoration: none; }
+        .footer-note a:hover { color: var(--ch-teal); text-decoration: underline; }
 
         /* ── Modal ───────────────────────────────────────── */
         .modal-backdrop {
           position: fixed;
           inset: 0;
           z-index: 100;
-          background: rgba(15,23,42,0.6);
+          background: rgba(10,10,10,0.6);
           backdrop-filter: blur(8px);
           display: flex;
           align-items: center;
@@ -909,14 +909,14 @@ export default function PricingPage() {
           max-width: 500px;
           width: 100%;
           position: relative;
-          border: 1px solid #d0e2ff;
+          border: 1px solid #cfeae7;
           animation: slideUp 0.3s cubic-bezier(0.18,0.82,0.16,1) both;
           max-height: 90vh;
           overflow-y: auto;
         }
-        .modal-card-bronze { border-color: #7dd3fc; box-shadow: 0 0 60px rgba(14,165,233,0.12); }
-        .modal-card-silver { border-color: #93c5fd; box-shadow: 0 0 60px rgba(59,130,246,0.12); }
-        .modal-card-gold   { border-color: #60a5fa; box-shadow: 0 0 80px rgba(29,78,216,0.15); }
+        .modal-card-bronze { border-color: var(--ch-teal-bright); box-shadow: 0 0 60px rgba(14,165,233,0.12); }
+        .modal-card-silver { border-color: var(--ch-teal-bright); box-shadow: 0 0 60px rgba(59,130,246,0.12); }
+        .modal-card-gold   { border-color: var(--ch-teal-bright); box-shadow: 0 0 80px rgba(29,78,216,0.15); }
 
         .modal-close {
           position: absolute;
@@ -924,13 +924,13 @@ export default function PricingPage() {
           background: transparent;
           border: none;
           cursor: pointer;
-          color: #94a3b8;
+          color: var(--ch-soft);
           padding: 6px;
           display: flex;
           transition: color 0.15s;
         }
         .modal-close svg { width: 14px; height: 14px; }
-        .modal-close:hover { color: #475569; }
+        .modal-close:hover { color: var(--ch-muted); }
 
         .modal-plan-badge {
           display: inline-block;
@@ -942,38 +942,38 @@ export default function PricingPage() {
           text-transform: uppercase;
           margin-bottom: 14px;
         }
-        .modal-plan-badge-bronze { background: #e0f2fe; border: 1px solid #7dd3fc; color: #0284c7; }
-        .modal-plan-badge-silver { background: #dbeafe; border: 1px solid #93c5fd; color: #1d4ed8; }
-        .modal-plan-badge-gold   { background: #eff6ff; border: 1px solid #60a5fa; color: #1e40af; }
+        .modal-plan-badge-bronze { background: #ddf3f0; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .modal-plan-badge-silver { background: #d7efec; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal); }
+        .modal-plan-badge-gold   { background: #f0faf8; border: 1px solid var(--ch-teal-bright); color: var(--ch-teal-deep); }
 
-        .modal-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: #0f172a; margin: 0 0 6px; }
-        .modal-sub   { font-size: 13px; color: #64748b; margin: 0 0 28px; line-height: 1.5; }
+        .modal-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; color: var(--ch-ink); margin: 0 0 6px; }
+        .modal-sub   { font-size: 13px; color: var(--ch-muted); margin: 0 0 28px; line-height: 1.5; }
 
         /* ── Form ───────────────────────────────────────── */
         .modal-form { display: flex; flex-direction: column; gap: 18px; }
         .form-row { display: flex; flex-direction: column; gap: 6px; }
-        .form-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #475569; }
+        .form-label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ch-muted); }
         .req { color: #dc2626; margin-left: 2px; }
-        .opt { color: #94a3b8; font-weight: 400; text-transform: none; letter-spacing: 0; }
+        .opt { color: var(--ch-soft); font-weight: 400; text-transform: none; letter-spacing: 0; }
 
         .form-input {
           background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--ch-hairline);
           border-radius: 8px;
           padding: 11px 14px;
           font-size: 14px;
-          color: #0f172a;
+          color: var(--ch-ink);
           font-family: inherit;
           outline: none;
           transition: border-color 0.2s, box-shadow 0.2s;
           width: 100%;
         }
-        .form-input::placeholder { color: #cbd5e1; }
+        .form-input::placeholder { color: var(--ch-hairline-2); }
         .form-textarea { resize: vertical; min-height: 80px; }
 
-        .form-input-bronze:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(14,165,233,0.12); }
-        .form-input-silver:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
-        .form-input-gold:focus   { border-color: #1d4ed8; box-shadow: 0 0 0 2px rgba(29,78,216,0.12); }
+        .form-input-bronze:focus { border-color: var(--ch-teal-bright); box-shadow: 0 0 0 2px rgba(14,165,233,0.12); }
+        .form-input-silver:focus { border-color: var(--ch-teal); box-shadow: 0 0 0 2px rgba(59,130,246,0.12); }
+        .form-input-gold:focus   { border-color: var(--ch-teal); box-shadow: 0 0 0 2px rgba(29,78,216,0.12); }
 
         .form-error { font-size: 13px; color: #dc2626; padding: 10px 14px; background: rgba(220,38,38,0.06); border: 1px solid rgba(220,38,38,0.2); border-radius: 8px; }
 
@@ -991,12 +991,12 @@ export default function PricingPage() {
           margin-top: 4px;
         }
         .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-        .modal-submit-bronze { background: #0ea5e9; color: #fff; }
-        .modal-submit-bronze:hover:not(:disabled) { background: #0284c7; box-shadow: 0 4px 16px rgba(14,165,233,0.3); }
-        .modal-submit-silver { background: #3b82f6; color: #fff; }
-        .modal-submit-silver:hover:not(:disabled) { background: #2563eb; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
-        .modal-submit-gold   { background: linear-gradient(135deg,#1d4ed8,#3b82f6); color: #fff; }
-        .modal-submit-gold:hover:not(:disabled) { background: linear-gradient(135deg,#1e40af,#1d4ed8); box-shadow: 0 6px 24px rgba(29,78,216,0.3); }
+        .modal-submit-bronze { background: var(--ch-teal); color: #fff; }
+        .modal-submit-bronze:hover:not(:disabled) { background: var(--ch-teal); box-shadow: 0 4px 16px rgba(14,165,233,0.3); }
+        .modal-submit-silver { background: var(--ch-teal); color: #fff; }
+        .modal-submit-silver:hover:not(:disabled) { background: var(--ch-teal); box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+        .modal-submit-gold   { background: linear-gradient(135deg,var(--ch-teal),var(--ch-teal)); color: #fff; }
+        .modal-submit-gold:hover:not(:disabled) { background: linear-gradient(135deg,var(--ch-teal-deep),var(--ch-teal)); box-shadow: 0 6px 24px rgba(29,78,216,0.3); }
 
         /* ── Success ────────────────────────────────────── */
         .modal-success { text-align: center; padding: 20px 0; }
@@ -1010,12 +1010,12 @@ export default function PricingPage() {
           font-weight: 900;
           margin-bottom: 20px;
         }
-        .success-icon-bronze { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
-        .success-icon-silver { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
-        .success-icon-gold   { background: #eff6ff; color: #1e40af; border: 1px solid #60a5fa; }
-        .modal-success h3 { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 10px; }
-        .modal-success p  { font-size: 14px; color: #64748b; line-height: 1.6; margin: 0 0 28px; }
-        .modal-success strong { color: #1d4ed8; }
+        .success-icon-bronze { background: #ddf3f0; color: var(--ch-teal); border: 1px solid var(--ch-teal-bright); }
+        .success-icon-silver { background: #d7efec; color: var(--ch-teal); border: 1px solid var(--ch-teal-bright); }
+        .success-icon-gold   { background: #f0faf8; color: var(--ch-teal-deep); border: 1px solid var(--ch-teal-bright); }
+        .modal-success h3 { font-size: 22px; font-weight: 800; color: var(--ch-ink); margin: 0 0 10px; }
+        .modal-success p  { font-size: 14px; color: var(--ch-muted); line-height: 1.6; margin: 0 0 28px; }
+        .modal-success strong { color: var(--ch-teal); }
 
         /* ── Animations ─────────────────────────────────── */
         @keyframes fadeDown  { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
@@ -1037,7 +1037,7 @@ export default function PricingPage() {
           font-weight: 800;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #94a3b8;
+          color: var(--ch-soft);
           text-align: center;
           margin-bottom: 20px;
         }
@@ -1045,7 +1045,7 @@ export default function PricingPage() {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
           background: #ffffff;
-          border: 1px solid #dbeafe;
+          border: 1px solid #d7efec;
           border-radius: 16px;
           overflow: hidden;
         }
@@ -1073,23 +1073,23 @@ export default function PricingPage() {
           font-weight: 800;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          border-bottom: 1px solid #dbeafe;
+          border-bottom: 1px solid #d7efec;
           vertical-align: bottom;
           line-height: 1.4;
-          background: #f0f6ff;
+          background: #f2faf9;
         }
         .compare-th-feature {
           text-align: left;
-          color: #64748b;
+          color: var(--ch-muted);
           width: 44%;
         }
         .compare-th-tier {
           width: 18%;
-          color: #94a3b8;
+          color: var(--ch-soft);
         }
-        .compare-th-bronze { color: #0284c7; }
-        .compare-th-silver { color: #2563eb; }
-        .compare-th-gold   { color: #1e40af; }
+        .compare-th-bronze { color: var(--ch-teal); }
+        .compare-th-silver { color: var(--ch-teal); }
+        .compare-th-gold   { color: var(--ch-teal-deep); }
 
         .compare-price {
           display: block;
@@ -1102,20 +1102,20 @@ export default function PricingPage() {
 
         .compare-td {
           padding: 11px 16px;
-          border-bottom: 1px solid #f0f6ff;
+          border-bottom: 1px solid #f2faf9;
           vertical-align: middle;
         }
         .compare-td-feature {
-          color: #475569;
+          color: var(--ch-muted);
           text-align: left;
           font-size: 12.5px;
         }
         .compare-td-price-row .compare-td-feature {
-          color: #0f172a;
+          color: var(--ch-ink);
           font-weight: 700;
         }
         .compare-row-alt td {
-          background: #f8fbff;
+          background: #f7fcfb;
         }
         .compare-td-check,
         .compare-td-label,
@@ -1124,24 +1124,24 @@ export default function PricingPage() {
           text-align: center;
           font-weight: 700;
         }
-        .compare-td-none { color: #cbd5e1; font-size: 15px; }
+        .compare-td-none { color: var(--ch-hairline-2); font-size: 15px; }
 
-        .compare-td-check.compare-td-bronze { color: #0ea5e9; }
-        .compare-td-check.compare-td-silver { color: #3b82f6; }
-        .compare-td-check.compare-td-gold   { color: #1d4ed8; }
+        .compare-td-check.compare-td-bronze { color: var(--ch-teal); }
+        .compare-td-check.compare-td-silver { color: var(--ch-teal); }
+        .compare-td-check.compare-td-gold   { color: var(--ch-teal); }
 
-        .compare-td-label.compare-td-bronze { color: #0284c7; font-size: 11.5px; }
-        .compare-td-label.compare-td-silver { color: #1d4ed8; font-size: 11.5px; }
-        .compare-td-label.compare-td-gold   { color: #1e40af; font-size: 11.5px; }
+        .compare-td-label.compare-td-bronze { color: var(--ch-teal); font-size: 11.5px; }
+        .compare-td-label.compare-td-silver { color: var(--ch-teal); font-size: 11.5px; }
+        .compare-td-label.compare-td-gold   { color: var(--ch-teal-deep); font-size: 11.5px; }
 
         .compare-td-price {
           font-size: 16px;
           font-weight: 900;
           letter-spacing: -0.03em;
         }
-        .compare-td-price.compare-td-bronze { color: #0ea5e9; }
-        .compare-td-price.compare-td-silver { color: #2563eb; }
-        .compare-td-price.compare-td-gold   { color: #1d4ed8; }
+        .compare-td-price.compare-td-bronze { color: var(--ch-teal); }
+        .compare-td-price.compare-td-silver { color: var(--ch-teal); }
+        .compare-td-price.compare-td-gold   { color: var(--ch-teal); }
       `}</style>
     </main>
   );

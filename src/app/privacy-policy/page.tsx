@@ -39,7 +39,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <p className="mt-4">
               We also collect standard website analytics data through anonymized tools.
-              We do not collect or store payment information directly — all payments are
+              We do not collect or store payment information directly, all payments are
               processed securely through Stripe.
             </p>
           </section>

@@ -519,7 +519,7 @@ export async function POST(req: NextRequest) {
 
     if (!uploadNotificationSentAt && pipePhotoUrl) {
       await sendPipePhotoEmail({
-        subject: `New Rock Order — ${rockColor.toUpperCase()}`,
+        subject: `New Rock Order, ${rockColor.toUpperCase()}`,
         html: `
         <p><strong>Product:</strong> Artificial Rock Installation</p>
         <p><strong>Color:</strong> ${escapeHtml(rockColor)}</p>
@@ -542,7 +542,7 @@ export async function POST(req: NextRequest) {
         <p><strong>Service address:</strong><br/>${escapeHtml(serviceAddress).replaceAll(", ", "<br/>")}</p>
         <p><strong>Stripe session:</strong> ${escapeHtml(sessionId)}</p>
         <p><strong>Order id:</strong> ${escapeHtml(orderId)}</p>
-        <p><strong>Notes:</strong><br/>${notes ? escapeHtml(notes).replaceAll("\n", "<br/>") : "—"}</p>
+        <p><strong>Notes:</strong><br/>${notes ? escapeHtml(notes).replaceAll("\n", "<br/>") : ", "}</p>
         <hr/>
         <p><strong>Pipe photo:</strong></p>
         <p><img src="${pipePhotoUrl}" alt="Pipe photo" style="max-width:100%;height:auto;border-radius:12px;border:1px solid #ddd;" /></p>
@@ -555,11 +555,11 @@ export async function POST(req: NextRequest) {
             : ""
         }
         <hr/>
-        <p><strong>TOS accepted:</strong> ${escapeHtml(tosAcceptedAtIso || "—")}</p>
-        <p><strong>TOS version:</strong> ${escapeHtml(tosVersion || "—")}</p>
-        <p><strong>TOS url:</strong> ${escapeHtml(tosUrl || "—")}</p>
-        <p><strong>TOS ip:</strong> ${escapeHtml(tosIp || "—")}</p>
-        <p><strong>TOS user-agent:</strong> ${escapeHtml(tosUserAgent || "—")}</p>
+        <p><strong>TOS accepted:</strong> ${escapeHtml(tosAcceptedAtIso || ", ")}</p>
+        <p><strong>TOS version:</strong> ${escapeHtml(tosVersion || ", ")}</p>
+        <p><strong>TOS url:</strong> ${escapeHtml(tosUrl || ", ")}</p>
+        <p><strong>TOS ip:</strong> ${escapeHtml(tosIp || ", ")}</p>
+        <p><strong>TOS user-agent:</strong> ${escapeHtml(tosUserAgent || ", ")}</p>
       `,
         attachments: emailAttachments,
       });

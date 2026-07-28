@@ -6,7 +6,7 @@
  * matches them to CRM jobs by gcal_event_id, and updates scheduled_for
  * if Ryder moved the event on his Google Calendar.
  *
- * Only updates SCHEDULED or IN_PROGRESS jobs — never rewrites completed jobs.
+ * Only updates SCHEDULED or IN_PROGRESS jobs, never rewrites completed jobs.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       continue;
     }
 
-    // If the GCal event was deleted/cancelled, skip — we don't auto-delete CRM jobs
+    // If the GCal event was deleted/cancelled, skip, we don't auto-delete CRM jobs
     // from calendar changes to avoid accidental data loss
     if (event.status === "cancelled") {
       skipped++;

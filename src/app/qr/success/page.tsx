@@ -111,7 +111,7 @@ function SummaryLine({
 }
 
 // Compress an image file to max 1600px on the longest side at 82% JPEG quality.
-// Keeps phone photos well under 500KB — avoids Vercel's 4.5MB body limit.
+// Keeps phone photos well under 500KB, avoids Vercel's 4.5MB body limit.
 async function compressImage(file: File, maxPx = 1600, quality = 0.82): Promise<File> {
   return new Promise((resolve) => {
     const img = new window.Image();
@@ -392,7 +392,7 @@ function QrSuccessPageInner() {
     setStatus("uploading");
 
     try {
-      // Compress photos before upload — phone images can be 4-8MB and will
+      // Compress photos before upload, phone images can be 4-8MB and will
       // exceed Vercel's serverless body limit. Canvas compress to ≤500KB each.
       const compressedPipe = file ? await compressImage(file) : null;
       const compressedElecBox =

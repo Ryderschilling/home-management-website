@@ -41,7 +41,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!POSTHOG_KEY) {
-    // PostHog not configured — pass through silently
+    // PostHog not configured, pass through silently
     return <>{children}</>;
   }
 

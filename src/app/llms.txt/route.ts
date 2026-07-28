@@ -1,13 +1,13 @@
 // src/app/llms.txt/route.ts
 //
-// llms.txt — a community-driven (non-official but widely adopted) standard
+// llms.txt, a community-driven (non-official but widely adopted) standard
 // that gives AI agents and LLM crawlers a clean, structured summary of the
 // site: what the business does, service area, pricing, and key pages. Google
 // Lighthouse added an llms.txt check in 2026, and it's used by Stripe,
 // Cloudflare, Vercel, and thousands of other sites.
 //
 // This is a dynamic route (not a static /public file) specifically so it can
-// never drift out of sync with the rest of the site — it's generated straight
+// never drift out of sync with the rest of the site, it's generated straight
 // from siteData.ts, servicePages.ts, and blogPosts.ts on every request.
 import { siteData, offerings, businessContact, trustStats } from "@/data/siteData";
 import { allServicePages } from "@/data/servicePages";
@@ -40,7 +40,7 @@ function buildLlmsTxt(): string {
   lines.push("## Services & Pricing");
   for (const offer of offerings) {
     const unit = offer.unitText ? `/${offer.unitText}` : " (one-time / as-needed)";
-    lines.push(`- **${offer.name}** — $${offer.price.replace(".00", "")}${unit}: ${offer.description}`);
+    lines.push(`- **${offer.name}**, $${offer.price.replace(".00", "")}${unit}: ${offer.description}`);
   }
   lines.push("");
   lines.push(

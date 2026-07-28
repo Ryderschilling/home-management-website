@@ -17,7 +17,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
-    // Simple admin auth — same pattern used elsewhere in the admin API
+    // Simple admin auth, same pattern used elsewhere in the admin API
     const authHeader = req.headers.get("x-admin-password");
     if (authHeader !== env.ADMIN_PASSWORD) {
       return NextResponse.json({ ok: false, error: { message: "Unauthorized" } }, { status: 401 });

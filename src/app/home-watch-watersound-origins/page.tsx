@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Who provides home watch services in Watersound Origins Florida?",
-    a: "Coastal Home Management 30A is the dedicated home watch provider for Watersound Origins. Owner Ryder Schilling lives full-time in the community and personally inspects every property. No subcontractors, no rotating staff — just one local person who treats your home like his own.",
+    a: "Coastal Home Management 30A is the dedicated home watch provider for Watersound Origins. Owner Ryder Schilling lives full-time in the community and personally inspects every property. No subcontractors, no rotating staff, just one local person who treats your home like his own.",
   },
   {
     q: "What does a home watch service do in Watersound Origins?",
@@ -35,7 +35,7 @@ const FAQ = [
   },
   {
     q: "Does CHM serve all of Watersound Origins?",
-    a: "Yes. We serve all streets and sections within Watersound Origins — including Naturewalk at Watersound Origins — as well as surrounding communities in Inlet Beach, Alys Beach, and along 30A.",
+    a: "Yes. We serve all streets and sections within Watersound Origins, including Naturewalk at Watersound Origins, as well as surrounding communities in Inlet Beach, Alys Beach, and along 30A.",
   },
 ];
 
@@ -65,7 +65,7 @@ export default function HomeWatchWatersoundPage() {
         </h1>
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
           Coastal Home Management 30A is the only home watch provider that actually lives in Watersound Origins.
-          Ryder Schilling personally inspects every property — no subcontractors, no office dispatchers, no guessing whether someone showed up.
+          Ryder Schilling personally inspects every property, no subcontractors, no office dispatchers, no guessing whether someone showed up.
           Weekly inspections, photo proof every visit, and immediate alerts if anything needs attention.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -110,7 +110,7 @@ export default function HomeWatchWatersoundPage() {
         <div className="grid gap-10 md:grid-cols-2">
           {[
             {
-              title: "Your neighbor — literally",
+              title: "Your neighbor, literally",
               body: "Ryder lives in Watersound Origins. He knows the streets, the HOA rules, the storm patterns, and the specific challenges of homes in this community. That neighborhood knowledge makes every visit better.",
             },
             {
@@ -119,7 +119,7 @@ export default function HomeWatchWatersoundPage() {
             },
             {
               title: "Documented proof after every visit",
-              body: "After every walkthrough you receive photos and a written summary — by text or email, however you prefer. No wondering if someone showed up. You see exactly what was found.",
+              body: "After every walkthrough you receive photos and a written summary, by text or email, however you prefer. No wondering if someone showed up. You see exactly what was found.",
             },
             {
               title: "Storm-ready and on-call",
@@ -274,9 +274,9 @@ export default function HomeWatchWatersoundPage() {
         <div className="mx-auto max-w-4xl">
           <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-black/40">Related</p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — All Areas</Link>
-            <Link href="/home-watch-naturewalk" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — Naturewalk</Link>
-            <Link href="/second-home-management-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Second Home Management — Watersound</Link>
+            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, All Areas</Link>
+            <Link href="/home-watch-naturewalk" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Naturewalk</Link>
+            <Link href="/second-home-management-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Second Home Management, Watersound</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
           </div>
         </div>

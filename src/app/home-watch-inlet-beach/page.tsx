@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-inlet-beach" },
   keywords: "home watch Inlet Beach FL, home watch service Inlet Beach Florida, second home care Inlet Beach, property watch Inlet Beach 30A, home watch 32461",
   openGraph: {
-    title: "Home Watch Service — Inlet Beach FL | CHM 30A",
+    title: "Home Watch Service, Inlet Beach FL | CHM 30A",
     description: "Local, insured home watch for Inlet Beach second-home owners. Weekly inspections, photo proof, storm prep. Free walkthrough.",
     url: "https://coastalhomemngt30a.com/home-watch-inlet-beach",
     images: ["/img.png"],
@@ -22,7 +22,7 @@ const FAQ = [
   },
   {
     q: "Who is the best home watch company in Inlet Beach FL?",
-    a: "Coastal Home Management 30A is a locally owned, 5.0-rated home watch service based in Inlet Beach. Owner Ryder Schilling lives in Watersound Origins and personally visits every property — no subcontractors or rotating staff. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach, and Rosemary Beach.",
+    a: "Coastal Home Management 30A is a locally owned, 5.0-rated home watch service based in Inlet Beach. Owner Ryder Schilling lives in Watersound Origins and personally visits every property, no subcontractors or rotating staff. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach, and Rosemary Beach.",
   },
   {
     q: "How often does home watch visit my Inlet Beach property?",
@@ -30,7 +30,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Inlet Beach FL?",
-    a: "Plans start at $150/month (Essential — weekly visits, photo reports, mail pickup), $300/month (Home Watch — adds appliance and plumbing checks), and $600/month (Coastal Elite — adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination). No contracts or cancellation fees.",
+    a: "Plans start at $150/month (Essential, weekly visits, photo reports, mail pickup), $300/month (Home Watch, adds appliance and plumbing checks), and $600/month (Coastal Elite, adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination). No contracts or cancellation fees.",
   },
 ];
 
@@ -132,12 +132,12 @@ export default function HomeWatchInletBeachPage() {
           </h2>
           <div className="grid gap-5 sm:grid-cols-2">
             {[
-              "Full interior walkthrough — every room, every system",
-              "Exterior inspection — roof line, entry points, drainage",
+              "Full interior walkthrough: every room, every system",
+              "Exterior inspection: roof line, entry points, drainage",
               "HVAC function check and filter assessment",
               "Plumbing and water heater check",
               "Irrigation system inspection",
-              "Photo documentation — entire property, every visit",
+              "Photo documentation: entire property, every visit",
               "Written visit report by text or email",
               "Mail and package retrieval",
               "Storm damage assessment after weather events",
@@ -159,11 +159,11 @@ export default function HomeWatchInletBeachPage() {
         <div className="mx-auto max-w-3xl grid gap-6 md:grid-cols-2">
           <blockquote className="border border-black/10 p-7">
             <p className="mb-5 text-sm leading-relaxed text-black/70">&ldquo;Ryder gives us peace of mind if we&apos;re out of town and need the house checked on. Very reliable.&rdquo;</p>
-            <footer className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Barbara Reed — Naturewalk, Inlet Beach</footer>
+            <footer className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Barbara Reed · Naturewalk, Inlet Beach</footer>
           </blockquote>
           <blockquote className="border border-black/10 p-7">
             <p className="mb-5 text-sm leading-relaxed text-black/70">&ldquo;Excellent service and communication! Very helpful and Ryder goes out of his way to help.&rdquo;</p>
-            <footer className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Beth Tedesco — Inlet Beach</footer>
+            <footer className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">Beth Tedesco, Inlet Beach</footer>
           </blockquote>
         </div>
       </section>
@@ -258,7 +258,7 @@ export default function HomeWatchInletBeachPage() {
         <div className="mx-auto max-w-4xl">
           <p className="mb-5 text-[11px] uppercase tracking-[0.22em] text-black/40">Related</p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch — All Areas</Link>
+            <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, All Areas</Link>
             <Link href="/home-watch-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Watersound Origins</Link>
             <Link href="/home-watch-naturewalk" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Naturewalk</Link>
             <Link href="/concierge-services-inlet-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Concierge Services</Link>

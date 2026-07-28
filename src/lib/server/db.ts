@@ -933,11 +933,11 @@ await tx`CREATE INDEX IF NOT EXISTS admin_retainers_active_generation_idx
     await tx`CREATE INDEX IF NOT EXISTS marketing_email_leads_campaign_idx
       ON marketing_email_leads (organization_id, campaign_id, created_at DESC)`;
 
-  // Drip suppression — stores Resend scheduled email IDs so they can be cancelled on conversion
+  // Drip suppression, stores Resend scheduled email IDs so they can be cancelled on conversion
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_email_ids TEXT`;
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS drip_suppressed_at TIMESTAMPTZ`;
 
-  // Lead qualification — neighborhood, answers JSON, computed score + grade
+  // Lead qualification, neighborhood, answers JSON, computed score + grade
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS neighborhood TEXT`;
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS qualification_json JSONB`;
   await tx`ALTER TABLE marketing_email_leads ADD COLUMN IF NOT EXISTS lead_score INTEGER`;
@@ -1021,7 +1021,7 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
       }
     }
 
-    // v25 — Google Calendar sync columns
+    // v25, Google Calendar sync columns
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS gcal_event_id TEXT`;
     await tx`ALTER TABLE admin_jobs ADD COLUMN IF NOT EXISTS gcal_synced_at TIMESTAMPTZ`;
 
@@ -1034,7 +1034,7 @@ await tx`CREATE INDEX IF NOT EXISTS admin_jobs_recurring_series_idx
       )
     `;
 
-    // v26 — visitor analytics reset baseline
+    // v26, visitor analytics reset baseline
     await tx`
       CREATE TABLE IF NOT EXISTS admin_visitor_analytics_resets (
         organization_id TEXT NOT NULL PRIMARY KEY,
