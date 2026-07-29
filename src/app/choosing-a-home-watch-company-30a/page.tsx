@@ -15,7 +15,7 @@ import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 const PAGE_URL = "https://coastalhomemngt30a.com/choosing-a-home-watch-company-30a";
 
-const standard = offerings.find((o) => o.name === "Standard Home Management");
+const essential = offerings.find((o) => o.name === "Essential");
 
 export const metadata: Metadata = {
   title: "How to Choose a Home Watch Company on 30A | Coastal Home Management",
@@ -38,8 +38,8 @@ const faqs = [
   },
   {
     q: "How much does home watch service cost on 30A?",
-    a: standard
-      ? `Pricing varies by provider and by how it's structured. Coastal Home Management 30A publishes flat monthly pricing starting at $${standard.price.replace(".00", "")}/month for weekly visits with photo documentation, viewable directly on our pricing page. Some other home watch and concierge providers in the area only provide pricing after a phone call and a custom quote based on selected services.`
+    a: essential
+      ? `Pricing varies by provider and by how it's structured. Coastal Home Management 30A publishes flat monthly pricing starting at $${essential.price.replace(".00", "")}/month for weekly visits with photo documentation, viewable directly on our pricing page. Some other home watch and concierge providers in the area only provide pricing after a phone call and a custom quote based on selected services.`
       : "Pricing varies by provider and by how it's structured. Some home watch companies publish flat monthly rates, others require a phone call for a custom quote based on selected services.",
   },
   {
@@ -92,8 +92,8 @@ const rows: Row[] = [
   },
   {
     label: "Pricing",
-    chm: standard
-      ? `Published flat monthly tiers, starting at $${standard.price.replace(".00", "")}/month`
+    chm: essential
+      ? `Published flat monthly tiers, starting at $${essential.price.replace(".00", "")}/month`
       : "Published flat monthly tiers",
     regional: "Custom quote by phone, pricing not published",
   },

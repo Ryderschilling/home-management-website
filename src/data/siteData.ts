@@ -129,12 +129,10 @@ export const bookingConfig = {
 // Used to build the `hasOfferCatalog` schema in layout.tsx AND the /llms.txt
 // feed. Edit prices here, everywhere else should reference this array.
 //
-// ⚠️ PRICING FLAG: your CHM master context doc lists Premium at $300/mo and
-// On-Call Tasks at $100 flat. The live site code (below, pulled from the
-// original layout.tsx) has Premium at $275/mo and On-Call at $85 flat. I used
-// the live code as the source of truth since that's what's actually deployed
-// and quoted to customers, but confirm which numbers are current and correct
-// the other doc so they don't drift again.
+// Tier names are canonical here and must match /pricing exactly:
+// Essential ($150) · Home Watch ($300) · Coastal Elite ($600).
+// If you rename a tier, update src/app/pricing/page.tsx and src/app/about/page.tsx
+// in the same commit or the site drifts out of sync again.
 export const offerings: {
   name: string;
   description: string;
@@ -142,21 +140,21 @@ export const offerings: {
   unitText?: "month" | "day";
 }[] = [
   {
-    name: "Standard Home Management",
+    name: "Essential",
     description:
-      "Weekly property inspection, photo documentation, storm watch, mail pickup, and text/email summary after each visit.",
+      "Essential home watch plan for 30A second homes: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after each visit.",
     price: "150.00",
     unitText: "month",
   },
   {
-    name: "Premium Home Management",
+    name: "Home Watch",
     description:
-      "Everything in Standard plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.",
+      "Home Watch plan: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.",
     price: "300.00",
     unitText: "month",
   },
   {
-    name: "Coastal Elite Membership",
+    name: "Coastal Elite",
     description:
       "Our highest tier, guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members.",
     price: "600.00",

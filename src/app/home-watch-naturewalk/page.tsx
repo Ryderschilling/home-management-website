@@ -232,7 +232,15 @@ export default function HomeWatchNaturewalkPage() {
       </section>
 
       <footer className="border-t border-black/10 bg-white px-6 py-8 text-center text-xs text-black/40">
-        © {new Date().getFullYear()} Coastal Home Management 30A · Inlet Beach, FL · (309) 415-8793
+        © {new Date().getFullYear()} Coastal Home Management 30A · Inlet Beach, FL · (309) 415-8793 ·{" "}
+        <a
+          href="https://ryderschilling.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition hover:text-black"
+        >
+          Built by Ryder Schilling
+        </a>
       </footer>
     </main>
   );

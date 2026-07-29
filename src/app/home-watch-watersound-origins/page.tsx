@@ -287,6 +287,14 @@ export default function HomeWatchWatersoundPage() {
         © {new Date().getFullYear()} Coastal Home Management 30A · Inlet Beach, FL · (309) 415-8793 ·{" "}
         <a href="mailto:coastalhomemanagement30a@gmail.com" className="hover:text-black transition">
           coastalhomemanagement30a@gmail.com
+        </a> ·{" "}
+        <a
+          href="https://ryderschilling.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition hover:text-black"
+        >
+          Built by Ryder Schilling
         </a>
       </footer>
     </main>

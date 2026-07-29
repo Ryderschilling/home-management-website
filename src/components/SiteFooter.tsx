@@ -159,6 +159,17 @@ export default function SiteFooter() {
           </span>
           <div className="flex items-center gap-5">
             <a
+              href="https://ryderschilling.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group transition-colors hover:text-[var(--ch-teal-bright)]"
+            >
+              Built by{" "}
+              <span className="text-white/62 transition-colors group-hover:text-[var(--ch-teal-bright)]">
+                Ryder Schilling
+              </span>
+            </a>
+            <a
               href="https://sourceatrade.com/contractors/coastal-home-management-30a-3"
               target="_blank"
               rel="noopener noreferrer"

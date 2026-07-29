@@ -169,7 +169,7 @@ export default function AboutPage() {
             <ul className="space-y-4 text-sm text-gray-700">
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Standard, Premium, and Coastal Elite tiers with weekly or bi-weekly inspections and photo reports</span>
+                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Essential, Home Watch, and Coastal Elite tiers with weekly or bi-weekly inspections and photo reports</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
@@ -206,13 +206,13 @@ export default function AboutPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse" aria-label="Coastal Home Management 30A service plan comparison">
               <caption className="sr-only">
-                Comparison of Standard, Premium, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
+                Comparison of Essential, Home Watch, and Coastal Elite monthly management plans offered by Coastal Home Management 30A
               </caption>
               <thead>
                 <tr className="border-b-2 border-black text-left">
                   <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
-                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Standard<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span></th>
-                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Premium<br /><span className="text-gray-500 text-xs font-sans">$300/mo</span></th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Essential<br /><span className="text-gray-500 text-xs font-sans">$150/mo</span></th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Home Watch<br /><span className="text-gray-500 text-xs font-sans">$300/mo</span></th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$600/mo</span></th>
                 </tr>
               </thead>

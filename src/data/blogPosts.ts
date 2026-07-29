@@ -21,9 +21,9 @@ export type BlogPost = {
   faqs: { q: string; a: string }[];
 };
 
-const premium = offerings.find((o) => o.name === "Premium Home Management");
-const standard = offerings.find((o) => o.name === "Standard Home Management");
-const elite = offerings.find((o) => o.name === "Coastal Elite Membership");
+const homeWatch = offerings.find((o) => o.name === "Home Watch");
+const essential = offerings.find((o) => o.name === "Essential");
+const elite = offerings.find((o) => o.name === "Coastal Elite");
 
 export const blogPosts: BlogPost[] = [
   {
@@ -58,7 +58,7 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "What we do for hurricane prep",
         paragraphs: [
-          "Every Standard, Premium, and Coastal Elite client gets storm watch built into their visit. When a storm is tracking toward the Panhandle, we walk the property, secure loose items, and photograph the exterior before landfall. After the storm passes, we're back out documenting condition and flagging anything that needs immediate attention, so you're not finding out about a problem from a neighbor's text three weeks later.",
+          "Every Essential, Home Watch, and Coastal Elite client gets storm watch built into their visit. When a storm is tracking toward the Panhandle, we walk the property, secure loose items, and photograph the exterior before landfall. After the storm passes, we're back out documenting condition and flagging anything that needs immediate attention, so you're not finding out about a problem from a neighbor's text three weeks later.",
         ],
       },
     ],
@@ -85,7 +85,7 @@ export const blogPosts: BlogPost[] = [
       "Real, current pricing for home watch and second home management in Watersound Origins, Naturewalk, and 30A. Compare tiers and what's included at each price point.",
     category: "direct-answer",
     datePublished: "2026-07-14",
-    directAnswer: `Home watch service on 30A typically runs $${standard?.price?.replace(".00", "")}–$${elite?.price?.replace(".00", "")}+ per month depending on visit frequency and what's included. Basic weekly checks with photo reports start around $${standard?.price?.replace(".00", "")}/month, mid-tier plans with maintenance coordination run $${premium?.price?.replace(".00", "")}/month, and full-service plans with guaranteed emergency response start near $${elite?.price?.replace(".00", "")}/month.`,
+    directAnswer: `Home watch service on 30A typically runs $${essential?.price?.replace(".00", "")}–$${elite?.price?.replace(".00", "")}+ per month depending on visit frequency and what's included. Basic weekly checks with photo reports start around $${essential?.price?.replace(".00", "")}/month, mid-tier plans with maintenance coordination run $${homeWatch?.price?.replace(".00", "")}/month, and full-service plans with guaranteed emergency response start near $${elite?.price?.replace(".00", "")}/month.`,
     body: [
       {
         heading: "Why home watch pricing varies so much",
@@ -96,9 +96,9 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "Coastal Home Management 30A pricing",
         paragraphs: [
-          `Standard Home Management, $${standard?.price?.replace(".00", "")}/month: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after every visit.`,
-          `Premium Home Management, $${premium?.price?.replace(".00", "")}/month: everything in Standard plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.`,
-          `Coastal Elite Membership, $${elite?.price?.replace(".00", "")}/month: our top tier, limited to 8 members. Guaranteed 2-hour emergency response, weekly photo reports, arrival prep twice a year, 3 on-call hours included, and a direct line to the founder.`,
+          `Essential, $${essential?.price?.replace(".00", "")}/month: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after every visit.`,
+          `Home Watch, $${homeWatch?.price?.replace(".00", "")}/month: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.`,
+          `Coastal Elite, $${elite?.price?.replace(".00", "")}/month: our top tier, limited to 8 members. Guaranteed 2-hour emergency response, weekly photo reports, arrival prep twice a year, 3 on-call hours included, and a direct line to the founder.`,
           "On-call property tasks and mail/trash handling are also available a la carte for owners who don't need a recurring plan.",
         ],
       },
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       {
         q: "What's the average cost of home watch service on 30A?",
-        a: `Expect to pay roughly $${standard?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency, reporting detail, and response guarantees. Weekly-visit plans with photo reports typically start around $${standard?.price?.replace(".00", "")}/month.`,
+        a: `Expect to pay roughly $${essential?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency, reporting detail, and response guarantees. Weekly-visit plans with photo reports typically start around $${essential?.price?.replace(".00", "")}/month.`,
       },
       {
         q: "Is home watch the same as vacation rental management?",
@@ -154,14 +154,14 @@ export const blogPosts: BlogPost[] = [
         heading: "The math on catching it early",
         paragraphs: [
           "A clogged condensate line cleared on the spot is a 20-minute fix. The same failure left running for two or three weeks in a Florida summer is mold remediation, replaced drywall, ruined furniture, and an insurance claim, easily five figures, plus weeks of a home you cannot use.",
-          `That is the entire point of home watch. Standard Home Management is $${standard?.price?.replace(".00", "")}/month for weekly visits with photo proof, which is a rounding error next to what an unchecked summer AC failure costs. The visit is not the product. Catching the problem while it is still small and cheap is the product.`,
+          `That is the entire point of home watch. Essential is $${essential?.price?.replace(".00", "")}/month for weekly visits with photo proof, which is a rounding error next to what an unchecked summer AC failure costs. The visit is not the product. Catching the problem while it is still small and cheap is the product.`,
         ],
       },
       {
         heading: "How we watch for this specifically",
         paragraphs: [
           "Every visit includes a check of the thermostat reading against its setpoint, a look at the AC handler and condensate drain, and a note on how the interior actually feels and smells, because a musty smell is often the first sign of a moisture problem before it is visible anywhere. During the summer months on 30A this is one of the first things we look at, not an afterthought.",
-          "For owners who want an extra layer, Premium and Coastal Elite clients can add a smart temperature and humidity sensor so a spike gets flagged between visits, not just during them.",
+          "For owners who want an extra layer, Home Watch and Coastal Elite clients can add a smart temperature and humidity sensor so a spike gets flagged between visits, not just during them.",
         ],
       },
     ],
@@ -176,7 +176,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         q: "Do you check the AC during home watch visits?",
-        a: `Yes. Every visit includes checking the thermostat reading against its setpoint, inspecting the air handler and condensate drain, and noting the feel and smell of the interior. Standard plans start at $${standard?.price?.replace(".00", "")}/month with a photo report after every check.`,
+        a: `Yes. Every visit includes checking the thermostat reading against its setpoint, inspecting the air handler and condensate drain, and noting the feel and smell of the interior. Essential plans start at $${essential?.price?.replace(".00", "")}/month with a photo report after every check.`,
       },
     ],
   },
