@@ -22,6 +22,7 @@ function buildOwnerEmail(data: {
   plan: string;
   tier: string;
   price: number;
+  term: string;
   name: string;
   email: string;
   phone: string;
@@ -78,7 +79,7 @@ function buildOwnerEmail(data: {
             <td style="padding:20px 36px 0;">
               <div style="display:inline-block;padding:6px 16px;border-radius:100px;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);">
                 <span style="font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:${tier.accent};">
-                  ${tier.label}, $${data.price}/mo
+                  ${tier.label}, $${data.price}/mo${data.term ? ` · ${data.term}` : ""}
                 </span>
               </div>
             </td>
@@ -94,6 +95,7 @@ function buildOwnerEmail(data: {
                 ${row("Phone", `<a href="tel:${data.phone.replace(/\D/g, "")}" style="color:${tier.accent};text-decoration:none;">${data.phone}</a>`)}
                 ${row("Plan", tier.label)}
                 ${row("Price", `$${data.price}/month`)}
+                ${row("Term", data.term)}
                 ${data.address ? row("Property", data.address) : ""}
                 ${data.message ? row("Message", data.message.replace(/\n/g, "<br/>")) : ""}
               </table>
@@ -150,6 +152,7 @@ export async function POST(req: NextRequest) {
     const plan    = safe(body.plan);
     const tier    = safe(body.tier).toLowerCase();
     const price   = Number(body.price) || 0;
+    const term    = safe(body.term);
     const name    = safe(body.name);
     const email   = safe(body.email).toLowerCase();
     const phone   = safe(body.phone);
@@ -170,7 +173,7 @@ export async function POST(req: NextRequest) {
       to: OWNER_EMAIL,
       replyTo: email,
       subject: `New Inquiry: ${tierLabel}, ${name}`,
-      html: buildOwnerEmail({ plan, tier, price, name, email, phone, address, message }),
+      html: buildOwnerEmail({ plan, tier, price, term, name, email, phone, address, message }),
     });
 
     return NextResponse.json({ ok: true });

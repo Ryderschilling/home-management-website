@@ -122,7 +122,7 @@ export const bookingConfig = {
     { id: "afternoon", label: "Afternoon", detail: "2pm – 5pm" },
     { id: "flexible", label: "Flexible", detail: "Whatever works" },
   ],
-  plans: ["Essential ($150/mo)", "Home Watch ($300/mo)", "Coastal Elite ($600/mo)", "Not sure yet"],
+  plans: ["Essential ($200/mo)", "Home Watch ($350/mo)", "Coastal Elite ($600/mo)", "Not sure yet"],
 };
 
 // ─── Single source of truth for pricing / service catalog ──────────────────
@@ -130,7 +130,9 @@ export const bookingConfig = {
 // feed. Edit prices here, everywhere else should reference this array.
 //
 // Tier names are canonical here and must match /pricing exactly:
-// Essential ($150) · Home Watch ($300) · Coastal Elite ($600).
+// Essential ($200) · Home Watch ($350) · Coastal Elite ($600).
+// Rate locks (billed monthly, no upfront payment): 6-month saves 5%,
+// 12-month saves 10%: Essential $190/$180 · Home Watch $330/$315 · Elite $570/$540.
 // If you rename a tier, update src/app/pricing/page.tsx and src/app/about/page.tsx
 // in the same commit or the site drifts out of sync again.
 export const offerings: {
@@ -142,21 +144,21 @@ export const offerings: {
   {
     name: "Essential",
     description:
-      "Essential home watch plan for 30A second homes: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after each visit.",
-    price: "150.00",
+      "Essential home watch plan for 30A second homes: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after each visit. $200/month month-to-month, $190/month on a 6-month rate lock, or $180/month on a 12-month rate lock (billed monthly).",
+    price: "200.00",
     unitText: "month",
   },
   {
     name: "Home Watch",
     description:
-      "Home Watch plan: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.",
-    price: "300.00",
+      "Home Watch plan: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination. $350/month month-to-month, $330/month on a 6-month rate lock, or $315/month on a 12-month rate lock (billed monthly).",
+    price: "350.00",
     unitText: "month",
   },
   {
     name: "Coastal Elite",
     description:
-      "Our highest tier, guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members.",
+      "Our highest tier, guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members. $600/month month-to-month, $570/month on a 6-month rate lock, or $540/month on a 12-month rate lock (billed monthly).",
     price: "600.00",
     unitText: "month",
   },

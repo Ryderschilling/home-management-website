@@ -226,8 +226,9 @@ function email3(name: string): string {
 
 function email4(name: string): string {
   const tiers = [
-    ["Basic Watch", "$100–$150/mo", "Weekly exterior check-ins, photo report, storm and freeze prep alerts."],
-    ["Full Management", "$200–$300/mo", "Full interior + exterior inspections, contractor coordination, package handling, seasonal prep, on-call response."],
+    ["Essential", "$200/mo", "Weekly interior + exterior walkthrough, issue alerts, mail pickup, and secure key holding."],
+    ["Home Watch", "$350/mo", "Everything in Essential plus photo documentation, written visit reports, and appliance and piping checks."],
+    ["Coastal Elite", "$600/mo", "Full management: storm monitoring, HVAC filter changes, arrival prep, and contractor coordination."],
     ["On-Call Only", "$75 base + $45/hr", "No retainer. Call when you need something handled. Perfect if you're here more often."],
   ];
 
@@ -264,7 +265,8 @@ function email4(name: string): string {
         <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 24px 0;">
           ${rows}
         </table>
-        <p style="${bodyText}">No long-term contracts. No corporate structure. Just me, your property, and a clear record of every visit.</p>
+        <p style="${bodyText}">Month-to-month, no contracts required. Prefer to lock your rate? A 6-month plan saves 5% and a 12-month plan saves 10%, still billed monthly.</p>
+        <p style="${bodyText}">No corporate structure. Just me, your property, and a clear record of every visit.</p>
         <p style="${bodyText}">Most clients start with a walkthrough, we figure out what level of coverage makes sense, and go from there. Takes 20 minutes.</p>
         <table cellpadding="0" cellspacing="0" border="0">
           <tr>

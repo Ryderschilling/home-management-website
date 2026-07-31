@@ -62,8 +62,9 @@ const FAQS: FaqItem[] = [
     q: "How much does home watch cost in 30A?",
     a: (
       <>
-        Our monthly plans start at $150/month (Essential) and go up to $600/month for the
-        Coastal Elite membership. On-call services are $75 base plus $45/hour, and mail or
+        Our monthly plans start at $200/month (Essential) and go up to $600/month for the
+        Coastal Elite membership. Lock in a 6 or 12-month rate and save up to 10%, still
+        billed monthly. On-call services are $75 base plus $45/hour, and mail or
         trash handling is $35/day. See the{" "}
         <Link href="/pricing" className="text-[var(--ch-teal)] underline underline-offset-4">
           full pricing page
@@ -333,8 +334,8 @@ export default function HomePage() {
                     <span className="ch-label">What&apos;s included</span>
                   </th>
                   {[
-                    ["Essential", "$150"],
-                    ["Home Watch", "$300"],
+                    ["Essential", "$200"],
+                    ["Home Watch", "$350"],
                     ["Coastal Elite", "$600"],
                   ].map(([name, price]) => (
                     <th key={name} scope="col" className="px-3 py-5 text-center align-bottom">
@@ -735,7 +736,7 @@ export default function HomePage() {
                 name: "How much does home watch cost in 30A?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Monthly home watch and second home management plans start at $150/month (Essential), $300/month (Home Watch), and $600/month for the Coastal Elite membership. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
+                  text: "Monthly home watch and second home management plans start at $200/month (Essential), $350/month (Home Watch), and $600/month for the Coastal Elite membership. A 6-month rate lock saves 5% and a 12-month rate lock saves 10%, both billed monthly. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
                 },
               },
               {

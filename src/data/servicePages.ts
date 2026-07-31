@@ -58,7 +58,7 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "What does second home management cost in Inlet Beach?",
-        a: "Plans start at $150/month for weekly checks with photo reports. Pricing depends on visit frequency and what's included; see our pricing page for the full breakdown.",
+        a: "Plans start at $200/month for weekly checks with photo reports, with 6 and 12-month rate locks that save up to 10%. Pricing depends on visit frequency and what's included; see our pricing page for the full breakdown.",
       },
     ],
   },
@@ -181,7 +181,7 @@ export const servicePages: Record<string, ServicePageData> = {
     faqs: [
       {
         q: "How much does home watch cost on 30A?",
-        a: "Home watch plans with Coastal Home Management 30A start at $150/month for weekly visits with photo reports. The exact price depends on visit frequency and add-ons like mail handling; see our pricing page for the full breakdown.",
+        a: "Home watch plans with Coastal Home Management 30A start at $200/month for weekly visits with photo reports, with 6 and 12-month rate locks that save up to 10%. The exact price depends on visit frequency and add-ons like mail handling; see our pricing page for the full breakdown.",
       },
       {
         q: "How often should someone check on a vacation home in Florida?",

@@ -21,16 +21,24 @@ function fireGtagConversion() {
 
 type Tier = "bronze" | "silver" | "gold";
 
+type BillingTerm = "monthly" | "6mo" | "12mo";
+
 interface Plan {
   tier: Tier;
   name: string;
   tagline: string;
-  price: number;
+  prices: Record<BillingTerm, number>;
   priceNote: string;
   badge: string;
   sections: { label: string; items: { text: string; tag?: string }[] }[];
   cta: string;
 }
+
+const termMeta: Record<BillingTerm, { label: string; save: string | null; note: string }> = {
+  monthly: { label: "Monthly", save: null, note: "" },
+  "6mo": { label: "6 Months", save: "Save 5%", note: "billed monthly · 6-month rate lock" },
+  "12mo": { label: "12 Months", save: "Save 10%", note: "billed monthly · 12-month rate lock" },
+};
 
 // ─── Plan Data ────────────────────────────────────────────────────────────────
 
@@ -39,7 +47,7 @@ const plans: Plan[] = [
     tier: "bronze",
     name: "Essential",
     tagline: "Simple, reliable home checks while you're away. Nothing missed.",
-    price: 150,
+    prices: { monthly: 200, "6mo": 190, "12mo": 180 },
     priceNote: "month-to-month · no contracts",
     badge: "Bronze",
     cta: "Get Started",
@@ -60,7 +68,7 @@ const plans: Plan[] = [
     tier: "silver",
     name: "Home Watch",
     tagline: "Everything in Essential plus photo reports and hands-on property care.",
-    price: 300,
+    prices: { monthly: 350, "6mo": 330, "12mo": 315 },
     priceNote: "month-to-month · no contracts",
     badge: "Silver",
     cta: "Get Started",
@@ -81,7 +89,7 @@ const plans: Plan[] = [
     tier: "gold",
     name: "Coastal Elite",
     tagline: "Full-service home management. Your property runs itself while you're gone.",
-    price: 600,
+    prices: { monthly: 600, "6mo": 570, "12mo": 540 },
     priceNote: "Founding rate. Limited spots available.",
     badge: "Gold, Elite",
     cta: "Claim a Founding Spot",
@@ -152,12 +160,14 @@ function Check({ tier }: { tier: Tier }) {
 
 interface ModalProps {
   plan: Plan;
+  term: BillingTerm;
   onClose: () => void;
 }
 
 type SubmitState = "idle" | "loading" | "success" | "error";
 
-function InquiryModal({ plan, onClose }: ModalProps) {
+function InquiryModal({ plan, term, onClose }: ModalProps) {
+  const price = plan.prices[term];
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -178,7 +188,8 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         body: JSON.stringify({
           plan: plan.name,
           tier: plan.tier,
-          price: plan.price,
+          price,
+          term: term === "monthly" ? "Month-to-month" : `${termMeta[term].label} rate lock`,
           name,
           email,
           phone,
@@ -196,7 +207,8 @@ function InquiryModal({ plan, onClose }: ModalProps) {
       posthog.capture("pricing_inquiry_submitted", {
         plan: plan.name,
         tier: plan.tier,
-        price: plan.price,
+        price,
+        term,
       });
       fireGtagConversion();
       setState("success");
@@ -220,7 +232,7 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         {state === "success" ? (
           <div className="modal-success">
             <div className={`success-icon success-icon-${plan.tier}`}>✓</div>
-            <h3>You're all set.</h3>
+            <h3>You&apos;re all set.</h3>
             <p>
               We received your inquiry for the <strong>{plan.name}</strong> plan. Ryder will be
               in touch within 24 hours.
@@ -232,7 +244,8 @@ function InquiryModal({ plan, onClose }: ModalProps) {
         ) : (
           <>
             <div className={`modal-plan-badge modal-plan-badge-${plan.tier}`}>
-              {plan.badge} · ${plan.price}/mo
+              {plan.badge} · ${price}/mo
+              {term !== "monthly" ? ` · ${termMeta[term].label} lock` : ""}
             </div>
             <h2 className="modal-title">Get Started with {plan.name}</h2>
             <p className="modal-sub">
@@ -334,8 +347,10 @@ function InquiryModal({ plan, onClose }: ModalProps) {
 
 // ─── Plan Card ────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void }) {
+function PlanCard({ plan, term, onSelect }: { plan: Plan; term: BillingTerm; onSelect: (p: Plan) => void }) {
   const isGold = plan.tier === "gold";
+  const price = plan.prices[term];
+  const monthlySavings = plan.prices.monthly - price;
 
   return (
     <div className={`card card-${plan.tier}`}>
@@ -352,16 +367,24 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
 
       <div className="price-row">
         <span className="price-sym">$</span>
-        <span className="price-num">{plan.price}</span>
+        <span className="price-num">{price}</span>
+        {monthlySavings > 0 && <span className="price-was">${plan.prices.monthly}</span>}
       </div>
-      <div className="price-period">per month</div>
-      <div className={`price-note ${isGold ? "price-note-gold" : ""}`}>
-        {isGold ? (
-          <>
+      <div className="price-period">
+        per month
+        {monthlySavings > 0 && (
+          <span className={`save-pill save-pill-${plan.tier}`}>Save ${monthlySavings}/mo</span>
+        )}
+      </div>
+      <div className={`price-note ${isGold && term === "monthly" ? "price-note-gold" : ""}`}>
+        {term === "monthly" ? (
+          isGold ? (
             <strong>Founding rate. Limited spots available.</strong>
-          </>
+          ) : (
+            plan.priceNote
+          )
         ) : (
-          plan.priceNote
+          termMeta[term].note
         )}
       </div>
 
@@ -384,7 +407,7 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
         </div>
       ))}
 
-      <button className={`cta cta-${plan.tier}`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price: plan.price }); onSelect(plan); }}>
+      <button className={`cta cta-${plan.tier}`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price, term }); onSelect(plan); }}>
         {plan.cta}
       </button>
     </div>
@@ -395,6 +418,7 @@ function PlanCard({ plan, onSelect }: { plan: Plan; onSelect: (p: Plan) => void 
 
 export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [term, setTerm] = useState<BillingTerm>("monthly");
 
   const handleSelect = useCallback((plan: Plan) => {
     setSelectedPlan(plan);
@@ -420,15 +444,41 @@ export default function PricingPage() {
         <p className="header-sub">
           Your 30A home, watched over like it&apos;s our own.
           <br />
-          All plans are month-to-month. No contracts. No cancellation fees.
+          Month-to-month by default, no contracts. Lock in 6 or 12 months and save.
         </p>
       </header>
 
       {/* Plans Grid */}
       <section className="plans-section">
+        <div className="term-toggle" role="group" aria-label="Billing term">
+          {(Object.keys(termMeta) as BillingTerm[]).map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`term-btn ${term === t ? "term-btn-active" : ""}`}
+              aria-pressed={term === t}
+              onClick={() => {
+                setTerm(t);
+                posthog.capture("pricing_term_selected", { term: t });
+              }}
+            >
+              {termMeta[t].label}
+              {termMeta[t].save && (
+                <span className={`term-save ${term === t ? "term-save-active" : ""}`}>
+                  {termMeta[t].save}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        <p className="term-note">
+          {term === "monthly"
+            ? "Month-to-month. Cancel anytime. Or lock a rate and save."
+            : `Rate locked for ${term === "6mo" ? "6" : "12"} months. Still billed monthly, nothing upfront.`}
+        </p>
         <div className="plans-grid">
           {plans.map((plan) => (
-            <PlanCard key={plan.tier} plan={plan} onSelect={handleSelect} />
+            <PlanCard key={plan.tier} plan={plan} term={term} onSelect={handleSelect} />
           ))}
         </div>
       </section>
@@ -460,11 +510,11 @@ export default function PricingPage() {
                 <th scope="col" className="compare-th compare-th-feature">Feature</th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-bronze">
                   Essential<br />
-                  <span className="compare-price">$150/mo</span>
+                  <span className="compare-price">$200/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-silver">
                   Home Watch<br />
-                  <span className="compare-price">$300/mo</span>
+                  <span className="compare-price">$350/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-gold">
                   Coastal Elite<br />
@@ -559,9 +609,21 @@ export default function PricingPage() {
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
-                <td className="compare-td compare-td-price compare-td-bronze">$150</td>
-                <td className="compare-td compare-td-price compare-td-silver">$300</td>
+                <td className="compare-td compare-td-price compare-td-bronze">$200</td>
+                <td className="compare-td compare-td-price compare-td-silver">$350</td>
                 <td className="compare-td compare-td-price compare-td-gold">$600</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature compare-td-price-row">6-month rate lock (billed monthly)</td>
+                <td className="compare-td compare-td-price compare-td-bronze">$190</td>
+                <td className="compare-td compare-td-price compare-td-silver">$330</td>
+                <td className="compare-td compare-td-price compare-td-gold">$570</td>
+              </tr>
+              <tr>
+                <td className="compare-td compare-td-feature compare-td-price-row">12-month rate lock (billed monthly)</td>
+                <td className="compare-td compare-td-price compare-td-bronze">$180</td>
+                <td className="compare-td compare-td-price compare-td-silver">$315</td>
+                <td className="compare-td compare-td-price compare-td-gold">$540</td>
               </tr>
             </tbody>
           </table>
@@ -589,7 +651,7 @@ export default function PricingPage() {
       </p>
 
       {/* Modal */}
-      {selectedPlan && <InquiryModal plan={selectedPlan} onClose={handleClose} />}
+      {selectedPlan && <InquiryModal plan={selectedPlan} term={term} onClose={handleClose} />}
 
       <style jsx global>{`
         /* ── Reset / base ─────────────────────────────── */
@@ -673,6 +735,93 @@ export default function PricingPage() {
           .card-silver { order: 2; }
           .card-bronze { order: 3; }
         }
+
+        /* ── Term toggle ────────────────────────────────── */
+        .term-toggle {
+          display: flex;
+          justify-content: center;
+          gap: 4px;
+          background: #ffffff;
+          border: 1px solid #cfeae7;
+          border-radius: 100px;
+          padding: 4px;
+          width: fit-content;
+          margin: 0 auto 10px;
+          animation: fadeUp 0.7s ease both;
+        }
+        .term-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          border: none;
+          background: transparent;
+          font-family: inherit;
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          color: var(--ch-muted);
+          padding: 9px 18px;
+          border-radius: 100px;
+          cursor: pointer;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .term-btn:hover { color: var(--ch-ink); }
+        .term-btn-active {
+          background: var(--ch-teal);
+          color: #ffffff;
+        }
+        .term-btn-active:hover { color: #ffffff; }
+        .term-save {
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          padding: 3px 8px;
+          border-radius: 100px;
+          background: #ddf3f0;
+          color: var(--ch-teal);
+          border: 1px solid var(--ch-teal-bright);
+        }
+        .term-save-active {
+          background: rgba(255, 255, 255, 0.16);
+          color: #ffffff;
+          border-color: rgba(255, 255, 255, 0.35);
+        }
+        .term-note {
+          text-align: center;
+          font-size: 12px;
+          color: var(--ch-soft);
+          margin: 0 auto 34px;
+          padding: 0 16px;
+        }
+        @media (max-width: 480px) {
+          .term-btn { padding: 8px 12px; font-size: 12px; }
+          .term-save { display: none; }
+        }
+
+        /* ── Discounted price ───────────────────────────── */
+        .price-was {
+          font-size: 17px;
+          font-weight: 700;
+          color: var(--ch-soft);
+          text-decoration: line-through;
+          margin-left: 8px;
+          margin-bottom: 8px;
+        }
+        .save-pill {
+          display: inline-block;
+          margin-left: 8px;
+          padding: 2px 8px;
+          border-radius: 100px;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          vertical-align: middle;
+        }
+        .save-pill-bronze,
+        .save-pill-silver { background: #ddf3f0; color: var(--ch-teal); border: 1px solid var(--ch-teal-bright); }
+        .save-pill-gold { background: #f0faf8; color: var(--ch-teal-deep); border: 1px solid var(--ch-teal-bright); }
 
         /* ── Card ───────────────────────────────────────── */
         .card {
@@ -1110,7 +1259,7 @@ export default function PricingPage() {
           text-align: left;
           font-size: 12.5px;
         }
-        .compare-td-price-row .compare-td-feature {
+        .compare-td-feature.compare-td-price-row {
           color: var(--ch-ink);
           font-weight: 700;
         }

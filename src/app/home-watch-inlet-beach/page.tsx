@@ -30,7 +30,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Inlet Beach FL?",
-    a: "Plans start at $150/month (Essential, weekly visits, photo reports, mail pickup), $300/month (Home Watch, adds appliance and plumbing checks), and $600/month (Coastal Elite, adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination). No contracts or cancellation fees.",
+    a: "Plans start at $200/month (Essential, weekly visits, photo reports, mail pickup), $350/month (Home Watch, adds appliance and plumbing checks), and $600/month (Coastal Elite, adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination). Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
 ];
 
@@ -214,7 +214,7 @@ export default function HomeWatchInletBeachPage() {
             url: "https://coastalhomemngt30a.com/home-watch-inlet-beach",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
-            priceRange: "$150-$600/month",
+            priceRange: "$200-$600/month",
             areaServed: [
               { "@type": "Place", name: "Inlet Beach, FL 32461" },
               { "@type": "Place", name: "Watersound Origins, FL" },

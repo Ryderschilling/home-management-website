@@ -26,7 +26,7 @@ const FAQ = [
   },
   {
     q: "What home watch services are available in Naturewalk Florida?",
-    a: "Coastal Home Management 30A offers Essential ($150/month), Home Watch ($300/month), and Coastal Elite ($600/month) plans for Naturewalk properties. All plans include weekly inspections, photo documentation, mail pickup, and written visit reports. Coastal Elite adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination.",
+    a: "Coastal Home Management 30A offers Essential ($200/month), Home Watch ($350/month), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include weekly inspections, photo documentation, mail pickup, and written visit reports. Coastal Elite adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination.",
   },
   {
     q: "Is Naturewalk at Watersound Origins in CHM's service area?",
@@ -181,7 +181,7 @@ export default function HomeWatchNaturewalkPage() {
             url: "https://coastalhomemngt30a.com/home-watch-naturewalk",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
-            priceRange: "$150-$600/month",
+            priceRange: "$200-$600/month",
             areaServed: [
               { "@type": "Place", name: "Naturewalk at Watersound Origins, Inlet Beach, FL" },
               { "@type": "Place", name: "Watersound Origins, Inlet Beach, FL" },

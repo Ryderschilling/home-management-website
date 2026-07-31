@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Watersound Origins?",
-    a: "Plans start at $150/month for weekly Essential visits, $300/month for the full Home Watch plan with appliance and plumbing checks, and $600/month for Coastal Elite with HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination. No contracts or cancellation fees.",
+    a: "Plans start at $200/month for weekly Essential visits, $350/month for the full Home Watch plan with appliance and plumbing checks, and $600/month for Coastal Elite with HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination. Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
   {
     q: "Is Coastal Home Management 30A insured?",
@@ -147,12 +147,12 @@ export default function HomeWatchWatersoundPage() {
             {[
               {
                 name: "Essential",
-                price: "$150/mo",
+                price: "$200/mo",
                 features: ["Weekly walkthrough", "Photo documentation", "Mail pickup", "Issue alerts", "Written report"],
               },
               {
                 name: "Home Watch",
-                price: "$300/mo",
+                price: "$350/mo",
                 features: ["Everything in Essential", "Appliance & plumbing checks", "Irrigation filter cleaning", "Bi-weekly or weekly schedule"],
                 featured: true,
               },
@@ -232,7 +232,7 @@ export default function HomeWatchWatersoundPage() {
             url: "https://coastalhomemngt30a.com/home-watch-watersound-origins",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
-            priceRange: "$150-$600/month",
+            priceRange: "$200-$600/month",
             areaServed: [
               { "@type": "Place", name: "Watersound Origins, Inlet Beach, FL 32461" },
               { "@type": "Place", name: "Naturewalk at Watersound Origins, FL" },

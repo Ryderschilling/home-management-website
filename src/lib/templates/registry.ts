@@ -79,7 +79,7 @@ export const templateRegistry: TemplateDefinition[] = [
     slug: "drip-day5-soft-close",
     name: "Here's What a Plan Looks Like",
     category: "email",
-    description: "Soft close email showing exact service tiers and pricing: Basic Watch ($100–150/mo), Full Management ($200–300/mo), On-Call Only ($75+$45/hr).",
+    description: "Soft close email showing exact service tiers and pricing: Essential ($200/mo), Home Watch ($350/mo), Coastal Elite ($600/mo), On-Call Only ($75+$45/hr), plus the 6/12-month rate locks.",
     subject: "Here's exactly what a plan looks like.",
     trigger: "Day 5 after opt-in",
     previewRoute: "/portal/templates/drip-day5-soft-close",
