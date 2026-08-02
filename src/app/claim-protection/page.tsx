@@ -68,9 +68,9 @@ export default function ClaimProtectionPage() {
   const { shutoff, coverageRecord } = protectionServices;
 
   return (
-    <main>
+    <main className="bg-[var(--ch-paper)]">
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="fade-section relative overflow-hidden px-4 pt-28 pb-20 md:px-8 md:pt-36 md:pb-28">
+      <section className="fade-section relative overflow-hidden bg-[var(--ch-paper)] px-4 pt-28 pb-20 md:px-8 md:pt-36 md:pb-28">
         <div className="mx-auto max-w-[1240px]">
           <p className="ch-eyebrow reveal-item">Why the record matters</p>
 
@@ -142,7 +142,7 @@ export default function ClaimProtectionPage() {
       </section>
 
       {/* ── What the record does ─────────────────────────────────────────── */}
-      <section className="fade-section px-4 py-24 md:px-8 md:py-32">
+      <section className="fade-section bg-[var(--ch-paper)] px-4 py-24 md:px-8 md:py-32">
         <div className="mx-auto grid max-w-[1240px] gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-24">
           <div>
             <p className="ch-eyebrow reveal-item">02 · What we do about it</p>
@@ -253,7 +253,7 @@ export default function ClaimProtectionPage() {
       </section>
 
       {/* ── What we will not claim ───────────────────────────────────────── */}
-      <section className="fade-section px-4 py-24 md:px-8 md:py-32">
+      <section className="fade-section bg-[var(--ch-paper)] px-4 py-24 md:px-8 md:py-32">
         <div className="mx-auto max-w-[860px]">
           <p className="ch-eyebrow reveal-item">04 · Being straight with you</p>
           <h2 className="ch-display ch-display--sm mb-7">
