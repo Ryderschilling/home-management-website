@@ -175,7 +175,7 @@ export const servicePages: Record<string, ServicePageData> = {
     ],
     process: [
       "We set your home check schedule.",
-      "We inspect key areas and identify anything abnormal.",
+      "We check key areas and identify anything abnormal.",
       "We report findings and coordinate follow-up when needed.",
     ],
     faqs: [
@@ -197,7 +197,7 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "What's included in a standard home check?",
-        a: "A walk-through of the interior and exterior, a check of major systems, storm and weather-related inspection, and a photo report sent to you after each visit.",
+        a: "A walk-through of the interior and exterior, a check of major systems, storm and weather-related checks, and a photo report sent to you after each visit.",
       },
     ],
   },

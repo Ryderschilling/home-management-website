@@ -4,13 +4,13 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Home Watch Service Watersound Origins FL | Coastal Home Management 30A",
   description:
-    "Coastal Home Management 30A is the dedicated home watch service for Watersound Origins. Local, insured, weekly inspections, photo reports, storm prep. Owner lives in the neighborhood. Free walkthrough.",
+    "Coastal Home Management 30A is the dedicated home watch service for Watersound Origins. Local, insured, weekly property checks, photo reports, storm prep. Owner lives in the neighborhood. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-watersound-origins" },
   keywords: "home watch Watersound Origins, Watersound Origins property management, home watch service Watersound FL, second home care Watersound Origins, property watch Watersound Origins Florida",
   openGraph: {
     title: "Home Watch Service in Watersound Origins | CHM 30A",
     description:
-      "The only home watch provider that lives in Watersound Origins. Weekly inspections, photo proof, storm checks. Free walkthrough.",
+      "The only home watch provider that lives in Watersound Origins. Weekly property checks, photo proof, storm checks. Free walkthrough.",
     url: "https://coastalhomemngt30a.com/home-watch-watersound-origins",
     images: ["/img.png"],
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Who provides home watch services in Watersound Origins Florida?",
-    a: "Coastal Home Management 30A is the dedicated home watch provider for Watersound Origins. Owner Ryder Schilling lives full-time in the community and personally inspects every property. No subcontractors, no rotating staff, just one local person who treats your home like his own.",
+    a: "Coastal Home Management 30A is the dedicated home watch provider for Watersound Origins. Owner Ryder Schilling lives full-time in the community and personally checks every property. No subcontractors, no rotating staff, just one local person who treats your home like his own.",
   },
   {
     q: "What does a home watch service do in Watersound Origins?",
@@ -65,8 +65,8 @@ export default function HomeWatchWatersoundPage() {
         </h1>
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
           Coastal Home Management 30A is the only home watch provider that actually lives in Watersound Origins.
-          Ryder Schilling personally inspects every property, no subcontractors, no office dispatchers, no guessing whether someone showed up.
-          Weekly inspections, photo proof every visit, and immediate alerts if anything needs attention.
+          Ryder Schilling personally checks every property, no subcontractors, no office dispatchers, no guessing whether someone showed up.
+          Weekly property checks, photo proof every visit, and immediate alerts if anything needs attention.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <a
@@ -228,7 +228,7 @@ export default function HomeWatchWatersoundPage() {
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             name: "Coastal Home Management 30A",
-            description: "Home watch service in Watersound Origins, Florida. Weekly inspections, photo reports, storm preparation, and full second-home oversight by a local Watersound Origins resident. Fully insured Florida LLC. 5.0 Google rating.",
+            description: "Home watch service in Watersound Origins, Florida. Weekly property checks, photo reports, storm preparation, and full second-home oversight by a local Watersound Origins resident. Fully insured Florida LLC. 5.0 Google rating.",
             url: "https://coastalhomemngt30a.com/home-watch-watersound-origins",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",

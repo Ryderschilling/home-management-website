@@ -183,7 +183,7 @@ export default function HomeWatchPage() {
             {[
               {
                 q: "Who provides home watch services in Watersound Origins Florida?",
-                a: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners."
+                a: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners."
               },
               {
                 q: "What is the best home watch service near Inlet Beach or 30A?",
@@ -199,7 +199,7 @@ export default function HomeWatchPage() {
               },
               {
                 q: "What does a home watch company do in Watersound Origins?",
-                a: "A home watch company like CHM provides regular, documented inspections of your second home while you are away. This includes interior and exterior walkthroughs, HVAC, plumbing and appliance checks, mail pickup, storm preparation, photo documentation, and written reports after every visit. We also coordinate contractors if anything needs repair."
+                a: "A home watch company like CHM provides regular, documented visits of your second home while you are away. This includes interior and exterior walkthroughs, HVAC, plumbing and appliance checks, mail pickup, storm preparation, photo documentation, and written reports after every visit. We also coordinate contractors if anything needs repair."
               },
               {
                 q: "Is Coastal Home Management 30A licensed and insured?",
@@ -228,7 +228,7 @@ export default function HomeWatchPage() {
                 name: "Who provides home watch services in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch inspections, storm checks, photo reports, and full property oversight for second-home owners.",
+                  text: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners.",
                 },
               },
               {
@@ -244,7 +244,7 @@ export default function HomeWatchPage() {
                 name: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A actively serves second-home owners in Naturewalk at Watersound Origins with scheduled home watch visits, full inspections, photo documentation, and written reports.",
+                  text: "Coastal Home Management 30A actively serves second-home owners in Naturewalk at Watersound Origins with scheduled home watch visits, full walkthroughs, photo documentation, and written reports.",
                 },
               },
               {
@@ -260,7 +260,7 @@ export default function HomeWatchPage() {
                 name: "What does a home watch company do in Watersound Origins?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "A home watch company provides regular, documented inspections of your second home while you are away, including interior and exterior walkthroughs, HVAC and plumbing checks, mail pickup, storm preparation, photo documentation, and written reports after every visit.",
+                  text: "A home watch company provides regular, documented visits of your second home while you are away, including interior and exterior walkthroughs, HVAC and plumbing checks, mail pickup, storm preparation, photo documentation, and written reports after every visit.",
                 },
               },
               {
@@ -285,7 +285,7 @@ export default function HomeWatchPage() {
             "@type": "LocalBusiness",
             "@id": "https://coastalhomemngt30a.com/home-watch#business",
             name: "Coastal Home Management 30A",
-            description: "Home watch service in Watersound Origins, Naturewalk, and Inlet Beach along 30A. Weekly inspections, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
+            description: "Home watch service in Watersound Origins, Naturewalk, and Inlet Beach along 30A. Weekly property checks, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
             url: "https://coastalhomemngt30a.com/home-watch",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
@@ -304,7 +304,7 @@ export default function HomeWatchPage() {
               { "@type": "Place", name: "Alys Beach, FL" },
               { "@type": "Place", name: "Rosemary Beach, FL" },
             ],
-            serviceType: ["Home Watch", "Second Home Management", "Property Inspection", "Storm Preparation", "Concierge Services"],
+            serviceType: ["Home Watch", "Second Home Management", "Property Checks", "Storm Preparation", "Concierge Services"],
             priceRange: "$200-$600/month",
           }),
         }}

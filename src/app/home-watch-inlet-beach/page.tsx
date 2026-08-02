@@ -4,12 +4,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Home Watch Service Inlet Beach FL | Coastal Home Management 30A",
   description:
-    "Home watch and second-home care in Inlet Beach, Florida. Local, insured, weekly inspections, photo reports, storm checks. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach. Free walkthrough.",
+    "Home watch and second-home care in Inlet Beach, Florida. Local, insured, weekly property checks, photo reports, storm checks. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-inlet-beach" },
   keywords: "home watch Inlet Beach FL, home watch service Inlet Beach Florida, second home care Inlet Beach, property watch Inlet Beach 30A, home watch 32461",
   openGraph: {
     title: "Home Watch Service, Inlet Beach FL | CHM 30A",
-    description: "Local, insured home watch for Inlet Beach second-home owners. Weekly inspections, photo proof, storm prep. Free walkthrough.",
+    description: "Local, insured home watch for Inlet Beach second-home owners. Weekly property checks, photo proof, storm prep. Free walkthrough.",
     url: "https://coastalhomemngt30a.com/home-watch-inlet-beach",
     images: ["/img.png"],
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "What home watch services are available in Inlet Beach Florida?",
-    a: "Coastal Home Management 30A provides dedicated home watch services throughout Inlet Beach, FL 32461. Services include weekly or bi-weekly property inspections, interior and exterior walkthroughs, photo documentation, written visit reports, mail pickup, storm preparation, HVAC and plumbing checks, and contractor coordination.",
+    a: "Coastal Home Management 30A provides dedicated home watch services throughout Inlet Beach, FL 32461. Services include weekly or bi-weekly property checks, interior and exterior walkthroughs, photo documentation, written visit reports, mail pickup, storm preparation, HVAC and plumbing checks, and contractor coordination.",
   },
   {
     q: "Who is the best home watch company in Inlet Beach FL?",
@@ -60,7 +60,7 @@ export default function HomeWatchInletBeachPage() {
         </h1>
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
           Coastal Home Management 30A is the locally owned and operated home watch service for Inlet Beach and the surrounding 30A corridor.
-          Weekly inspections, photo documentation after every visit, storm preparation, and a single local person who personally checks your home every time.
+          Weekly property checks, photo documentation after every visit, storm preparation, and a single local person who personally checks your home every time.
           Rated 5.0 on Google. Fully insured Florida LLC.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -133,10 +133,10 @@ export default function HomeWatchInletBeachPage() {
           <div className="grid gap-5 sm:grid-cols-2">
             {[
               "Full interior walkthrough: every room, every system",
-              "Exterior inspection: roof line, entry points, drainage",
+              "Exterior check: roof line, entry points, drainage",
               "HVAC function check and filter assessment",
               "Plumbing and water heater check",
-              "Irrigation system inspection",
+              "Irrigation system check",
               "Photo documentation: entire property, every visit",
               "Written visit report by text or email",
               "Mail and package retrieval",
@@ -210,7 +210,7 @@ export default function HomeWatchInletBeachPage() {
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             name: "Coastal Home Management 30A",
-            description: "Home watch service in Inlet Beach, FL. Weekly inspections, photo reports, storm prep, HVAC checks, mail pickup. Serving Watersound Origins, Naturewalk, Alys Beach, and 30A. Fully insured Florida LLC. 5.0 Google rating.",
+            description: "Home watch service in Inlet Beach, FL. Weekly property checks, photo reports, storm prep, HVAC checks, mail pickup. Serving Watersound Origins, Naturewalk, Alys Beach, and 30A. Fully insured Florida LLC. 5.0 Google rating.",
             url: "https://coastalhomemngt30a.com/home-watch-inlet-beach",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",

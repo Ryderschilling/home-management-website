@@ -144,7 +144,7 @@ export const offerings: {
   {
     name: "Essential",
     description:
-      "Essential home watch plan for 30A second homes: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after each visit. $200/month month-to-month, $190/month on a 6-month rate lock, or $180/month on a 12-month rate lock (billed monthly).",
+      "Essential home watch plan for 30A second homes: weekly property check, photo documentation, storm watch, mail pickup, and a text or email summary after each visit. $200/month month-to-month, $190/month on a 6-month rate lock, or $180/month on a 12-month rate lock (billed monthly).",
     price: "200.00",
     unitText: "month",
   },
@@ -158,7 +158,7 @@ export const offerings: {
   {
     name: "Coastal Elite",
     description:
-      "Our highest tier, guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, and Ryder's direct line. Limited to 8 members. $600/month month-to-month, $570/month on a 6-month rate lock, or $540/month on a 12-month rate lock (billed monthly).",
+      "Our highest tier. Guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, Ryder's direct line, plus Water Shutoff Protection monitoring and the Annual Coverage Record included. Limited to 8 members. $600/month month-to-month, $570/month on a 6-month rate lock, or $540/month on a 12-month rate lock (billed monthly).",
     price: "600.00",
     unitText: "month",
   },
@@ -174,6 +174,18 @@ export const offerings: {
       "Mail collection and/or trash takeout and return while you're away from your 30A property.",
     price: "35.00",
     unitText: "day",
+  },
+  {
+    name: "Water Shutoff Protection",
+    description:
+      "A smart automatic shutoff valve installed on your main water line by a licensed plumber. It closes the line by itself when it detects a burst or a running leak, and the alert routes to us so someone local goes to the house. $1,295 installed, then $35/month to monitor and respond. Monitoring is included on Coastal Elite.",
+    price: "1295.00",
+  },
+  {
+    name: "Annual Coverage Record",
+    description:
+      "Once a year, every visit to your home compiled into one dated document: what was checked, what was found, and the photos, in order, including the areas that were dry. Delivered as a PDF you can forward to your insurance agent. $195/year. Included on Coastal Elite.",
+    price: "195.00",
   },
 ];
 
@@ -194,7 +206,7 @@ export const siteData = {
       id: "second-home-management",
       title: "Second Home Management",
       description:
-        "Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins, full property inspections, issue coordination, and proactive care to keep your home in top condition.",
+        "Comprehensive oversight while you’re away. Weekly or bi-weekly check-ins, full property checks, issue coordination, and proactive care to keep your home in top condition.",
       image: "/img.png",
       ctaLabel: "Inquire Now",
     },

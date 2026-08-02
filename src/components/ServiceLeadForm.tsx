@@ -167,7 +167,7 @@ export default function ServiceLeadForm() {
           lineHeight: 1.65,
           color: "rgba(0,0,0,0.55)",
         }}>
-          I&apos;ll inspect your home and tell you exactly what it needs, no pressure, no commitment.
+          I&apos;ll walk your home and tell you exactly what it needs, no pressure, no commitment.
         </p>
 
         <form onSubmit={handleSubmit} noValidate>

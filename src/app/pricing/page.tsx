@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import { siteData } from "@/data/siteData";
+import LegalDisclaimer from "@/components/LegalDisclaimer";
 
 const GOOGLE_ADS_ID = "AW-18257719328";
 const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
@@ -117,6 +118,13 @@ const plans: Plan[] = [
           { text: "<strong>Priority response</strong>, you're first in line, always" },
         ],
       },
+      {
+        label: "Claim Protection",
+        items: [
+          { text: "<strong>Water Shutoff Protection</strong>, monitored by us, we go to the house when it trips", tag: "Included" },
+          { text: "<strong>Annual Coverage Record</strong>, a dated PDF of every visit for the year", tag: "$195 value" },
+        ],
+      },
     ],
   },
 ];
@@ -141,6 +149,16 @@ const addons = [
     name: "Day-Rate Mail & Trash",
     desc: "Short trips or one-offs without a monthly retainer.",
     price: "$35/day",
+  },
+  {
+    name: "Water Shutoff Protection",
+    desc: "Smart automatic shutoff valve on your main line, installed by a licensed plumber. Alerts route to us. Included on Coastal Elite.",
+    price: "$1,295 installed + $35/mo",
+  },
+  {
+    name: "Annual Coverage Record",
+    desc: "Every visit for the year in one dated PDF with photos, built to hand to your insurance agent. Included on Coastal Elite.",
+    price: "$195/year",
   },
 ];
 
@@ -608,6 +626,18 @@ export default function PricingPage() {
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
+                <td className="compare-td compare-td-feature">Water Shutoff Protection, monitored</td>
+                <td className="compare-td compare-td-label">Add-on</td>
+                <td className="compare-td compare-td-label">Add-on</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr className="compare-row-alt">
+                <td className="compare-td compare-td-feature">Annual Coverage Record (dated PDF)</td>
+                <td className="compare-td compare-td-label">$195/yr</td>
+                <td className="compare-td compare-td-label">$195/yr</td>
+                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+              </tr>
+              <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
                 <td className="compare-td compare-td-price compare-td-bronze">$200</td>
                 <td className="compare-td compare-td-price compare-td-silver">$350</td>
@@ -642,6 +672,11 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Legal. Read src/data/protection.ts before touching insurance copy. */}
+      <section className="legal-strip">
+        <LegalDisclaimer variant="inline" />
+      </section>
+
       {/* Footer note */}
       <p className="footer-note">
         Questions? Call or text Ryder directly:{" "}
@@ -655,6 +690,13 @@ export default function PricingPage() {
 
       <style jsx global>{`
         /* ── Reset / base ─────────────────────────────── */
+        .legal-strip {
+          max-width: 900px;
+          margin: 56px auto 0;
+          padding: 0 24px;
+          text-align: center;
+        }
+
         .pricing-page {
           font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
           background: #f2faf9;

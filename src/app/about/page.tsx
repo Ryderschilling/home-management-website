@@ -43,7 +43,7 @@ const organizationSchema = {
   },
   image: "https://coastalhomemngt30a.com/profile-web.jpg",
   description:
-    "Coastal Home Management 30A is a local, owner-operated, fully insured Florida LLC providing second-home management, property inspections, and concierge services for vacation homeowners along scenic 30A in the Florida Panhandle. Founded by Ryder Schilling in October 2025, the company serves Watersound Origins, Naturewalk at Seagrove, Inlet Beach, Rosemary Beach, WaterColor, Seaside, and surrounding 30A communities.",
+    "Coastal Home Management 30A is a local, owner-operated, fully insured Florida LLC providing second-home management, property checks, and concierge services for vacation homeowners along scenic 30A in the Florida Panhandle. Founded by Ryder Schilling in October 2025, the company serves Watersound Origins, Naturewalk at Seagrove, Inlet Beach, Rosemary Beach, WaterColor, Seaside, and surrounding 30A communities.",
   foundingDate: businessContact.foundingDate,
   telephone: businessContact.phone,
   email: "coastalhomemanagement30a@gmail.com",
@@ -154,7 +154,7 @@ export default function AboutPage() {
               Second-home management for 30A property owners.
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              We provide weekly property inspections, photo documentation, and written reports so
+              We provide weekly property checks, photo documentation, and written reports so
               that second-home and vacation rental owners along 30A always know exactly what&apos;s
               happening at their property, even when they&apos;re a thousand miles away.
             </p>
@@ -169,7 +169,7 @@ export default function AboutPage() {
             <ul className="space-y-4 text-sm text-gray-700">
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Essential, Home Watch, and Coastal Elite tiers with weekly or bi-weekly inspections and photo reports</span>
+                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Essential, Home Watch, and Coastal Elite tiers with weekly or bi-weekly property checks and photo reports</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
@@ -218,7 +218,7 @@ export default function AboutPage() {
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
                 {[
-                  ["Weekly property inspection",           true,  true,  true],
+                  ["Weekly property check",           true,  true,  true],
                   ["Photo documentation every visit",      true,  true,  true],
                   ["Written visit summary (text/email)",   true,  true,  true],
                   ["Mail & package pickup",                true,  true,  true],
@@ -400,7 +400,7 @@ export default function AboutPage() {
             <div>
               <h3 className="text-base font-serif mb-2">Photo-Documented Every Visit</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Every property inspection is photographed and reported in writing. You receive a
+                Every property check is photographed and reported in writing. You receive a
                 visit summary after every check-in, a verifiable record of your home&apos;s condition
                 that no large management company consistently provides.
               </p>

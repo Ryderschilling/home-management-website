@@ -4,12 +4,12 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Home Watch Service Naturewalk at Watersound Origins | Coastal Home Management 30A",
   description:
-    "Home watch and second-home care for Naturewalk at Watersound Origins. Local, insured, weekly inspections, photo reports after every visit. Ryder Schilling lives steps away. Free walkthrough.",
+    "Home watch and second-home care for Naturewalk at Watersound Origins. Local, insured, weekly property checks, photo reports after every visit. Ryder Schilling lives steps away. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-naturewalk" },
   keywords: "home watch Naturewalk, Naturewalk Watersound Origins home watch, property watch Naturewalk Florida, second home care Naturewalk Inlet Beach, home management Naturewalk 30A",
   openGraph: {
     title: "Home Watch, Naturewalk at Watersound Origins | CHM 30A",
-    description: "Local, insured home watch for Naturewalk at Watersound Origins. Weekly inspections, photo proof, storm checks. Free walkthrough.",
+    description: "Local, insured home watch for Naturewalk at Watersound Origins. Weekly property checks, photo proof, storm checks. Free walkthrough.",
     url: "https://coastalhomemngt30a.com/home-watch-naturewalk",
     images: ["/img.png"],
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Who checks on vacation homes in Naturewalk at Watersound Origins when owners are away?",
-    a: "Coastal Home Management 30A provides dedicated home watch services for second-home owners in Naturewalk at Watersound Origins. Ryder Schilling, a full-time resident of the Watersound Origins community, personally conducts every inspection, photographs the property, and sends a written report after each visit.",
+    a: "Coastal Home Management 30A provides dedicated home watch services for second-home owners in Naturewalk at Watersound Origins. Ryder Schilling, a full-time resident of the Watersound Origins community, personally walks every property, photographs the property, and sends a written report after each visit.",
   },
   {
     q: "Does CHM serve Naturewalk at Watersound Origins specifically?",
@@ -26,7 +26,7 @@ const FAQ = [
   },
   {
     q: "What home watch services are available in Naturewalk Florida?",
-    a: "Coastal Home Management 30A offers Essential ($200/month), Home Watch ($350/month), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include weekly inspections, photo documentation, mail pickup, and written visit reports. Coastal Elite adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination.",
+    a: "Coastal Home Management 30A offers Essential ($200/month), Home Watch ($350/month), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include weekly property checks, photo documentation, mail pickup, and written visit reports. Coastal Elite adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination.",
   },
   {
     q: "Is Naturewalk at Watersound Origins in CHM's service area?",
@@ -59,7 +59,7 @@ export default function HomeWatchNaturewalkPage() {
           Home Watch Services for Naturewalk at Watersound Origins
         </h1>
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
-          Naturewalk at Watersound Origins is one of CHM's primary service communities. Ryder Schilling lives in the neighborhood and personally inspects every property on a weekly or bi-weekly schedule.
+          Naturewalk at Watersound Origins is one of CHM's primary service communities. Ryder Schilling lives in the neighborhood and personally checks every property on a weekly or bi-weekly schedule.
           Photo proof after every visit. Written report every time. Immediate alerts if anything needs attention.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -177,7 +177,7 @@ export default function HomeWatchNaturewalkPage() {
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
             name: "Coastal Home Management 30A",
-            description: "Home watch service for Naturewalk at Watersound Origins and surrounding 30A communities. Local resident, fully insured, weekly inspections, photo reports, storm preparation.",
+            description: "Home watch service for Naturewalk at Watersound Origins and surrounding 30A communities. Local resident, fully insured, weekly property checks, photo reports, storm preparation.",
             url: "https://coastalhomemngt30a.com/home-watch-naturewalk",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",

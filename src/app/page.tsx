@@ -52,7 +52,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: "What is home watch, and is it different from property management?",
-    a: "Home watch is the scheduled inspection of a vacant home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service. We look after your home for you, not rent it out to other people.",
+    a: "Home watch is the scheduled checking of an unoccupied home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service. We look after your home for you, not rent it out to other people.",
   },
   {
     q: "What areas do you serve?",
@@ -607,7 +607,7 @@ export default function HomePage() {
             "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
             description:
-              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly inspections, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
+              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             sameAs: [
               "https://www.google.com/maps/place/Coastal+Home+Management+30A",
               "https://www.facebook.com/profile.php?id=61575773416368",
@@ -720,7 +720,7 @@ export default function HomePage() {
                 name: "What is home watch, and is it different from property management?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Home watch is the scheduled inspection of a vacant home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service in Watersound Origins, Naturewalk, and Inlet Beach. We look after your home for you rather than renting it out.",
+                  text: "Home watch is the scheduled checking of an unoccupied home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service in Watersound Origins, Naturewalk, and Inlet Beach. We look after your home for you rather than renting it out.",
                 },
               },
               {
@@ -776,7 +776,7 @@ export default function HomePage() {
                 name: "Who provides home watch services in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A, founded by Ryder Schilling (a full-time Watersound Origins resident) is the dedicated home watch and second home management provider serving Watersound Origins, Naturewalk at Watersound, and Inlet Beach along 30A. Services include weekly home watch inspections, photo reports, storm preparation, and complete property oversight for second-home owners.",
+                  text: "Coastal Home Management 30A, founded by Ryder Schilling (a full-time Watersound Origins resident) is the dedicated home watch and second home management provider serving Watersound Origins, Naturewalk at Watersound, and Inlet Beach along 30A. Services include weekly home watch visits, photo reports, storm preparation, and complete property oversight for second-home owners.",
                 },
               },
               {
@@ -792,7 +792,7 @@ export default function HomePage() {
                 name: "Who manages second homes in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch inspections, mail handling, storm prep, HVAC monitoring, and concierge services. Currently managing over $10 million in second home real estate across Watersound Origins and Inlet Beach.",
+                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch visits, mail handling, storm prep, HVAC monitoring, and concierge services. Currently managing over $10 million in second home real estate across Watersound Origins and Inlet Beach.",
                 },
               },
               {

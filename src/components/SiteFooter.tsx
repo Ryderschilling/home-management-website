@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LegalDisclaimer from "./LegalDisclaimer";
 import {
   siteData,
   trustStats,
@@ -13,6 +14,7 @@ const SERVICES: Array<[string, string]> = [
   ["/concierge-services-inlet-beach", "Concierge Services"],
   ["/mail-package-handling-inlet-beach", "Mail & Package Handling"],
   ["/home-check-services-30a", "Home Check Services"],
+  ["/claim-protection", "Claim Protection"],
   ["/artificial-rock-installation-inlet-beach", "Artificial Rock Install"],
   ["/pricing", "Pricing & Plans"],
 ];
@@ -152,7 +154,12 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-7 text-[12px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
+        {/* Legal. Read src/data/protection.ts before touching insurance copy. */}
+        <div className="mt-14 max-w-[860px] border-t border-white/10 pt-7">
+          <LegalDisclaimer variant="dark" />
+        </div>
+
+        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-7 text-[12px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
           <span>
             © {new Date().getFullYear()} Coastal Home Management 30A. Owner-operated in Inlet
             Beach, Florida.
