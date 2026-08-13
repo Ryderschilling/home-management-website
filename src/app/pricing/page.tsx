@@ -147,7 +147,7 @@ const addons = [
   },
   {
     name: "Day-Rate Mail & Trash",
-    desc: "Short trips or one-offs without a monthly retainer.",
+    desc: "Scheduled mail pickups, minimum 3 days.",
     price: "$35/day",
   },
   {
