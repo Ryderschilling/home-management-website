@@ -4,7 +4,7 @@ import { allBlogPosts } from "@/data/blogPosts";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://coastalhomemngt30a.com";
-  const lastModified = new Date("2026-06-27");
+  const lastModified = new Date();
 
   const blogUrls: MetadataRoute.Sitemap = [
     {
@@ -39,6 +39,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/home-watch`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/home-watch-watersound-origins`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/home-watch-inlet-beach`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/home-watch-naturewalk`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/second-home-management-inlet-beach`,

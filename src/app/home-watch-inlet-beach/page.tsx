@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Home Watch Service Inlet Beach FL | Coastal Home Management 30A",
+  title: "Home Watch Service in Inlet Beach, FL",
   description:
     "Home watch and second-home care in Inlet Beach, Florida. Local, insured, weekly property checks, photo reports, storm checks. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-inlet-beach" },

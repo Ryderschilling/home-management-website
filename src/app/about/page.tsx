@@ -4,14 +4,14 @@ import Link from "next/link";
 import { businessContact, siteData } from "@/data/siteData";
 
 export const metadata: Metadata = {
-  title: "About Coastal Home Management 30A | Property Management Experts",
+  title: "About Ryder Schilling, Home Watch Owner",
   description:
     "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Naturewalk & Inlet Beach. Meet founder Ryder Schilling.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com/about",
   },
   openGraph: {
-    title: "About Coastal Home Management 30A | Property Management Experts",
+    title: "About Ryder Schilling, Home Watch Owner",
     description:
       "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Naturewalk & Inlet Beach. Meet founder Ryder Schilling.",
     url: "https://coastalhomemngt30a.com/about",

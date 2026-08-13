@@ -58,19 +58,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
 
   title: {
-    default: "Second Home Management in Inlet Beach, 30A | CHM",
+    default: "Home Watch & Second Home Management, Inlet Beach 30A",
     template: "%s | Coastal Home Management 30A",
   },
 
   description:
     "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
 
-  alternates: {
-    canonical: "https://coastalhomemngt30a.com",
-  },
-
   openGraph: {
-    title: "Second Home Management in Inlet Beach, 30A | CHM",
+    title: "Home Watch & Second Home Management, Inlet Beach 30A",
     description:
       "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
     url: "https://coastalhomemngt30a.com",

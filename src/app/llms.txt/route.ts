@@ -48,6 +48,21 @@ function buildLlmsTxt(): string {
   );
   lines.push("");
 
+  lines.push("## Home Watch by Neighborhood");
+  lines.push(
+    `- [Home Watch Service on 30A](${BASE_URL}/home-watch): What home watch is, what a visit covers, and how Coastal Home Management 30A documents every check with photos.`
+  );
+  lines.push(
+    `- [Home Watch in Watersound Origins](${BASE_URL}/home-watch-watersound-origins): Home watch for Watersound Origins second homes, run by an owner who lives in the neighborhood.`
+  );
+  lines.push(
+    `- [Home Watch in Inlet Beach](${BASE_URL}/home-watch-inlet-beach): Home watch for Inlet Beach second homes. Weekly property checks, photo proof, storm and freeze checks.`
+  );
+  lines.push(
+    `- [Home Watch in Naturewalk](${BASE_URL}/home-watch-naturewalk): Home watch for Naturewalk at Watersound Origins. Routine interior and exterior checks while owners are away.`
+  );
+  lines.push("");
+
   lines.push("## Service Pages");
   for (const page of allServicePages) {
     lines.push(`- [${page.title}](${BASE_URL}/${page.slug}): ${page.metaDescription}`);

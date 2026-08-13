@@ -1,15 +1,20 @@
 import Link from "next/link";
+import Image from "next/image";
 import { siteData } from "@/data/siteData";
 import type { ServicePageData } from "@/data/servicePages";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
 
 const relatedServiceLinks = [
-  { href: "/second-home-management-inlet-beach", label: "Home Watch, Inlet Beach", slug: "second-home-management-inlet-beach" },
-  { href: "/second-home-management-watersound-origins", label: "Home Watch, Watersound Origins", slug: "second-home-management-watersound-origins" },
+  { href: "/home-watch", label: "Home Watch, 30A", slug: "home-watch" },
+  { href: "/home-watch-watersound-origins", label: "Home Watch, Watersound Origins", slug: "home-watch-watersound-origins" },
+  { href: "/home-watch-inlet-beach", label: "Home Watch, Inlet Beach", slug: "home-watch-inlet-beach" },
+  { href: "/home-watch-naturewalk", label: "Home Watch, Naturewalk", slug: "home-watch-naturewalk" },
+  { href: "/second-home-management-inlet-beach", label: "Second Home Management, Inlet Beach", slug: "second-home-management-inlet-beach" },
+  { href: "/second-home-management-watersound-origins", label: "Second Home Management, Watersound Origins", slug: "second-home-management-watersound-origins" },
   { href: "/vacation-home-care-30a", label: "Vacation Home Care, 30A", slug: "vacation-home-care-30a" },
   { href: "/concierge-services-inlet-beach", label: "Concierge Services", slug: "concierge-services-inlet-beach" },
   { href: "/mail-package-handling-inlet-beach", label: "Mail & Package Handling", slug: "mail-package-handling-inlet-beach" },
-  { href: "/home-check-services-30a", label: "Home Watch & Home Checks, 30A", slug: "home-check-services-30a" },
+  { href: "/home-check-services-30a", label: "Home Checks, 30A", slug: "home-check-services-30a" },
   { href: "/pricing", label: "Service Plans & Pricing", slug: "pricing" },
   { href: "/", label: "Home", slug: "home" },
 ];
@@ -30,6 +35,28 @@ export default function ServiceLandingPage({
       name: siteData.businessName,
       email: siteData.contactEmail,
     },
+  };
+
+  // BreadcrumbList schema, this is what renders the breadcrumb trail under a
+  // Google result instead of a raw URL, and it tells crawlers how the site
+  // nests. Every landing page emits it automatically from its slug.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://coastalhomemngt30a.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: service.title,
+        item: `https://coastalhomemngt30a.com/${service.slug}`,
+      },
+    ],
   };
 
   // FAQPage schema, this is the single highest-leverage tag for AI citation
@@ -82,9 +109,13 @@ export default function ServiceLandingPage({
       {/* Hero Image */}
       <section className="px-6 py-14 md:py-20">
         <div className="mx-auto max-w-5xl">
-          <img
+          <Image
             src={service.image}
             alt={service.title}
+            width={1600}
+            height={900}
+            priority
+            sizes="(max-width: 1024px) 100vw, 1024px"
             className="aspect-[16/9] w-full border border-gray-200 object-cover"
           />
         </div>
@@ -233,6 +264,10 @@ export default function ServiceLandingPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
     </main>
   );

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Home Watch Service Naturewalk at Watersound Origins | Coastal Home Management 30A",
+  title: "Home Watch Service in Naturewalk, FL",
   description:
     "Home watch and second-home care for Naturewalk at Watersound Origins. Local, insured, weekly property checks, photo reports after every visit. Ryder Schilling lives steps away. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-naturewalk" },

@@ -16,8 +16,8 @@ export type ServicePageData = {
 export const servicePages: Record<string, ServicePageData> = {
   "second-home-management-inlet-beach": {
     slug: "second-home-management-inlet-beach",
-    title: "Home Watch & Second Home Management in Inlet Beach",
-    metaTitle: "Home Watch & Second Home Management in Inlet Beach, Florida",
+    title: "Second Home Management in Inlet Beach",
+    metaTitle: "Second Home Management in Inlet Beach, Florida",
     metaDescription:
       "Local home watch and second home management in Inlet Beach and along 30A. Weekly home watch checks with photo proof, issue coordination, and trusted oversight while you're away.",
     intro:
@@ -249,8 +249,8 @@ export const servicePages: Record<string, ServicePageData> = {
 
   "second-home-management-watersound-origins": {
     slug: "second-home-management-watersound-origins",
-    title: "Home Watch & Second Home Management in Watersound Origins",
-    metaTitle: "Home Watch & Second Home Management in Watersound Origins, FL",
+    title: "Second Home Management in Watersound Origins",
+    metaTitle: "Second Home Management in Watersound Origins, FL",
     metaDescription:
       "Local home watch and second home management in Watersound Origins and Naturewalk. Weekly property checks with photo proof, issue coordination, and trusted oversight while you're away.",
     intro:
@@ -295,7 +295,7 @@ export const servicePages: Record<string, ServicePageData> = {
   "vacation-home-care-30a": {
     slug: "vacation-home-care-30a",
     title: "Vacation Home Care on 30A",
-    metaTitle: "Vacation Home Care Services on Scenic 30A, Florida",
+    metaTitle: "Vacation Home Care on Scenic 30A",
     metaDescription:
       "Vacation home care on scenic 30A and Inlet Beach. Property checks, pre-arrival prep, issue response, and trusted local management for second homeowners.",
     intro:
@@ -336,7 +336,7 @@ export const servicePages: Record<string, ServicePageData> = {
   "artificial-rock-installation-inlet-beach": {
     slug: "artificial-rock-installation-inlet-beach",
     title: "Artificial Rock Installation in Inlet Beach",
-    metaTitle: "Artificial Rock Installation in Inlet Beach and 30A",
+    metaTitle: "Artificial Rock Installation, Inlet Beach",
     metaDescription:
       "Artificial rock installation in Inlet Beach and along 30A to cover exposed pipes and fixtures with a clean, finished look.",
     intro:

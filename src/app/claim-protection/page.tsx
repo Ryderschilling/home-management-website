@@ -8,7 +8,7 @@ import { primaryPhone, primaryPhoneDisplay } from "@/data/siteData";
 // There is a hard line here and it is documented at the top of that file.
 
 export const metadata: Metadata = {
-  title: "Claim Protection for Empty 30A Homes | Coastal Home Management 30A",
+  title: "Claim Protection for Empty 30A Homes",
   description:
     "Most water claims on empty Florida second homes are denied on timing, not on coverage. Here is how a dated, photographed visit record protects the claim, and what an automatic water shutoff actually does.",
   alternates: { canonical: "https://coastalhomemngt30a.com/claim-protection" },

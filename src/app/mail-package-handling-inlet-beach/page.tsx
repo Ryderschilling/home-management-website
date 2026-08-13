@@ -7,6 +7,9 @@ const service = servicePages["mail-package-handling-inlet-beach"];
 export const metadata: Metadata = {
   title: service.metaTitle,
   description: service.metaDescription,
+  alternates: {
+    canonical: `https://coastalhomemngt30a.com/${service.slug}`,
+  },
 };
 
 export default function Page() {

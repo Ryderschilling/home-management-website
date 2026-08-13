@@ -5,7 +5,7 @@ import HeroImage from "@/components/HeroImage";
 import { siteData } from "@/data/siteData";
 
 export const metadata: Metadata = {
-  title: "Home Watch Service Watersound Origins & 30A | Coastal Home Management",
+  title: "Home Watch Service on 30A & Watersound Origins",
   description:
     "Trusted home watch service in Watersound Origins, Naturewalk & Inlet Beach, 30A. Local, insured, weekly check-ins, photo proof every visit. The only home watch company that lives in the neighborhood. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch" },

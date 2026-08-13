@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Coastal Home Management 30A",
+  title: "Privacy Policy",
   description:
     "Privacy policy for Coastal Home Management 30A. How we collect, use, and protect your information.",
+  alternates: {
+    canonical: "https://coastalhomemngt30a.com/privacy-policy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

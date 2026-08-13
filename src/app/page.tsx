@@ -15,6 +15,9 @@ import { BookButton } from "@/components/BookingProvider";
 export const metadata: Metadata = {
   description:
     "Second home management and home watch in Watersound Origins, Naturewalk & Inlet Beach on 30A. Weekly visits, photo report every time, one owner-operator. Book a free walkthrough.",
+  alternates: {
+    canonical: "https://coastalhomemngt30a.com",
+  },
 };
 
 /* Marquee content, one array, rendered twice for a seamless loop. */

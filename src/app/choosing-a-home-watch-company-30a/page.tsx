@@ -18,7 +18,7 @@ const PAGE_URL = "https://coastalhomemngt30a.com/choosing-a-home-watch-company-3
 const essential = offerings.find((o) => o.name === "Essential");
 
 export const metadata: Metadata = {
-  title: "How to Choose a Home Watch Company on 30A | Coastal Home Management",
+  title: "How to Choose a Home Watch Company on 30A",
   description:
     "A local's guide to comparing home watch and second-home management providers on 30A: service area focus, pricing transparency, and what's actually included in a visit.",
   alternates: { canonical: PAGE_URL },

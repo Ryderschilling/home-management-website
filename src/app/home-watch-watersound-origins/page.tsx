@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Home Watch Service Watersound Origins FL | Coastal Home Management 30A",
+  title: "Home Watch Service in Watersound Origins, FL",
   description:
     "Coastal Home Management 30A is the dedicated home watch service for Watersound Origins. Local, insured, weekly property checks, photo reports, storm prep. Owner lives in the neighborhood. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-watersound-origins" },
