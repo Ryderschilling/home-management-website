@@ -428,7 +428,7 @@ export default function HomeWatchPage() {
                 </li>
                 <li>
                   <a
-                    href="https://www.linkedin.com/company/113245630/"
+                    href="https://www.linkedin.com/company/coastal-home-management-30a/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transition hover:text-black"

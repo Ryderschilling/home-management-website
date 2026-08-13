@@ -65,7 +65,7 @@ export const businessContact = {
   // (facebook.com/CoastalHomeManagement30A) is the one you actually want
   // customers to see, tell me and I'll switch all three to match it instead.
   facebookUrl: "https://www.facebook.com/profile.php?id=61575773416368",
-  linkedinUrl: "https://www.linkedin.com/company/113245630/",
+  linkedinUrl: "https://www.linkedin.com/company/coastal-home-management-30a/",
 };
 
 // ─── Phone / booking configuration ─────────────────────────────────────────

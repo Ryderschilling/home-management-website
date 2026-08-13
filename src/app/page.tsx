@@ -614,7 +614,7 @@ export default function HomePage() {
             sameAs: [
               "https://www.google.com/maps/place/Coastal+Home+Management+30A",
               "https://www.facebook.com/profile.php?id=61575773416368",
-              "https://www.linkedin.com/company/113245630/",
+              "https://www.linkedin.com/company/coastal-home-management-30a/",
               "https://www.yelp.com/biz/coastal-home-management-30a-inlet-beach",
               "https://www.destinflorida.com/30a/services/home-watch-concierge/coastal-home-management-30a",
               "https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl",
