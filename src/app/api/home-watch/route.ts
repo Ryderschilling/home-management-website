@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 import { Resend } from "resend";
 import { env } from "@/lib/server/env";
 
@@ -229,6 +230,15 @@ export async function POST(req: NextRequest) {
         console.error("[CHM] Lead confirmation email failed (non-blocking):", e);
       }
     }
+
+    await forwardLeadToDashboard({
+      name,
+      email: email || null,
+      phone,
+      community: neighborhood || null,
+      message: message || null,
+      source: source || "Website home-watch",
+    });
 
     return NextResponse.json({ ok: true });
   } catch (e) {

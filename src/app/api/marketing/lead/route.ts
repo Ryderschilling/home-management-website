@@ -6,6 +6,7 @@ import { ensureAdminTables, sql } from "@/lib/server/db";
 import { env } from "@/lib/server/env";
 import { scheduleDripSequence } from "@/lib/server/lead-drip";
 import { getPostHogClient } from "@/lib/posthog-server";
+import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 
 export const runtime = "nodejs";
 
@@ -203,6 +204,15 @@ export async function POST(req: NextRequest) {
     }
 
     const orgId = env.DEFAULT_ORGANIZATION_ID;
+
+    // Single source of truth: every lead also lands in the dashboard as a LEAD client.
+    await forwardLeadToDashboard({
+      name: firstName || null,
+      email,
+      phone,
+      community: neighborhood,
+      source: sourcePage ? `Website ${sourcePage}` : "Website",
+    });
 
     let campaignId: string | null = null;
     let normalizedCampaignCode: string | null = null;

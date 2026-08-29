@@ -184,9 +184,6 @@ export default function SiteFooter() {
             >
               sourceatrade.com
             </a>
-            <Link href="/admin/login" className="transition-colors hover:text-[var(--ch-teal-bright)]">
-              Admin
-            </Link>
           </div>
         </div>
       </div>

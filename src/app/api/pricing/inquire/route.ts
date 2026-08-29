@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 import { Resend } from "resend";
 import { env } from "@/lib/server/env";
 
@@ -174,6 +175,14 @@ export async function POST(req: NextRequest) {
       replyTo: email,
       subject: `New Inquiry: ${tierLabel}, ${name}`,
       html: buildOwnerEmail({ plan, tier, price, term, name, email, phone, address, message }),
+    });
+
+    await forwardLeadToDashboard({
+      name,
+      email,
+      phone,
+      message: [`Pricing inquiry: ${tierLabel}`, message || null, address || null].filter(Boolean).join(". "),
+      source: "Website pricing",
     });
 
     return NextResponse.json({ ok: true });

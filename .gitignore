@@ -42,3 +42,6 @@ next-env.d.ts
 
 /generated/prisma
 .env.local
+
+# local safety copy of removed backend (do not commit)
+_to_delete/
