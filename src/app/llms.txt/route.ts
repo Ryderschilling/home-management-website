@@ -12,6 +12,7 @@
 import { siteData, offerings, businessContact, trustStats } from "@/data/siteData";
 import { allServicePages } from "@/data/servicePages";
 import { allBlogPosts } from "@/data/blogPosts";
+import { allTownPages } from "@/data/townPages";
 
 const BASE_URL = "https://coastalhomemngt30a.com";
 
@@ -61,6 +62,17 @@ function buildLlmsTxt(): string {
   lines.push(
     `- [Home Watch in Naturewalk](${BASE_URL}/home-watch-naturewalk): Home watch for Naturewalk at Watersound Origins. Routine interior and exterior checks while owners are away.`
   );
+  lines.push("");
+
+  lines.push("## Home Watch by Beach Town");
+  lines.push(
+    `- [All Service Areas](${BASE_URL}/service-areas): Every town Coastal Home Management 30A serves, with the honest drive time from the owner's home in Watersound Origins.`
+  );
+  for (const town of allTownPages) {
+    lines.push(
+      `- [Home Watch in ${town.town}](${BASE_URL}/${town.slug}): ${town.directAnswer}`
+    );
+  }
   lines.push("");
 
   lines.push("## Service Pages");

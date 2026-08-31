@@ -30,6 +30,7 @@ const AREAS: Array<[string, string]> = [
 
 const COMPANY: Array<[string, string]> = [
   ["/about", "About Ryder"],
+  ["/service-areas", "Service Areas"],
   ["/blog", "Journal"],
   ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
   ["/privacy-policy", "Privacy Policy"],
