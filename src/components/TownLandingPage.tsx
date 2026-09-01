@@ -48,6 +48,8 @@ const PLANS = [
   },
 ];
 
+const article = (word: string) => (/^[aeiou]/i.test(word) ? "an" : "a");
+
 export default function TownLandingPage({ town }: { town: TownPageData }) {
   const url = `${SITE}/${town.slug}`;
 
@@ -240,8 +242,9 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
             What goes wrong in an empty {town.townShort} home
           </h2>
           <p className="mb-10 max-w-2xl text-sm leading-relaxed text-black/50">
-            Every town on this coast fails differently. These are the specific things we look for on
-            a {town.town} property, and the reason a generic checklist misses them.
+            Every town on this coast fails differently. These are the specific things we look for
+            on {article(town.town)} {town.town} property, and the reason a generic checklist
+            misses them.
           </p>
           <div className="grid gap-6 md:grid-cols-2">
             {town.failureModes.map((f) => (
