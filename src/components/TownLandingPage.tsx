@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { TownPageData } from "@/data/townPages";
+import { trustStats } from "@/data/siteData";
 
 const SITE = "https://coastalhomemngt30a.com";
 const PHONE_DISPLAY = "(309) 415-8793";
@@ -84,9 +85,9 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
       },
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: "5.0",
-        bestRating: "5",
-        reviewCount: "4",
+        ratingValue: trustStats.ratingValue,
+        bestRating: trustStats.bestRating,
+        reviewCount: trustStats.reviewCount,
       },
     },
     areaServed: [
@@ -169,7 +170,7 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
             href={`mailto:${EMAIL}?subject=${encodeURIComponent(`Home watch in ${town.town}`)}`}
             className="inline-block bg-black px-8 py-4 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-neutral-800"
           >
-            Get a Free Walkthrough
+            Get My Free Home Check
           </a>
           <a
             href={`tel:${PHONE_TEL}`}
@@ -200,6 +201,10 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
               { k: "Plans", v: "$200, $350 and $600 per month. No contract." },
               { k: "Proof of visit", v: "Photographs and a written report after every check" },
               { k: "Storm and freeze", v: "Pre-storm and post-storm checks, same-day photos" },
+              {
+                k: "Reviews",
+                v: `${trustStats.ratingValue} on Google across ${trustStats.reviewCount} reviews`,
+              },
               { k: "Insured", v: "Fully insured Florida LLC, founded October 2025" },
               { k: "Who shows up", v: "Ryder Schilling, the owner. No subcontractors." },
             ].map((row) => (
@@ -389,16 +394,17 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
         <h2 className="mb-4 text-3xl tracking-tight text-black md:text-4xl" style={SERIF}>
           Ready to have eyes on your {town.townShort} home?
         </h2>
-        <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-black/60">
-          Free walkthrough, no commitment. We look at the property, tell you what it actually needs,
-          and you decide from there.
+        <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-black/60">
+          Send me your address. I&apos;ll walk your home this week and email you photos and a
+          written condition report within 48 hours. No charge, no commitment, and the report is
+          yours to keep either way.
         </p>
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <a
             href={`mailto:${EMAIL}?subject=${encodeURIComponent(`Home watch in ${town.town}`)}`}
             className="inline-block bg-black px-10 py-4 text-[11px] font-medium uppercase tracking-[0.2em] text-white transition hover:bg-neutral-800"
           >
-            Get My Free Walkthrough
+            Get My Free Home Check
           </a>
           <a
             href={`tel:${PHONE_TEL}`}

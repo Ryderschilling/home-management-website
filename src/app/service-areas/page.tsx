@@ -8,7 +8,7 @@ const SERIF = {
 } as const;
 
 export const metadata: Metadata = {
-  title: "Home Watch Service Areas on 30A | Coastal Home Management 30A",
+  title: "Home Watch Service Areas on 30A",
   description:
     "Every town Coastal Home Management 30A serves, from Dune Allen Beach to west Panama City Beach, with drive times from the owner's home in Watersound Origins. Home watch from $200/mo.",
   keywords:

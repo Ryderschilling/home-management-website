@@ -37,7 +37,7 @@ const STEPS: Step[] = [
   {
     n: "01",
     title: "Tell me about your property",
-    body: "Call or book a walkthrough. We talk through your home, your schedule, and what level of care actually makes sense. No sales call, no pressure. Most owners are set up within a few days.",
+    body: "Send your address or call. You do not need to be in town. I walk the home, email you photos and a written condition report within 48 hours, and tell you what it actually needs. No sales call, no pressure. Most owners are set up within a few days.",
     x: 110,
     y: 250,
     w: 600,
@@ -307,7 +307,8 @@ export default function ScrollJourney() {
           >
             <p className="ch-label !text-[var(--ch-teal-bright)]">And that&apos;s it</p>
             <p className="mt-4 text-[26px] leading-tight tracking-[-0.02em] text-white" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 108, 'wght' 620" }}>
-              The first walkthrough is free.
+              The first walkthrough is free,
+              and you do not need to be here for it.
             </p>
             <span className="ch-magnet mt-7 inline-block" data-magnet="0.3">
               <button type="button" className="ch-btn ch-btn--light" onClick={() => open("journey")}>

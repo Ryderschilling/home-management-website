@@ -50,7 +50,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 4,
     onThirtyA: true,
     eyebrow: "Rosemary Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Rosemary Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Rosemary Beach, FL",
     metaDescription:
       "Home watch for Rosemary Beach second homes. Weekly walkthroughs, photo proof every visit, carriage house and courtyard checks, storm response. Owner lives 4 minutes away in Watersound Origins. Plans from $200/mo.",
     keywords:
@@ -138,7 +138,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 6,
     onThirtyA: true,
     eyebrow: "Alys Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Alys Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Alys Beach, FL",
     metaDescription:
       "Home watch for Alys Beach courtyard homes. Weekly walkthroughs, courtyard and drain checks, photo proof every visit, storm response. Owner lives 6 minutes away in Watersound Origins. Plans from $200/mo.",
     keywords:
@@ -225,7 +225,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 5,
     onThirtyA: true,
     eyebrow: "Seacrest Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Seacrest Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Seacrest Beach, FL",
     metaDescription:
       "Home watch for Seacrest Beach second homes and cottages. Weekly walkthroughs, photo proof every visit, rental-adjacent checks, storm response. Owner lives 5 minutes away. Plans from $200/mo.",
     keywords:
@@ -312,7 +312,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 6,
     onThirtyA: true,
     eyebrow: "Watersound Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Watersound Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Watersound Beach, FL",
     metaDescription:
       "Home watch for gated Watersound Beach homes. Weekly walkthroughs, dune-front salt exposure checks, photo proof every visit, storm response. Owner lives in Watersound Origins. Plans from $200/mo.",
     keywords:
@@ -399,7 +399,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 11,
     onThirtyA: true,
     eyebrow: "Seagrove Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Seagrove Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Seagrove Beach, FL",
     metaDescription:
       "Home watch for Seagrove Beach cottages and second homes. Weekly walkthroughs of older 30A housing stock, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -486,7 +486,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 13,
     onThirtyA: true,
     eyebrow: "Seaside · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Seaside, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Seaside, FL",
     metaDescription:
       "Home watch for Seaside, Florida cottages. Weekly walkthroughs, wood exterior and tin roof checks, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -573,7 +573,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 15,
     onThirtyA: true,
     eyebrow: "WaterColor · Walton County, FL · 30A",
-    metaTitle: "Home Watch in WaterColor, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in WaterColor, FL",
     metaDescription:
       "Home watch for WaterColor second homes. Weekly walkthroughs, deep-porch and irrigation checks, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -660,7 +660,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 18,
     onThirtyA: true,
     eyebrow: "Grayton Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Grayton Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Grayton Beach, FL",
     metaDescription:
       "Home watch for Grayton Beach homes and cottages. Weekly walkthroughs, flood and sand-road access, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -747,7 +747,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 21,
     onThirtyA: true,
     eyebrow: "Blue Mountain Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Blue Mountain Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Blue Mountain Beach, FL",
     metaDescription:
       "Home watch for Blue Mountain Beach second homes. Weekly walkthroughs, steep-lot drainage and wind exposure checks, photo proof every visit. Plans from $200/mo, no contract.",
     keywords:
@@ -834,7 +834,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 24,
     onThirtyA: true,
     eyebrow: "Santa Rosa Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Santa Rosa Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Santa Rosa Beach, FL",
     metaDescription:
       "Home watch for Santa Rosa Beach second homes, north and south of Highway 98. Weekly walkthroughs, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -921,7 +921,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 27,
     onThirtyA: true,
     eyebrow: "Dune Allen Beach · Walton County, FL · 30A",
-    metaTitle: "Home Watch in Dune Allen Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Dune Allen Beach, FL",
     metaDescription:
       "Home watch for Dune Allen Beach second homes at the west end of 30A. Weekly walkthroughs, coastal dune lake and salt exposure checks, photo proof every visit. Plans from $200/mo.",
     keywords:
@@ -1008,7 +1008,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 33,
     onThirtyA: false,
     eyebrow: "Miramar Beach · Walton County, FL",
-    metaTitle: "Home Watch in Miramar Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Miramar Beach, FL",
     metaDescription:
       "Home watch for Miramar Beach second homes and Gulf-front condos near Sandestin. Scheduled walkthroughs, photo proof every visit, storm response. Plans from $200/mo, no contract.",
     keywords:
@@ -1095,7 +1095,7 @@ export const townPages: Record<string, TownPageData> = {
     driveMinutes: 12,
     onThirtyA: false,
     eyebrow: "Panama City Beach · Bay County, FL",
-    metaTitle: "Home Watch in Panama City Beach, FL | Coastal Home Management 30A",
+    metaTitle: "Home Watch in Panama City Beach, FL",
     metaDescription:
       "Home watch for west Panama City Beach second homes and condos, including Wild Heron, Breakfast Point and the Camp Helen side. Photo proof every visit. Plans from $200/mo.",
     keywords:

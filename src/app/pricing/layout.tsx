@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PRICING_FAQS } from "@/data/pricingFaqs";
 
 export const metadata: Metadata = {
   title: "Home Watch Pricing & Plans on 30A",
@@ -9,10 +10,30 @@ export const metadata: Metadata = {
   },
 };
 
+// Pulled from the same array the page renders, so the visible FAQ and the
+// schema can never drift apart. Targets "how much does home watch cost 30a".
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: PRICING_FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 export default function PricingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+    </>
+  );
 }

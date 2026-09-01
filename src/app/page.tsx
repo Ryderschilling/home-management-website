@@ -14,7 +14,7 @@ import { BookButton } from "@/components/BookingProvider";
 
 export const metadata: Metadata = {
   description:
-    "Second home management and home watch in Watersound Origins, Naturewalk & Inlet Beach on 30A. Weekly visits, photo report every time, one owner-operator. Book a free walkthrough.",
+    "Second home management and home watch in Watersound Origins, Naturewalk & Inlet Beach on 30A. Weekly visits, photo report every time, one owner-operator. Free first walkthrough, and you do not need to be in town for it.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com",
   },
@@ -90,7 +90,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: "How do I get started?",
-    a: "Book a free walkthrough using any button on this page, or call directly. We'll talk through your property, your schedule, and what level of care makes sense. Most clients are set up and receiving their first visit report within a few days of the first conversation.",
+    a: "Send your address using any button on this page, or call directly. You do not need to be in town. I'll walk the property, email you photos and a written condition report within 48 hours, and tell you straight what it actually needs. Most clients are set up and receiving their first visit report within a few days.",
   },
 ];
 
@@ -547,9 +547,9 @@ export default function HomePage() {
           </h2>
 
           <p className="ch-lede ch-lede--light reveal-item mx-auto mb-12 mt-10 text-center">
-            The first walkthrough is free and takes about thirty minutes. I&apos;ll tell you
-            straight what your property actually needs, even if that turns out to be less than
-            you expected.
+            The first walkthrough is free, and you do not need to be in Florida for it. Send me
+            your address, I&apos;ll walk your home this week and email you photos and a written
+            condition report within 48 hours. The report is yours to keep either way.
           </p>
 
           <div className="reveal-item flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -660,7 +660,7 @@ export default function HomePage() {
                 "@type": "HowToStep",
                 position: 1,
                 name: "Tell us about your property",
-                text: "Book a free walkthrough or call Ryder directly. We discuss your property, your schedule, and what level of care makes sense. No sales call, just a real conversation. Most clients are set up within a few days.",
+                text: "Send your address or call Ryder directly. You do not need to be in town for the first walkthrough. He walks the property, emails photos and a written condition report within 48 hours, and tells you what it actually needs. No sales call. Most clients are set up within a few days.",
                 url: "https://coastalhomemngt30a.com/#how-it-works",
               },
               {
@@ -771,7 +771,7 @@ export default function HomePage() {
                 name: "How do I get started?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Book a free walkthrough on the website or call directly. We discuss your property and what level of care fits. Most clients receive their first visit report within a few days of the first conversation.",
+                  text: "Send your address on the website or call directly. You do not need to be in town. Ryder walks the property and emails photos and a written condition report within 48 hours. Most clients receive their first visit report within a few days.",
                 },
               },
               {

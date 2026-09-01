@@ -196,7 +196,7 @@ export default function BookingModal({
               {step === 3 ? "Confirmed" : `Step ${step + 1} of 3 · ${STEP_LABELS[step]}`}
             </p>
             <p className="mt-2 font-serif text-lg tracking-tight text-[var(--ch-ink)]">
-              {step === 3 ? "You're on the calendar list" : "Book a free walkthrough"}
+              {step === 3 ? "You're on the calendar list" : "Free walkthrough, no need to be in town"}
             </p>
           </div>
           <button

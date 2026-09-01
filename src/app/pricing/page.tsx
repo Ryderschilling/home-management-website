@@ -3,8 +3,9 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
-import { siteData } from "@/data/siteData";
+import { siteData, trustStats } from "@/data/siteData";
 import LegalDisclaimer from "@/components/LegalDisclaimer";
+import { PRICING_FAQS } from "@/data/pricingFaqs";
 
 const GOOGLE_ADS_ID = "AW-18257719328";
 const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
@@ -129,6 +130,20 @@ const plans: Plan[] = [
   },
 ];
 
+// Most people who land on a pricing page have not decided yet. Without this they
+// read three numbers and leave. Reuses the existing InquiryModal so the lead
+// still hits /api/pricing/inquire and still fires the Google Ads conversion.
+const notSurePlan: Plan = {
+  tier: "silver",
+  name: "Not Sure Yet",
+  tagline: "Tell me about the property and I'll tell you what it actually needs.",
+  prices: { monthly: 0, "6mo": 0, "12mo": 0 },
+  priceNote: "",
+  badge: "",
+  cta: "Send It",
+  sections: [],
+};
+
 const addons = [
   {
     name: "Extra On-Call Service",
@@ -252,7 +267,17 @@ function InquiryModal({ plan, term, onClose }: ModalProps) {
             <div className={`success-icon success-icon-${plan.tier}`}>✓</div>
             <h3>You&apos;re all set.</h3>
             <p>
-              We received your inquiry for the <strong>{plan.name}</strong> plan. Ryder will be
+              {price > 0 ? (
+                <>
+                  We received your inquiry for the <strong>{plan.name}</strong> plan.
+                </>
+              ) : (
+                <>
+                  Got it. Ryder will walk your home this week and email you photos and a written
+                  condition report within 48 hours.
+                </>
+              )}{" "}
+              Ryder will be
               in touch within 24 hours.
             </p>
             <button className={`modal-submit modal-submit-${plan.tier}`} onClick={onClose}>
@@ -262,10 +287,13 @@ function InquiryModal({ plan, term, onClose }: ModalProps) {
         ) : (
           <>
             <div className={`modal-plan-badge modal-plan-badge-${plan.tier}`}>
-              {plan.badge} · ${price}/mo
-              {term !== "monthly" ? ` · ${termMeta[term].label} lock` : ""}
+              {price > 0
+                ? `${plan.badge} · $${price}/mo${term !== "monthly" ? ` · ${termMeta[term].label} lock` : ""}`
+                : "Free home check · no commitment"}
             </div>
-            <h2 className="modal-title">Get Started with {plan.name}</h2>
+            <h2 className="modal-title">
+              {price > 0 ? `Get Started with ${plan.name}` : "Get My Free Home Check"}
+            </h2>
             <p className="modal-sub">
               Fill this out and Ryder will personally reach out within 24 hours.
             </p>
@@ -501,6 +529,37 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Undecided leads. The biggest drop-off on a pricing page is the person
+          who wants a price but cannot pick a tier. Catch them here, not at the bottom. */}
+      <section className="notsure-section">
+        <div className="notsure-card">
+          <p className="notsure-lbl">Not sure which plan?</p>
+          <h2 className="notsure-h2">
+            Send me your address and I&apos;ll tell you what your house actually needs.
+          </h2>
+          <p className="notsure-body">
+            The first walkthrough is free and you do not need to be in Florida for it. I&apos;ll
+            walk the property this week, email you photos and a written condition report within
+            48 hours, and tell you straight which plan fits. Often it is less than people expect.
+            The report is yours to keep either way.
+          </p>
+          <button
+            type="button"
+            className="notsure-btn"
+            onClick={() => {
+              posthog.capture("pricing_notsure_opened");
+              setSelectedPlan(notSurePlan);
+            }}
+          >
+            Get My Free Home Check
+          </button>
+          <p className="notsure-proof">
+            {trustStats.ratingValue} on Google across {trustStats.reviewCount} reviews · Fully
+            insured Florida LLC · Owner lives in Watersound Origins
+          </p>
+        </div>
+      </section>
+
       {/* Add-ons */}
       <section className="addons-section">
         <div className="addons-lbl">À La Carte Add-Ons</div>
@@ -657,6 +716,19 @@ export default function PricingPage() {
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* FAQ. Rendered as real content AND as FAQPage schema in layout.tsx. */}
+      <section className="faq-section">
+        <div className="faq-lbl">Before You Decide</div>
+        <div className="faq-list">
+          {PRICING_FAQS.map((f) => (
+            <div key={f.q} className="faq-item">
+              <h3 className="faq-q">{f.q}</h3>
+              <p className="faq-a">{f.a}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -1067,6 +1139,56 @@ export default function PricingPage() {
         .addon-name  { font-size: 13px; font-weight: 700; color: var(--ch-ink); margin-bottom: 4px; }
         .addon-desc  { font-size: 12px; color: var(--ch-muted); line-height: 1.5; }
         .addon-price { font-size: 15px; font-weight: 800; margin-top: 10px; color: var(--ch-teal); }
+
+        /* ── Not sure which plan (undecided lead capture) ── */
+        .notsure-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; }
+        .notsure-card {
+          background: var(--ch-ink);
+          border-radius: 16px;
+          padding: 44px 32px;
+          text-align: center;
+        }
+        .notsure-lbl {
+          font-size: 10px; font-weight: 800; letter-spacing: 0.2em;
+          text-transform: uppercase; color: var(--ch-teal-bright); margin-bottom: 14px;
+        }
+        .notsure-h2 {
+          font-size: 27px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em;
+          color: #ffffff; max-width: 620px; margin: 0 auto 16px;
+        }
+        .notsure-body {
+          font-size: 14px; line-height: 1.65; color: rgba(255,255,255,0.66);
+          max-width: 580px; margin: 0 auto 26px;
+        }
+        .notsure-btn {
+          appearance: none; border: 0; cursor: pointer;
+          background: var(--ch-teal-bright); color: var(--ch-ink);
+          font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+          padding: 16px 36px; border-radius: 999px;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+        }
+        .notsure-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 8px 26px rgba(0,0,0,0.28); }
+        .notsure-proof {
+          margin-top: 20px; font-size: 11.5px; letter-spacing: 0.02em;
+          color: rgba(255,255,255,0.48);
+        }
+        @media (max-width: 700px) {
+          .notsure-card { padding: 34px 22px; }
+          .notsure-h2 { font-size: 22px; }
+          .notsure-btn { width: 100%; }
+        }
+
+        /* ── FAQ ─────────────────────────────────────────── */
+        .faq-section { max-width: 780px; margin: 64px auto 0; padding: 0 20px; }
+        .faq-lbl {
+          font-size: 10px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+          color: var(--ch-soft); text-align: center; margin-bottom: 24px;
+        }
+        .faq-list { display: flex; flex-direction: column; gap: 22px; }
+        .faq-item { border-bottom: 1px solid #d7efec; padding-bottom: 22px; }
+        .faq-item:last-child { border-bottom: 0; }
+        .faq-q { font-size: 15px; font-weight: 700; color: var(--ch-ink); margin-bottom: 8px; line-height: 1.35; }
+        .faq-a { font-size: 14px; line-height: 1.7; color: var(--ch-muted); }
 
         /* ── Related Services ────────────────────────────── */
         .related-section { max-width: 1160px; margin: 56px auto 0; padding: 0 20px; border-top: 1px solid #d7efec; padding-top: 40px; }

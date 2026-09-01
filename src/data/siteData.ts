@@ -16,13 +16,13 @@ export type Service = {
 // what's in your schema and your real Google Business Profile is a trust/spam
 // signal to Google, not a harmless typo.
 //
-// reviewCount = live Google reviews ONLY (confirmed 4 as of 2026-07-14 after
-// Buddy Norman's review). Testimonials sent privately (text/email/Facebook)
-// do NOT count here, only what shows on the GBP listing.
+// reviewCount = live Google reviews ONLY (confirmed 9 as of 2026-08-31 on the
+// GBP listing). Testimonials sent privately (text/email/Facebook) do NOT count
+// here, only what shows on the GBP listing.
 export const trustStats = {
   ratingValue: "5.0",
   bestRating: "5",
-  reviewCount: "4",
+  reviewCount: "9",
   propertiesManaged: "$10 million+",
   activeHomes: "15+",
 };
