@@ -6,14 +6,14 @@ import { businessContact, siteData } from "@/data/siteData";
 export const metadata: Metadata = {
   title: "About Ryder Schilling, Home Watch Owner",
   description:
-    "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Naturewalk & Inlet Beach. Meet founder Ryder Schilling.",
+    "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com/about",
   },
   openGraph: {
     title: "About Ryder Schilling, Home Watch Owner",
     description:
-      "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Naturewalk & Inlet Beach. Meet founder Ryder Schilling.",
+      "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
     url: "https://coastalhomemngt30a.com/about",
     images: [
       {
@@ -297,9 +297,9 @@ export default function AboutPage() {
               visit reports.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Today CHM serves second-home and vacation rental owners across Watersound Origins, Naturewalk,
-              and the broader 30A corridor. The core commitment hasn&apos;t changed: be the person your
-              clients can actually call.
+              Today CHM serves second-home and vacation rental owners across Watersound Origins, Alys,
+              Rosemary, and the broader scenic 30A corridor, as an insured Florida LLC. The core commitment
+              hasn&apos;t changed: be the person your clients can actually call.
             </p>
           </div>
         </div>
@@ -432,17 +432,17 @@ export default function AboutPage() {
           <h2 id="service-area-heading" className="text-3xl font-serif mb-6">Service Area</h2>
           <p className="text-gray-300 max-w-2xl mb-10 leading-relaxed">
             Coastal Home Management 30A operates along the full Emerald Coast 30A corridor in the
-            Florida Panhandle. Primary coverage is Watersound Origins and Naturewalk at Seagrove,
+            Florida Panhandle. Primary coverage is Watersound Origins, Alys, Rosemary, and scenic 30A,
             with service extending across the following communities:
           </p>
 
           <ul className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-200 mb-12" aria-label="Communities served">
             {[
               "Watersound Origins",
-              "Naturewalk at Seagrove",
-              "Inlet Beach",
-              "Rosemary Beach",
               "Alys Beach",
+              "Rosemary Beach",
+              "Inlet Beach",
+              "Naturewalk at Seagrove",
               "WaterColor",
               "Seaside",
               "Seagrove Beach",
@@ -581,7 +581,7 @@ export default function AboutPage() {
             </a>
           </div>
           <p className="mt-8 text-xs text-gray-400 uppercase tracking-widest">
-            Serving Watersound Origins · Naturewalk · Inlet Beach · Rosemary Beach · WaterColor · Seaside · 30A
+            Serving Watersound Origins · Alys · Rosemary · Scenic 30A
           </p>
         </div>
       </section>

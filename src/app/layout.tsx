@@ -58,17 +58,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
 
   title: {
-    default: "Home Watch & Second Home Management, Inlet Beach 30A",
+    default: "Home Watch & Second Home Management, Scenic 30A",
     template: "%s | Coastal Home Management 30A",
   },
 
   description:
-    "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
+    "Second home management and property care in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
 
   openGraph: {
-    title: "Home Watch & Second Home Management, Inlet Beach 30A",
+    title: "Home Watch & Second Home Management, Scenic 30A",
     description:
-      "Second home management and property care in Watersound Origins & Inlet Beach, 30A. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
+      "Second home management and property care in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
     url: "https://coastalhomemngt30a.com",
     siteName: "Coastal Home Management 30A",
     images: [
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
         url: "https://coastalhomemngt30a.com/img.png",
         width: 1200,
         height: 630,
-        alt: "Coastal Home Management 30A, Second home management in Watersound Origins and Inlet Beach, Florida",
+        alt: "Coastal Home Management 30A, second home management in Watersound Origins, Alys, Rosemary and scenic 30A, Florida",
       },
     ],
     locale: "en_US",
@@ -109,7 +109,7 @@ const localBusinessSchema = {
       name: "Coastal Home Management 30A",
       alternateName: "CHM 30A",
       description:
-        "Local, owner-operated second home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida.",
+        "Local, owner-operated, insured second home management and property care for vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida.",
       url: "https://coastalhomemngt30a.com",
       telephone: businessContact.phone,
       email: "coastalhomemanagement30a@gmail.com",
@@ -262,7 +262,7 @@ const organizationSchema = {
   },
   image: "https://coastalhomemngt30a.com/img.png",
   description:
-    "Local, owner-operated second home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida.",
+    "Local, owner-operated, insured second home management and property care for vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida.",
   telephone: businessContact.phone,
   email: "coastalhomemanagement30a@gmail.com",
   address: {

@@ -14,7 +14,7 @@ import { BookButton } from "@/components/BookingProvider";
 
 export const metadata: Metadata = {
   description:
-    "Second home management and home watch in Watersound Origins, Naturewalk & Inlet Beach on 30A. Weekly visits, photo report every time, one owner-operator. Free first walkthrough, and you do not need to be in town for it.",
+    "Second home management and home watch in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly visits, photo report every time, one owner-operator. Free first walkthrough, and you do not need to be in town for it.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com",
   },
@@ -23,10 +23,9 @@ export const metadata: Metadata = {
 /* Marquee content, one array, rendered twice for a seamless loop. */
 const MARQUEE = [
   "Watersound Origins",
-  "Naturewalk",
-  "Inlet Beach",
-  "Rosemary Beach",
   "Alys Beach",
+  "Rosemary Beach",
+  "Scenic 30A",
   "Insured FL LLC",
   "5.0 on Google",
   "Owner-operated",
@@ -51,7 +50,7 @@ const STATS: Stat[] = [
 const FAQS: FaqItem[] = [
   {
     q: "What does Coastal Home Management 30A do?",
-    a: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep so your home is always in order, whether you're here or a thousand miles away.",
+    a: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep so your home is always in order, whether you're here or a thousand miles away.",
   },
   {
     q: "What is home watch, and is it different from property management?",
@@ -59,7 +58,7 @@ const FAQS: FaqItem[] = [
   },
   {
     q: "What areas do you serve?",
-    a: "We serve Watersound Origins, Naturewalk, Inlet Beach, and surrounding communities along scenic 30A in the Florida Panhandle, including Rosemary Beach, Alys Beach, and Seacrest. If you're not sure whether your property falls within our coverage area, just reach out, we're happy to confirm.",
+    a: "We serve Watersound Origins, Alys, Rosemary, and scenic 30A in the Florida Panhandle, including Inlet Beach, Naturewalk, Seacrest, and the surrounding communities. If you're not sure whether your property falls within our coverage area, just reach out, we're happy to confirm.",
   },
   {
     q: "How much does home watch cost in 30A?",
@@ -116,7 +115,7 @@ export default function HomePage() {
         <div className="hero-content relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
           <h1 className="hero-title">COASTAL HOME MANAGEMENT 30A</h1>
           <div className="hero-divider" aria-hidden="true" />
-          <p className="hero-sub">INLET BEACH, 30A FLORIDA</p>
+          <p className="hero-sub">SCENIC 30A, FLORIDA</p>
           <a href="#contact" className="hero-cta">
             Contact
           </a>
@@ -126,11 +125,11 @@ export default function HomePage() {
           <div className="hero-bottom-inner">
             <span>WATERSOUND ORIGINS</span>
             <span className="pipe">|</span>
-            <span>NATUREWALK</span>
+            <span>ALYS</span>
             <span className="pipe">|</span>
-            <span>INLET BEACH</span>
+            <span>ROSEMARY</span>
             <span className="pipe">|</span>
-            <span>INSURED</span>
+            <span>SCENIC 30A</span>
           </div>
         </div>
 
@@ -215,8 +214,8 @@ export default function HomePage() {
               I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they
               could actually trust, not a company, a person. I&apos;m here full-time, I know the
               streets, and I&apos;m the one who shows up to your house. Today I look after more
-              than $10 million in second-home real estate across Watersound Origins, Naturewalk,
-              and Inlet Beach. Every visit, every time.
+              than $10 million in second-home real estate across Watersound Origins, Alys, Rosemary,
+              and scenic 30A. Fully insured. Every visit, every time.
             </p>
             <div className="reveal-item mt-9 flex flex-wrap items-center gap-6">
               <BookButton source="meet-ryder" className="ch-btn ch-btn--solid" />
@@ -476,7 +475,7 @@ export default function HomePage() {
           <p className="ch-eyebrow ch-eyebrow--center reveal-item">Coverage</p>
           <h2 className="ch-display ch-display--sm reveal-item">Where we work</h2>
           <p className="ch-label reveal-item !text-[var(--ch-soft)]">
-            Watersound Origins · Naturewalk · Inlet Beach · Scenic 30A
+            Watersound Origins · Alys · Rosemary · Scenic 30A
           </p>
           <div className="reveal-item pt-4">
             <ServiceAreaMapWrapper />
@@ -610,7 +609,7 @@ export default function HomePage() {
             "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
             description:
-              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
+              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             sameAs: [
               "https://www.google.com/maps/place/Coastal+Home+Management+30A",
               "https://www.facebook.com/profile.php?id=61575773416368",
@@ -645,7 +644,7 @@ export default function HomePage() {
             "@type": "HowTo",
             name: "How Second Home Management Works on 30A, Coastal Home Management",
             description:
-              "A step-by-step guide to how Coastal Home Management 30A handles home watch and property care for second-home owners in Watersound Origins, Naturewalk, and Inlet Beach, Florida.",
+              "A step-by-step guide to how Coastal Home Management 30A handles home watch and property care for second-home owners in Watersound Origins, Alys, Rosemary, and scenic 30A, Florida.",
             image: {
               "@type": "ImageObject",
               url: "https://coastalhomemngt30a.com/img.png",
@@ -715,7 +714,7 @@ export default function HomePage() {
                 name: "What does Coastal Home Management 30A do?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep.",
+                  text: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep.",
                 },
               },
               {
@@ -723,7 +722,7 @@ export default function HomePage() {
                 name: "What is home watch, and is it different from property management?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Home watch is the scheduled checking of an unoccupied home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service in Watersound Origins, Naturewalk, and Inlet Beach. We look after your home for you rather than renting it out.",
+                  text: "Home watch is the scheduled checking of an unoccupied home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service in Watersound Origins, Alys, Rosemary, and scenic 30A. We look after your home for you rather than renting it out.",
                 },
               },
               {
@@ -731,7 +730,7 @@ export default function HomePage() {
                 name: "What areas do you serve?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "We serve Watersound Origins, Naturewalk, Inlet Beach, and surrounding communities along scenic 30A in the Florida Panhandle, including Rosemary Beach, Alys Beach, and Seacrest.",
+                  text: "We serve Watersound Origins, Alys, Rosemary, and scenic 30A in the Florida Panhandle, including Inlet Beach, Naturewalk, Seacrest, and the surrounding communities.",
                 },
               },
               {

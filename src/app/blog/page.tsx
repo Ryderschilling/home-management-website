@@ -25,7 +25,10 @@ export default function BlogIndexPage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-700 md:text-lg">
             Straight answers on home watch, second home care, and what to know
-            as a homeowner in Watersound Origins, Naturewalk, and along scenic 30A.
+            as a homeowner in Watersound Origins, Alys, Rosemary, and along scenic 30A.
+          </p>
+          <p className="mt-5 text-[11px] uppercase tracking-[0.18em] text-gray-500">
+            Written by Ryder Schilling · Insured Florida LLC
           </p>
         </div>
       </section>

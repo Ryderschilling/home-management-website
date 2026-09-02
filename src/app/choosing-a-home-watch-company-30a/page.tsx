@@ -126,6 +126,9 @@ export default function ChoosingHomeWatchCompanyPage() {
           <h1 className="mt-5 text-3xl font-serif leading-tight md:text-5xl">
             How to Choose a Home Watch Company on 30A
           </h1>
+          <p className="mt-5 text-[11px] uppercase tracking-[0.18em] text-gray-500">
+            Insured Florida LLC · Watersound Origins · Alys · Rosemary · Scenic 30A
+          </p>
         </div>
       </section>
 

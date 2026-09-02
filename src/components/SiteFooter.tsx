@@ -109,11 +109,11 @@ export default function SiteFooter() {
             <p className="mt-4 text-[14px] leading-[1.8] text-white/62">
               Watersound Origins
               <br />
-              Naturewalk at Watersound
+              Alys Beach
               <br />
-              Inlet Beach &amp; Scenic 30A
+              Rosemary Beach
               <br />
-              Rosemary Beach · Alys Beach
+              Scenic 30A
             </p>
           </div>
 

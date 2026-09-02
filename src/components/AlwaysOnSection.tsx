@@ -23,14 +23,14 @@ const LIVE_FACTS: Fact[] = [
   ["Answered", "24 hours a day, 7 days a week"],
   ["Urgent calls", "Reach Ryder immediately, any hour"],
   ["Every call", "Logged against your property file"],
-  ["Coverage", "Watersound Origins \u00b7 Naturewalk \u00b7 Inlet Beach"],
+  ["Coverage", "Watersound Origins \u00b7 Alys \u00b7 Rosemary \u00b7 Scenic 30A"],
 ];
 
 const DIRECT_FACTS: Fact[] = [
   ["Who picks up", "Ryder. Every time."],
   ["Typical response", "Same day, usually within the hour"],
   ["Storm & freeze", "Unscheduled visits, no extra charge on Elite"],
-  ["Coverage", "Watersound Origins \u00b7 Naturewalk \u00b7 Inlet Beach"],
+  ["Coverage", "Watersound Origins \u00b7 Alys \u00b7 Rosemary \u00b7 Scenic 30A"],
 ];
 
 export default function AlwaysOnSection() {

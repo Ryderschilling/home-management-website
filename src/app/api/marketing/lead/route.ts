@@ -74,7 +74,7 @@ async function sendWelcomeEmail(firstName: string | null, email: string) {
           <tr>
             <td style="padding:36px 44px 0;">
               <p style="margin:0 0 28px 0;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(0,0,0,0.4);">
-                Watersound Origins · Naturewalk · 30A
+                Watersound Origins · Alys · Rosemary · Scenic 30A
               </p>
               <h1 style="margin:0 0 16px 0;font-family:ui-serif,Georgia,'Times New Roman',Times,serif;font-size:26px;font-weight:600;line-height:1.1;letter-spacing:-0.02em;color:#0b0b0b;">
                 Hey ${displayName}, thanks for reaching out.

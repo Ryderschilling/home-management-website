@@ -108,10 +108,10 @@ export const bookingConfig = {
   /** Neighborhoods offered in the booking flow. */
   neighborhoods: [
     "Watersound Origins",
-    "Naturewalk",
-    "Inlet Beach",
-    "Rosemary Beach",
     "Alys Beach",
+    "Rosemary Beach",
+    "Inlet Beach",
+    "Naturewalk",
     "Seacrest",
     "Somewhere else on 30A",
   ],
@@ -191,7 +191,7 @@ export const offerings: {
 
 export const siteData = {
   businessName: "Coastal Home Management 30A",
-  serviceArea: "Watersound Origins & surrounding areas",
+  serviceArea: "Watersound Origins, Alys, Rosemary, and scenic 30A",
   startingPrice: "",
 
   // IMPORTANT: replace this with your real email

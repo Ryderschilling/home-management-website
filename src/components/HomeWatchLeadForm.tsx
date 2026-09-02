@@ -163,8 +163,10 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
             >
               <option value="">Select neighborhood</option>
               <option value="Watersound Origins">Watersound Origins</option>
-              <option value="Naturewalk">Naturewalk</option>
+              <option value="Alys Beach">Alys Beach</option>
+              <option value="Rosemary Beach">Rosemary Beach</option>
               <option value="Inlet Beach">Inlet Beach</option>
+              <option value="Naturewalk">Naturewalk</option>
               <option value="Other 30A">Other 30A Community</option>
             </select>
           </div>

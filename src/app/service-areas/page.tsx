@@ -87,7 +87,8 @@ export default function Page() {
           Every town we watch homes in, and how far it actually is
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-black/60">
-          Coastal Home Management 30A is run by one person who lives in Watersound Origins. That
+          Coastal Home Management 30A is an insured Florida LLC run by one person who lives in
+          Watersound Origins, serving Alys, Rosemary, and scenic 30A. That
           means the honest answer to <em>how fast can you get here</em> is different in every town,
           so here it is in minutes rather than in marketing language. Every page below is written for
           that specific town: what the homes are like there, and what actually goes wrong in them.

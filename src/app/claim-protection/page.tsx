@@ -88,6 +88,10 @@ export default function ClaimProtectionPage() {
 
           <span className="ch-draw mb-9 block h-px w-24 bg-[var(--ch-teal)]" />
 
+          <p className="ch-label reveal-item mb-6 !text-[var(--ch-soft)]">
+            Insured Florida LLC · Watersound Origins · Alys · Rosemary · Scenic 30A
+          </p>
+
           <p className="ch-lede reveal-item max-w-[62ch]">
             A supply line lets go in March. You find it in May. The repair was never the
             expensive part. The expensive part is the two months nobody could account for,

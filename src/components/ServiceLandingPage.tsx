@@ -89,6 +89,9 @@ export default function ServiceLandingPage({
           <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-gray-700 md:text-lg">
             {service.intro}
           </p>
+          <p className="mx-auto mt-5 text-[11px] uppercase tracking-[0.18em] text-gray-500">
+            Insured Florida LLC · Watersound Origins · Alys · Rosemary · Scenic 30A
+          </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <a
               href="#lead-form"

@@ -22,7 +22,7 @@ function buildLlmsTxt(): string {
   lines.push(`# ${siteData.businessName}`);
   lines.push("");
   lines.push(
-    `> Local, owner-operated second-home management and property care for vacation homeowners in Watersound Origins, Naturewalk, and Inlet Beach along scenic 30A, Florida. Weekly home checks, photo reports, mail handling, and concierge tasks, run personally by founder Ryder Schilling.`
+    `> Local, owner-operated, insured second-home management and property care for vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A, Florida. Weekly home checks, photo reports, mail handling, and concierge tasks, run personally by founder Ryder Schilling.`
   );
   lines.push("");
   lines.push(

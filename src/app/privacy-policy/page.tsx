@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-serif text-black mb-3">1. Who We Are</h2>
             <p>
               Coastal Home Management 30A is a second-home property management service
-              operating in Watersound Origins, Naturewalk, Inlet Beach, and surrounding
+              operating in Watersound Origins, Alys, Rosemary, and surrounding scenic
               30A communities in Florida. Our website is coastalhomemngt30a.com.
               You can reach us at coastalhomemanagement30a@gmail.com.
             </p>

@@ -7,13 +7,13 @@ import { siteData } from "@/data/siteData";
 export const metadata: Metadata = {
   title: "Home Watch Service on 30A & Watersound Origins",
   description:
-    "Trusted home watch service in Watersound Origins, Naturewalk & Inlet Beach, 30A. Local, insured, weekly check-ins, photo proof every visit. The only home watch company that lives in the neighborhood. Free walkthrough.",
+    "Trusted home watch service in Watersound Origins, Alys, Rosemary and scenic 30A. Local, insured Florida LLC, weekly check-ins, photo proof every visit. The only home watch company that lives in the neighborhood. Free walkthrough.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch" },
   keywords: "home watch Watersound Origins, home watch 30A, home watch Inlet Beach FL, home watch service Florida Panhandle, second home watch Naturewalk, property watch 30A",
   openGraph: {
     title: "Someone watching your 30A home while you're away.",
     description:
-      "Local, insured home watch in Watersound Origins, Naturewalk & 30A. Free walkthrough, no commitment.",
+      "Local, insured home watch in Watersound Origins, Alys, Rosemary & scenic 30A. Free walkthrough, no commitment.",
     url: "https://coastalhomemngt30a.com/home-watch",
     images: ["/img.png"],
   },
@@ -61,7 +61,7 @@ export default function HomeWatchPage() {
           {/* Left: copy */}
           <div>
             <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40">
-              Watersound Origins · Naturewalk · 30A
+              Watersound Origins · Alys · Rosemary · Scenic 30A
             </p>
             <h1
               className="mb-5 text-4xl leading-[1.05] tracking-tight text-black md:text-5xl"
@@ -183,7 +183,7 @@ export default function HomeWatchPage() {
             {[
               {
                 q: "Who provides home watch services in Watersound Origins Florida?",
-                a: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners."
+                a: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Alys, Rosemary, and scenic 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners."
               },
               {
                 q: "What is the best home watch service near Inlet Beach or 30A?",
@@ -228,7 +228,7 @@ export default function HomeWatchPage() {
                 name: "Who provides home watch services in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Naturewalk, and Inlet Beach along 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners.",
+                  text: "Coastal Home Management 30A, founded and operated by Ryder Schilling, a Watersound Origins resident, is the dedicated home watch provider serving Watersound Origins, Alys, Rosemary, and scenic 30A. We offer weekly and bi-weekly home watch visits, storm checks, photo reports, and full property oversight for second-home owners.",
                 },
               },
               {
@@ -285,7 +285,7 @@ export default function HomeWatchPage() {
             "@type": "LocalBusiness",
             "@id": "https://coastalhomemngt30a.com/home-watch#business",
             name: "Coastal Home Management 30A",
-            description: "Home watch service in Watersound Origins, Naturewalk, and Inlet Beach along 30A. Weekly property checks, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
+            description: "Home watch service in Watersound Origins, Alys, Rosemary, and scenic 30A. Weekly property checks, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
             url: "https://coastalhomemngt30a.com/home-watch",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
@@ -395,7 +395,7 @@ export default function HomeWatchPage() {
                   </Link>
                 </li>
                 <li>Local &amp; Insured</li>
-                <li>Serving Inlet Beach &amp; 30A</li>
+                <li>Serving Watersound Origins &amp; Scenic 30A</li>
                 <li>Reliable, high-trust service</li>
               </ul>
             </div>

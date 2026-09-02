@@ -4,7 +4,7 @@ import { PRICING_FAQS } from "@/data/pricingFaqs";
 export const metadata: Metadata = {
   title: "Home Watch Pricing & Plans on 30A",
   description:
-    "View home watch and property management service plans for Inlet Beach and 30A. Transparent monthly pricing, no contracts required, and 6 or 12-month rate locks that save up to 10%.",
+    "View home watch and property management service plans for Watersound Origins, Alys, Rosemary and scenic 30A. Transparent monthly pricing, no contracts required, and 6 or 12-month rate locks that save up to 10%.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com/pricing",
   },

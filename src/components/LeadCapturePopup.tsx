@@ -249,7 +249,7 @@ export default function LeadCapturePopup() {
           <div>
             <p className="ch-label">
               {step === "form"
-                ? "Watersound Origins · Naturewalk · 30A"
+                ? "Watersound Origins · Alys · Rosemary · Scenic 30A"
                 : step === "qualify"
                   ? "One quick thing"
                   : "You're on the list"}
