@@ -57,9 +57,18 @@ const appUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
 
+  // NO BRAND SUFFIX IN THE TEMPLATE. Audited 9/2/26: the old
+  // "%s | Coastal Home Management 30A" suffix is 30 characters, and Google
+  // truncates a title around 60. It was pushing 31 of 36 pages past the cut,
+  // so real keywords ("...in Rosemary Beach, FL") were being clipped to make
+  // room for a brand nobody searches yet. Google also derives and shows the
+  // site name separately in results, so repeating it in the title tag buys
+  // nothing. Keep page titles under about 58 characters and let them stand
+  // on their own. The homepage default below is the one place the brand
+  // belongs, and it comes from the site-name schema anyway.
   title: {
     default: "Home Watch & Second Home Management, Scenic 30A",
-    template: "%s | Coastal Home Management 30A",
+    template: "%s",
   },
 
   description:
