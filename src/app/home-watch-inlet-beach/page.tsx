@@ -262,6 +262,11 @@ export default function HomeWatchInletBeachPage() {
             <Link href="/home-watch-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Watersound Origins</Link>
             <Link href="/home-watch-naturewalk" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Naturewalk</Link>
             <Link href="/concierge-services-inlet-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Concierge Services</Link>
+            <Link href="/service-areas" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">All Service Areas</Link>
+            <Link href="/home-watch-rosemary-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Rosemary Beach</Link>
+            <Link href="/home-watch-alys-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Alys Beach</Link>
+            <Link href="/home-watch-seacrest-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Seacrest Beach</Link>
+            <Link href="/home-watch-panama-city-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Panama City Beach</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
           </div>
         </div>

@@ -277,6 +277,11 @@ export default function HomeWatchWatersoundPage() {
             <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, All Areas</Link>
             <Link href="/home-watch-naturewalk" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Naturewalk</Link>
             <Link href="/second-home-management-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Second Home Management, Watersound</Link>
+            <Link href="/service-areas" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">All Service Areas</Link>
+            <Link href="/home-watch-alys-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Alys Beach</Link>
+            <Link href="/home-watch-rosemary-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Rosemary Beach</Link>
+            <Link href="/home-watch-watersound-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Watersound Beach</Link>
+            <Link href="/home-watch-grayton-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Grayton Beach</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
           </div>
         </div>

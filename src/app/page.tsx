@@ -480,6 +480,44 @@ export default function HomePage() {
           <div className="reveal-item pt-4">
             <ServiceAreaMapWrapper />
           </div>
+
+          {/* Crawl paths into the town pages. GSC 9/2/26 reported "Referring page:
+              None detected" for /service-areas and every town page: the cluster was
+              discovered by sitemap alone, with no internal links Google had crawled,
+              which is what parked it in "Discovered - currently not indexed". This
+              page is the most-crawled page on the site, so the links belong here. */}
+          <div className="reveal-item flex flex-wrap justify-center gap-x-4 gap-y-2 pt-8">
+            {[
+              ["/home-watch-rosemary-beach", "Rosemary Beach"],
+              ["/home-watch-alys-beach", "Alys Beach"],
+              ["/home-watch-seacrest-beach", "Seacrest Beach"],
+              ["/home-watch-watersound-beach", "Watersound Beach"],
+              ["/home-watch-seagrove-beach", "Seagrove Beach"],
+              ["/home-watch-seaside", "Seaside"],
+              ["/home-watch-watercolor", "WaterColor"],
+              ["/home-watch-grayton-beach", "Grayton Beach"],
+              ["/home-watch-blue-mountain-beach", "Blue Mountain Beach"],
+              ["/home-watch-santa-rosa-beach", "Santa Rosa Beach"],
+              ["/home-watch-dune-allen-beach", "Dune Allen Beach"],
+              ["/home-watch-inlet-beach", "Inlet Beach"],
+              ["/home-watch-miramar-beach", "Miramar Beach"],
+              ["/home-watch-panama-city-beach", "Panama City Beach"],
+            ].map(([href, label]) => (
+              <Link
+                key={href}
+                href={href}
+                className="text-[13px] text-[var(--ch-soft)] underline decoration-transparent underline-offset-4 transition hover:text-[var(--ch-ink)] hover:decoration-current"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="reveal-item pt-6">
+            <Link href="/service-areas" className="ch-link">
+              Every town we serve, with drive times &rarr;
+            </Link>
+          </div>
         </div>
       </section>
 

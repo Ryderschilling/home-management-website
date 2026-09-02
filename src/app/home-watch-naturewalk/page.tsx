@@ -226,6 +226,11 @@ export default function HomeWatchNaturewalkPage() {
             <Link href="/home-watch" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, All Areas</Link>
             <Link href="/home-watch-watersound-origins" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Watersound Origins</Link>
             <Link href="/home-watch-inlet-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Home Watch, Inlet Beach</Link>
+            <Link href="/service-areas" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">All Service Areas</Link>
+            <Link href="/home-watch-watersound-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Watersound Beach</Link>
+            <Link href="/home-watch-seagrove-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Seagrove Beach</Link>
+            <Link href="/home-watch-seaside" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Seaside</Link>
+            <Link href="/home-watch-watercolor" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">WaterColor</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
           </div>
         </div>
