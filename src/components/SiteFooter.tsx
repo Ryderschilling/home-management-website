@@ -2,6 +2,7 @@ import Link from "next/link";
 import LegalDisclaimer from "./LegalDisclaimer";
 import {
   siteData,
+  businessContact,
   trustStats,
   contactChannels,
   primaryPhone,
@@ -47,6 +48,7 @@ const FIND_US: Array<[string, string]> = [
     "https://www.destinflorida.com/30a/services/home-watch-concierge/coastal-home-management-30a",
     "DestinFlorida.com",
   ],
+  [businessContact.bhwcUrl, "BestHomeWatchCompanies.com"],
 ];
 
 function Col({ title, links }: { title: string; links: Array<[string, string]> }) {
@@ -126,6 +128,15 @@ export default function SiteFooter() {
               {trustStats.activeHomes} active client homes
               <br />
               {trustStats.ratingValue} on Google ({trustStats.reviewCount} reviews)
+              <br />
+              <a
+                href={businessContact.bhwcUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors duration-300 hover:text-[var(--ch-teal-bright)]"
+              >
+                {businessContact.bhwcRanking} on BestHomeWatchCompanies.com
+              </a>
               <br />
               Insured Florida LLC, formed 2025
             </p>

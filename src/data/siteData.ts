@@ -66,6 +66,11 @@ export const businessContact = {
   // customers to see, tell me and I'll switch all three to match it instead.
   facebookUrl: "https://www.facebook.com/profile.php?id=61575773416368",
   linkedinUrl: "https://www.linkedin.com/company/coastal-home-management-30a/",
+  // BestHomeWatchCompanies.com profile, claimed 9/11/26. Used in every sameAs block,
+  // the footer, the Inlet Beach page and llms.txt. If the ranking on that site
+  // changes, change bhwcRanking here and nowhere else.
+  bhwcUrl: "https://www.besthomewatchcompanies.com/companies/coastal-home-management-30a/",
+  bhwcRanking: "#1 for home watch in Inlet Beach",
 };
 
 // ─── Phone / booking configuration ─────────────────────────────────────────

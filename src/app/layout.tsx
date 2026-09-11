@@ -227,6 +227,7 @@ const localBusinessSchema = {
         businessContact.facebookUrl,
         businessContact.linkedinUrl,
         siteData.gbpMapsUrl,
+        businessContact.bhwcUrl,
       ],
     },
     {
@@ -252,6 +253,7 @@ const localBusinessSchema = {
         businessContact.facebookUrl,
         businessContact.linkedinUrl,
         siteData.gbpMapsUrl,
+        businessContact.bhwcUrl,
       ],
     },
   ],
@@ -299,6 +301,7 @@ const organizationSchema = {
     businessContact.facebookUrl,
     businessContact.linkedinUrl,
     siteData.gbpMapsUrl,
+    businessContact.bhwcUrl,
   ],
 };
 

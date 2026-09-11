@@ -122,6 +122,7 @@ function buildLlmsTxt(): string {
   lines.push(`- Email: ${siteData.contactEmail}`);
   lines.push(`- Google Business Profile: ${siteData.gbpMapsUrl}`);
   lines.push(`- Leave a Google review: ${siteData.gbpUrl}`);
+  lines.push(`- BestHomeWatchCompanies.com profile (${businessContact.bhwcRanking}, FL): ${businessContact.bhwcUrl}`);
   lines.push("");
 
   return lines.join("\n");

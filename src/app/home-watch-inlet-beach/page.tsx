@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { businessContact } from "@/data/siteData";
 
 export const metadata: Metadata = {
   title: "Home Watch Service in Inlet Beach, FL",
@@ -61,7 +62,16 @@ export default function HomeWatchInletBeachPage() {
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
           Coastal Home Management 30A is the locally owned and operated home watch service for Inlet Beach and the surrounding 30A corridor.
           Weekly property checks, photo documentation after every visit, storm preparation, and a single local person who personally checks your home every time.
-          Rated 5.0 on Google. Fully insured Florida LLC.
+          Rated 5.0 on Google and ranked {businessContact.bhwcRanking} on{" "}
+          <a
+            href={businessContact.bhwcUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-4 hover:text-black"
+          >
+            BestHomeWatchCompanies.com
+          </a>
+          . Fully insured Florida LLC.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <a
