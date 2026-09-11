@@ -6,14 +6,14 @@ import { businessContact, siteData } from "@/data/siteData";
 export const metadata: Metadata = {
   title: "About Ryder Schilling, Home Watch Owner",
   description:
-    "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
+    "Local, insured home watch for 30A second homes that sit empty between visits. Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com/about",
   },
   openGraph: {
     title: "About Ryder Schilling, Home Watch Owner",
     description:
-      "Local, insured property management for 30A vacation rentals. Serving Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
+      "Local, insured home watch for 30A second homes that sit empty between visits. Watersound Origins, Alys, Rosemary & scenic 30A. Meet founder Ryder Schilling.",
     url: "https://coastalhomemngt30a.com/about",
     images: [
       {
@@ -140,7 +140,8 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl md:text-2xl font-serif text-gray-700 leading-relaxed max-w-2xl">
             Coastal Home Management 30A is an owner-operated, fully insured Florida LLC providing
-            vacation rental property management and home watch services along the Emerald Coast.
+            home watch and second-home care for non-rental homes along the Emerald Coast. We do not
+            manage vacation rentals.
           </p>
         </div>
       </section>
@@ -154,8 +155,8 @@ export default function AboutPage() {
               Second-home management for 30A property owners.
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              We provide weekly property checks, photo documentation, and written reports so
-              that second-home and vacation rental owners along 30A always know exactly what&apos;s
+              We provide scheduled property checks, photo documentation, and written reports so
+              that second-home owners along 30A always know exactly what&apos;s
               happening at their property, even when they&apos;re a thousand miles away.
             </p>
             <p className="text-gray-700 leading-relaxed">
@@ -169,7 +170,7 @@ export default function AboutPage() {
             <ul className="space-y-4 text-sm text-gray-700">
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
-                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Essential, Home Watch, and Coastal Elite tiers with weekly or bi-weekly property checks and photo reports</span>
+                <span><strong className="font-medium text-black">Monthly Management Plans</strong>, Essential, Home Watch, and Coastal Elite tiers with bi-weekly or weekly property checks and photo reports every visit</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" aria-hidden="true" />
@@ -212,33 +213,32 @@ export default function AboutPage() {
                 <tr className="border-b-2 border-black text-left">
                   <th scope="col" className="py-4 pr-6 font-serif text-base font-normal w-1/2">What&apos;s Included</th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Essential<br /><span className="text-gray-500 text-xs font-sans">$200/mo</span></th>
-                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Home Watch<br /><span className="text-gray-500 text-xs font-sans">$350/mo</span></th>
+                  <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Home Watch<br /><span className="text-gray-500 text-xs font-sans">$300/mo</span></th>
                   <th scope="col" className="py-4 px-4 font-serif text-base font-normal text-center">Coastal Elite<br /><span className="text-gray-500 text-xs font-sans">$600/mo</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
                 {[
-                  ["Weekly property check",           true,  true,  true],
+                  ["Interior & exterior walkthrough",       true,  true,  true],
                   ["Photo documentation every visit",      true,  true,  true],
-                  ["Written visit summary (text/email)",   true,  true,  true],
+                  ["Written visit report every visit",     true,  true,  true],
                   ["Mail & package pickup",                true,  true,  true],
-                  ["Storm watch & freeze alerts",          true,  true,  true],
-                  ["Bi-weekly detailed photo report",      false, true,  true],
-                  ["Seasonal maintenance checks",          false, true,  true],
-                  ["1 on-call task/month included",        false, true,  true],
-                  ["Contractor coordination",              false, true,  true],
-                  ["Priority 4-hour response",             false, true,  true],
+                  ["Issue alerts and key holding",         true,  true,  true],
+                  ["Weekly visits (Essential is bi-weekly)", false, true, true],
+                  ["Appliance & plumbing checks",          false, true,  true],
+                  ["Irrigation filter cleaning",           false, true,  true],
+                  ["Storm & freeze checks",                false, false, true],
+                  ["HVAC filter changes",                  false, false, true],
+                  ["Pre-arrival prep & A/C preset",        false, false, true],
+                  ["Contractor coordination",              false, false, true],
                   ["Guaranteed 2-hour emergency response", false, false, true],
-                  ["3 on-call hours/month included",       false, false, true],
-                  ["Arrival Prep 2×/year",                 false, false, true],
-                  ["Quarterly Property Condition Report",  false, false, true],
-                  ["Direct line to Ryder, no queue",      false, false, true],
+                  ["Annual Coverage Record",               false, false, true],
                 ].map(([feature, std, prem, elite]) => (
                   <tr key={feature as string}>
                     <td className="py-3 pr-6 text-gray-700">{feature as string}</td>
-                    <td className="py-3 px-4 text-center">{std  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
-                    <td className="py-3 px-4 text-center">{prem ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
-                    <td className="py-3 px-4 text-center">{elite? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">, </span>}</td>
+                    <td className="py-3 px-4 text-center">{std  ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">·</span>}</td>
+                    <td className="py-3 px-4 text-center">{prem ? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">·</span>}</td>
+                    <td className="py-3 px-4 text-center">{elite? <span aria-label="Included" className="text-black">✓</span> : <span aria-label="Not included" className="text-gray-300">·</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -246,7 +246,7 @@ export default function AboutPage() {
                 <tr className="border-t-2 border-black">
                   <td className="py-4 pr-6 font-serif text-base">Monthly price</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$200</td>
-                  <td className="py-4 px-4 text-center font-serif text-base">$350</td>
+                  <td className="py-4 px-4 text-center font-serif text-base">$300</td>
                   <td className="py-4 px-4 text-center font-serif text-base">$600</td>
                 </tr>
               </tfoot>
@@ -297,7 +297,7 @@ export default function AboutPage() {
               visit reports.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Today CHM serves second-home and vacation rental owners across Watersound Origins, Alys,
+              Today CHM serves second-home owners across Watersound Origins, Alys,
               Rosemary, and the broader scenic 30A corridor, as an insured Florida LLC. The core commitment
               hasn&apos;t changed: be the person your clients can actually call.
             </p>
@@ -408,7 +408,7 @@ export default function AboutPage() {
             <div>
               <h3 className="text-base font-serif mb-2">Storm &amp; Emergency Response</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                CHM monitors active weather events and conducts unscheduled visits when conditions
+                CHM tracks active weather events and makes unscheduled visits when conditions
                 warrant. Elite clients receive a guaranteed 2-hour emergency response and immediate
                 direct communication with Ryder.
               </p>

@@ -12,6 +12,9 @@ function fireGtagConversion() {
       gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
     };
     w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+    // GA4 lead event (added 9/11/26). Before this, no lead ever reached GA4, only
+    // Google Ads and PostHog. Mark generate_lead as a key event in GA4 admin.
+    w.gtag?.("event", "generate_lead", { form_location: window.location.pathname });
   } catch {}
 }
 
@@ -124,8 +127,8 @@ export default function ServiceLeadForm() {
           lineHeight: 1.65,
           color: "rgba(0,0,0,0.6)",
         }}>
-          I&apos;ll be in touch within 24 hours to schedule your free walkthrough.
-          Check your inbox. I sent you something useful in the meantime.
+          I&apos;ll walk your home and email you photos and a written condition report
+          within 48 hours. You do not need to be in town. Check your inbox for a copy.
         </p>
       </div>
     );
@@ -167,7 +170,7 @@ export default function ServiceLeadForm() {
           lineHeight: 1.65,
           color: "rgba(0,0,0,0.55)",
         }}>
-          I&apos;ll walk your home and tell you exactly what it needs, no pressure, no commitment.
+          You do not need to be in town. I&apos;ll walk your home and email you photos and a written condition report within 48 hours.
         </p>
 
         <form onSubmit={handleSubmit} noValidate>

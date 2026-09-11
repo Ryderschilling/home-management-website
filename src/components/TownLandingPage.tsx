@@ -16,7 +16,7 @@ const PLANS = [
     name: "Essential",
     price: "$200/mo",
     features: [
-      "Weekly walkthrough, interior and exterior",
+      "Bi-weekly walkthrough, interior and exterior",
       "Photo documentation every visit",
       "Written report after each check",
       "Mail and package handling",
@@ -25,14 +25,14 @@ const PLANS = [
   },
   {
     name: "Home Watch",
-    price: "$350/mo",
+    price: "$300/mo",
     featured: true,
     features: [
       "Everything in Essential",
+      "Weekly visits instead of bi-weekly",
       "Appliance and plumbing checks",
       "Irrigation filter cleaning",
-      "Detailed written condition reports",
-      "Weekly or bi-weekly schedule",
+      "Photos and a written report every visit",
     ],
   },
   {
@@ -41,7 +41,7 @@ const PLANS = [
     features: [
       "Everything in Home Watch",
       "HVAC filter changes",
-      "Storm and freeze monitoring",
+      "Storm and freeze checks when weather moves in",
       "Pre-arrival prep and A/C preset",
       "Contractor coordination",
     ],
@@ -87,12 +87,8 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
         postalCode: "32461",
         addressCountry: "US",
       },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: trustStats.ratingValue,
-        bestRating: trustStats.bestRating,
-        reviewCount: trustStats.reviewCount,
-      },
+      // No aggregateRating here: layout.tsx already rates this @id, and a second
+      // one is a critical "multiple aggregate ratings" error in Search Console.
     },
     areaServed: [
       {
@@ -201,8 +197,8 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
                 k: "Distance from owner",
                 v: `About ${town.driveMinutes} minutes from Watersound Origins`,
               },
-              { k: "Visit schedule", v: "Weekly or bi-weekly, on a fixed day" },
-              { k: "Plans", v: "$200, $350 and $600 per month. No contract." },
+              { k: "Visit schedule", v: "Bi-weekly on Essential, weekly on Home Watch and Elite, on a fixed day" },
+              { k: "Plans", v: "$200 bi-weekly, $300 weekly, $600 Coastal Elite. No contract." },
               { k: "Proof of visit", v: "Photographs and a written report after every check" },
               { k: "Storm and freeze", v: "Pre-storm and post-storm checks, same-day photos" },
               {

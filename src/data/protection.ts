@@ -43,7 +43,7 @@
 export const protectionServices = {
   shutoff: {
     name: "Water Shutoff Protection",
-    short: "A smart valve that shuts your water off automatically, monitored by us.",
+    short: "A smart valve that shuts your water off automatically, with alerts routed to us.",
     installPrice: 1295,
     installPriceLabel: "$1,295 installed",
     monitoringPrice: 35,

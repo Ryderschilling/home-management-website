@@ -20,7 +20,7 @@ const essential = offerings.find((o) => o.name === "Essential");
 export const metadata: Metadata = {
   title: "How to Choose a Home Watch Company on 30A",
   description:
-    "A local's guide to comparing home watch and second-home management providers on 30A: service area focus, pricing transparency, and what's actually included in a visit.",
+    "How to compare home watch companies on 30A, from a local owner serving Watersound Origins, Alys, Rosemary and scenic 30A. Free photo home check, no need to be in town.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: "How to Choose a Home Watch Company on 30A",
@@ -39,7 +39,7 @@ const faqs = [
   {
     q: "How much does home watch service cost on 30A?",
     a: essential
-      ? `Pricing varies by provider and by how it's structured. Coastal Home Management 30A publishes flat monthly pricing starting at $${essential.price.replace(".00", "")}/month for weekly visits with photo documentation, viewable directly on our pricing page. Some other home watch and concierge providers in the area only provide pricing after a phone call and a custom quote based on selected services.`
+      ? `Pricing varies by provider and by how it's structured. Coastal Home Management 30A publishes flat monthly pricing starting at $${essential.price.replace(".00", "")}/month for bi-weekly visits with photo documentation, viewable directly on our pricing page. Some other home watch and concierge providers in the area only provide pricing after a phone call and a custom quote based on selected services.`
       : "Pricing varies by provider and by how it's structured. Some home watch companies publish flat monthly rates, others require a phone call for a custom quote based on selected services.",
   },
   {
@@ -63,7 +63,7 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to Choose a Home Watch Company on 30A",
   description:
-    "A local's guide to comparing home watch and second-home management providers on 30A: service area focus, pricing transparency, and what's actually included in a visit.",
+    "How to compare home watch companies on 30A, from a local owner serving Watersound Origins, Alys, Rosemary and scenic 30A. Free photo home check, no need to be in town.",
   datePublished: "2026-07-14",
   dateModified: "2026-07-14",
   author: {
@@ -141,8 +141,8 @@ export default function ChoosingHomeWatchCompanyPage() {
               things: how local their coverage actually is to your specific
               neighborhood, whether pricing is published upfront or requires a
               phone call, and whether every visit is documented with photos.
-              Coastal Home Management 30A is built specifically around
-              Watersound Origins and Naturewalk, with flat published pricing and
+              Coastal Home Management 30A is run from Watersound Origins and serves
+              Watersound Origins, Alys, Rosemary, and scenic 30A, with flat published pricing and
               a photo report after every visit.
             </p>
           </div>

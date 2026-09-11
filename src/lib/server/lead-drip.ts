@@ -226,9 +226,9 @@ function email3(name: string): string {
 
 function email4(name: string): string {
   const tiers = [
-    ["Essential", "$200/mo", "Weekly interior + exterior walkthrough, issue alerts, mail pickup, and secure key holding."],
-    ["Home Watch", "$350/mo", "Everything in Essential plus photo documentation, written visit reports, and appliance and piping checks."],
-    ["Coastal Elite", "$600/mo", "Full management: storm monitoring, HVAC filter changes, arrival prep, and contractor coordination."],
+    ["Essential", "$200/mo", "Bi-weekly interior + exterior walkthrough with photos and a written report every visit, issue alerts, mail pickup, and key holding."],
+    ["Home Watch", "$300/mo", "Everything in Essential with weekly visits, plus appliance and piping checks and irrigation filter cleaning."],
+    ["Coastal Elite", "$600/mo", "Full management: storm and freeze checks, HVAC filter changes, arrival prep, and contractor coordination."],
     ["On-Call Only", "$75 base + $45/hr", "No retainer. Call when you need something handled. Perfect if you're here more often."],
   ];
 

@@ -122,7 +122,7 @@ export const bookingConfig = {
     { id: "afternoon", label: "Afternoon", detail: "2pm – 5pm" },
     { id: "flexible", label: "Flexible", detail: "Whatever works" },
   ],
-  plans: ["Essential ($200/mo)", "Home Watch ($350/mo)", "Coastal Elite ($600/mo)", "Not sure yet"],
+  plans: ["Essential ($200/mo, bi-weekly)", "Home Watch ($300/mo, weekly)", "Coastal Elite ($600/mo)", "Not sure yet"],
 };
 
 // ─── Single source of truth for pricing / service catalog ──────────────────
@@ -130,9 +130,11 @@ export const bookingConfig = {
 // feed. Edit prices here, everywhere else should reference this array.
 //
 // Tier names are canonical here and must match /pricing exactly:
-// Essential ($200) · Home Watch ($350) · Coastal Elite ($600).
+// Essential ($200, bi-weekly) · Home Watch ($300, weekly) · Coastal Elite ($600).
+// Set 9/11/26. Every plan gets photos and a written report every visit; visit
+// frequency is the main difference between Essential and Home Watch.
 // Rate locks (billed monthly, no upfront payment): 6-month saves 5%,
-// 12-month saves 10%: Essential $190/$180 · Home Watch $330/$315 · Elite $570/$540.
+// 12-month saves 10%: Essential $190/$180 · Home Watch $285/$270 · Elite $570/$540.
 // If you rename a tier, update src/app/pricing/page.tsx and src/app/about/page.tsx
 // in the same commit or the site drifts out of sync again.
 export const offerings: {
@@ -144,21 +146,21 @@ export const offerings: {
   {
     name: "Essential",
     description:
-      "Essential home watch plan for 30A second homes: weekly property check, photo documentation, storm watch, mail pickup, and a text or email summary after each visit. $200/month month-to-month, $190/month on a 6-month rate lock, or $180/month on a 12-month rate lock (billed monthly).",
+      "Essential home watch plan for 30A second homes: a bi-weekly property check (every other week), interior and exterior, with photo documentation and a written report after every visit, issue alerts, mail pickup, and key holding. $200/month month-to-month, $190/month on a 6-month rate lock, or $180/month on a 12-month rate lock (billed monthly).",
     price: "200.00",
     unitText: "month",
   },
   {
     name: "Home Watch",
     description:
-      "Home Watch plan: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination. $350/month month-to-month, $330/month on a 6-month rate lock, or $315/month on a 12-month rate lock (billed monthly).",
-    price: "350.00",
+      "Home Watch plan: everything in Essential with weekly visits instead of bi-weekly, plus appliance and plumbing checks and irrigation filter cleaning. Photos and a written report every visit. $300/month month-to-month, $285/month on a 6-month rate lock, or $270/month on a 12-month rate lock (billed monthly).",
+    price: "300.00",
     unitText: "month",
   },
   {
     name: "Coastal Elite",
     description:
-      "Our highest tier. Guaranteed 2-hour emergency response, weekly photo reports, Arrival Prep 2x/year, 3 on-call hours included, Ryder's direct line, plus Water Shutoff Protection monitoring and the Annual Coverage Record included. Limited to 8 members. $600/month month-to-month, $570/month on a 6-month rate lock, or $540/month on a 12-month rate lock (billed monthly).",
+      "Our highest tier. Weekly visits with photos and a written report, storm and freeze checks, HVAC filter changes, pre-arrival prep, contractor coordination, guaranteed 2-hour emergency response, Ryder's direct line, plus Water Shutoff Protection alert response and the Annual Coverage Record included. Limited to 8 members. $600/month month-to-month, $570/month on a 6-month rate lock, or $540/month on a 12-month rate lock (billed monthly).",
     price: "600.00",
     unitText: "month",
   },
@@ -178,7 +180,7 @@ export const offerings: {
   {
     name: "Water Shutoff Protection",
     description:
-      "A smart automatic shutoff valve installed on your main water line by a licensed plumber. It closes the line by itself when it detects a burst or a running leak, and the alert routes to us so someone local goes to the house. $1,295 installed, then $35/month to monitor and respond. Monitoring is included on Coastal Elite.",
+      "A smart automatic shutoff valve installed on your main water line by a licensed plumber. It closes the line by itself when it detects a burst or a running leak, and the alert routes to us so someone local goes to the house. $1,295 installed, then $35/month for alert response. Alert response is included on Coastal Elite.",
     price: "1295.00",
   },
   {

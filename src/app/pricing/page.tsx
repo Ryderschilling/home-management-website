@@ -16,6 +16,9 @@ function fireGtagConversion() {
       gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
     };
     w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+    // GA4 lead event (added 9/11/26). Before this, no lead ever reached GA4, only
+    // Google Ads and PostHog. Mark generate_lead as a key event in GA4 admin.
+    w.gtag?.("event", "generate_lead", { form_location: window.location.pathname });
   } catch {}
 }
 
@@ -57,7 +60,8 @@ const plans: Plan[] = [
       {
         label: "What's Included",
         items: [
-          { text: "<strong>Weekly walkthrough</strong>, interior & exterior" },
+          { text: "<strong>Bi-weekly walkthrough</strong>, interior & exterior, every other week" },
+          { text: "<strong>Photo documentation</strong> and a written report after every visit" },
           { text: "<strong>Issue alerts</strong> sent immediately if anything needs attention" },
           { text: "<strong>Mail pickup</strong> every visit" },
           { text: "<strong>Trash out & return</strong> on request" },
@@ -69,8 +73,8 @@ const plans: Plan[] = [
   {
     tier: "silver",
     name: "Home Watch",
-    tagline: "Everything in Essential plus photo reports and hands-on property care.",
-    prices: { monthly: 350, "6mo": 330, "12mo": 315 },
+    tagline: "Everything in Essential, every week, plus hands-on system checks.",
+    prices: { monthly: 300, "6mo": 285, "12mo": 270 },
     priceNote: "month-to-month · no contracts",
     badge: "Silver",
     cta: "Get Started",
@@ -79,10 +83,10 @@ const plans: Plan[] = [
         label: "What's Included",
         items: [
           { text: "<strong>Everything in Essential</strong>, plus:" },
-          { text: "<strong>Photo documentation</strong> sent after every visit" },
-          { text: "<strong>Written visit report</strong>, what was checked, what was found" },
+          { text: "<strong>Weekly walkthrough</strong>, twice the visits of Essential" },
           { text: "<strong>Appliance & piping checks</strong> each visit" },
           { text: "<strong>Irrigation filter cleaning</strong>" },
+          { text: "<strong>Photos and a written report</strong>, what was checked, what was found" },
         ],
       },
     ],
@@ -100,7 +104,7 @@ const plans: Plan[] = [
         label: "Full Watch + Reports",
         items: [
           { text: "<strong>Everything in Home Watch</strong>, plus:" },
-          { text: "<strong>Storm & freeze monitoring</strong>, active checks when weather moves in" },
+          { text: "<strong>Storm & freeze checks</strong>, extra visits when weather moves in" },
           { text: "<strong>HVAC filter changes</strong>, every unit, every time", tag: "Free" },
         ],
       },
@@ -122,7 +126,7 @@ const plans: Plan[] = [
       {
         label: "Claim Protection",
         items: [
-          { text: "<strong>Water Shutoff Protection</strong>, monitored by us, we go to the house when it trips", tag: "Included" },
+          { text: "<strong>Water Shutoff Protection</strong>, alerts come to us and we go to the house when it trips", tag: "Included" },
           { text: "<strong>Annual Coverage Record</strong>, a dated PDF of every visit for the year", tag: "$195 value" },
         ],
       },
@@ -159,6 +163,12 @@ const addons = [
     name: "Arrival Prep (Add-On)",
     desc: "Pre-arrival setup for Essential or Home Watch clients.",
     price: "From $150/visit",
+  },
+  {
+    name: "Storm Check",
+    desc: "Storm prep before landfall and a photo check of your home after it passes. Sign up once for the season.",
+    price: "$100/storm · $50 on a plan",
+    href: "/storm-check",
   },
   {
     name: "Day-Rate Mail & Trash",
@@ -569,6 +579,11 @@ export default function PricingPage() {
               <div className="addon-name">{a.name}</div>
               <div className="addon-desc">{a.desc}</div>
               <div className="addon-price">{a.price}</div>
+              {a.href ? (
+                <Link href={a.href} className="addon-desc underline underline-offset-4">
+                  Sign up for Storm Check
+                </Link>
+              ) : null}
             </div>
           ))}
         </div>
@@ -591,7 +606,7 @@ export default function PricingPage() {
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-silver">
                   Home Watch<br />
-                  <span className="compare-price">$350/mo</span>
+                  <span className="compare-price">$300/mo</span>
                 </th>
                 <th scope="col" className="compare-th compare-th-tier compare-th-gold">
                   Coastal Elite<br />
@@ -601,10 +616,10 @@ export default function PricingPage() {
             </thead>
             <tbody>
               <tr>
-                <td className="compare-td compare-td-feature">Weekly walkthrough, interior &amp; exterior</td>
-                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
-                <td className="compare-td compare-td-check compare-td-silver">✓</td>
-                <td className="compare-td compare-td-check compare-td-gold">✓</td>
+                <td className="compare-td compare-td-feature">Walkthrough, interior &amp; exterior</td>
+                <td className="compare-td compare-td-label compare-td-bronze">Bi-weekly</td>
+                <td className="compare-td compare-td-label compare-td-silver">Weekly</td>
+                <td className="compare-td compare-td-label compare-td-gold">Weekly</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Issue alerts sent immediately</td>
@@ -632,60 +647,60 @@ export default function PricingPage() {
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Photo documentation after every visit</td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Written visit report</td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-check compare-td-bronze">✓</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Appliance &amp; piping checks each visit</td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Irrigation filter cleaning</td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-silver">✓</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
-                <td className="compare-td compare-td-feature">Storm &amp; freeze monitoring</td>
-                <td className="compare-td compare-td-none">, </td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-feature">Storm &amp; freeze checks</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">HVAC filter changes, every unit</td>
-                <td className="compare-td compare-td-none">, </td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-label compare-td-gold">Free</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Pre-arrival walkthrough &amp; A/C pre-set</td>
-                <td className="compare-td compare-td-none">, </td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature">Post-departure secure check</td>
-                <td className="compare-td compare-td-none">, </td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Contractor coordination &amp; on-call access</td>
-                <td className="compare-td compare-td-none">, </td>
-                <td className="compare-td compare-td-none">, </td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
+                <td className="compare-td compare-td-none" aria-label="Not included">·</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
               </tr>
               <tr>
-                <td className="compare-td compare-td-feature">Water Shutoff Protection, monitored</td>
+                <td className="compare-td compare-td-feature">Water Shutoff Protection, alert response</td>
                 <td className="compare-td compare-td-label">Add-on</td>
                 <td className="compare-td compare-td-label">Add-on</td>
                 <td className="compare-td compare-td-check compare-td-gold">✓</td>
@@ -699,19 +714,19 @@ export default function PricingPage() {
               <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">Monthly price</td>
                 <td className="compare-td compare-td-price compare-td-bronze">$200</td>
-                <td className="compare-td compare-td-price compare-td-silver">$350</td>
+                <td className="compare-td compare-td-price compare-td-silver">$300</td>
                 <td className="compare-td compare-td-price compare-td-gold">$600</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature compare-td-price-row">6-month rate lock (billed monthly)</td>
                 <td className="compare-td compare-td-price compare-td-bronze">$190</td>
-                <td className="compare-td compare-td-price compare-td-silver">$330</td>
+                <td className="compare-td compare-td-price compare-td-silver">$285</td>
                 <td className="compare-td compare-td-price compare-td-gold">$570</td>
               </tr>
               <tr>
                 <td className="compare-td compare-td-feature compare-td-price-row">12-month rate lock (billed monthly)</td>
                 <td className="compare-td compare-td-price compare-td-bronze">$180</td>
-                <td className="compare-td compare-td-price compare-td-silver">$315</td>
+                <td className="compare-td compare-td-price compare-td-silver">$270</td>
                 <td className="compare-td compare-td-price compare-td-gold">$540</td>
               </tr>
             </tbody>

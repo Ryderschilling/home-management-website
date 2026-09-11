@@ -101,14 +101,15 @@ async function sendWelcomeEmail(firstName: string | null, email: string) {
                    "Pipes, leaks, and small issues that become expensive ones"].map(item => `
                 <tr>
                   <td style="padding:6px 0;vertical-align:top;">
-                    <span style="display:inline-block;width:16px;font-size:13px;color:rgba(0,0,0,0.35);">, </span>
+                    <span style="display:inline-block;width:16px;font-size:13px;color:rgba(0,0,0,0.35);">·</span>
                     <span style="font-size:14px;color:rgba(0,0,0,0.7);line-height:1.5;">${item}</span>
                   </td>
                 </tr>`).join("")}
               </table>
               <p style="margin:0 0 32px 0;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
-                I'll be in touch within 24 hours to schedule a free walkthrough of your property.
-                No commitment, just a conversation and a real look at what your home needs.
+                I'll walk your home this week and email you photos and a written condition report
+                within 48 hours. You do not need to be in town, there is no charge, and the report
+                is yours to keep either way. If I need a gate code or access details, I'll reply here.
               </p>
 
               <!-- CTA Button -->
@@ -129,7 +130,7 @@ async function sendWelcomeEmail(firstName: string | null, email: string) {
           <tr>
             <td style="padding:24px 44px 36px;border-top:1px solid rgba(0,0,0,0.08);">
               <p style="margin:0;font-size:14px;line-height:1.6;color:rgba(0,0,0,0.6);">
-, Ryder<br />
+                Ryder<br />
                 <span style="font-size:12px;color:rgba(0,0,0,0.4);">Coastal Home Management 30A</span><br />
                 <a href="tel:3094158793" style="font-size:12px;color:rgba(0,0,0,0.4);text-decoration:none;">(309) 415-8793</a>
               </p>
@@ -140,7 +141,7 @@ async function sendWelcomeEmail(firstName: string | null, email: string) {
           <tr>
             <td style="padding:16px 44px 24px;background:#f0efed;">
               <p style="margin:0;font-size:11px;color:rgba(0,0,0,0.35);line-height:1.5;">
-                You received this because you requested information at coastalhomemanagement30a.com.
+                You received this because you requested information at coastalhomemngt30a.com.
                 We won't spam you, this is a real person reaching out.
               </p>
             </td>

@@ -241,7 +241,7 @@ export default function ClaimProtectionPage() {
                 </ul>
                 <p className="mt-8 border-t border-[var(--ch-hairline)] pt-5 text-[13.5px] text-[var(--ch-muted)]">
                   {"installPriceLabel" in s
-                    ? `${s.installPriceLabel}, then ${s.monitoringPriceLabel} to monitor and respond. Monitoring is included on Coastal Elite.`
+                    ? `${s.installPriceLabel}, then ${s.monitoringPriceLabel} for alert response. Alert response is included on Coastal Elite.`
                     : `${s.annualPriceLabel}. Included on Coastal Elite.`}
                 </p>
               </div>

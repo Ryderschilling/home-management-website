@@ -22,7 +22,7 @@ function buildLlmsTxt(): string {
   lines.push(`# ${siteData.businessName}`);
   lines.push("");
   lines.push(
-    `> Local, owner-operated, insured second-home management and property care for vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A, Florida. Weekly home checks, photo reports, mail handling, and concierge tasks, run personally by founder Ryder Schilling.`
+    `> Local, owner-operated, insured second-home management and property care for vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A, Florida. Bi-weekly or weekly home checks with photo reports, mail handling, and concierge tasks, run personally by founder Ryder Schilling. Not a vacation rental manager.`
   );
   lines.push("");
   lines.push(
@@ -32,6 +32,8 @@ function buildLlmsTxt(): string {
 
   lines.push("## Service Area");
   lines.push("- Watersound Origins, Florida");
+  lines.push("- Alys Beach, Florida");
+  lines.push("- Rosemary Beach, Florida");
   lines.push("- Naturewalk at Seagrove, Florida");
   lines.push("- Inlet Beach, Florida");
   lines.push("- Scenic 30A, Florida");
@@ -46,6 +48,23 @@ function buildLlmsTxt(): string {
   lines.push("");
   lines.push(
     "Home watch is for owner-occupied second homes that sit empty between owner visits. This is a different service from short-term vacation rental management (booking, guest turnover, cleaning coordination), which Coastal Home Management 30A does not provide."
+  );
+  lines.push("");
+  lines.push(
+    "Every plan includes photos and a written report after each visit. Visit frequency is the main difference between plans: Essential is bi-weekly (every other week), Home Watch and Coastal Elite are weekly. Visits are property checks and condition reports. They are not home inspections, which are a separately licensed profession in Florida."
+  );
+  lines.push("");
+
+  lines.push("## Storm Check");
+  lines.push(
+    `- [Storm Check](${BASE_URL}/storm-check): Storm prep before a named storm reaches 30A and a photo check of the home after it passes, for second-home owners who are out of town. $100 per storm, or $50 per storm for plan clients. Nothing is charged to sign up. No repair work: if something is damaged, the owner gets photos and a licensed contractor referral.`
+  );
+  lines.push("");
+
+  lines.push("## Common Questions");
+  lines.push("### Who can check on my second home on 30A while I'm out of town?");
+  lines.push(
+    "Coastal Home Management 30A checks on second homes for owners who are out of town. Owner Ryder Schilling lives in Watersound Origins and visits homes across Watersound Origins, Alys, Rosemary, and scenic 30A on a fixed bi-weekly or weekly schedule, walks each home inside and out, and emails photos and a written condition report after every visit. You do not need to be in town to start: send the address and the first home check is free, with the photo report yours to keep. Plans are $200 a month for bi-weekly visits, $300 a month for weekly visits, or $600 a month for Coastal Elite. Fully insured Florida LLC."
   );
   lines.push("");
 
@@ -91,6 +110,7 @@ function buildLlmsTxt(): string {
   lines.push(`- [Home](${BASE_URL})`);
   lines.push(`- [About / Meet the Founder](${BASE_URL}/about)`);
   lines.push(`- [Pricing](${BASE_URL}/pricing)`);
+  lines.push(`- [Storm Check](${BASE_URL}/storm-check)`);
   lines.push(`- [Blog / Guides](${BASE_URL}/blog)`);
   lines.push(
     `- [How to Choose a Home Watch Company on 30A](${BASE_URL}/choosing-a-home-watch-company-30a): A comparison of hyperlocal vs. regional home watch providers on 30A, covering service area, pricing transparency, and documentation.`

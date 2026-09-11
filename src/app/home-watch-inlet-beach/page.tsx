@@ -30,7 +30,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Inlet Beach FL?",
-    a: "Plans start at $200/month (Essential, weekly visits, photo reports, mail pickup), $350/month (Home Watch, adds appliance and plumbing checks), and $600/month (Coastal Elite, adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination). Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
+    a: "Plans are $200/month (Essential, bi-weekly visits with photo reports and mail pickup), $300/month (Home Watch, weekly visits plus appliance and plumbing checks), and $600/month (Coastal Elite, adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination). Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
 ];
 
@@ -271,6 +271,7 @@ export default function HomeWatchInletBeachPage() {
             <Link href="/home-watch-seacrest-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Seacrest Beach</Link>
             <Link href="/home-watch-panama-city-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Panama City Beach</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
+            <Link href="/storm-check" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Storm Check</Link>
           </div>
         </div>
       </section>

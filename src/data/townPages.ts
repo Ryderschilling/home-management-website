@@ -59,7 +59,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Rosemary Beach homes are dense, vertical, and built out of wood and iron four minutes from salt spray. That combination punishes a house that sits empty. Coastal Home Management 30A walks yours on a set schedule, inside and out, top floor to courtyard, and sends photo proof after every single visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Rosemary Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about a four minute drive from Rosemary Beach town center, and personally performs every property check. Visits are weekly or bi-weekly, cover the interior and exterior including carriage houses and private courtyards, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Rosemary Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about a four minute drive from Rosemary Beach town center, and personally performs every property check. Visits are weekly or bi-weekly, cover the interior and exterior including carriage houses and private courtyards, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Rosemary Beach was laid out in 1995 as a New Urbanist town, so the homes are unusually tall and unusually close together. Three and four story units, tower rooms, rooftop decks, and a carriage house over the garage off the rear lane are the standard pattern, not the exception. Most of the square footage is stacked vertically, which means a leak that starts on the third floor is running through two more levels of finished space before anyone would ever see it.",
       "The architecture is Dutch West Indies and St. Augustine, with a lot of exposed exterior wood, painted shutters, wrought iron balconies and railings, and deep porches. Those details are the reason the town looks the way it does and also the reason a Rosemary Beach house needs eyes on it more often than a stucco house does. Salt eats iron. Humidity finds end grain.",
@@ -103,7 +103,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Rosemary Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. Month to month with no contract, or lock a 6 or 12 month rate and save up to 10 percent. Rosemary Beach homes with a carriage house or a third floor usually make the most sense on Home Watch or above, because there is simply more house to walk.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. Month to month with no contract, or lock a 6 or 12 month rate and save up to 10 percent. Rosemary Beach homes with a carriage house or a third floor usually make the most sense on Home Watch or above, because there is simply more house to walk.",
       },
       {
         q: "Do you check the carriage house too?",
@@ -147,7 +147,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "An Alys Beach house turns inward. The courtyard, the pool, the fountain and the plunge are the middle of the home, and they are the part no neighbor can see. Coastal Home Management 30A walks the whole property on a set schedule and photographs it, so a courtyard drain backing up in July is a text message and not a discovery in October.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Alys Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about a six minute drive from Alys Beach, and performs every property check personally. Visits are weekly or bi-weekly, cover the interior, the private courtyard, pool equipment and the masonry exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Alys Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about a six minute drive from Alys Beach, and performs every property check personally. Visits are weekly or bi-weekly, cover the interior, the private courtyard, pool equipment and the masonry exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Alys Beach homes are masonry, not frame. Poured concrete and block with white stucco, Bermuda style roofs, and a design code so tight the whole town reads as one building. That construction is genuinely more durable than the wood towns to the west, which changes what goes wrong here. You are not usually chasing rot. You are chasing water that got in and had nowhere to evaporate to.",
       "The plan is courtyard-first. Most homes wrap a private open air courtyard with a pool or plunge, a fountain, and mature plantings, and the living space opens onto it through large sliding and folding door systems. It is beautiful and it puts a lot of drainage, a lot of pool chemistry, and a lot of door hardware in the exact center of the house.",
@@ -190,7 +190,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Alys Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Alys Beach homes with a courtyard pool land on Home Watch or Coastal Elite, because the courtyard and pool equipment add real checks to every visit.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Alys Beach homes with a courtyard pool land on Home Watch or Coastal Elite, because the courtyard and pool equipment add real checks to every visit.",
       },
       {
         q: "Do you check the courtyard and pool?",
@@ -234,7 +234,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Seacrest is the busiest stretch of this end of 30A, and busy cuts both ways. Your home is surrounded by activity and still completely unobserved. Coastal Home Management 30A puts a set of eyes inside your Seacrest house on a schedule, with photographs after every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Seacrest Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about five minutes from Seacrest Beach, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Seacrest Beach, Florida (32461, Walton County). Owner Ryder Schilling lives in Watersound Origins, about five minutes from Seacrest Beach, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Seacrest has the widest spread of housing on this end of 30A. There are original 1990s and early 2000s cottages, there are large new builds on the north side, and there are dense clusters of townhomes and small-lot homes built around the lagoon pool. Two houses one street apart can be twenty five years and two million dollars apart.",
       "The community is organized around a roughly 12,000 square foot lagoon pool and a tram that runs residents to the beach, which means a very high share of the homes here are on rental programs at least part of the year. Even the ones that are not sit inside a neighborhood with constant turnover.",
@@ -277,7 +277,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seacrest Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, 6 and 12 month rate locks save up to 10 percent. Seacrest homes on original 1990s equipment usually get the most out of Home Watch, since the plumbing and appliance checks are where the real risk sits.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, 6 and 12 month rate locks save up to 10 percent. Seacrest homes on original 1990s equipment usually get the most out of Home Watch, since the plumbing and appliance checks are where the real risk sits.",
       },
       {
         q: "My Seacrest home is on a rental program. Do I still need home watch?",
@@ -321,7 +321,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Watersound Beach is gated, quiet, and directly on the dune line. The privacy that makes it worth owning here is the same privacy that means nobody would notice a problem for a month. Coastal Home Management 30A checks your home on a set schedule and documents every visit with photographs.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Watersound Beach, Florida (32461, Walton County), the gated community on the south side of 30A. Owner Ryder Schilling lives in Watersound Origins, about six minutes away, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and the salt-exposed exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Watersound Beach, Florida (32461, Walton County), the gated community on the south side of 30A. Owner Ryder Schilling lives in Watersound Origins, about six minutes away, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and the salt-exposed exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Watersound Beach is dune-front and gated, with homes set among the scrub and boardwalks rather than on a conventional street grid. Many properties sit within a few hundred feet of open Gulf, and a meaningful number have no wind break at all between them and salt spray.",
       "Construction is high-end coastal, heavy on standing seam metal roofs, deep porches, exterior stairs, elevated foundations, and outdoor living space. It is beautiful and it is also a large amount of exposed surface area in the most corrosive microclimate on 30A.",
@@ -364,7 +364,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Watersound Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Dune-front homes usually justify Coastal Elite for the storm response alone.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Dune-front homes usually justify Coastal Elite for the storm response alone.",
       },
       {
         q: "Can you get through the gate?",
@@ -375,7 +375,7 @@ export const townPages: Record<string, TownPageData> = {
         a: "Before a named storm we check the property, secure what can be secured, and photograph the pre-storm condition. After it passes and it is safe to be outside, we go back, walk the whole property, and send photographs the same day. Having a dated before and after record of your own house is worth a great deal if a claim ever gets complicated.",
       },
       {
-        q: "Do you monitor for freezes too?",
+        q: "Do you check for freezes too?",
         a: "Yes. The Panhandle does get hard freezes, and an unoccupied house with an unprotected exterior line or an exposed pool pump is exactly what fails. Freeze response is included on Coastal Elite.",
       },
       {
@@ -408,7 +408,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Seagrove has the oldest housing stock on 30A, and old houses fail in specific, predictable ways. Coastal Home Management 30A checks yours on a schedule, knows what to look for in a 1980s cottage under live oaks, and sends photo proof after every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Seagrove Beach, Florida (32459, Walton County), including Old Seagrove. Owner Ryder Schilling lives in Watersound Origins, about eleven minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to older systems and moisture, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Seagrove Beach, Florida (32459, Walton County), including Old Seagrove. Owner Ryder Schilling lives in Watersound Origins, about eleven minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to older systems and moisture, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Seagrove is the closest thing 30A has to an old neighborhood. Old Seagrove in particular has sand streets, enormous live oaks and magnolias, and cottages that predate the entire New Urbanist buildout to the east. Plenty of those houses have been renovated beautifully. Plenty of them are still running on the bones they were built with.",
       "North of 30A the character changes again, with larger lots, more full-time residents than most 30A towns, and a real mix of 1990s houses and recent construction. Eastern Lake runs through the community, which puts a good number of homes on or near a coastal dune lake.",
@@ -451,7 +451,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seagrove Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract, and 6 or 12 month rate locks save up to 10 percent. Older Seagrove homes usually get more value from Home Watch than Essential, because the plumbing and appliance checks are where the risk actually is.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, and 6 or 12 month rate locks save up to 10 percent. Older Seagrove homes usually get more value from Home Watch than Essential, because the plumbing and appliance checks are where the risk actually is.",
       },
       {
         q: "My Seagrove cottage is older. Does that change what you check?",
@@ -495,7 +495,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "The Seaside cottages are now forty years old, built almost entirely of wood, standing in salt air, and rented hard. That is a maintenance profile, not a house. Coastal Home Management 30A watches yours on a set schedule and photographs every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Seaside, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about thirteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and the wood exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Seaside, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about thirteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and the wood exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Seaside was founded in 1981 and is the town that started all of this. The design code is famous: wood frame construction, tin roofs, deep porches, and a picket fence in front of every house that has to be a different design from its neighbor's. It is also, at this point, an entire town of forty year old wooden buildings within a quarter mile of the Gulf.",
       "The lots are small and the houses are close. Most have no garage and limited storage, and many have detached rear cottages or upstairs units. The town is walkable by design, which means service access is on foot for a lot of properties.",
@@ -538,7 +538,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seaside?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Seaside cottages sit best on Home Watch, because the exterior wood and the roof are what need tracking here, not just the interior.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Seaside cottages sit best on Home Watch, because the exterior wood and the roof are what need tracking here, not just the interior.",
       },
       {
         q: "My Seaside cottage is a rental most of the year. What does home watch add?",
@@ -582,7 +582,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "WaterColor homes are big, heavily landscaped, and built around outdoor living that only works if somebody maintains it. Coastal Home Management 30A checks yours on a set schedule, watches the systems and the grounds, and sends photo proof after every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in WaterColor, Florida (32459, Walton County), the St. Joe community around Western Lake. Owner Ryder Schilling lives in Watersound Origins, about fifteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior, exterior and grounds, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in WaterColor, Florida (32459, Walton County), the St. Joe community around Western Lake. Owner Ryder Schilling lives in Watersound Origins, about fifteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior, exterior and grounds, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "WaterColor was developed in the early 2000s, so the housing stock is now in its twenties. That is a specific and often overlooked age: past the warranty period, past the first round of easy years, and right at the point where original HVAC systems, water heaters and roofs all start coming due at once.",
       "The design language is deep porches, hardie and wood exteriors, metal roofs, screened outdoor rooms, and mature landscaping that the community takes seriously. Homes are large by 30A standards and most have significant covered outdoor square footage, outdoor kitchens and fans, and heavy irrigation.",
@@ -625,7 +625,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in WaterColor?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Larger WaterColor homes with a pool or extensive grounds typically fit Home Watch or Coastal Elite.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Larger WaterColor homes with a pool or extensive grounds typically fit Home Watch or Coastal Elite.",
       },
       {
         q: "Do you check irrigation and the grounds?",
@@ -669,7 +669,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Grayton is the oldest town on 30A and the least uniform. A 1940s beach shack sits next to a new build, half the roads are sand, and Western Lake floods when it wants to. Coastal Home Management 30A checks your Grayton home on a schedule and photographs every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Grayton Beach, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about eighteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to flooding and older construction, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Grayton Beach, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about eighteen minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to flooding and older construction, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Grayton Beach dates to the 1890s and has never been master planned, which is exactly why people love it and exactly why no two properties here have the same risk profile. Original beach cottages, 1970s and 1980s houses, and multi-million dollar new construction all share the same sand streets.",
       "Much of Grayton has no HOA and no architectural review, so maintenance standards are whatever each owner decides. There is no management company noticing that your gutters are full. If you are out of state, the only person who will notice is the one you hire.",
@@ -712,7 +712,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Grayton Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. In Grayton, where there is often no HOA and no neighbor watching, weekly Essential is the floor we recommend rather than bi-weekly.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. In Grayton, where there is often no HOA and no neighbor watching, weekly visits on Home Watch are the floor we recommend rather than bi-weekly Essential.",
       },
       {
         q: "My Grayton house floods sometimes. Can you check on it after rain?",
@@ -756,7 +756,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Blue Mountain sits on the highest ground on the Gulf coast of Florida, which means steep lots, real drainage, and homes that catch wind nothing else on 30A catches. Coastal Home Management 30A checks yours on a set schedule with photo proof after every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Blue Mountain Beach, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about twenty one minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to slope drainage and wind exposure, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Blue Mountain Beach, Florida (32459, Walton County). Owner Ryder Schilling lives in Watersound Origins, about twenty one minutes east, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior with attention to slope drainage and wind exposure, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Blue Mountain Beach is built on the highest dunes on the Florida Gulf coast, roughly 65 feet above sea level. That elevation is the whole character of the place. Lots are sloped, driveways are steep, and homes on the south side often have several stories of glass pointed straight at open Gulf to get the view they paid for.",
       "The housing mix is genuinely wide, from 1980s and 1990s cottages on the north side to large modern builds on the ridge. Big Redfish Lake anchors the west end of the community, and the neighborhood is quieter and less commercial than Seaside or Rosemary, with a smaller full-time population than Santa Rosa Beach.",
@@ -799,7 +799,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Blue Mountain Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent.",
       },
       {
         q: "Is Blue Mountain Beach safer from storms because it's higher?",
@@ -843,7 +843,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Santa Rosa Beach is the largest and least uniform address on 30A. Gulf-front homes, bay-side homes and wooded lots north of 98 all carry the same mailing address and almost nothing else in common. Coastal Home Management 30A checks yours on a set schedule with photo proof every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Santa Rosa Beach, Florida (32459, Walton County), on both the 30A corridor and north of Highway 98. Owner Ryder Schilling lives in Watersound Origins and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Santa Rosa Beach, Florida (32459, Walton County), on both the 30A corridor and north of Highway 98. Owner Ryder Schilling lives in Watersound Origins and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Santa Rosa Beach is a mailing address covering an enormous area, not a single neighborhood. It stretches from the 30A corridor on the Gulf all the way north across Highway 98 to Point Washington, Church Street, Hammock Bay and the Choctawhatchee Bay side. Two Santa Rosa Beach homes can be fifteen miles and two entirely different climates apart.",
       "South of 98 along 30A you have second homes, rentals and Gulf-view construction. North of 98 you find larger wooded lots, more full-time residents, more well and septic systems, and a much higher share of primary residences. What a home watch visit should actually cover differs sharply between the two.",
@@ -886,7 +886,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Santa Rosa Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks that save up to 10 percent. Because the area is so spread out, Santa Rosa Beach clients are routed on a fixed weekly or bi-weekly day, which is what keeps the price where it is.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks that save up to 10 percent. Because the area is so spread out, Santa Rosa Beach clients are routed on a fixed weekly or bi-weekly day, which is what keeps the price where it is.",
       },
       {
         q: "Santa Rosa Beach is huge. Which parts do you actually serve?",
@@ -930,11 +930,11 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Dune Allen is the quiet west end of 30A: three coastal dune lakes, older stock, and almost no through traffic. Quiet is why people buy here and it is also why an empty house can sit unnoticed for a very long time. Coastal Home Management 30A checks yours on a schedule with photo proof every visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Dune Allen Beach, Florida (32459, Walton County), at the western end of scenic 30A. Owner Ryder Schilling lives in Watersound Origins and performs every check personally. Visits are weekly or bi-weekly, cover the interior and salt-exposed exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Dune Allen Beach, Florida (32459, Walton County), at the western end of scenic 30A. Owner Ryder Schilling lives in Watersound Origins and performs every check personally. Visits are weekly or bi-weekly, cover the interior and salt-exposed exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Dune Allen is the westernmost stretch of 30A and one of the least developed. Oyster Lake, Stallworth Lake and Allen Lake all reach the Gulf inside this small area, which is an unusual concentration of coastal dune lakes and the reason so much of the land here was never built on.",
       "Housing skews older than the towns to the east. A lot of 1980s and 1990s beach houses on pilings, some original small cottages, and a scattering of large modern rebuilds on the best Gulf-front lots. Many properties are directly on the dune line with nothing between them and salt spray.",
-      "There is very little commercial activity and very little through traffic. That is exactly the appeal, and it is also the operational fact that matters: nobody is driving past your house, no HOA is inspecting anything, and a problem here goes unobserved longer than almost anywhere else on the corridor.",
+      "There is very little commercial activity and very little through traffic. That is exactly the appeal, and it is also the operational fact that matters: nobody is driving past your house, no HOA is checking anything, and a problem here goes unobserved longer than almost anywhere else on the corridor.",
     ],
     failureModes: [
       {
@@ -973,7 +973,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Dune Allen Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. At the west end we recommend a fixed weekly day so the route works, and we price it the same as everywhere else.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. At the west end we recommend a fixed weekly day so the route works, and we price it the same as everywhere else.",
       },
       {
         q: "You're based on the east end. Is Dune Allen too far?",
@@ -1017,7 +1017,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "Miramar Beach runs from Sandestin to the Walton county line and is far more condo and resort-driven than 30A. Coastal Home Management 30A serves it on a scheduled basis, with the same photo-documented visit every time.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in Miramar Beach, Florida (32550, Walton County), including properties near Sandestin. Owner Ryder Schilling lives in Watersound Origins, about thirty three minutes east, and performs every check personally. Visits are scheduled weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in Miramar Beach, Florida (32550, Walton County), including properties near Sandestin. Owner Ryder Schilling lives in Watersound Origins, about thirty three minutes east, and performs every check personally. Visits are scheduled weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "Miramar Beach is a different animal from 30A. Gulf-front high rise and mid rise condominiums dominate the beach side, Sandestin Golf and Beach Resort occupies a large share of the area with its own villages and its own rules, and there are established single family neighborhoods behind and around all of it.",
       "Because so much of the inventory is condominium, a lot of the building envelope is somebody else's responsibility. What is still entirely yours is the interior: the HVAC, the water heater, the supply lines, the humidity, the appliances, and the unit itself sitting closed up for months while the association worries about the roof.",
@@ -1060,7 +1060,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Miramar Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Condominium units are usually well served by Essential, since the association already owns the building envelope.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Condominium units are usually well served by Essential, since the association already owns the building envelope.",
       },
       {
         q: "Do you watch condominiums or just houses?",
@@ -1104,7 +1104,7 @@ export const townPages: Record<string, TownPageData> = {
     heroLead:
       "The west end of Panama City Beach is twelve minutes from Watersound Origins, closer than half of 30A. Coastal Home Management 30A watches second homes and condominiums on that end of PCB with the same scheduled, photo-documented visit.",
     directAnswer:
-      "Coastal Home Management 30A provides home watch service in west Panama City Beach, Florida (32413, Bay County), including the Camp Helen, Wild Heron, Breakfast Point and Carillon Beach side. Owner Ryder Schilling lives in Watersound Origins, about twelve minutes west of the county line, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200, $350, and $600 per month with no contract required. Phone (309) 415-8793.",
+      "Coastal Home Management 30A provides home watch service in west Panama City Beach, Florida (32413, Bay County), including the Camp Helen, Wild Heron, Breakfast Point and Carillon Beach side. Owner Ryder Schilling lives in Watersound Origins, about twelve minutes west of the county line, and performs every check personally. Visits are weekly or bi-weekly, cover the interior and exterior, and produce a written report with photographs after every visit. Plans run $200 per month for bi-weekly visits, $300 for weekly visits, and $600 for Coastal Elite, with no contract required. Phone (309) 415-8793.",
     housingStock: [
       "West Panama City Beach, the 32413 side toward the Walton county line, is much closer in character to 30A than the tower-lined middle of PCB. Wild Heron, Breakfast Point, Carillon Beach and the neighborhoods around Lake Powell are second-home and primary-home communities with real HOAs and real landscaping, not resort inventory.",
       "There is also a very large condominium market here, both Gulf-front and just off the beach, and a great deal of it is owned by out-of-state buyers who visit a few weeks a year. Those units sit closed for long periods in a humid coastal climate.",
@@ -1147,7 +1147,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Panama City Beach?",
-        a: "Plans are $200 per month for weekly Essential checks with photo reports, $350 per month for Home Watch with appliance and plumbing checks, and $600 per month for Coastal Elite with HVAC filter changes, storm and freeze monitoring, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. West-end PCB is priced exactly the same as 30A, with no county-line surcharge.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. West-end PCB is priced exactly the same as 30A, with no county-line surcharge.",
       },
       {
         q: "Do you watch condominiums in PCB?",

@@ -158,7 +158,8 @@ function buildLeadConfirmation(firstName: string): string {
           <h1 style="margin:0 0 16px;font-size:22px;color:#0b0b0b;letter-spacing:-0.02em;">${hi}</h1>
           <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
             Thanks for reaching out about your home. I got your message and I'll be in touch personally
-            within 24 hours to set up a free walkthrough.
+            within 24 hours. You do not need to be in town: I'll walk the home and email you photos
+            and a written condition report within 48 hours, free.
           </p>
           <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:rgba(0,0,0,0.7);">
             I'm local, I'm insured, and I treat every home here like it's my own. If anything comes up

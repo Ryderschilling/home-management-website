@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { siteData, trustStats, testimonials, businessContact } from "@/data/siteData";
+import { siteData, businessContact } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import ServiceAreaMapWrapper from "@/components/ServiceAreaMapWrapper";
@@ -53,6 +53,10 @@ const FAQS: FaqItem[] = [
     a: "We provide regular, documented property care for second-home and vacation homeowners in Watersound Origins, Alys, Rosemary, and scenic 30A. Every visit includes a full walk-through, photo documentation, and a summary report sent directly to you. We also handle on-call tasks, mail pickup, trash service, contractor coordination, and arrival prep so your home is always in order, whether you're here or a thousand miles away.",
   },
   {
+    q: "Who can check on my second home on 30A while I'm out of town?",
+    a: "Coastal Home Management 30A checks on second homes for owners who are out of town. Owner Ryder Schilling lives in Watersound Origins and visits homes across Watersound Origins, Alys, Rosemary, and scenic 30A on a fixed bi-weekly or weekly schedule, walks each home inside and out, and emails photos and a written condition report after every visit. You do not need to be in town to start: send the address and the first home check is free, with the photo report yours to keep. Plans are $200 a month for bi-weekly visits, $300 a month for weekly visits, or $600 a month for Coastal Elite. Fully insured Florida LLC.",
+  },
+  {
     q: "What is home watch, and is it different from property management?",
     a: "Home watch is the scheduled checking of an unoccupied home: someone physically walks the property inside and out on a set schedule, checks the systems, and reports what they find. Traditional property management usually means managing tenants or rental bookings. Coastal Home Management 30A is a home watch and second home management service. We look after your home for you, not rent it out to other people.",
   },
@@ -64,8 +68,9 @@ const FAQS: FaqItem[] = [
     q: "How much does home watch cost in 30A?",
     a: (
       <>
-        Our monthly plans start at $200/month (Essential) and go up to $600/month for the
-        Coastal Elite membership. Lock in a 6 or 12-month rate and save up to 10%, still
+        Essential is $200/month for a bi-weekly check, Home Watch is $300/month for weekly
+        visits, and Coastal Elite is $600/month. Every plan includes photos and a written
+        report after each visit. Lock in a 6 or 12-month rate and save up to 10%, still
         billed monthly. On-call services are $75 base plus $45/hour, and mail or
         trash handling is $35/day. See the{" "}
         <Link href="/pricing" className="text-[var(--ch-teal)] underline underline-offset-4">
@@ -337,7 +342,7 @@ export default function HomePage() {
                   </th>
                   {[
                     ["Essential", "$200"],
-                    ["Home Watch", "$350"],
+                    ["Home Watch", "$300"],
                     ["Coastal Elite", "$600"],
                   ].map(([name, price]) => (
                     <th key={name} scope="col" className="px-3 py-5 text-center align-bottom">
@@ -360,7 +365,8 @@ export default function HomePage() {
               <tbody className="divide-y divide-[var(--ch-hairline)] text-[var(--ch-muted)]">
                 {(
                   [
-                    ["Weekly walkthrough, interior & exterior", true, true, true],
+                    ["Walkthrough, interior & exterior", true, true, true],
+                    ["Weekly visits (Essential is every other week)", false, true, true],
                     ["Issue alerts sent immediately", true, true, true],
                     ["Photo documentation after every visit", true, true, true],
                     ["Written visit report", true, true, true],
@@ -369,7 +375,7 @@ export default function HomePage() {
                     ["Secure key holding & access coordination", true, true, true],
                     ["Appliance & piping checks each visit", false, true, true],
                     ["Irrigation filter cleaning", false, true, true],
-                    ["Storm & freeze monitoring", false, false, true],
+                    ["Storm & freeze checks when weather moves in", false, false, true],
                     ["HVAC filter changes (every unit)", false, false, true],
                     ["Pre-arrival walkthrough & A/C pre-set", false, false, true],
                     ["Post-departure secure check", false, false, true],
@@ -518,6 +524,11 @@ export default function HomePage() {
               Every town we serve, with drive times &rarr;
             </Link>
           </div>
+          <div className="reveal-item pt-3">
+            <Link href="/storm-check" className="ch-link">
+              Out of town this hurricane season? Put your home on Storm Check &rarr;
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -616,6 +627,7 @@ export default function HomePage() {
               ["/mail-package-handling-inlet-beach", "Mail & Package Handling"],
               ["/home-check-services-30a", "Home Check Services"],
               ["/pricing", "Service Plans & Pricing"],
+              ["/storm-check", "Storm Check Sign-Up"],
               ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
             ].map(([href, label]) => (
               <Link
@@ -658,19 +670,9 @@ export default function HomePage() {
               "https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl",
               "https://sourceatrade.com/contractors/coastal-home-management-30a-3",
             ],
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: trustStats.ratingValue,
-              bestRating: trustStats.bestRating,
-              reviewCount: trustStats.reviewCount,
-            },
-            review: testimonials.map((t) => ({
-              "@type": "Review",
-              datePublished: t.datePublished,
-              author: { "@type": "Person", name: t.author },
-              reviewRating: { "@type": "Rating", ratingValue: t.rating, bestRating: "5" },
-              reviewBody: t.body,
-            })),
+            // aggregateRating and review live ONLY in layout.tsx. Printing them here
+            // too gave this @id two ratings, which GSC flagged 9/5/26 as a critical
+            // "Review has multiple aggregate ratings" error on 8 items.
           }),
         }}
       />
@@ -760,6 +762,14 @@ export default function HomePage() {
               },
               {
                 "@type": "Question",
+                name: "Who can check on my second home on 30A while I'm out of town?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Coastal Home Management 30A checks on second homes for owners who are out of town. Owner Ryder Schilling lives in Watersound Origins and visits homes across Watersound Origins, Alys, Rosemary, and scenic 30A on a fixed bi-weekly or weekly schedule, walks each home inside and out, and emails photos and a written condition report after every visit. You do not need to be in town to start: send the address and the first home check is free, with the photo report yours to keep. Plans are $200 a month for bi-weekly visits, $300 a month for weekly visits, or $600 a month for Coastal Elite. Fully insured Florida LLC.",
+                },
+              },
+              {
+                "@type": "Question",
                 name: "What is home watch, and is it different from property management?",
                 acceptedAnswer: {
                   "@type": "Answer",
@@ -779,7 +789,7 @@ export default function HomePage() {
                 name: "How much does home watch cost in 30A?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Monthly home watch and second home management plans start at $200/month (Essential), $350/month (Home Watch), and $600/month for the Coastal Elite membership. A 6-month rate lock saves 5% and a 12-month rate lock saves 10%, both billed monthly. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
+                  text: "Monthly home watch and second home management plans are $200/month for Essential (bi-weekly visits), $300/month for Home Watch (weekly visits), and $600/month for the Coastal Elite membership. Every plan includes photos and a written report after each visit. A 6-month rate lock saves 5% and a 12-month rate lock saves 10%, both billed monthly. On-call services are $75 base plus $45/hour. Mail or trash handling is $35/day.",
                 },
               },
               {
@@ -835,7 +845,7 @@ export default function HomePage() {
                 name: "Who manages second homes in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch visits, mail handling, storm prep, HVAC monitoring, and concierge services. Currently managing over $10 million in second home real estate across Watersound Origins and Inlet Beach.",
+                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch visits, mail handling, storm prep, HVAC checks, and concierge services. Currently managing over $10 million in second home real estate across Watersound Origins and Inlet Beach.",
                 },
               },
               {

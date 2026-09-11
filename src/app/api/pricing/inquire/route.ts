@@ -133,7 +133,7 @@ function buildOwnerEmail(data: {
           <tr>
             <td style="padding:14px 36px 20px;background:#f0efed;">
               <p style="margin:0;font-size:11px;color:rgba(0,0,0,0.3);line-height:1.5;">
-                Sent from the CHM pricing page · coastalhomemanagement30a.com/pricing
+                Sent from the CHM pricing page · coastalhomemngt30a.com/pricing
               </p>
             </td>
           </tr>

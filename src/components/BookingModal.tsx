@@ -12,6 +12,9 @@ function fireGtagConversion() {
       gtag?: (c: string, a: string, p: Record<string, unknown>) => void;
     };
     w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+    // GA4 lead event (added 9/11/26). Before this, no lead ever reached GA4, only
+    // Google Ads and PostHog. Mark generate_lead as a key event in GA4 admin.
+    w.gtag?.("event", "generate_lead", { form_location: window.location.pathname });
   } catch {}
 }
 
@@ -26,7 +29,7 @@ function phCapture(event: string, props?: Record<string, unknown>) {
 
 type Step = 0 | 1 | 2 | 3; // 3 = success
 
-const STEP_LABELS = ["Your property", "When works", "How to reach you"];
+const STEP_LABELS = ["Your property", "Timing, optional", "How to reach you"];
 
 export default function BookingModal({
   open,
@@ -49,7 +52,7 @@ export default function BookingModal({
 
   // Step 2
   const [date, setDate] = useState("");
-  const [window_, setWindow] = useState("");
+  const [window_, setWindow] = useState("flexible");
 
   // Step 3
   const [firstName, setFirstName] = useState("");
@@ -91,7 +94,9 @@ export default function BookingModal({
   if (!open) return null;
 
   const canAdvance =
-    step === 0 ? Boolean(neighborhood) : step === 1 ? Boolean(date && window_) : true;
+    step === 0 ? Boolean(neighborhood) : true;
+  // Timing is optional on purpose (9/11/26): the offer is that you do not need to be
+  // in town, so an absentee owner must never be blocked by having to pick a date.
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -280,7 +285,7 @@ export default function BookingModal({
             <div className="space-y-7">
               <div>
                 <label htmlFor="bk-date" className="ch-label mb-3 block">
-                  Preferred day
+                  Preferred day (optional)
                 </label>
                 <input
                   id="bk-date"
@@ -289,7 +294,6 @@ export default function BookingModal({
                   min={minDate}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  required
                 />
               </div>
 
@@ -312,8 +316,8 @@ export default function BookingModal({
               </div>
 
               <p className="text-[13px] leading-relaxed text-[var(--ch-muted)]">
-                This is a request, not a locked slot. Ryder confirms by text or email,
-                usually the same day.
+                Skip this if you are out of town. Flexible is fine: Ryder walks the home and
+                emails you photos and a written condition report within 48 hours.
               </p>
             </div>
           )}

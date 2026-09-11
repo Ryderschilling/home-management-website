@@ -80,14 +80,14 @@ export async function POST(req: NextRequest) {
     const who = firstName || "Someone";
 
     const rows: Array<[string, string]> = [
-      ["Name", firstName || ", "],
+      ["Name", firstName || "Not given"],
       ["Email", email],
-      ["Phone", phone || ", "],
-      ["Neighborhood", neighborhood || ", "],
-      ["Address", address || ", "],
-      ["Preferred day", date || ", "],
+      ["Phone", phone || "Not given"],
+      ["Neighborhood", neighborhood || "Not given"],
+      ["Address", address || "Not given"],
+      ["Preferred day", date || "Not given"],
       ["Arrival window", windowLabel],
-      ["Plan interest", plan || ", "],
+      ["Plan interest", plan || "Not given"],
       ["Came from", source],
     ];
 
@@ -154,9 +154,10 @@ export async function POST(req: NextRequest) {
     }
   </table>
   <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#56565c;">
-    The walkthrough is free and takes about 30 minutes. I'll look at the property
-    inside and out and tell you straight what it actually needs, even if that
-    turns out to be less than you expected.
+    The home check is free and you do not need to be in town. I'll walk the property
+    inside and out and email you photos and a written condition report within 48 hours,
+    and tell you straight what it actually needs, even if that turns out to be less
+    than you expected. The report is yours to keep either way.
   </p>
   <p style="margin:24px 0 0;font-size:15px;line-height:1.7;color:#0a0a0a;">
     Ryder Schilling<br />

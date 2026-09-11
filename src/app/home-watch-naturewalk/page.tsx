@@ -26,7 +26,7 @@ const FAQ = [
   },
   {
     q: "What home watch services are available in Naturewalk Florida?",
-    a: "Coastal Home Management 30A offers Essential ($200/month), Home Watch ($350/month), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include weekly property checks, photo documentation, mail pickup, and written visit reports. Coastal Elite adds HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination.",
+    a: "Coastal Home Management 30A offers Essential ($200/month, bi-weekly), Home Watch ($300/month, weekly), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include photo documentation, mail pickup, and a written report after every visit. Coastal Elite adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination.",
   },
   {
     q: "Is Naturewalk at Watersound Origins in CHM's service area?",
@@ -59,7 +59,7 @@ export default function HomeWatchNaturewalkPage() {
           Home Watch Services for Naturewalk at Watersound Origins
         </h1>
         <p className="mb-8 max-w-2xl text-base leading-relaxed text-black/60">
-          Naturewalk at Watersound Origins is one of CHM's primary service communities. Ryder Schilling lives in the neighborhood and personally checks every property on a weekly or bi-weekly schedule.
+          Naturewalk at Watersound Origins is one of CHM&apos;s primary service communities. Ryder Schilling lives in the neighborhood and personally checks every property on a weekly or bi-weekly schedule.
           Photo proof after every visit. Written report every time. Immediate alerts if anything needs attention.
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
@@ -235,6 +235,7 @@ export default function HomeWatchNaturewalkPage() {
             <Link href="/home-watch-seaside" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Seaside</Link>
             <Link href="/home-watch-watercolor" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">WaterColor</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
+            <Link href="/storm-check" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Storm Check</Link>
           </div>
         </div>
       </section>

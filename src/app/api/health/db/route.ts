@@ -9,12 +9,11 @@ export async function GET() {
       ok: true,
       db: "connected",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         ok: false,
         db: "error",
-        message: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

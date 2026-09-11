@@ -15,6 +15,9 @@ function fireGtagConversion() {
       gtag?: (command: string, action: string, params: Record<string, unknown>) => void;
     };
     w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
+    // GA4 lead event (added 9/11/26). Before this, no lead ever reached GA4, only
+    // Google Ads and PostHog. Mark generate_lead as a key event in GA4 admin.
+    w.gtag?.("event", "generate_lead", { form_location: window.location.pathname });
   } catch {}
 }
 

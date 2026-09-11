@@ -85,7 +85,7 @@ export const blogPosts: BlogPost[] = [
       "Real, current pricing for home watch and second home management in Watersound Origins, Naturewalk, and 30A. Compare tiers and what's included at each price point.",
     category: "direct-answer",
     datePublished: "2026-07-14",
-    directAnswer: `Home watch service on 30A typically runs $${essential?.price?.replace(".00", "")}–$${elite?.price?.replace(".00", "")}+ per month depending on visit frequency and what's included. Basic weekly checks with photo reports start around $${essential?.price?.replace(".00", "")}/month, mid-tier plans with maintenance coordination run $${homeWatch?.price?.replace(".00", "")}/month, and full-service plans with guaranteed emergency response start near $${elite?.price?.replace(".00", "")}/month.`,
+    directAnswer: `Home watch service on 30A typically runs $${essential?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency and what's included. Bi-weekly checks with photo reports start around $${essential?.price?.replace(".00", "")}/month, weekly plans with appliance and plumbing checks run $${homeWatch?.price?.replace(".00", "")}/month, and full-service plans with guaranteed emergency response start near $${elite?.price?.replace(".00", "")}/month.`,
     body: [
       {
         heading: "Why home watch pricing varies so much",
@@ -96,8 +96,8 @@ export const blogPosts: BlogPost[] = [
       {
         heading: "Coastal Home Management 30A pricing",
         paragraphs: [
-          `Essential, $${essential?.price?.replace(".00", "")}/month: weekly property inspection, photo documentation, storm watch, mail pickup, and a text or email summary after every visit.`,
-          `Home Watch, $${homeWatch?.price?.replace(".00", "")}/month: everything in Essential plus bi-weekly photo reports, seasonal maintenance checks, one on-call task per month, and contractor coordination.`,
+          `Essential, $${essential?.price?.replace(".00", "")}/month: a bi-weekly property check, photo documentation and a written report every visit, issue alerts, and mail pickup.`,
+          `Home Watch, $${homeWatch?.price?.replace(".00", "")}/month: everything in Essential with weekly visits instead of bi-weekly, plus appliance and plumbing checks and irrigation filter cleaning.`,
           `Coastal Elite, $${elite?.price?.replace(".00", "")}/month: our top tier, limited to 8 members. Guaranteed 2-hour emergency response, weekly photo reports, arrival prep twice a year, 3 on-call hours included, and a direct line to the founder.`,
           "On-call property tasks and mail/trash handling are also available a la carte for owners who don't need a recurring plan.",
         ],
@@ -112,7 +112,7 @@ export const blogPosts: BlogPost[] = [
     faqs: [
       {
         q: "What's the average cost of home watch service on 30A?",
-        a: `Expect to pay roughly $${essential?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency, reporting detail, and response guarantees. Weekly-visit plans with photo reports typically start around $${essential?.price?.replace(".00", "")}/month.`,
+        a: `Expect to pay roughly $${essential?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency, reporting detail, and response guarantees. Bi-weekly plans with photo reports start around $${essential?.price?.replace(".00", "")}/month, and weekly plans around $${homeWatch?.price?.replace(".00", "")}/month.`,
       },
       {
         q: "Is home watch the same as vacation rental management?",
@@ -154,7 +154,7 @@ export const blogPosts: BlogPost[] = [
         heading: "The math on catching it early",
         paragraphs: [
           "A clogged condensate line cleared on the spot is a 20-minute fix. The same failure left running for two or three weeks in a Florida summer is mold remediation, replaced drywall, ruined furniture, and an insurance claim, easily five figures, plus weeks of a home you cannot use.",
-          `That is the entire point of home watch. Essential is $${essential?.price?.replace(".00", "")}/month for weekly visits with photo proof, which is a rounding error next to what an unchecked summer AC failure costs. The visit is not the product. Catching the problem while it is still small and cheap is the product.`,
+          `That is the entire point of home watch. Essential is $${essential?.price?.replace(".00", "")}/month for bi-weekly visits with photo proof, which is a rounding error next to what an unchecked summer AC failure costs. The visit is not the product. Catching the problem while it is still small and cheap is the product.`,
         ],
       },
       {
@@ -171,12 +171,12 @@ export const blogPosts: BlogPost[] = [
         a: "Mold can begin growing in as little as 24 to 48 hours once indoor humidity climbs above 60 percent, which happens quickly in a sealed summer home after the AC fails. That short window is why weekly checks matter most in the summer.",
       },
       {
-        q: "Why does an empty home need AC monitoring in the summer?",
+        q: "Why does an empty home need its AC checked in the summer?",
         a: "Because the AC is what keeps humidity out, not just heat. When it fails in an empty Florida home, moisture builds fast and can damage drywall, furniture, and ductwork long before the owner ever finds out. A routine visit catches it while it is still a cheap fix.",
       },
       {
         q: "Do you check the AC during home watch visits?",
-        a: `Yes. Every visit includes checking the thermostat reading against its setpoint, inspecting the air handler and condensate drain, and noting the feel and smell of the interior. Essential plans start at $${essential?.price?.replace(".00", "")}/month with a photo report after every check.`,
+        a: `Yes. Every visit includes checking the thermostat reading against its setpoint, looking at the air handler and condensate drain, and noting the feel and smell of the interior. Essential plans start at $${essential?.price?.replace(".00", "")}/month with a photo report after every check.`,
       },
     ],
   },

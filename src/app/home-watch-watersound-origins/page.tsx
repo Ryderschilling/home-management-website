@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Watersound Origins?",
-    a: "Plans start at $200/month for weekly Essential visits, $350/month for the full Home Watch plan with appliance and plumbing checks, and $600/month for Coastal Elite with HVAC filter changes, storm monitoring, pre-arrival prep, and contractor coordination. Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
+    a: "Plans are $200/month for bi-weekly Essential visits, $300/month for weekly Home Watch visits with appliance and plumbing checks, and $600/month for Coastal Elite with storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination. Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
   {
     q: "Is Coastal Home Management 30A insured?",
@@ -123,7 +123,7 @@ export default function HomeWatchWatersoundPage() {
             },
             {
               title: "Storm-ready and on-call",
-              body: "Coastal Florida storms are real. CHM monitors storm events and performs pre- and post-storm checks so you always know the status of your property, even during hurricane season.",
+              body: "Coastal Florida storms are real. CHM tracks storm events and performs pre- and post-storm checks so you always know the status of your property, even during hurricane season.",
             },
           ].map((p) => (
             <div key={p.title} className="border border-black/10 p-7">
@@ -148,18 +148,18 @@ export default function HomeWatchWatersoundPage() {
               {
                 name: "Essential",
                 price: "$200/mo",
-                features: ["Weekly walkthrough", "Photo documentation", "Mail pickup", "Issue alerts", "Written report"],
+                features: ["Bi-weekly walkthrough", "Photo documentation", "Written report", "Mail pickup", "Issue alerts"],
               },
               {
                 name: "Home Watch",
-                price: "$350/mo",
-                features: ["Everything in Essential", "Appliance & plumbing checks", "Irrigation filter cleaning", "Bi-weekly or weekly schedule"],
+                price: "$300/mo",
+                features: ["Everything in Essential", "Weekly visits", "Appliance & plumbing checks", "Irrigation filter cleaning"],
                 featured: true,
               },
               {
                 name: "Coastal Elite",
                 price: "$600/mo",
-                features: ["Everything in Home Watch", "HVAC filter changes", "Storm & freeze monitoring", "Pre-arrival prep", "Contractor coordination"],
+                features: ["Everything in Home Watch", "HVAC filter changes", "Storm & freeze checks", "Pre-arrival prep", "Contractor coordination"],
               },
             ].map((plan) => (
               <div
@@ -262,7 +262,7 @@ export default function HomeWatchWatersoundPage() {
           Ready to protect your Watersound home?
         </h2>
         <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-black/60">
-          Free walkthrough, no commitment. Reach out and we'll set everything up within a few days.
+          Free walkthrough, no commitment. Reach out and we&apos;ll set everything up within a few days.
         </p>
         <a
           href="mailto:coastalhomemanagement30a@gmail.com"
@@ -286,6 +286,7 @@ export default function HomeWatchWatersoundPage() {
             <Link href="/home-watch-watersound-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Watersound Beach</Link>
             <Link href="/home-watch-grayton-beach" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Grayton Beach</Link>
             <Link href="/pricing" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Pricing & Plans</Link>
+            <Link href="/storm-check" className="border border-black/20 px-4 py-2 text-xs uppercase tracking-[0.14em] text-black/70 hover:border-black hover:text-black transition">Storm Check</Link>
           </div>
         </div>
       </section>
