@@ -227,9 +227,12 @@ export default function HomeWatchWatersoundPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
+            "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
+            hasMap: "https://www.google.com/maps?cid=1620304355006096316",
+            sameAs: ["https://www.google.com/maps?cid=1620304355006096316"],
             description: "Home watch service in Watersound Origins, Florida. Weekly property checks, photo reports, storm preparation, and full second-home oversight by a local Watersound Origins resident. Fully insured Florida LLC. 5.0 Google rating.",
-            url: "https://coastalhomemngt30a.com/home-watch-watersound-origins",
+            url: "https://coastalhomemngt30a.com",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
             priceRange: "$200-$600/month",

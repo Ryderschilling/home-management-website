@@ -72,8 +72,10 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
     url,
     provider: {
       "@type": "LocalBusiness",
+      "@id": `${SITE}/#business`,
       name: "Coastal Home Management 30A",
       url: SITE,
+      hasMap: "https://www.google.com/maps?cid=1620304355006096316",
       telephone: "+13094158793",
       email: EMAIL,
       priceRange: "$200-$600/month",

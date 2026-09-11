@@ -42,6 +42,20 @@ Short version, and it is a hard line:
   Always phrase it as "ask your agent."
 - Any page that mentions insurance must render `<LegalDisclaimer />`.
 
+## THE GOOGLE LISTING RULE (read before writing any schema)
+
+On 9/10/26 Google AI Mode showed our name with Coast Property Management's photo,
+87 reviews, and listing. Their name is nearly ours and they share our category.
+
+- Our real Google listing is `siteData.gbpMapsUrl` (Maps CID 1620304355006096316).
+- Every `LocalBusiness` block uses `"@id": "https://coastalhomemngt30a.com/#business"`.
+  Never invent a page-specific business @id. As a Service provider, use the same @id.
+- `sameAs` and `hasMap` use `siteData.gbpMapsUrl`. Never the g.page review link
+  (`siteData.gbpUrl` is only for "leave a review" buttons).
+- Never use `google.com/maps/place/<name>` URLs. They resolve to nothing.
+- `scripts/check-entity.mjs` runs as `prebuild` and fails the Vercel build if any
+  of this is broken. Fix the schema, never delete the check.
+
 ## Build principles
 - This is a solo operator's ops platform, not a toy demo — build for reliability and maintainability
 - Primary pain being solved: scattered comms + no central client info

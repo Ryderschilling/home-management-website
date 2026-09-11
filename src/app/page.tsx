@@ -725,8 +725,10 @@ export default function HomePage() {
             ],
             provider: {
               "@type": "LocalBusiness",
+              "@id": "https://coastalhomemngt30a.com/#business",
               name: "Coastal Home Management 30A",
               url: "https://coastalhomemngt30a.com",
+              hasMap: "https://www.google.com/maps?cid=1620304355006096316",
               telephone: businessContact.phone,
               email: "coastalhomemanagement30a@gmail.com",
               address: {

@@ -32,7 +32,10 @@ export default function ServiceLandingPage({
     areaServed: siteData.serviceArea,
     provider: {
       "@type": "LocalBusiness",
+      "@id": "https://coastalhomemngt30a.com/#business",
       name: siteData.businessName,
+      url: "https://coastalhomemngt30a.com",
+      hasMap: siteData.gbpMapsUrl,
       email: siteData.contactEmail,
     },
   };

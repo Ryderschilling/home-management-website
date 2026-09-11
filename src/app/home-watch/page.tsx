@@ -283,10 +283,12 @@ export default function HomeWatchPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "@id": "https://coastalhomemngt30a.com/home-watch#business",
+            "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
+            hasMap: "https://www.google.com/maps?cid=1620304355006096316",
+            sameAs: ["https://www.google.com/maps?cid=1620304355006096316"],
             description: "Home watch service in Watersound Origins, Alys, Rosemary, and scenic 30A. Weekly property checks, photo reports, storm prep, and full property oversight for second-home owners. Founded by Ryder Schilling, a Watersound Origins resident. Fully insured Florida LLC.",
-            url: "https://coastalhomemngt30a.com/home-watch",
+            url: "https://coastalhomemngt30a.com",
             telephone: "+13094158793",
             email: "coastalhomemanagement30a@gmail.com",
             address: {
