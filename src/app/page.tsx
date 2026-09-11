@@ -646,10 +646,11 @@ export default function HomePage() {
             "@type": "LocalBusiness",
             "@id": "https://coastalhomemngt30a.com/#business",
             name: "Coastal Home Management 30A",
+            hasMap: "https://www.google.com/maps?cid=1620304355006096316",
             description:
               "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             sameAs: [
-              "https://www.google.com/maps/place/Coastal+Home+Management+30A",
+              "https://www.google.com/maps?cid=1620304355006096316",
               "https://www.facebook.com/profile.php?id=61575773416368",
               "https://www.linkedin.com/company/coastal-home-management-30a/",
               "https://www.yelp.com/biz/coastal-home-management-30a-inlet-beach",

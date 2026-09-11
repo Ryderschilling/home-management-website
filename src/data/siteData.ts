@@ -200,6 +200,9 @@ export const siteData = {
   // Google Business Profile, update with your direct review link from GBP dashboard
   // Format: https://g.page/r/YOUR_PLACE_ID/review  (find it in Google Business Profile > Get more reviews)
   gbpUrl: "https://g.page/r/CbwjKOQ5enwWEBM/review",
+  // The actual Maps listing (CID). Use THIS for schema sameAs/hasMap, never the review link.
+  // Google AI Mode was attaching Coast Property Management's listing to our name (9/10/26).
+  gbpMapsUrl: "https://www.google.com/maps?cid=1620304355006096316",
 
   services: [
     {

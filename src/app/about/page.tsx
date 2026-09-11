@@ -80,7 +80,7 @@ const organizationSchema = {
     name: "Ryder Schilling",
     jobTitle: "Founder & Owner",
   },
-  sameAs: [businessContact.facebookUrl, businessContact.linkedinUrl, siteData.gbpUrl],
+  sameAs: [businessContact.facebookUrl, businessContact.linkedinUrl, siteData.gbpMapsUrl],
 };
 
 const personSchema = {

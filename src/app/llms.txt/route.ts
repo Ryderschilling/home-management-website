@@ -100,7 +100,8 @@ function buildLlmsTxt(): string {
   lines.push("## Contact");
   lines.push(`- Phone: ${businessContact.phone}`);
   lines.push(`- Email: ${siteData.contactEmail}`);
-  lines.push(`- Google Business Profile: ${siteData.gbpUrl}`);
+  lines.push(`- Google Business Profile: ${siteData.gbpMapsUrl}`);
+  lines.push(`- Leave a Google review: ${siteData.gbpUrl}`);
   lines.push("");
 
   return lines.join("\n");

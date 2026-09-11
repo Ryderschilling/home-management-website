@@ -127,6 +127,7 @@ const localBusinessSchema = {
         url: "https://coastalhomemngt30a.com/logo.png",
       },
       image: "https://coastalhomemngt30a.com/img.png",
+      hasMap: siteData.gbpMapsUrl,
       priceRange: "$$",
       currenciesAccepted: "USD",
       paymentAccepted: "Credit Card, Stripe",
@@ -225,7 +226,7 @@ const localBusinessSchema = {
       sameAs: [
         businessContact.facebookUrl,
         businessContact.linkedinUrl,
-        siteData.gbpUrl,
+        siteData.gbpMapsUrl,
       ],
     },
     {
@@ -250,7 +251,7 @@ const localBusinessSchema = {
       sameAs: [
         businessContact.facebookUrl,
         businessContact.linkedinUrl,
-        siteData.gbpUrl,
+        siteData.gbpMapsUrl,
       ],
     },
   ],
@@ -297,7 +298,7 @@ const organizationSchema = {
   sameAs: [
     businessContact.facebookUrl,
     businessContact.linkedinUrl,
-    siteData.gbpUrl,
+    siteData.gbpMapsUrl,
   ],
 };
 
