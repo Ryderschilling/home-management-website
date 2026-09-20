@@ -348,6 +348,12 @@ export default function RootLayout({
         <PostHogProvider>
           <PublicShell>{children}</PublicShell>
         </PostHogProvider>
+        {/* Pulse analytics (pulse.ryderschilling.com). Runs alongside GA4. */}
+        <Script
+          src="https://pulse.ryderschilling.com/p.js"
+          data-site="ps_chm30a"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

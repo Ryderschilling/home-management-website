@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
               Coastal Home Management 30A is a second-home property management service
               operating in Watersound Origins, Alys, Rosemary, and surrounding scenic
               30A communities in Florida. Our website is coastalhomemngt30a.com.
-              You can reach us at coastalhomemanagement30a@gmail.com.
+              You can reach us at <a href="mailto:coastalhomemanagement30a@gmail.com" className="underline">coastalhomemanagement30a@gmail.com</a>.
             </p>
           </section>
 
@@ -80,7 +80,7 @@ export default function PrivacyPolicyPage() {
             <h2 className="text-xl font-serif text-black mb-3">6. Your Rights</h2>
             <p>
               You have the right to access, correct, or request deletion of your personal
-              information. To make a request, email coastalhomemanagement30a@gmail.com.
+              information. To make a request, email <a href="mailto:coastalhomemanagement30a@gmail.com" className="underline">coastalhomemanagement30a@gmail.com</a>.
             </p>
           </section>
 
@@ -96,7 +96,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-xl font-serif text-black mb-3">8. Contact</h2>
             <p>
-              Questions about this policy? Email coastalhomemanagement30a@gmail.com.
+              Questions about this policy? Email <a href="mailto:coastalhomemanagement30a@gmail.com" className="underline">coastalhomemanagement30a@gmail.com</a>.
             </p>
           </section>
         </div>

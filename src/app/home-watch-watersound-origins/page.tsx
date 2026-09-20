@@ -293,7 +293,11 @@ export default function HomeWatchWatersoundPage() {
 
       {/* Footer */}
       <footer className="border-t border-black/10 bg-white px-6 py-8 text-center text-xs text-black/40">
-        © {new Date().getFullYear()} Coastal Home Management 30A · Inlet Beach, FL · (309) 415-8793 ·{" "}
+        © {new Date().getFullYear()} Coastal Home Management 30A · Inlet Beach, FL ·{" "}
+        <a href="tel:+13094158793" className="hover:text-black transition">
+          (309) 415-8793
+        </a>{" "}
+        ·{" "}
         <a href="mailto:coastalhomemanagement30a@gmail.com" className="hover:text-black transition">
           coastalhomemanagement30a@gmail.com
         </a> ·{" "}
