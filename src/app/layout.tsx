@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Archivo, Instrument_Sans } from "next/font/google";
 import { PostHogProvider } from "@/providers/PostHogProvider";
 import PublicShell from "@/components/PublicShell";
+import MetaPixel from "@/components/MetaPixel";
 import { trustStats, testimonials, businessContact, siteData, offerings } from "@/data/siteData";
 
 /**
@@ -348,6 +349,7 @@ export default function RootLayout({
         <PostHogProvider>
           <PublicShell>{children}</PublicShell>
         </PostHogProvider>
+        <MetaPixel />
         {/* Pulse analytics (pulse.ryderschilling.com). Runs alongside GA4. */}
         <Script
           src="https://pulse.ryderschilling.com/p.js"

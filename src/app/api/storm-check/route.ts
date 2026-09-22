@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
+import { sendLeadWelcome } from "@/lib/server/lead-welcome";
 
 export const runtime = "nodejs";
 
@@ -12,9 +13,9 @@ export const runtime = "nodejs";
  * Nothing is charged at sign-up; Ryder invoices in Square.
  *
  * The lead goes to the dashboard through the existing intake bridge, so /leads
- * stays the single source of truth. Ryder gets an email. The homeowner gets NO
- * automated email from this route on purpose: nothing client-facing sends
- * without Ryder's review.
+ * stays the single source of truth. Ryder gets an email. Since 9/21/26 the
+ * homeowner also gets the approved instant welcome email (lead-welcome.ts),
+ * a standing template Ryder signed off on for every new lead.
  */
 
 const OWNER_FALLBACK = "coastalhomemanagement30a@gmail.com";
@@ -102,6 +103,8 @@ export async function POST(req: NextRequest) {
         console.error("[storm-check] notify email failed:", err);
       }
     }
+
+    await sendLeadWelcome({ firstName, email, requestLine: "Your home is on the Storm Check list." });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
