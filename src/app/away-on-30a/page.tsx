@@ -82,6 +82,19 @@ export default function AwayOn30APage() {
           </div>
           <div className="reveal-item">
             <AwayBookingFlow />
+            {/* Direct line for owners who do not want a walkthrough (added 9/22/26).
+                Real tel:/sms:/mailto: links so Pulse and GA4 count the tap. */}
+            <div className="mt-5 border border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] p-6 md:p-7">
+              <p className="ch-label mb-2">Rather just talk?</p>
+              <p className="mb-5 text-[15px] leading-[1.6] text-[var(--ch-ink)]">
+                Skip the walkthrough and reach Ryder directly. Questions, pricing, or a one-off favor.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <a href={`sms:${primaryPhone()}`} className="ch-btn ch-btn--solid">Text Ryder</a>
+                <a href={`tel:${primaryPhone()}`} className="ch-btn">Call {primaryPhoneDisplay()}</a>
+                <a href="mailto:coastalhomemanagement30a@gmail.com?subject=Question%20about%20my%2030A%20home" className="ch-btn">Email</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
