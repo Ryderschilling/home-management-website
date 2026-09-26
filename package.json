@@ -10,8 +10,8 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "postbuild": "node scripts/indexnow.mjs"
+    "postbuild": "node scripts/indexnow.mjs",
+    "schema:sync": "node scripts/sync-schema.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

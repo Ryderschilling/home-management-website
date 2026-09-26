@@ -1,3 +1,8 @@
+// GENERATED FROM THE CHM OPS DASHBOARD. DO NOT EDIT BY HAND.
+// Source: chm-dashboard/prisma/schema.prisma (the owner of this schema).
+// Refresh with: node scripts/sync-schema.mjs
+// Never run prisma migrate or db push from this repo.
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,145 +11,885 @@ datasource db {
   provider = "postgresql"
 }
 
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELED
+enum ClientStatus {
+  LEAD
+  ACTIVE
+  /// Bought once and that was it: a rock cover, a single haul-off. Not a lead,
+  /// not a former client, and deliberately not counted in MRR.
+  ONE_TIME
+  PAUSED
+  FORMER
 }
 
-enum VisitStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELED
-  MISSED
+enum LeadStage {
+  NEW
+  CONTACTED
+  WON
+  LOST
+}
+
+enum BillingCadence {
+  MONTHLY
+  PER_VISIT
+  AD_HOC
 }
 
 enum PaymentStatus {
-  PENDING
-  SUCCEEDED
-  FAILED
-  REFUNDED
+  PAID
+  DUE
+  UPCOMING
 }
 
-enum EmailType {
-  ORDER_CONFIRMATION
-  PAYMENT_SUCCESS
-  ORDER_COMPLETION
+enum PaymentMethod {
+  SQUARE
+  CASH
+  CHECK
+  VENMO
+  ZELLE
+  OTHER
 }
 
-model Organization {
-  id              String           @id @default(cuid())
-  name            String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  orders          Order[]
-  recurrenceRules RecurrenceRule[]
-  emailLogs       EmailLog[]
-
-  @@index([createdAt])
+enum PaymentCategory {
+  RETAINER
+  A_LA_CARTE
+  PROJECT
+  ADD_ON
+  OTHER
 }
 
-model Order {
-  id          String           @id @default(cuid())
-  organizationId String
-  status      OrderStatus      @default(PENDING)
-  totalAmount Int?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  visits         Visit[]
-  recurrenceRule RecurrenceRule?
-  payments       Payment[]
-  emailLogs      EmailLog[]
-
-  @@index([organizationId, status])
-  @@index([createdAt])
+enum JobStatus {
+  SCHEDULED
+  DONE
+  CANCELED
 }
 
-model RecurrenceRule {
-  id             String        @id @default(cuid())
-  organizationId String
-  orderId         String        @unique
-  frequency       String
-  interval        Int           @default(1)
-  byDay           String[]
-  startDate       DateTime
-  endDate         DateTime?
-  active          Boolean       @default(true)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  @@index([organizationId, active])
-  @@index([startDate, endDate])
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
 }
 
-model Visit {
-  id            String      @id @default(cuid())
-  orderId        String
-  scheduledFor   DateTime
-  status         VisitStatus @default(SCHEDULED)
-  notes          String?
-  completedAt    DateTime?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-
-  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  proofPhotos ProofPhoto[]
-
-  @@unique([orderId, scheduledFor])
-  @@index([scheduledFor])
-  @@index([status])
+/// Where a client's smart water shutoff valve is in its lifecycle.
+enum ShutoffStatus {
+  QUOTED
+  SCHEDULED
+  INSTALLED
+  REMOVED
 }
 
-model ProofPhoto {
-  id         String   @id @default(cuid())
-  visitId    String
-  url        String
-  caption    String?
-  uploadedAt DateTime @default(now())
+/// What the device (or the plumber) told us.
+enum AlertKind {
+  LEAK
+  HIGH_FLOW
+  SHUTOFF_TRIGGERED
+  LOW_TEMP
+  FREEZE_RISK
+  OFFLINE
+  BATTERY
+  TEST
+  OTHER
+}
 
-  visit Visit @relation(fields: [visitId], references: [id], onDelete: Cascade)
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
 
-  @@index([visitId, uploadedAt])
+/// Lifecycle of one year's Coverage Record PDF for one client.
+
+/// A visit report is DRAFT while Ryder is still filling it in and FINAL once
+/// it is locked. FINAL reports are what the Coverage Record is built from.
+enum VisitReportStatus {
+  DRAFT
+  FINAL
+}
+
+/// State of one checked area on one visit. OK is the default on every area,
+/// which is the whole point: the record has to affirmatively document the
+/// areas that were fine, not only the ones that were not.
+enum FindingState {
+  OK
+  ISSUE
+  NA
+}
+
+enum CoverageStatus {
+  ENROLLED
+  DUE
+  DRAFTED
+  SENT
+}
+
+enum ExpenseCategory {
+  LABOR
+  SUPPLIES
+  GAS
+  SOFTWARE
+  INSURANCE
+  MARKETING
+  OTHER
+}
+
+model Client {
+  id               String         @id @default(cuid())
+  name             String
+  status           ClientStatus   @default(ACTIVE)
+  email            String?
+  phone            String?
+  altContact       String?
+  community        String?
+  planName         String?
+  /// MONTHLY: what they pay a month. PER_VISIT or AD_HOC: a flat rate per
+  /// visit. lib/jobValue.ts reads it both ways off `cadence`.
+  planAmount       Decimal?       @db.Decimal(10, 2)
+  /// How many visits a month the plan is supposed to include. The divisor for
+  /// per-visit value, so $135 over 4 visits is $33.75 every month whatever the
+  /// calendar looks like. Null falls back to counting the calendar. Ignored
+  /// for anything that is not MONTHLY.
+  visitsPerMonth   Int?
+  cadence          BillingCadence @default(MONTHLY)
+  lockedRate       Boolean        @default(false)
+  lockedUntil      DateTime?
+  startDate        DateTime?
+  source           String?
+  /// Website-lead pipeline stage. Null for clients that never came in as a lead.
+  leadStage        LeadStage?
+  squareCustomerId String?
+  notes            String?
+  /// Set when Ryder emails a portal invite from the client page.
+  portalInvitedAt  DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  properties  Property[]
+  payments    Payment[]
+  jobs        Job[]
+  tasks       Task[]
+  logs        Note[]
+  squareLinks SquareLink[]
+  expenses    Expense[]
+
+  shutoffDevices  ShutoffDevice[]
+  coverageRecords CoverageRecord[]
+  visitReports    VisitReport[]
+  jobStandards    JobStandard[]
+
+  // --- Homeowner portal ---
+  portalUser    PortalUser?
+  orders        Order[]
+  subscriptions PlanSubscription[]
+  agreements    AgreementAcceptance[]
+}
+
+model Property {
+  id           String   @id @default(cuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  label        String?
+  address      String
+  gateCode     String?
+  doorCode     String?
+  alarmCode    String?
+  wifiName     String?
+  wifiPassword String?
+  keyLocation  String?
+  trashDay     String?
+  hvacNotes    String?
+  notes        String?
+  /// Structured answers from the portal: where mail goes, plants to water,
+  /// thermostat preference, pets, pool, trash notes. Free-form JSON on purpose
+  /// so a new question never needs a migration. See lib/serviceNotes.ts.
+  serviceNotes Json?
+  createdAt    DateTime @default(now())
+
+  jobs           Job[]
+  orders         Order[]
+  subscriptions  PlanSubscription[]
+  shutoffDevices ShutoffDevice[]
+  checkAreas     PropertyCheckArea[]
+  visitReports   VisitReport[]
+  jobStandards   JobStandard[]
+}
+
+/// How long a job normally takes.
+///
+/// Ryder times a job once, records the minutes here, and every occurrence of
+/// that job inherits the number. This is what makes "how many hours does my
+/// week actually cost me" and "what do I really earn per hour on this client"
+/// answerable without him retyping a time on every single visit.
+///
+/// Matching a Job to a standard, in order:
+///   1. gcalSeriesId  - exact, and the one to prefer. A recurring Google
+///      Calendar series is the same job repeating, by definition.
+///   2. titleMatch    - case-insensitive substring of the job title. Covers
+///      one-off events and anything created by hand in CHM.
+///
+/// An explicit `Job.laborHours` ALWAYS wins over the standard. The standard is
+/// the estimate that fills the gap, never an overwrite of a measured number.
+model JobStandard {
+  id           String    @id @default(cuid())
+  /// What Ryder calls this job, e.g. "Beth Tedesco Mail".
+  label        String
+  /// How long it takes, in minutes. Stored as minutes because that is how he
+  /// measures it; hours are derived for display and math.
+  minutes      Int
+  clientId     String?
+  client       Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  propertyId   String?
+  property     Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  /// The recurring Google Calendar series id this covers. Unique so one series
+  /// can never end up with two competing standards.
+  gcalSeriesId String?   @unique
+  /// Fallback matcher, case-insensitive substring of the job title.
+  titleMatch   String?
+  active       Boolean   @default(true)
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([clientId])
 }
 
 model Payment {
-  id             String        @id @default(cuid())
-  orderId         String
-  amount          Int
-  currency        String        @default("usd")
-  status          PaymentStatus @default(PENDING)
-  externalId      String?
-  idempotencyKey  String?       @unique
-  paidAt          DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  order Order @relation(fields: [orderId], references: [id], onDelete: Restrict)
-
-  @@index([orderId, status])
-  @@index([createdAt])
+  id              String          @id @default(cuid())
+  clientId        String?
+  client          Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  amount          Decimal         @db.Decimal(10, 2)
+  status          PaymentStatus   @default(PAID)
+  dueDate         DateTime?
+  paidDate        DateTime?
+  method          PaymentMethod?
+  category        PaymentCategory @default(RETAINER)
+  description     String?
+  invoiceNumber   String?
+  squareInvoiceId String?
+  /// Set on payments taken through the portal (card on file / checkout) and on
+  /// subscription charges caught by the Square webhook. Unique so a webhook
+  /// retry can never double count.
+  squarePaymentId String?         @unique
+  orderId         String?
+  order           Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  expenses        Expense[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }
 
-model EmailLog {
-  id             String    @id @default(cuid())
-  organizationId String
-  orderId         String?
-  type           EmailType
-  toEmail        String
-  subject        String
-  providerId     String?
-  sentAt         DateTime  @default(now())
-  createdAt      DateTime  @default(now())
+model Worker {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String?
+  email      String?
+  defaultPay Decimal? @db.Decimal(10, 2)
+  payNote    String?
+  active     Boolean  @default(true)
+  /// sha256 of the crew login PIN (see lib/auth.ts pinHash). Null = no crew access.
+  /// Unique so a PIN identifies exactly one worker at login.
+  pinHash    String?  @unique
+  createdAt  DateTime @default(now())
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Restrict)
-  order        Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  jobs     Job[]
+  expenses Expense[]
+}
 
-  @@index([organizationId, type, sentAt])
+model Job {
+  id           String    @id @default(cuid())
+  clientId     String?
+  client       Client?   @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  propertyId   String?
+  property     Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  title        String
+  jobType      String?
+  date         DateTime
+  status       JobStatus @default(SCHEDULED)
+  workerId     String?
+  worker       Worker?   @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  /// What was actually paid out to a worker for this job. 0 when Ryder did it.
+  laborCost    Decimal   @default(0) @db.Decimal(10, 2)
+  /// How long the job took, in WHOLE MINUTES. This is the real column.
+  /// Minutes everywhere means a 5 minute stop is 5, not 0.08, and a month of
+  /// visits adds up exactly. See lib/duration.ts.
+  laborMinutes Int?
+  /// DEPRECATED decimal hours. Read only, kept so nothing looks blank before
+  /// scripts/backfill-labor-minutes.ts has run. Safe to drop after that.
+  laborHours   Decimal?  @db.Decimal(6, 2)
+  /// Explicit one-off charge. Leave null when the visit is covered by a plan;
+  /// lib/jobValue.ts then allocates a share of the client's monthly plan.
+  chargeAmount Decimal?  @db.Decimal(10, 2)
+  durationMin  Int?
+  /// Position in that day's route, 0 first. Null means "not ordered yet" and
+  /// falls to the bottom, sorted by time. Set by the up/down arrows on /jobs.
+  /// Deliberately NOT written by the Google Calendar sync: the order of a day
+  /// is Ryder's driving decision, not something Google knows about.
+  routeOrder   Int?
+  notes        String?
+  /// End of the time block. Null means use durationMin, or treat as a point in time.
+  endDate      DateTime?
+  allDay       Boolean   @default(false)
+  location     String?
+
+  // --- Google Calendar link ---
+  /// The Google event id. For an occurrence of a recurring series this is the
+  /// instance id (e.g. "abc123_20260805T140000Z"), so each visit is its own row.
+  gcalEventId  String?   @unique
+  /// recurringEventId when this job is one occurrence of a series.
+  gcalSeriesId String?
+  /// Google's `updated` timestamp at the last successful sync. Used to decide
+  /// whether Google or CHM has the fresher version of the scheduling fields.
+  gcalUpdated  DateTime?
+  syncedAt     DateTime?
+
+  // --- Homeowner portal ---
+  /// Where this job came from. PORTAL jobs carry an OrderLine and are the only
+  /// ones a client can move or cancel from the portal (3+ days out).
+  source         JobSource         @default(MANUAL)
+  /// The plan this visit counts against, so the monthly allowance is exact.
+  subscriptionId String?
+  subscription   PlanSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  orderLine      OrderLine?
+
+  tasks       Task[]
+  visitReport VisitReport?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([gcalSeriesId])
+  @@index([date])
+  @@index([subscriptionId])
+}
+
+model Task {
+  id        String       @id @default(cuid())
+  title     String
+  done      Boolean      @default(false)
+  dueDate   DateTime?
+  priority  TaskPriority @default(NORMAL)
+  clientId  String?
+  client    Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  /// Optional link to the job this is a step of. Job checklists render from this
+  /// and get written into the Google event description so they show on the phone.
+  jobId     String?
+  job       Job?         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([jobId])
+}
+
+model Expense {
+  id          String          @id @default(cuid())
+  date        DateTime
+  amount      Decimal         @db.Decimal(10, 2)
+  category    ExpenseCategory @default(OTHER)
+  vendor      String?
+  description String?
+  workerId    String?
+  worker      Worker?         @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  /// Optional link to the invoice/payment this cost belongs to,
+  /// so per-invoice profit = payment amount minus its linked expenses.
+  paymentId   String?
+  payment     Payment?        @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  /// Optional link to a client, so per-client cost and true spread work.
+  /// Auto-filled from the invoice's client when attached to a payment.
+  clientId    String?
+  client      Client?         @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdAt   DateTime        @default(now())
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+/// A smart automatic water shutoff valve on a client's main line.
+/// Sold at $1,295 installed plus $35/mo to monitor. Monitoring is bundled
+/// into the Coastal Elite plan. Read the public site's src/data/protection.ts
+/// before writing any client-facing copy about this: we never claim it lowers
+/// anyone's premium, we say the client's own carrier may publish a credit.
+model ShutoffDevice {
+  id         String    @id @default(cuid())
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  status       ShutoffStatus @default(QUOTED)
+  /// Phyn Plus, Flo by Moen, FloLogic, Water Hero, Leak Defense, Moen Smart Water.
+  brand        String?
+  model        String?
+  serialNumber String?
+
+  installDate  DateTime?
+  /// Which plumber put it in, so warranty calls go to the right person.
+  installedBy  String?
+  /// What the client paid for the install.
+  installPrice Decimal?  @db.Decimal(10, 2)
+  /// What the hardware plus plumber cost us. installPrice minus this is the margin.
+  installCost  Decimal?  @db.Decimal(10, 2)
+
+  /// True when we are holding the alerts and responding.
+  monitored     Boolean  @default(false)
+  monitoringFee Decimal? @db.Decimal(10, 2)
+
+  /// Last time we confirmed the device was online and healthy.
+  lastCheckedAt DateTime?
+  warrantyEnd   DateTime?
+  notes         String?
+
+  alerts    ShutoffAlert[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+}
+
+/// One thing the shutoff device reported, and what we did about it.
+/// Every row here is also evidence: it is dated, it names the property, and
+/// it records the response. Keep resolvedAt honest.
+model ShutoffAlert {
+  id       String        @id @default(cuid())
+  deviceId String
+  device   ShutoffDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  occurredAt DateTime
+  kind       AlertKind     @default(OTHER)
+  severity   AlertSeverity @default(WARNING)
+  /// One line, what the alert said.
+  summary    String
+  /// What we did. Drove over, closed the valve, called the plumber.
+  action     String?
+  /// Null means still open.
+  resolvedAt DateTime?
+  notes      String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([deviceId])
+  @@index([occurredAt])
+  @@index([resolvedAt])
+}
+
+/// One year's Coverage Record for one client: the dated PDF of every visit,
+/// $195/year, included on Coastal Elite. A row existing means the client is
+/// enrolled for that period. dueDate drives the "who do I owe a PDF" list.
+model CoverageRecord {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  periodStart DateTime
+  periodEnd   DateTime
+  /// When Ryder wants it in the client's hands. Usually periodEnd plus a couple weeks.
+  dueDate     DateTime
+  status      CoverageStatus @default(ENROLLED)
+  sentDate    DateTime?
+  /// What they pay for it. Null on Coastal Elite, where it is included.
+  fee         Decimal?       @db.Decimal(10, 2)
+  /// Where the finished PDF lives (Drive link, local path, whatever).
+  fileUrl     String?
+  /// Snapshot of what went into the document, filled when it is built.
+  visitCount  Int?
+  photoCount  Int?
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([dueDate])
+  @@index([status])
+}
+
+/// The list of areas checked at ONE property, editable per house. Seeded from
+/// the default template in src/lib/checkAreas.ts, then trimmed or added to.
+/// A house with no pool should not have a pool line in its record.
+model PropertyCheckArea {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  label      String
+  /// Interior / Systems / Exterior / Security. Groups the form and the PDF.
+  category   String   @default("Interior")
+  sortOrder  Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([propertyId, sortOrder])
+}
+
+/// One home watch visit, written up on site. This is the evidence record.
+/// Reporting a visit also writes back to its Job (hours, cost, charge, DONE)
+/// so the existing money model in lib/jobValue.ts and lib/metrics.ts picks it
+/// up. Do NOT build a second accounting path here.
+model VisitReport {
+  id         String    @id @default(cuid())
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  /// The calendar job this visit belongs to. One report per job.
+  jobId      String?   @unique
+  job        Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  visitDate     DateTime
+  /// Minutes on site. Mirrored onto Job.laborHours so time reporting works.
+  minutesOnSite Int?
+  weather       String?
+
+  status        VisitReportStatus @default(DRAFT)
+  /// What the client is told. Goes on the visit PDF verbatim.
+  summary       String?
+  /// Never shown to the client, never in the PDF.
+  internalNotes String?
+  /// When the "Send report" button emailed this to the client, and where.
+  sentAt        DateTime?
+  sentTo        String?
+
+  /// Billable beyond the plan. Mirrored onto Job.chargeAmount.
+  chargeAmount Decimal? @db.Decimal(10, 2)
+  /// Paid out to a helper for this visit. Mirrored onto Job.laborCost.
+  laborCost    Decimal? @db.Decimal(10, 2)
+  /// Out of pocket on this visit (filters, supplies). Creates an Expense row.
+  materialCost Decimal? @db.Decimal(10, 2)
+  materialNote String?
+
+  findings VisitFinding[]
+  photos   VisitPhoto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([visitDate])
+  @@index([status])
+}
+
+/// One area, on one visit, with the state it was found in.
+/// `label` is a SNAPSHOT taken at report time on purpose. Renaming an area
+/// later must not rewrite what a past record says.
+model VisitFinding {
+  id        String       @id @default(cuid())
+  reportId  String
+  report    VisitReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  areaId    String?
+  label     String
+  category  String       @default("Interior")
+  state     FindingState @default(OK)
+  note      String?
+  sortOrder Int          @default(0)
+
+  photos VisitPhoto[]
+
+  @@index([reportId, sortOrder])
+}
+
+/// Photos live as bytes in Postgres so there is exactly one source of truth
+/// across localhost and Vercel, and no storage account to set up. The form
+/// resizes to 1400px / JPEG 0.7 in the browser before upload, so a photo is
+/// roughly 120-180KB. /visits shows total storage used. If that number gets
+/// close to the Neon plan limit, move `data` to Vercel Blob and keep the row.
+model VisitPhoto {
+  id        String        @id @default(cuid())
+  reportId  String
+  report    VisitReport   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  /// Optional link to the area this photo documents.
+  findingId String?
+  finding   VisitFinding? @relation(fields: [findingId], references: [id], onDelete: SetNull)
+
+  data      Bytes
+  mimeType  String  @default("image/jpeg")
+  bytes     Int     @default(0)
+  width     Int?
+  height    Int?
+  caption   String?
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([reportId, sortOrder])
+  @@index([findingId])
+}
+
+/// Maps Square customer IDs to clients. One client can own several
+/// Square records (spouses, duplicate directory entries).
+model SquareLink {
+  squareCustomerId String @id
+  clientId         String
+  client           Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+/// Tiny key-value store (last Square sync time, etc).
+model AppState {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+
+// ============================================================================
+// HOMEOWNER PORTAL (added 2026-09-23)
+//
+// Clients log in on the public website, pick a plan and visit days, pay through
+// Square, and the result lands here as Orders, Jobs and Payments. The website
+// carries a verbatim copy of this schema (scripts/sync-schema.mjs over there).
+// THIS FILE IS THE OWNER. Never run migrate or db push from the website repo.
+// ============================================================================
+
+/// Who created a Job. CALENDAR = pulled from Google, MANUAL = typed in CHM Ops,
+/// PORTAL = a client ordered it on the website.
+enum JobSource {
+  CALENDAR
+  MANUAL
+  PORTAL
+}
+
+/// PLAN bills monthly on autopay. ADDON is a fixed price charged at checkout.
+/// REQUEST has no fixed price: the client books the day and describes the work,
+/// Ryder quotes it, nothing is charged by the portal.
+enum ServiceKind {
+  PLAN
+  ADDON
+  REQUEST
+}
+
+enum ServiceUnit {
+  MONTH
+  DAY
+  VISIT
+  EACH
+}
+
+/// DRAFT is the cart. PENDING means checkout started (or a REQUEST order that
+/// carries no charge). PAID is money in. FAILED is a declined card.
+enum OrderStatus {
+  DRAFT
+  PENDING
+  PAID
+  FAILED
+  CANCELED
+}
+
+enum PlanTerm {
+  MONTHLY
+  LOCK12
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+}
+
+/// A client's portal login. One per client, matched on email at signup.
+model PortalUser {
+  id              String    @id @default(cuid())
+  clientId        String    @unique
+  client          Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  email           String    @unique
+  /// scrypt hash, see lib/portal/password.ts. Never bcrypt, no extra library.
+  passwordHash    String
+  emailVerifiedAt DateTime?
+  verifyCode      String?
+  verifyExpires   DateTime?
+  resetToken      String?   @unique
+  resetExpires    DateTime?
+  failedLogins    Int       @default(0)
+  lockedUntil     DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sessions PortalSession[]
+}
+
+/// A row per browser login. The id is the cookie value. Deleting the row logs
+/// that browser out, which is how "log out everywhere" works.
+model PortalSession {
+  id        String     @id
+  userId    String
+  user      PortalUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  userAgent String?
+  createdAt DateTime   @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+/// Login and code-entry throttling without Redis. key = "login:<email>" etc.
+model PortalRateLimit {
+  key     String   @id
+  count   Int      @default(0)
+  resetAt DateTime
+}
+
+/// THE PRICE LIST. The portal tiles, the checkout math, and (eventually) the
+/// public pricing page all read from here. Change a price once.
+model ServiceCatalog {
+  code           String      @id
+  name           String
+  blurb          String?
+  kind           ServiceKind
+  unit           ServiceUnit @default(EACH)
+  /// Public price. For a PLAN this is the month-to-month rate.
+  price          Decimal     @db.Decimal(10, 2)
+  /// PLAN only: the 12-month locked monthly rate.
+  lock12Price    Decimal?    @db.Decimal(10, 2)
+  /// ADDON only: the cheaper price a client on an active plan pays (storm check $50 vs $100).
+  planPrice      Decimal?    @db.Decimal(10, 2)
+  /// PLAN only: visits the client may pick per month.
+  visitsPerMonth Int?
+  requiresPlan   Boolean     @default(false)
+  /// What the crew sees as jobType on the Job row.
+  jobType        String?
+  /// The one question the popup asks for this service (label shown to the client).
+  questionLabel  String?
+  questionHint   String?
+  active         Boolean     @default(true)
+  sort           Int         @default(0)
+  /// Square catalog ids, created on first use by lib/portal/square.ts.
+  squarePlanId               String?
+  squareVariationMonthlyId   String?
+  squareVariationLock12Id    String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+/// One row per calendar day Ryder has explicitly opened or closed. Days with no
+/// row follow the weekly template in AppState "portalAvailability".
+model AvailabilityDay {
+  id       String   @id @default(cuid())
+  /// Anchored at local noon so no timezone can shift it. Use lib dayKey helpers.
+  date     DateTime @unique
+  open     Boolean  @default(true)
+  /// Max jobs on this day. Null = template capacity.
+  capacity Int?
+  note     String?
+}
+
+model Order {
+  id                  String      @id @default(cuid())
+  clientId            String
+  client              Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  propertyId          String?
+  property            Property?   @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  status              OrderStatus @default(DRAFT)
+  subtotal            Decimal     @default(0) @db.Decimal(10, 2)
+  tip                 Decimal     @default(0) @db.Decimal(10, 2)
+  total               Decimal     @default(0) @db.Decimal(10, 2)
+  squareOrderId       String?
+  squarePaymentId     String?     @unique
+  squareReceiptUrl    String?
+  agreementVersion    String?
+  agreementAcceptedAt DateTime?
+  acceptedIp          String?
+  acceptedName        String?
+  /// Why a FAILED order failed, straight from Square.
+  failureReason       String?
+  paidAt              DateTime?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  lines    OrderLine[]
+  payments Payment[]
+
+  @@index([clientId, status])
+}
+
+/// One thing bought. A plan produces one line per picked visit day plus one
+/// PLAN line for the subscription itself. An add-on produces one line per day.
+model OrderLine {
+  id             String            @id @default(cuid())
+  orderId        String
+  order          Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serviceCode    String
+  /// Snapshots at order time, so a later price change never rewrites history.
+  name           String
+  kind           ServiceKind
+  qty            Int               @default(1)
+  unitPrice      Decimal           @db.Decimal(10, 2)
+  amount         Decimal           @db.Decimal(10, 2)
+  /// The visit day for this line. Null on the PLAN line itself.
+  scheduledDate  DateTime?
+  planTerm       PlanTerm?
+  /// The popup answers, verbatim. Copied onto the Job notes so the crew sees them.
+  details        Json?
+  jobId          String?           @unique
+  job            Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  subscriptionId String?
+  subscription   PlanSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  createdAt      DateTime          @default(now())
+
   @@index([orderId])
+}
+
+/// A client's plan. Portal-created ones carry a Square subscription. Legacy
+/// clients get a row with their contracted rate and no Square id, so the portal
+/// shows "Your rate: $135/mo, locked through Jun 2027" and counts their visits.
+model PlanSubscription {
+  id                   String             @id @default(cuid())
+  clientId             String
+  client               Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  propertyId           String?
+  property             Property?          @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  serviceCode          String
+  serviceName          String
+  term                 PlanTerm           @default(MONTHLY)
+  rate                 Decimal            @db.Decimal(10, 2)
+  visitsPerMonth       Int                @default(2)
+  /// 0 = Sunday ... 6 = Saturday. Null = client picks by hand every month.
+  preferredWeekday     Int?
+  /// Which weeks of the month on a 12-month plan: [1,3] = 1st and 3rd, [2,4] = 2nd and 4th,
+  /// [] = every week. Month-to-month plans pick exact days instead and leave this empty.
+  weekOrdinals         Int[]              @default([])
+  /// Month-to-month only: when the "renew for next month" email went out, so it goes once.
+  renewalReminderAt    DateTime?
+  startDate            DateTime
+  endDate              DateTime?
+  status               SubscriptionStatus @default(ACTIVE)
+  squareSubscriptionId String?            @unique
+  squareCustomerId     String?
+  squareCardId         String?
+  /// Set by the Square webhook on a failed autopay. Cleared when it clears.
+  lastPaymentFailedAt  DateTime?
+  canceledAt           DateTime?
+  cancelReason         String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  jobs  Job[]
+  lines OrderLine[]
+
+  @@index([clientId, status])
+}
+
+/// The service agreement, versioned. Bump the version when the words change so
+/// every acceptance points at the exact text the client saw.
+model AgreementVersion {
+  version     String   @id
+  title       String
+  /// Markdown-ish plain text. Rendered as paragraphs in the checkout scroll box.
+  body        String
+  effectiveAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
+
+model AgreementAcceptance {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  version    String
+  orderId    String?
+  acceptedAt DateTime @default(now())
+  ip         String?
+  typedName  String
+  userAgent  String?
+
+  @@index([clientId])
 }

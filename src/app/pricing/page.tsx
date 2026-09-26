@@ -150,9 +150,9 @@ const notSurePlan: Plan = {
 
 const addons = [
   {
-    name: "Extra On-Call Service",
-    desc: "One task, one visit, beyond included services on any plan.",
-    price: "$75 + $45/hr",
+    name: "On-Call Visit",
+    desc: "One task, one visit. A contractor meetup, an extra walkthrough, an errand at the house. One flat price.",
+    price: "$100 flat",
   },
   {
     name: "Artificial Rock Install",

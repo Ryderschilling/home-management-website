@@ -172,8 +172,8 @@ export const offerings: {
   {
     name: "On-Call Property Tasks",
     description:
-      "One-off requests, contractor meeting, errands, random jobs. No recurring commitment required.",
-    price: "85.00",
+      "One-off requests, contractor meeting, errands, random jobs. $100 flat per visit. No recurring commitment required.",
+    price: "100.00",
   },
   {
     name: "Mail & Trash Handling",

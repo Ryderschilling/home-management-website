@@ -99,7 +99,7 @@ export const servicePages: Record<string, ServicePageData> = {
       },
       {
         q: "How much does a one-off concierge task cost?",
-        a: "On-call property tasks, like meeting a contractor or handling an errand, are $85 flat with no recurring commitment required.",
+        a: "On-call property tasks, like meeting a contractor or handling an errand, are $100 flat per visit with no recurring commitment required.",
       },
       {
         q: "Can I request concierge help the same week I need it?",

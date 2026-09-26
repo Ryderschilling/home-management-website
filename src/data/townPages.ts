@@ -380,7 +380,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "Will you meet contractors at my house?",
-        a: "Yes. Contractor coordination is included on Coastal Elite and available as an on-call task otherwise, currently $85 flat per visit.",
+        a: "Yes. Contractor coordination is included on Coastal Elite and available as an on-call task otherwise, $100 flat per visit.",
       },
     ],
     related: [

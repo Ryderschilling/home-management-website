@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/claim-protection", label: "Claim Protection" },
   { href: "/about", label: "About" },
   { href: "/#contact", label: "Contact" },
+  { href: "/portal", label: "Client Login" },
 ];
 
 export default function SiteHeader() {
