@@ -188,7 +188,15 @@ model Client {
   /// Funnel timestamps. Stamped the first time the stage is reached, never moved.
   bookedAt         DateTime?
   showedAt         DateTime?
+  /// The day they BOUGHT. Set by hand with the Bought button on /ads (or the
+  /// Won stage). This, not an invoice, is what counts a customer for CAC.
   wonAt            DateTime?
+  /// What they bought, entered by Ryder with the Bought button.
+  /// dealPer "month": dealAmount a month for dealMonths months (0 = month to month).
+  /// dealPer "once": a single dealAmount.
+  dealAmount       Decimal?       @db.Decimal(10, 2)
+  dealPer          String?
+  dealMonths       Int?
   lostAt           DateTime?
   lostReason       String?
   /// Follow-up email control. optOut is permanent (unsubscribe link or Ryder).
