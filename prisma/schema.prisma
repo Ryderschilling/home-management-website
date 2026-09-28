@@ -200,6 +200,9 @@ model Client {
   /// Who set the deal: "square" (auto from the first paid payment, refreshed
   /// on every sync) or "manual" (the Bought button, never overwritten).
   dealSource       String?
+  /// When the Purchase went to Meta (Conversions API). Sent once, ever, so
+  /// Meta learns which ad clicks turned into paying clients. lib/metaCapi.ts.
+  capiPurchaseAt   DateTime?
   /// Set when Ryder links this lead to the client who actually paid (bought
   /// under a different email or phone). The lead row is then a shell: its
   /// attribution moved to that client and /ads skips it so nothing counts twice.

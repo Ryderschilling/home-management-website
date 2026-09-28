@@ -6,7 +6,7 @@
 type W = {
   gtag?: (c: string, a: string, p: Record<string, unknown>) => void;
   posthog?: { capture: (e: string, p?: Record<string, unknown>) => void };
-  fbq?: (a: string, e: string, p?: Record<string, unknown>) => void;
+  fbq?: (a: string, e: string, p?: Record<string, unknown>, o?: { eventID: string }) => void;
   pulse?: (e: string, p?: Record<string, unknown>) => void;
 };
 
@@ -15,12 +15,12 @@ const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
 
 export type Step = "optin" | "walkthrough" | "start";
 
-export function fireConversion(step: Step) {
+export function fireConversion(step: Step, eventId?: string) {
   try {
     const w = window as unknown as W;
     if (step === "optin") {
       // The opt-in is the Lead. It is what the Meta ad set optimizes for.
-      w.fbq?.("track", "Lead", { content_name: "Away on 30A opt-in" });
+      w.fbq?.("track", "Lead", { content_name: "Away on 30A opt-in" }, eventId ? { eventID: eventId } : undefined);
       w.gtag?.("event", "generate_lead", { form_location: "/away-on-30a" });
       w.posthog?.capture("away_optin");
       w.pulse?.("form", { label: "Away on 30A opt-in" });

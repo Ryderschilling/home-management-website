@@ -22,18 +22,26 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) return setError("Add a real email so Ryder can reach you.");
     setError("");
     setBusy(true);
+    // One id for the browser pixel AND the server (Conversions API), so Meta
+    // counts this opt-in once, not twice.
+    let eventId = "";
+    try {
+      eventId = crypto.randomUUID();
+    } catch {
+      eventId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
     try {
       const res = await fetch("/api/away/optin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: clean, company }),
+        body: JSON.stringify({ email: clean, company, eventId }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.ok === false) {
         setError(data?.error?.message || "That did not go through. Try again.");
         return;
       }
-      fireConversion("optin");
+      fireConversion("optin", eventId);
       rememberEmail(clean);
       router.push("/away-on-30a/next");
     } catch {

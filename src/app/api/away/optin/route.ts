@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 import { sendOptInEmail } from "@/lib/server/optin-email";
+import { sendCapiEvent } from "@/lib/server/metaCapi";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
         eventLabel: "optin",
       }),
       sendOptInEmail(email),
+      sendCapiEvent({ eventName: "Lead", eventId: typeof body.eventId === "string" ? body.eventId.slice(0, 64) : null, email }),
     ]);
     return NextResponse.json({ ok: true });
   } catch (err) {
