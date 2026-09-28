@@ -373,7 +373,9 @@ export async function POST(req: NextRequest) {
     // Do NOT await these. Return the 200 immediately; email delivery happens in the background.
     // Errors are caught and logged inside each function, they will never block or fail the response.
     void sendWelcomeEmail(firstName || null, email);
-    void scheduleDripSequence(
+    // The old Resend-scheduled drip. Set LEGACY_DRIP=off on Vercel the day the
+    // CHM Ops follow-up sequence is turned on, or leads get both.
+    if (process.env.LEGACY_DRIP !== "off") void scheduleDripSequence(
       firstName || null,
       email,
       env.APP_URL,

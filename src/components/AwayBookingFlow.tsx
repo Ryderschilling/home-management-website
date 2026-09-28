@@ -91,10 +91,19 @@ export default function AwayBookingFlow() {
     } catch {}
   }, []);
 
+  // Form drop-off for the Ads page: which step people reach before they leave.
+  const [started, setStarted] = useState(false);
+  function markStart() {
+    if (started) return;
+    setStarted(true);
+    window.chmTrack?.("form_step", { target: "1", label: "Away on 30A" });
+  }
+
   function next() {
     setError("");
     if (step === 1 && !address.trim()) return setError("Add the address of your 30A home.");
     if (step === 2 && (!date || !windowId)) return setError("Pick a day and a time window.");
+    window.chmTrack?.("form_step", { target: String(step + 1), label: "Away on 30A" });
     setStep((s) => s + 1);
   }
 
@@ -144,7 +153,7 @@ export default function AwayBookingFlow() {
   }
 
   return (
-    <form onSubmit={submit} noValidate className="border border-[var(--ch-hairline)] bg-[var(--ch-paper)] p-6 md:p-9">
+    <form onSubmit={submit} onFocusCapture={markStart} noValidate className="border border-[var(--ch-hairline)] bg-[var(--ch-paper)] p-6 md:p-9">
       <div className="mb-7 flex items-center justify-between">
         <p className="ch-label">Free walkthrough · Step {step} of 3</p>
         <div className="flex gap-1.5" aria-hidden="true">

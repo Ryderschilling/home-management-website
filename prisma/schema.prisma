@@ -21,9 +21,13 @@ enum ClientStatus {
   FORMER
 }
 
+/// The funnel, in Hormozi's order: lead, engaged (you talked), booked the free
+/// walkthrough, showed up for it, bought. Enum order is the funnel order.
 enum LeadStage {
   NEW
   CONTACTED
+  BOOKED
+  SHOWED
   WON
   LOST
 }
@@ -159,6 +163,39 @@ model Client {
   notes            String?
   /// Set when Ryder emails a portal invite from the client page.
   portalInvitedAt  DateTime?
+
+  // --- Ad attribution (added 2026-09-28, see lib/ads.ts) ---
+  /// Normalized lead channel: meta, google_ads, google, direct_mail, fb_group,
+  /// referral, website, direct, other. Set from first touch at intake, Ryder
+  /// can override it on /ads. Null on clients that predate tracking.
+  channel          String?
+  /// The exact Meta ad the lead first came from, when the URL carried it.
+  metaAdId         String?
+  metaAd           MetaAd?        @relation(fields: [metaAdId], references: [id], onDelete: SetNull)
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  utmContent       String?
+  utmTerm          String?
+  fbclid           String?
+  gclid            String?
+  /// First page they landed on and where they came from, first touch.
+  landingPage      String?
+  referrer         String?
+  /// Anonymous first-party visitor id from the website, ties TrackEvents to them.
+  visitorId        String?
+  firstTouchAt     DateTime?
+  /// Funnel timestamps. Stamped the first time the stage is reached, never moved.
+  bookedAt         DateTime?
+  showedAt         DateTime?
+  wonAt            DateTime?
+  lostAt           DateTime?
+  lostReason       String?
+  /// Follow-up email control. optOut is permanent (unsubscribe link or Ryder).
+  emailOptOut      Boolean        @default(false)
+  emailPaused      Boolean        @default(false)
+  unsubToken       String?        @unique
+
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
@@ -180,6 +217,13 @@ model Client {
   orders        Order[]
   subscriptions PlanSubscription[]
   agreements    AgreementAcceptance[]
+
+  // --- Ads + follow-up ---
+  trackEvents TrackEvent[]
+  emailSends  EmailSend[]
+
+  @@index([channel])
+  @@index([visitorId])
 }
 
 model Property {
@@ -387,6 +431,9 @@ model Expense {
   description String?
   workerId    String?
   worker      Worker?         @relation(fields: [workerId], references: [id], onDelete: SetNull)
+  /// Lead channel this MARKETING cost belongs to (direct_mail, fb_group, ...).
+  /// How non-Meta ad spend reaches /ads. Meta spend comes from MetaAdDay instead.
+  channel     String?
   /// Optional link to the invoice/payment this cost belongs to,
   /// so per-invoice profit = payment amount minus its linked expenses.
   paymentId   String?
@@ -891,5 +938,167 @@ model AgreementAcceptance {
   typedName  String
   userAgent  String?
 
+  @@index([clientId])
+}
+
+
+// ============================================================================
+// ADS (added 2026-09-28)
+//
+// Meta is mirrored READ-ONLY from the Marketing API (lib/meta.ts). Nothing here
+// ever writes to Meta. TrackEvent is first-party click tracking from the public
+// website. EmailSequence is the lead follow-up that runs through Resend.
+// ============================================================================
+
+model MetaCampaign {
+  /// Meta's own id.
+  id          String    @id
+  name        String
+  status      String?
+  objective   String?
+  dailyBudget Decimal?  @db.Decimal(10, 2)
+  createdTime DateTime?
+  syncedAt    DateTime  @default(now())
+
+  adSets MetaAdSet[]
+  ads    MetaAd[]
+}
+
+model MetaAdSet {
+  id          String       @id
+  campaignId  String
+  campaign    MetaCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name        String
+  status      String?
+  dailyBudget Decimal?     @db.Decimal(10, 2)
+  syncedAt    DateTime     @default(now())
+
+  ads MetaAd[]
+}
+
+model MetaAd {
+  id           String       @id
+  adSetId      String
+  adSet        MetaAdSet    @relation(fields: [adSetId], references: [id], onDelete: Cascade)
+  campaignId   String
+  campaign     MetaCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  name         String
+  status       String?
+  thumbnailUrl String?
+  headline     String?
+  body         String?
+  createdTime  DateTime?
+  /// Ryder's own note on the ad ("hook = leak story"). Never overwritten by sync.
+  note         String?
+  syncedAt     DateTime     @default(now())
+
+  days    MetaAdDay[]
+  clients Client[]
+}
+
+/// One ad, one day, straight from Meta insights. Re-synced for the trailing
+/// 28 days every run because Meta restates recent days.
+model MetaAdDay {
+  id           String   @id @default(cuid())
+  adId         String
+  ad           MetaAd   @relation(fields: [adId], references: [id], onDelete: Cascade)
+  /// Midnight UTC of the ad account's calendar day (account runs Central).
+  date         DateTime @db.Date
+  spend        Decimal  @default(0) @db.Decimal(10, 2)
+  impressions  Int      @default(0)
+  reach        Int      @default(0)
+  clicks       Int      @default(0)
+  linkClicks   Int      @default(0)
+  landingViews Int      @default(0)
+  /// Leads as META counts them (pixel). Our own count comes from Client rows.
+  metaLeads    Int      @default(0)
+  /// 3-second video views, for hook rate.
+  videoViews   Int      @default(0)
+  actions      Json?
+  syncedAt     DateTime @default(now())
+
+  @@unique([adId, date])
+  @@index([date])
+}
+
+/// First-party website events. Anonymous until the visitor becomes a lead,
+/// then clientId is filled in for every event under their visitorId.
+model TrackEvent {
+  id          String   @id @default(cuid())
+  visitorId   String
+  sessionId   String?
+  clientId    String?
+  client      Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  /// pageview, click, form_step, lead, scroll
+  type        String
+  path        String
+  /// What was clicked: button text or link label.
+  label       String?
+  /// Where it goes: href, tel:, sms:, mailto:, or a form step number.
+  target      String?
+  utmSource   String?
+  utmCampaign String?
+  utmContent  String?
+  metaAdId    String?
+  referrer    String?
+  device      String?
+  createdAt   DateTime @default(now())
+
+  @@index([visitorId])
+  @@index([clientId])
+  @@index([createdAt])
+  @@index([metaAdId])
+}
+
+/// A follow-up sequence. Built OFF. Ryder approves the copy, then turns it on.
+model EmailSequence {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  name        String
+  /// Who gets it, see lib/sequence.ts AUDIENCES.
+  audience    String    @default("new_lead")
+  active      Boolean   @default(false)
+  /// When it was last turned on. Leads older than includeSince are left out,
+  /// and older leads that are in start their clock here, not at signup.
+  activatedAt DateTime?
+  includeSince DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  steps EmailStep[]
+}
+
+model EmailStep {
+  id         String        @id @default(cuid())
+  sequenceId String
+  sequence   EmailSequence @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  order      Int
+  /// Days after the lead's start. 0 = first run after they qualify.
+  delayDays  Int
+  subject    String
+  /// Plain text. Blank line = new paragraph. {{firstName}} is filled in.
+  body       String
+  active     Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  sends EmailSend[]
+
+  @@unique([sequenceId, order])
+}
+
+model EmailSend {
+  id       String    @id @default(cuid())
+  stepId   String
+  step     EmailStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  clientId String
+  client   Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  sentAt   DateTime  @default(now())
+  resendId String?
+  /// SENT or FAILED.
+  status   String    @default("SENT")
+  error    String?
+
+  @@unique([stepId, clientId])
   @@index([clientId])
 }

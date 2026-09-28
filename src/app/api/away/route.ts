@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
       community: neighborhood || null,
       source: utm ? "Meta ads /away-on-30a" : "Website /away-on-30a",
       message: summary,
+      booked: Boolean(date),
     });
 
     const whenShort = dayLabel ? `${dayLabel}, ${windowId === "afternoon" ? "afternoon" : windowId === "morning" ? "morning" : "time to be set"}` : "";
