@@ -405,6 +405,10 @@ function InquiryModal({ plan, term, onClose }: ModalProps) {
 
 function PlanCard({ plan, term, onSelect }: { plan: Plan; term: BillingTerm; onSelect: (p: Plan) => void }) {
   const isGold = plan.tier === "gold";
+  // Mobile only: the feature list starts folded so all three plans fit in a
+  // couple of thumbs of scrolling. Desktop always shows everything (CSS).
+  const [open, setOpen] = useState(false);
+  const count = plan.sections.reduce((n, s) => n + s.items.length, 0);
   const price = plan.prices[term];
   const monthlySavings = plan.prices.monthly - price;
 
@@ -444,6 +448,15 @@ function PlanCard({ plan, term, onSelect }: { plan: Plan; term: BillingTerm; onS
         )}
       </div>
 
+      <button className={`cta cta-${plan.tier} cta-mobile`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price, term, where: "mobile-top" }); onSelect(plan); }}>
+        {plan.cta}
+      </button>
+      <button type="button" className="features-toggle" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        {open ? "Hide what's included" : `See what's included (${count})`}
+        <span aria-hidden="true" className={`features-caret ${open ? "features-caret-open" : ""}`}>›</span>
+      </button>
+
+      <div className={`features-wrap ${open ? "features-open" : ""}`}>
       <div className={`divider divider-${plan.tier}`} />
 
       {plan.sections.map((section) => (
@@ -463,7 +476,9 @@ function PlanCard({ plan, term, onSelect }: { plan: Plan; term: BillingTerm; onS
         </div>
       ))}
 
-      <button className={`cta cta-${plan.tier}`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price, term }); onSelect(plan); }}>
+      </div>
+
+      <button className={`cta cta-${plan.tier} cta-desktop`} onClick={() => { posthog.capture("pricing_cta_clicked", { plan: plan.name, tier: plan.tier, price, term }); onSelect(plan); }}>
         {plan.cta}
       </button>
     </div>
@@ -498,7 +513,7 @@ export default function PricingPage() {
           Service Plans <span className="header-accent">&amp; Pricing</span>
         </h1>
         <p className="header-sub">
-          Your 30A home, watched over like it&apos;s our own.
+          Your 30A home, watched over like it&apos;s our own.{" "}
           <br />
           Month-to-month by default, no contracts. Lock in 6 or 12 months and save.
         </p>
@@ -859,10 +874,47 @@ export default function PricingPage() {
           align-items: start;
         }
         @media (max-width: 900px) {
-          .plans-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
-          .card-gold   { order: 1; }
-          .card-silver { order: 2; }
-          .card-bronze { order: 3; }
+          /* Cheapest first on phones (9/28/26): leading with $600 scared people off. */
+          .plans-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; gap: 14px; }
+        }
+
+        /* ── Mobile: short cards, features fold away ────── */
+        /* Doubled class names on purpose: the base .cta / .card rules sit later in
+           this block and would otherwise win. */
+        .cta.cta-mobile, .features-toggle { display: none; }
+        @media (max-width: 900px) {
+          .plans-grid .card { padding: 24px 20px 20px; }
+          .plans-grid .card:hover { transform: none; }
+          .cta.cta-mobile { display: block; margin-top: 16px; }
+          .cta.cta-desktop { display: none; }
+          .features-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background: none;
+            border: none;
+            font: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--ch-teal);
+            cursor: pointer;
+          }
+          .features-caret { display: inline-block; transition: transform 0.2s ease; font-size: 18px; line-height: 1; }
+          .features-caret-open { transform: rotate(90deg); }
+          .features-wrap { display: none; }
+          .features-wrap.features-open { display: block; }
+          .gold-pulse { display: none; }
+
+          /* Header: get to the prices fast. */
+          .pricing-header { padding: 96px 20px 28px; }
+          .header-logo { display: none; }
+          .trust-badge { font-size: 10.5px; padding: 6px 14px; margin-bottom: 14px; }
+          .header-sub { font-size: 14px; }
+          .header-sub br { display: none; }
         }
 
         /* ── Term toggle ────────────────────────────────── */

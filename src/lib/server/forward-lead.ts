@@ -15,6 +15,10 @@ type LeadPayload = {
   community?: string | null;
   /** They picked a walkthrough day, so they land as BOOKED, not NEW. */
   booked?: boolean;
+  /** Which step of a funnel this was ("optin", "walkthrough", "start"), for /ads. */
+  eventLabel?: string;
+  /** "buy": they asked to start now, not just to talk. */
+  intent?: "buy";
 };
 
 export async function forwardLeadToDashboard(p: LeadPayload): Promise<void> {
@@ -25,7 +29,7 @@ export async function forwardLeadToDashboard(p: LeadPayload): Promise<void> {
   // Record the conversion as an event too, so the page funnel on /ads counts it.
   if (attribution?.visitorId && path) {
     await prisma.trackEvent
-      .create({ data: { visitorId: attribution.visitorId, type: "lead", path, utmSource: attribution.utmSource ?? null, utmCampaign: attribution.utmCampaign ?? null, utmContent: attribution.utmContent ?? null, metaAdId: attribution.metaAdId && /^\d+$/.test(attribution.metaAdId) ? attribution.metaAdId : null } })
+      .create({ data: { visitorId: attribution.visitorId, type: "lead", path, label: p.eventLabel ?? null, utmSource: attribution.utmSource ?? null, utmCampaign: attribution.utmCampaign ?? null, utmContent: attribution.utmContent ?? null, metaAdId: attribution.metaAdId && /^\d+$/.test(attribution.metaAdId) ? attribution.metaAdId : null } })
       .catch(() => {});
   }
   if (!url || !secret) return; // not configured yet, skip silently
@@ -33,7 +37,7 @@ export async function forwardLeadToDashboard(p: LeadPayload): Promise<void> {
     await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-intake-secret": secret },
-      body: JSON.stringify({ ...p, attribution }),
+      body: JSON.stringify({ ...p, eventLabel: undefined, attribution }),
       signal: AbortSignal.timeout(4000),
     });
   } catch {

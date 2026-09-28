@@ -1,174 +1,126 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import AwayBookingFlow from "@/components/AwayBookingFlow";
-import LegalDisclaimer from "@/components/LegalDisclaimer";
-import { primaryPhone, primaryPhoneDisplay, trustStats } from "@/data/siteData";
+import Image from "next/image";
+import OptInForm from "@/components/away/OptInForm";
+import { trustStats } from "@/data/siteData";
 
-// Away on 30A, the Meta ads landing page (9/21/26). Offer approved by Ryder:
-// Essential $200/mo bi-weekly, free first walkthrough (in person, FaceTime, or
-// solo with a report), "Love your first month or it's free."
-// Copy rules: never "inspection", "monitoring", "security" or "patrol". No
-// insurance discount language. The yearly record line mentions an agent or
-// adjuster, so this page renders <LegalDisclaimer />.
-// noindex on purpose: it is a paid-traffic page and repeats the homepage offer.
+// Away on 30A, page 1 of 2 (simplified 9/28/26 at Ryder's direction).
+// Headline, the pool photo, one email box, then the reasons, then the footer.
+// The reasons follow Hormozi's value equation: the result they want, proof it
+// happens, how fast they see it, and how little they have to do.
+// Copy rules: never promise Ryder will call. Never "inspection", "monitoring",
+// "security" or "patrol". No insurance language on this page (so it needs no
+// disclaimer). noindex: paid-traffic page.
 
 const PAGE_URL = "https://coastalhomemngt30a.com/away-on-30a";
 
 export const metadata: Metadata = {
-  title: "Away on 30A: Your Home, Checked Every Two Weeks",
-  description:
-    "A walkthrough of your 30A second home every two weeks with a photo report to your phone the same day. $200 a month. First walkthrough free, first month guaranteed.",
+  title: "Own a Home on 30A? Know It's Fine Without Flying Down.",
+  description: "What Coastal Home Management does for 30A second homes while you're away. Put in your email and see how it works.",
   alternates: { canonical: PAGE_URL },
   robots: { index: false, follow: true },
   openGraph: {
-    title: "Away on 30A: Your Home, Checked Every Two Weeks",
-    description: "Walk in to exactly how you left it. First walkthrough free, in person or on FaceTime.",
+    title: "Own a home on 30A? Know it's fine without flying down.",
+    description: "See what we do for 30A second homes while the owners are away.",
     url: PAGE_URL,
-    images: ["/img.png"],
+    images: ["/ryder-at-work.jpg"],
   },
 };
 
-const INCLUDED = [
-  "A walkthrough every two weeks, inside and out",
-  "Photo report to your phone the same day",
-  "A check after every named storm",
-  "A dated yearly record of every visit, ready for your agent or adjuster",
-  "One local owner, one direct line: Ryder",
+/** Hormozi's value equation, in the owner's words. */
+const REASONS = [
+  {
+    k: "What you get",
+    t: "Walk in to exactly how you left it.",
+    b: "Your house gets walked inside and out every two weeks. Leaks, AC trouble, storm damage and packages on the porch get caught while they are still small.",
+  },
+  {
+    k: "Why it works",
+    t: "You see every visit, not a promise.",
+    b: `Dated photos after every walkthrough. ${trustStats.activeHomes} homes on 30A already do it this way, rated ${trustStats.ratingValue} on Google. Love your first month or it's free.`,
+  },
+  {
+    k: "How fast",
+    t: "The same day, every time.",
+    b: "The photo report hits your phone before Ryder leaves the driveway. You never wait until the end of the month to find out.",
+  },
+  {
+    k: "What you do",
+    t: "Nothing. Not even fly in.",
+    b: "No app, no login, no scheduling. It's a text from the same local guy every time. You don't need to be in town to start.",
+  },
 ];
 
-const STEPS = [
-  { n: "01", t: "Pick a Tuesday or Thursday", b: "Takes about a minute. Ryder texts you to lock in the exact time." },
-  { n: "02", t: "Ryder walks your home", b: "With you in person, together on FaceTime, or on his own if you are out of town." },
-  { n: "03", t: "You get the photo report", b: "Same day, yours to keep. Then you decide if you want it every two weeks." },
-];
-
-const FAQ = [
-  { q: "Do I need to be in town?", a: "No. Most owners are not. Ryder can walk the home on his own and send the photo report, or walk it with you on FaceTime." },
-  { q: "What does the free walkthrough cost?", a: "Nothing, and there is no commitment. The photo report is yours to keep whether you sign up or not." },
-  { q: "What does \"love your first month or it's free\" mean?", a: "If you sign up for Essential and you are not happy with your first month, tell Ryder and that month is not charged." },
-  { q: "What if my home needs more than every two weeks?", a: "Homes with a pool, irrigation, older plumbing, or long empty stretches often do better with a weekly walkthrough. That is Home Watch at $300 a month. Ryder will tell you straight which one your home actually needs." },
-  { q: "Which areas do you cover?", a: "Watersound Origins, Naturewalk, Inlet Beach, Alys Beach, Rosemary Beach, Seacrest and the rest of scenic 30A." },
+const STATS = [
+  [trustStats.ratingValue, `on Google, ${trustStats.reviewCount} reviews`],
+  [trustStats.activeHomes, "30A homes cared for"],
+  [trustStats.propertiesManaged, "in property looked after"],
+  ["Same day", "photo report, every visit"],
 ];
 
 export default function AwayOn30APage() {
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
-  };
-
   return (
     <main className="bg-[var(--ch-paper)]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      {/* ── Headline, photo, the one ask ───────────────────────────────── */}
+      <section className="px-4 pt-28 pb-16 md:px-8 md:pt-36 md:pb-24">
+        <div className="mx-auto max-w-[980px] text-center">
+          <p className="ch-eyebrow ch-eyebrow--center">For 30A second-home owners</p>
+          <h1 className="ch-display mx-auto mb-10 max-w-[17ch]">Own a home on 30A? Know it&apos;s fine without flying down.</h1>
 
-      {/* ── Hero + booking ─────────────────────────────────────────────── */}
-      <section id="book" className="fade-section bg-[var(--ch-paper)] px-4 pt-28 pb-16 md:px-8 md:pt-36 md:pb-24">
-        <div className="mx-auto grid max-w-[1240px] items-start gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-          <div>
-            <p className="ch-eyebrow reveal-item">Away on 30A</p>
-            <h1 className="ch-display mb-8 max-w-[16ch]">
-              <span className="ch-mask"><span>Your home, checked</span></span>
-              <span className="ch-mask"><span>every two weeks</span></span>
-              <span className="ch-mask"><span>while you&apos;re away.</span></span>
-            </h1>
-            <span className="ch-draw mb-8 block h-px w-24 bg-[var(--ch-teal)]" />
-            <p className="ch-lede reveal-item mb-8 max-w-[48ch]">
-              Walk in to exactly how you left it. Start with a free walkthrough of your home, in
-              person or on FaceTime. You do not need to be in town.
-            </p>
-            <p className="ch-label reveal-item !text-[var(--ch-soft)]">
-              {trustStats.ratingValue} on Google · {trustStats.reviewCount} reviews · Insured Florida LLC · Local to Watersound Origins
-            </p>
+          <div className="relative mx-auto mb-10 aspect-[16/9] w-full overflow-hidden border border-[var(--ch-hairline)]">
+            <Image
+              src="/ryder-at-work.jpg"
+              alt="Ryder cleaning the pool at a 30A home"
+              fill
+              priority
+              sizes="(min-width: 1024px) 980px, 100vw"
+              className="object-cover"
+            />
           </div>
-          <div className="reveal-item">
-            <AwayBookingFlow />
-            {/* Direct line for owners who do not want a walkthrough (added 9/22/26).
-                Real tel:/sms:/mailto: links so Pulse and GA4 count the tap. */}
-            <div className="mt-5 border border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] p-6 md:p-7">
-              <p className="ch-label mb-2">Rather just talk?</p>
-              <p className="mb-5 text-[15px] leading-[1.6] text-[var(--ch-ink)]">
-                Skip the walkthrough and reach Ryder directly. Questions, pricing, or a one-off favor.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <a href={`sms:${primaryPhone()}`} className="ch-btn ch-btn--solid">Text Ryder</a>
-                <a href={`tel:${primaryPhone()}`} className="ch-btn">Call {primaryPhoneDisplay()}</a>
-                <a href="mailto:coastalhomemanagement30a@gmail.com?subject=Question%20about%20my%2030A%20home" className="ch-btn">Email</a>
-              </div>
-            </div>
+
+          <p className="ch-lede mx-auto mb-7 max-w-[44ch]">
+            Put in your email to see what we do for 30A homes while their owners are away.
+          </p>
+          <div className="mx-auto flex max-w-[560px] justify-center">
+            <OptInForm id="optin-top" />
           </div>
         </div>
       </section>
 
-      {/* ── The offer ──────────────────────────────────────────────────── */}
-      <section className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-20 md:px-8 md:py-28">
-        <div className="mx-auto grid max-w-[1240px] gap-12 md:grid-cols-[1fr_1.2fr]">
-          <div>
-            <p className="ch-label mb-3">Essential</p>
-            <p className="text-[64px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>
-              $200<span className="text-[22px] text-[var(--ch-muted)]">/mo</span>
-            </p>
-            <p className="mt-6 max-w-[34ch] text-[20px] leading-[1.4] text-[var(--ch-ink)]">Love your first month or it&apos;s free.</p>
-            <a href="#book" className="ch-btn ch-btn--solid mt-8">Book My Free Walkthrough</a>
-          </div>
-          <ul>
-            {INCLUDED.map((t) => (
-              <li key={t} className="flex gap-4 border-t border-[var(--ch-hairline)] py-5 text-[16px] leading-[1.6] text-[var(--ch-ink)]">
-                <span className="mt-[9px] block h-px w-5 shrink-0 bg-[var(--ch-teal)]" aria-hidden="true" />
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── How it works ───────────────────────────────────────────────── */}
-      <section className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper)] px-4 py-20 md:px-8 md:py-28">
+      {/* ── Why owners use us ──────────────────────────────────────────── */}
+      <section className="border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-[1240px]">
-          <p className="ch-eyebrow reveal-item">How it works</p>
-          <h2 className="ch-display ch-display--sm mb-12 max-w-[22ch]">Three steps, and you never have to fly in.</h2>
-          <div className="grid gap-10 md:grid-cols-3">
-            {STEPS.map((s) => (
-              <div key={s.n} className="border-t border-[var(--ch-hairline-2)] pt-6">
-                <p className="ch-label mb-4 !text-[var(--ch-teal)]">{s.n}</p>
-                <h3 className="mb-3 text-[20px] leading-[1.3] text-[var(--ch-ink)]">{s.t}</h3>
-                <p className="text-[15px] leading-[1.7] text-[var(--ch-muted)]">{s.b}</p>
+          <p className="ch-eyebrow">Why owners use us</p>
+          <h2 className="ch-display ch-display--sm mb-12 max-w-[22ch]">Peace of mind, without lifting a finger.</h2>
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            {REASONS.map((r) => (
+              <div key={r.k} className="border-t border-[var(--ch-hairline-2)] pt-6">
+                <p className="ch-label mb-4 !text-[var(--ch-teal)]">{r.k}</p>
+                <h3 className="mb-3 text-[20px] leading-[1.3] text-[var(--ch-ink)]">{r.t}</h3>
+                <p className="text-[15px] leading-[1.7] text-[var(--ch-muted)]">{r.b}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 grid grid-cols-2 gap-px border border-[var(--ch-hairline)] bg-[var(--ch-hairline)] md:grid-cols-4">
+            {STATS.map(([n, l]) => (
+              <div key={l} className="bg-[var(--ch-paper)] px-6 py-7">
+                <p className="mb-1 text-[34px] leading-none tracking-[-0.02em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 110, 'wght' 620" }}>
+                  {n}
+                </p>
+                <p className="text-[13px] text-[var(--ch-muted)]">{l}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Who ────────────────────────────────────────────────────────── */}
-      <section className="fade-section ch-deep-band px-4 py-20 text-white md:px-8 md:py-28">
-        <div className="mx-auto max-w-[860px]">
-          <p className="ch-eyebrow ch-eyebrow--light reveal-item">Who shows up</p>
-          <p className="text-[clamp(22px,2.6vw,32px)] leading-[1.4]">
-            I&apos;m Ryder. I live in Watersound Origins and I check on 30A homes while their owners
-            are somewhere else. Every visit gets dated photos sent to your phone, and you always
-            text the same person.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <a href="#book" className="ch-btn ch-btn--solid">Book My Free Walkthrough</a>
-            <a href={`tel:${primaryPhone()}`} className="ch-btn !border-white/40 !text-white">{primaryPhoneDisplay()}</a>
+      {/* ── The ask, once more ─────────────────────────────────────────── */}
+      <section className="ch-deep-band px-4 py-20 text-white md:px-8 md:py-24">
+        <div className="mx-auto max-w-[760px] text-center">
+          <h2 className="mb-8 text-[clamp(24px,3vw,36px)] leading-[1.25]">See what we&apos;d do for your house.</h2>
+          <div className="mx-auto flex max-w-[560px] justify-center">
+            <OptInForm id="optin-bottom" dark />
           </div>
-        </div>
-      </section>
-
-      {/* ── FAQ ────────────────────────────────────────────────────────── */}
-      <section className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper)] px-4 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-[860px]">
-          <p className="ch-eyebrow reveal-item">Questions</p>
-          <h2 className="ch-display ch-display--sm mb-10">Plain answers.</h2>
-          {FAQ.map(({ q, a }) => (
-            <div key={q} className="border-t border-[var(--ch-hairline)] py-7">
-              <h3 className="mb-3 text-[17px] leading-[1.4] text-[var(--ch-ink)]">{q}</h3>
-              <p className="text-[14.5px] leading-[1.75] text-[var(--ch-muted)]">{a}</p>
-            </div>
-          ))}
-          <p className="mt-8 text-[14px] text-[var(--ch-muted)]">
-            Want to compare every plan? <Link href="/pricing" className="underline underline-offset-4">See pricing</Link>.
-          </p>
-          <LegalDisclaimer variant="inline" />
         </div>
       </section>
     </main>

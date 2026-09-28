@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
       source: utm ? "Meta ads /away-on-30a" : "Website /away-on-30a",
       message: summary,
       booked: Boolean(date),
+      eventLabel: "walkthrough",
     });
 
     const whenShort = dayLabel ? `${dayLabel}, ${windowId === "afternoon" ? "afternoon" : windowId === "morning" ? "morning" : "time to be set"}` : "";

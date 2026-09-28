@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { bookingConfig } from "@/data/siteData";
+import { fireConversion, recallEmail } from "@/components/away/fire";
 
 /**
- * Three-step free walkthrough booking for /away-on-30a (Meta ads, 9/21/26).
+ * Three-step free walkthrough booking, page 2 of the Away on 30A funnel
+ * (/away-on-30a/next). Built 9/21/26, moved behind the opt-in 9/28/26.
  * Step 1 the home, step 2 the day, step 3 contact. Short steps convert better
  * than one long form, and the address comes first because it is the question
  * an owner is most eager to answer.
@@ -12,9 +14,6 @@ import { bookingConfig } from "@/data/siteData";
  * Days are Tuesdays and Thursdays only (Ryder's walkthrough days). Ryder
  * confirms the exact time by text, so there is no live calendar to go stale.
  */
-
-const GOOGLE_ADS_ID = "AW-18257719328";
-const CONVERSION_LABEL = "JhfKCL2oyskcEKDg-oFE";
 
 const WINDOWS = [
   { id: "morning", label: "Morning", detail: "8am to 12pm" },
@@ -49,22 +48,6 @@ function upcomingSlots(count = 6): Slot[] {
   return out;
 }
 
-function fireLeadEvents() {
-  try {
-    const w = window as unknown as {
-      gtag?: (c: string, a: string, p: Record<string, unknown>) => void;
-      posthog?: { capture: (e: string, p?: Record<string, unknown>) => void };
-      fbq?: (a: string, e: string, p?: Record<string, unknown>) => void;
-      pulse?: (e: string, p?: Record<string, unknown>) => void;
-    };
-    w.gtag?.("event", "conversion", { send_to: `${GOOGLE_ADS_ID}/${CONVERSION_LABEL}` });
-    w.gtag?.("event", "generate_lead", { form_location: "/away-on-30a" });
-    w.posthog?.capture("away_walkthrough_booked");
-    w.fbq?.("track", "Lead", { content_name: "Away on 30A walkthrough" });
-    w.pulse?.("form", { label: "Away on 30A walkthrough" });
-  } catch {}
-}
-
 export default function AwayBookingFlow() {
   const slots = useMemo(() => upcomingSlots(6), []);
   const [step, setStep] = useState(1);
@@ -84,6 +67,9 @@ export default function AwayBookingFlow() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    // Page 2 of the funnel: they already gave an email on page 1.
+    const known = recallEmail();
+    if (known) setEmail(known);
     try {
       const p = new URLSearchParams(window.location.search);
       const bits = ["utm_source", "utm_campaign", "utm_content"].map((k) => p.get(k)).filter(Boolean);
@@ -126,7 +112,7 @@ export default function AwayBookingFlow() {
         setError(data?.error?.message || "That did not go through. Try again, or call (309) 415-8793.");
         return;
       }
-      fireLeadEvents();
+      fireConversion("walkthrough");
       setDone(true);
     } catch {
       setError("That did not go through. Try again, or call (309) 415-8793.");
