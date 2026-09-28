@@ -630,6 +630,7 @@ export default function HomePage() {
               ["/storm-check", "Storm Check Sign-Up"],
               ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
               ["/home-watch-vs-property-management-30a", "Home Watch vs Property Management"],
+              ["/property-managers-30a", "Property Managers on 30A"],
               ["/closing-your-30a-home-checklist", "Closing Up Your 30A Home"],
               ["/ac-humidity-settings-30a-second-home", "AC & Humidity Settings"],
               ["/storm-shutters-30a", "Storm Shutters While You're Away"],

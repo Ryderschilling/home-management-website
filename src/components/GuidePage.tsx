@@ -95,6 +95,24 @@ export default function GuidePage({ page }: { page: GuidePageData }) {
                   ))}
                 </ul>
               )}
+              {s.directory && (
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  {s.directory.map((d) => (
+                    <a
+                      key={d.name}
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener"
+                      className="group block border border-[var(--ch-hairline)] bg-[var(--ch-paper)] p-5 transition-colors hover:border-[var(--ch-teal)]"
+                    >
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--ch-muted)]">{d.kind}</p>
+                      <p className="mt-2 text-[18px] leading-tight text-[var(--ch-ink)] group-hover:text-[var(--ch-teal)]">{d.name}</p>
+                      <p className="mt-2 text-[13px] leading-[1.6] text-[var(--ch-muted)]">{d.areas}</p>
+                      <p className="mt-3 text-[14.5px] leading-[1.65] text-[var(--ch-ink)]">{d.note}</p>
+                    </a>
+                  ))}
+                </div>
+              )}
               {s.table && (
                 <div className="mt-4 overflow-x-auto border border-[var(--ch-hairline)]">
                   <table className="w-full min-w-[600px] text-left text-[14px]">

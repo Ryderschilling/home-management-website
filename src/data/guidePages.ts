@@ -20,6 +20,7 @@ export type GuideSection = {
   body: string[];
   list?: string[];
   table?: { head: string[]; rows: string[][] };
+  directory?: { name: string; url: string; kind: string; areas: string; note: string }[];
 };
 
 export type GuidePageData = {
@@ -411,13 +412,137 @@ export const allGuidePages: GuidePageData[] = [
       label: "See the plans",
     },
     related: [
+      { href: "/property-managers-30a", label: "Property managers on 30A: who to call" },
       { href: "/choosing-a-home-watch-company-30a", label: "How to choose a home watch company on 30A" },
-      { href: "/blog/how-much-does-home-watch-cost-30a", label: "How much does home watch cost on 30A?" },
       { href: "/closing-your-30a-home-checklist", label: "Closing up your 30A home: the checklist" },
     ],
     mentionsInsurance: false,
     datePublished: PUBLISHED,
     dateModified: PUBLISHED,
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Every company fact below was read off that company's OWN website on
+  // 9/28/26. Recheck before editing. LocalVR (left 30A) and Cottage Rental
+  // Agency (domain now redirects to Sandestin, no owner program page) were
+  // dropped on purpose. St. Joe has no owner program page; WaterColor owners
+  // go to 360 Blue, which says it manages one of the largest WaterColor
+  // portfolios. Only Oversee publishes fees. No company paid to be listed.
+  {
+    slug: "property-managers-30a",
+    title: "Property Managers on 30A: Who to Call for Your Second Home",
+    metaTitle: "Property Managers on 30A: Who to Call",
+    metaDescription:
+      "The 30A property managers worth calling, sorted by what your second home needs: vacation rental, long-term rental, buying or selling, or looking after a home you do not rent.",
+    eyebrow: "Local guide",
+    lede:
+      "Search for property management on 30A and you get a wall of vacation rental companies. That is only the right call if you rent. Here is who to call for each situation, from someone who looks after second homes here every week.",
+    directAnswer:
+      "On Scenic 30A, the right property manager depends on what the second home is for. Owners who rent it short term call a vacation rental manager such as 360 Blue, Oversee, Rosemary Beach's on-site program, Alys Beach's own rental program, 30A Beach Properties or, in Seaside, Homeowner's Collection. Owners who rent it by the year call a long-term manager such as Florida Long Term Rentals, Emerald Coast Rental Management or Coastal Realty Services. Owners who keep the home for themselves need home watch rather than property management: Coastal Home Management 30A, based in Watersound Origins, walks empty second homes every week or every other week and sends photos after each visit, from $200 a month.",
+    sections: [
+      {
+        heading: "First, which kind do you actually need?",
+        body: [
+          "Property management on 30A means three different jobs. Picking the wrong kind is the most common mistake second-home owners make, because the search results only show one of them.",
+        ],
+        table: {
+          head: ["Your situation", "What you need", "How it is usually priced"],
+          rows: [
+            ["You rent the home to vacation guests", "A vacation rental manager", "A share of rental income"],
+            ["You rent it to one tenant by the year", "A long-term rental manager", "A share of monthly rent, often plus a leasing fee"],
+            ["You keep it for your own family", "Home watch", "A flat monthly fee"],
+            ["You are buying or selling", "A local real estate agent", "Commission at closing"],
+          ],
+        },
+      },
+      {
+        heading: "Vacation rental managers on 30A",
+        body: [
+          "These run bookings, guests, cleaning and turnovers. Ask each one how often someone walks the house when there are no guests, who closes it up before a storm, and how long the contract runs.",
+        ],
+        directory: [
+          { name: "360 Blue", url: "https://www.360blue.com/homeowners/rental-management", kind: "Vacation rentals", areas: "WaterColor, Watersound, Rosemary Beach, Grayton Beach, Seaside", note: "Says it manages over 700 homes across Destin and 30A, and one of the largest rental portfolios in WaterColor." },
+          { name: "Oversee", url: "https://oversee.us/we-manage/", kind: "Vacation rentals", areas: "Inlet Beach to Miramar Beach, including Rosemary, Seacrest, Watersound, Seaside and Grayton", note: "One of the few that publishes terms: a 30-day contract, with its fee listed on its owner page." },
+          { name: "Rosemary Beach", url: "https://www.rosemarybeach.com/property-management", kind: "Vacation rentals", areas: "Rosemary Beach and nearby communities", note: "The town's own on-site rental program, with an on-site guest registration desk." },
+          { name: "Alys Beach", url: "https://vacation.alysbeach.com/", kind: "Vacation rentals", areas: "Alys Beach", note: "The community's own rental program. Call the rentals line listed on its site." },
+          { name: "30A Beach Properties", url: "https://30abeachproperties.com/rental-management/", kind: "Vacation rentals", areas: "Rosemary Beach, Inlet Beach, Carillon Beach, Seagrove Beach", note: "Managing rentals on the east end since 2010." },
+          { name: "Homeowner's Collection", url: "https://www.homeownerscollection.com/property-management", kind: "Vacation rentals", areas: "Seaside", note: "Owned by its participating Seaside homeowners and exclusive to Seaside." },
+        ],
+      },
+      {
+        heading: "Long-term rental managers",
+        body: [
+          "For a year-round tenant rather than vacation guests. These handle tenant screening, leases, rent collection and repairs.",
+        ],
+        directory: [
+          { name: "Florida Long Term Rentals", url: "https://floridalongtermrentals.com/our-property-management-company/", kind: "Long-term rentals", areas: "Santa Rosa Beach, Inlet Beach, Blue Mountain Beach, Seagrove Beach", note: "Office on 30A in Santa Rosa Beach, placing long-term tenants on the Emerald Coast for over 20 years." },
+          { name: "Emerald Coast Rental Management", url: "https://www.emeraldcoastrentalmanagement.com/owners", kind: "Long-term rentals", areas: "30A, Destin and Fort Walton Beach", note: "Destin office, open since 2019." },
+          { name: "Coastal Realty Services", url: "https://coastalrealtyservices.com/santa-rosa-beach-30A-property-management", kind: "Long-term rentals", areas: "Santa Rosa Beach and 30A, plus Okaloosa and Santa Rosa counties", note: "Fort Walton Beach firm with over 50 years in business." },
+        ],
+      },
+      {
+        heading: "Buying or selling on 30A",
+        body: [],
+        directory: [
+          { name: "The Gettings Group (Corcoran Reverie)", url: "https://gettingsgroup.com/", kind: "Real estate", areas: "30A, including Rosemary Beach, Watersound and Seacrest", note: "30A real estate team led by Josh Gettings." },
+        ],
+      },
+      {
+        heading: "If you do not rent it: home watch",
+        body: [
+          "Most second homes on 30A are never rented. They sit empty for weeks while the owners are home somewhere else, and a rental manager has nothing to manage. What those homes need is someone local walking through on a schedule: catching a leak, a tripped AC or storm damage in days instead of months.",
+          "That is what Coastal Home Management 30A does. Ryder Schilling owns and runs it from Watersound Origins, a few minutes from Rosemary and Alys. Every visit is a walkthrough inside and out, with photos and a written report emailed to you. Essential is every other week for $200 a month, Home Watch is weekly for $300, and Coastal Elite adds storm and freeze checks, arrival prep and contractor coordination for $600. No long contract, and the first home check is free.",
+        ],
+      },
+      {
+        heading: "What to ask any manager before you sign",
+        body: [],
+        list: [
+          "How often does someone physically walk the house, including weeks with no guests?",
+          "Do I get photos, and after which visits?",
+          "Who closes shutters and brings in furniture before a named storm, and does that cost extra?",
+          "What is the fee, and what is charged on top of it (cleaning, maintenance markup, linens)?",
+          "How long is the contract, and what does it cost to leave?",
+          "Who is my one local contact, and how fast do they answer?",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        q: "Who are the property managers on 30A?",
+        a: "For vacation rentals: 360 Blue, Oversee, Rosemary Beach's on-site program, Alys Beach's own rental program, 30A Beach Properties, and Homeowner's Collection in Seaside. For long-term rentals: Florida Long Term Rentals, Emerald Coast Rental Management and Coastal Realty Services. For homes that are not rented, home watch companies such as Coastal Home Management 30A look after the house instead.",
+      },
+      {
+        q: "How much does vacation rental management cost on 30A?",
+        a: "Most 30A rental managers quote privately, usually as a share of rental income. Oversee is one of the few that publishes its fee and a 30-day contract on its owner page. Ask every manager what is charged on top of the headline fee.",
+      },
+      {
+        q: "Do I need a property manager if I do not rent my 30A home?",
+        a: "Usually not. A home that is not rented needs regular walkthroughs, storm prep and someone local with a key. That is home watch, which on 30A runs from about $100 to $600 a month depending on how often someone visits.",
+      },
+      {
+        q: "Does Coastal Home Management 30A manage vacation rentals?",
+        a: "No. Coastal Home Management 30A is a home watch and second-home care company for homes that are not rented. For rentals, call one of the managers listed on this page.",
+      },
+      {
+        q: "Did any company pay to be on this list?",
+        a: "No. Every company here was checked against its own website in September 2026, and none paid to be listed.",
+      },
+    ],
+    cta: {
+      heading: "Not renting it? Start with a free home check.",
+      body: "Ryder walks the house and emails you photos and a written condition report. You do not need to be in town.",
+      href: "/pricing",
+      label: "See the plans",
+    },
+    related: [
+      { href: "/home-watch-vs-property-management-30a", label: "Home watch vs property management on 30A" },
+      { href: "/choosing-a-home-watch-company-30a", label: "How to choose a home watch company on 30A" },
+      { href: "/closing-your-30a-home-checklist", label: "Closing up your 30A home: the checklist" },
+    ],
+    mentionsInsurance: false,
+    datePublished: "2026-09-28",
+    dateModified: "2026-09-28",
   },
 ];
 
