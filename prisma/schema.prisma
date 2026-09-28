@@ -197,6 +197,13 @@ model Client {
   dealAmount       Decimal?       @db.Decimal(10, 2)
   dealPer          String?
   dealMonths       Int?
+  /// Who set the deal: "square" (auto from the first paid payment, refreshed
+  /// on every sync) or "manual" (the Bought button, never overwritten).
+  dealSource       String?
+  /// Set when Ryder links this lead to the client who actually paid (bought
+  /// under a different email or phone). The lead row is then a shell: its
+  /// attribution moved to that client and /ads skips it so nothing counts twice.
+  mergedIntoId     String?
   lostAt           DateTime?
   lostReason       String?
   /// Follow-up email control. optOut is permanent (unsubscribe link or Ryder).
