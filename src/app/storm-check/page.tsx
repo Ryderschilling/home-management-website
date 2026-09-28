@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 const BEFORE = [
   "Bring in or tie down patio furniture, grills, planters and anything the wind can move",
-  "Close storm shutters if the home has them",
+  "Close storm shutters if the home has them: roll-down, accordion, Bermuda or bolt-on panels",
   "Confirm doors, windows and the garage are shut and latched",
   "Photograph the outside of the home, so you have a dated before picture",
 ];
@@ -209,6 +209,10 @@ export default function StormCheckPage() {
               </div>
             ))}
           </div>
+          <p className="mt-8 text-[14.5px] leading-[1.75] text-[var(--ch-muted)]">
+            Not sure what your shutters need before the season?{" "}
+            <Link href="/storm-shutters-30a" className="underline underline-offset-4">Read the storm shutter guide</Link>.
+          </p>
           <LegalDisclaimer variant="inline" />
         </div>
       </section>

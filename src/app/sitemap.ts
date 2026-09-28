@@ -2,6 +2,7 @@
 import { MetadataRoute } from "next";
 import { allBlogPosts } from "@/data/blogPosts";
 import { allTownPages } from "@/data/townPages";
+import { allGuidePages } from "@/data/guidePages";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://coastalhomemngt30a.com";
@@ -36,6 +37,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     })),
   ];
+
+  const guideUrls: MetadataRoute.Sitemap = allGuidePages.map((g) => ({
+    url: `${baseUrl}/${g.slug}`,
+    lastModified: new Date(g.dateModified),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }));
 
   return [
     {
@@ -153,6 +161,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
     ...townUrls,
+    ...guideUrls,
     ...blogUrls,
   ];
 }

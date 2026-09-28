@@ -1,0 +1,17 @@
+import type { Metadata } from "next";
+import GuidePage from "@/components/GuidePage";
+import { getGuidePage } from "@/data/guidePages";
+
+const page = getGuidePage("ac-humidity-settings-30a-second-home");
+const url = `https://coastalhomemngt30a.com/${page.slug}`;
+
+export const metadata: Metadata = {
+  title: page.metaTitle,
+  description: page.metaDescription,
+  alternates: { canonical: url },
+  openGraph: { title: page.metaTitle, description: page.metaDescription, url, type: "article" },
+};
+
+export default function Page() {
+  return <GuidePage page={page} />;
+}

@@ -13,6 +13,7 @@ import { siteData, offerings, businessContact, trustStats } from "@/data/siteDat
 import { allServicePages } from "@/data/servicePages";
 import { allBlogPosts } from "@/data/blogPosts";
 import { allTownPages } from "@/data/townPages";
+import { allGuidePages } from "@/data/guidePages";
 
 const BASE_URL = "https://coastalhomemngt30a.com";
 
@@ -99,6 +100,13 @@ function buildLlmsTxt(): string {
     lines.push(`- [${page.title}](${BASE_URL}/${page.slug}): ${page.metaDescription}`);
   }
   lines.push("");
+
+  lines.push("## Owner Guides (answer first)");
+  for (const g of allGuidePages) {
+    lines.push(`### ${g.title}`);
+    lines.push(`${g.directAnswer} Source: ${BASE_URL}/${g.slug}`);
+    lines.push("");
+  }
 
   lines.push("## Guides & Answers");
   for (const post of allBlogPosts) {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LegalDisclaimer from "./LegalDisclaimer";
+import BhwcBadge from "./BhwcBadge";
 import {
   siteData,
   businessContact,
@@ -35,6 +36,10 @@ const COMPANY: Array<[string, string]> = [
   ["/storm-check", "Storm Check"],
   ["/blog", "Journal"],
   ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
+  ["/home-watch-vs-property-management-30a", "Home Watch vs Property Management"],
+  ["/closing-your-30a-home-checklist", "Closing Up Your 30A Home"],
+  ["/ac-humidity-settings-30a-second-home", "AC & Humidity Settings"],
+  ["/storm-shutters-30a", "Storm Shutters While You're Away"],
   ["/privacy-policy", "Privacy Policy"],
 ];
 
@@ -129,17 +134,9 @@ export default function SiteFooter() {
               <br />
               {trustStats.ratingValue} on Google ({trustStats.reviewCount} reviews)
               <br />
-              <a
-                href={businessContact.bhwcUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors duration-300 hover:text-[var(--ch-teal-bright)]"
-              >
-                {businessContact.bhwcRanking} on BestHomeWatchCompanies.com
-              </a>
-              <br />
               Insured Florida LLC, formed 2025
             </p>
+            <BhwcBadge variant="dark" className="mt-5" />
           </div>
         </div>
 
