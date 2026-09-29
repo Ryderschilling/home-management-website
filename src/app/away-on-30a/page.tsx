@@ -36,7 +36,7 @@ const REASONS = [
   {
     k: "Why it works",
     t: "You see every visit, not a promise.",
-    b: `Dated photos after every walkthrough. ${trustStats.activeHomes} homes on 30A already do it this way, rated ${trustStats.ratingValue} on Google. Love your first month or it's free.`,
+    b: `Dated photos after every walkthrough. ${trustStats.activeHomes} homes on 30A already do it this way, rated 5 stars on Google. Love your first month or it's free.`,
   },
   {
     k: "How fast",
@@ -51,7 +51,7 @@ const REASONS = [
 ];
 
 const STATS = [
-  [trustStats.ratingValue, `on Google, ${trustStats.reviewCount} reviews`],
+  ["5-star", "on Google"],
   [trustStats.activeHomes, "30A homes cared for"],
   [trustStats.propertiesManaged, "in property looked after"],
   ["Same day", "photo report, every visit"],

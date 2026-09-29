@@ -41,7 +41,7 @@ type Stat = {
 };
 
 const STATS: Stat[] = [
-  { value: "$10M+", count: 10, prefix: "$", suffix: "M+", decimals: 0, label: "In property under care" },
+  { value: "$20M+", count: 20, prefix: "$", suffix: "M+", decimals: 0, label: "In property under care" },
   { value: "15+", count: 15, prefix: "", suffix: "+", decimals: 0, label: "Active client homes" },
   { value: "5.0", count: 5, prefix: "", suffix: "", decimals: 1, label: "Rating on Google" },
   { value: "100%", count: 100, prefix: "", suffix: "%", decimals: 0, label: "Visits photographed" },
@@ -219,7 +219,7 @@ export default function HomePage() {
               I&apos;m Ryder Schilling. I started CHM because my neighbors needed someone they
               could actually trust, not a company, a person. I&apos;m here full-time, I know the
               streets, and I&apos;m the one who shows up to your house. Today I look after more
-              than $10 million in second-home real estate across Watersound Origins, Alys, Rosemary,
+              than $20 million in second-home real estate across Watersound Origins, Alys, Rosemary,
               and scenic 30A. Fully insured. Every visit, every time.
             </p>
             <div className="reveal-item mt-9 flex flex-wrap items-center gap-6">
@@ -559,7 +559,7 @@ export default function HomePage() {
               </p>
 
               <ul className="about-list">
-                <li>$10M+ in second-home real estate under care</li>
+                <li>$20M+ in second-home real estate under care</li>
                 <li>I live in the neighborhood, not an office</li>
                 <li>Photo report after every single visit</li>
                 <li>Insured Florida LLC, formed 2025</li>
@@ -665,7 +665,7 @@ export default function HomePage() {
             name: "Coastal Home Management 30A",
             hasMap: "https://www.google.com/maps?cid=1620304355006096316",
             description:
-              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida. Actively manages more than $10 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
+              "Coastal Home Management 30A provides second home management and home watch services for second-home owners in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida. Actively manages more than $20 million in second home real estate across 15+ active client properties. Services include weekly property checks, photo documentation, mail handling, arrival prep, contractor coordination, and on-call concierge tasks. Rated 5.0 on Google. Founded 2025, fully insured Florida LLC.",
             sameAs: [
               "https://www.google.com/maps?cid=1620304355006096316",
               "https://www.facebook.com/profile.php?id=61575773416368",
@@ -851,7 +851,7 @@ export default function HomePage() {
                 name: "Who manages second homes in Watersound Origins Florida?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch visits, mail handling, storm prep, HVAC checks, and concierge services. Currently managing over $10 million in second home real estate across Watersound Origins and Inlet Beach.",
+                  text: "Coastal Home Management 30A manages second homes in Watersound Origins, Florida. Owner Ryder Schilling lives in the community and provides personal, high-trust property care including home watch visits, mail handling, storm prep, HVAC checks, and concierge services. Currently managing over $20 million in second home real estate across Watersound Origins and Inlet Beach.",
                 },
               },
               {

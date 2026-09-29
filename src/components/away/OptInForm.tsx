@@ -76,7 +76,7 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
         <p className={`mt-3 text-[13px] ${dark ? "text-white" : "text-[var(--ch-ink)]"}`} role="alert">{error}</p>
       ) : (
         <p className={`mt-3 text-[12.5px] ${dark ? "text-white/60" : "text-[var(--ch-soft)]"}`}>
-          Free, no commitment. No spam, just Ryder.
+          Free, no commitment. No spam.
         </p>
       )}
     </form>

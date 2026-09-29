@@ -19,7 +19,10 @@ export async function sendOptInEmail(email: string): Promise<boolean> {
 
   const subject = "Thanks for reaching out about your 30A home";
   const html = `<div style="font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;max-width:540px;margin:0 auto;padding:34px 30px;background:#ffffff;border-top:3px solid #0d7f79;color:#0a0a0a;">
-  <p style="margin:0 0 22px;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#96969e;">Coastal Home Management 30A</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr>
+    <td style="vertical-align:middle;padding-right:12px;"><img src="${SITE()}/chm-logo-email.png" width="40" height="40" alt="CHM" style="display:block;border:0;border-radius:4px;" /></td>
+    <td style="vertical-align:middle;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#56565c;">Coastal Home Management 30A</td>
+  </tr></table>
   <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">Hey, this is Ryder. Thanks for reaching out about your home on 30A. I'll be in touch.</p>
   <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">In the meantime, here's <a href="${services}" style="color:#0d7f79;">what we do for 30A homes</a>, and a <a href="${report}" style="color:#0d7f79;">real visit report</a> so you can see exactly what owners get after every walkthrough.</p>
   <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">If you have a question before then, just reply to this email.</p>

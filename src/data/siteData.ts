@@ -23,7 +23,7 @@ export const trustStats = {
   ratingValue: "5.0",
   bestRating: "5",
   reviewCount: "9",
-  propertiesManaged: "$10 million+",
+  propertiesManaged: "$20 million+",
   activeHomes: "15+",
 };
 

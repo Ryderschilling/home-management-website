@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { primaryPhone } from "@/data/siteData";
+import InfoForm from "@/components/away/InfoForm";
 
 // Away on 30A, page 2 of 2 (simplified 9/28/26). Reached after the email
 // opt-in. "Ryder will be in touch", then a look at what we do for a house.
-// Never promise a call. No forms here: the lead is already in CHM Ops, and the
-// follow-up emails take it from there if Ryder has not reached them yet.
+// Never promise a call. The short home-info form is optional and updates the
+// same lead in CHM Ops (matched on email). Never ask for codes.
 
 export const metadata: Metadata = {
   title: "You're In",
@@ -29,10 +30,14 @@ export default function AwayNextPage() {
       <section className="px-4 pt-28 pb-14 md:px-8 md:pt-36 md:pb-20">
         <div className="mx-auto max-w-[860px] text-center">
           <p className="ch-eyebrow ch-eyebrow--center">You&apos;re in</p>
-          <h1 className="ch-display mx-auto mb-6 max-w-[16ch]">Thanks. Ryder will be in touch.</h1>
+          <h1 className="ch-display mx-auto mb-3" style={{ fontSize: "clamp(64px, 14vw, 132px)", lineHeight: 0.95 }}>Thanks.</h1>
+          <p className="mx-auto mb-6 text-[var(--ch-ink)]" style={{ fontSize: "clamp(22px, 4vw, 32px)", lineHeight: 1.25 }}>Ryder will be in touch.</p>
           <p className="ch-lede mx-auto max-w-[46ch]">
-            A quick email is on its way to you now. In the meantime, here&apos;s what we do for 30A homes.
+            A quick email is on its way to you now. Want to save a step? Tell us a little about your home.
           </p>
+          <div className="mx-auto mt-10 max-w-[680px]">
+            <InfoForm />
+          </div>
         </div>
       </section>
 
