@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import OptInForm from "@/components/away/OptInForm";
-import { trustStats } from "@/data/siteData";
+import { trustStats, testimonials, siteData } from "@/data/siteData";
 
 // Away on 30A, page 1 of 2 (simplified 9/28/26 at Ryder's direction).
 // Headline, the pool photo, one email box, then the reasons, then the footer.
@@ -31,7 +31,7 @@ const REASONS = [
   {
     k: "What you get",
     t: "Walk in to exactly how you left it.",
-    b: "Your house gets walked inside and out every two weeks. Leaks, AC trouble, storm damage and packages on the porch get caught while they are still small.",
+    b: "Your house gets walked inside and out on the schedule you pick. Leaks, AC trouble, storm damage and packages on the porch get caught while they are still small.",
   },
   {
     k: "Why it works",
@@ -86,6 +86,46 @@ export default function AwayOn30APage() {
         </div>
       </section>
 
+      {/* ── Social proof: the three live Google reviews ─────────────────── */}
+      {/* Quotes come from testimonials in siteData (the GBP reviews). Never edit them here. */}
+      <section className="border-t border-[var(--ch-hairline)] bg-[var(--ch-paper)] px-4 py-20 md:px-8 md:py-24">
+        <div className="mx-auto max-w-[1240px]">
+          <div className="mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="ch-eyebrow">From our clients</p>
+              <h2 className="ch-display ch-display--sm max-w-[20ch]">Don&apos;t just listen to us. Hear what our clients have to say.</h2>
+            </div>
+            <a
+              href={siteData.gbpMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center gap-4 self-start border border-[var(--ch-hairline-2)] bg-[var(--ch-paper)] px-5 py-4 md:self-auto"
+              aria-label={`Rated ${trustStats.ratingValue} out of 5 on Google`}
+            >
+              <span className="text-[34px] leading-none tracking-[-0.02em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 110, 'wght' 650" }}>
+                {trustStats.ratingValue}
+              </span>
+              <span className="flex flex-col gap-1.5">
+                <ReviewStars size={15} />
+                <span className="text-[13px] text-[var(--ch-muted)]">5-star rated on Google</span>
+              </span>
+            </a>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {testimonials.map((t) => (
+              <figure key={t.author} className="flex flex-col border border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] p-7 md:p-8">
+                <ReviewStars size={13} />
+                <blockquote className="mt-5 flex-1 text-[16px] leading-[1.6] tracking-[-0.01em] text-[var(--ch-ink)]">&ldquo;{t.body}&rdquo;</blockquote>
+                <figcaption className="mt-6 border-t border-[var(--ch-hairline)] pt-4">
+                  <p className="text-[14px] font-semibold text-[var(--ch-ink)]">{t.author}</p>
+                  <p className="text-[13px] text-[var(--ch-muted)]">Google review</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Why owners use us ──────────────────────────────────────────── */}
       <section className="border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-[1240px]">
@@ -124,5 +164,17 @@ export default function AwayOn30APage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function ReviewStars({ size }: { size: number }) {
+  return (
+    <span className="flex gap-[3px]" aria-hidden="true">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <svg key={i} width={size} height={size} viewBox="0 0 12 12" fill="var(--ch-teal)">
+          <path d="M6 0l1.6 3.9L12 4.4 8.8 7.2l1 4.4L6 9.3 2.2 11.6l1-4.4L0 4.4l4.4-.5z" />
+        </svg>
+      ))}
+    </span>
   );
 }
