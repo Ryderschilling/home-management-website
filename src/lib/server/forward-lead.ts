@@ -21,7 +21,20 @@ type LeadPayload = {
   intent?: "buy";
 };
 
-export async function forwardLeadToDashboard(p: LeadPayload): Promise<void> {
+export type ForwardResult = {
+  ok: boolean;
+  /** CHM Ops made a brand-new person (false = matched someone already there). */
+  created?: boolean;
+  clientId?: string;
+  error?: string;
+};
+
+/**
+ * Two tries (9/29/26 audit): a Neon cold start or a slow deploy used to lose
+ * the lead silently. Now the caller learns whether it landed, so it can warn
+ * Ryder by email with the lead's details when it did not.
+ */
+export async function forwardLeadToDashboard(p: LeadPayload): Promise<ForwardResult> {
   const url = process.env.DASHBOARD_INTAKE_URL;
   const secret = process.env.INTAKE_SECRET;
   // Which ad / search / post brought this person, from the tracker cookie.
@@ -32,15 +45,30 @@ export async function forwardLeadToDashboard(p: LeadPayload): Promise<void> {
       .create({ data: { visitorId: attribution.visitorId, type: "lead", path, label: p.eventLabel ?? null, utmSource: attribution.utmSource ?? null, utmCampaign: attribution.utmCampaign ?? null, utmContent: attribution.utmContent ?? null, metaAdId: attribution.metaAdId && /^\d+$/.test(attribution.metaAdId) ? attribution.metaAdId : null } })
       .catch(() => {});
   }
-  if (!url || !secret) return; // not configured yet, skip silently
-  try {
-    await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-intake-secret": secret },
-      body: JSON.stringify({ ...p, eventLabel: undefined, attribution }),
-      signal: AbortSignal.timeout(4000),
-    });
-  } catch {
-    // swallow: the lead email already went out, dashboard sync is a bonus
+  if (!url || !secret) {
+    console.error("[forward-lead] DASHBOARD_INTAKE_URL or INTAKE_SECRET missing");
+    return { ok: false, error: "DASHBOARD_INTAKE_URL or INTAKE_SECRET is not set on Vercel" };
   }
+  const body = JSON.stringify({ ...p, eventLabel: undefined, attribution });
+  let lastError = "";
+  for (const [i, ms] of [7000, 9000].entries()) {
+    if (i > 0) await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-intake-secret": secret },
+        body,
+        signal: AbortSignal.timeout(ms),
+      });
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; created?: boolean; clientId?: string; error?: string };
+      if (res.ok && data.ok !== false) return { ok: true, created: data.created === true, clientId: data.clientId };
+      lastError = `CHM Ops answered ${res.status}${data.error ? `: ${data.error}` : ""}`;
+      // A 4xx will not fix itself on a retry.
+      if (res.status >= 400 && res.status < 500) break;
+    } catch (err) {
+      lastError = err instanceof Error ? err.message : String(err);
+    }
+  }
+  console.error("[forward-lead] lead did not reach CHM Ops:", lastError);
+  return { ok: false, error: lastError };
 }

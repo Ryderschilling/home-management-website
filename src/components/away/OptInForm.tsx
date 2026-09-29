@@ -41,7 +41,8 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
         setError(data?.error?.message || "That did not go through. Try again.");
         return;
       }
-      fireConversion("optin", eventId);
+      // The server says whether this is a NEW person; a repeat is not a new Lead for Meta.
+      if (data?.fire !== false) fireConversion("optin", eventId);
       rememberEmail(clean);
       router.push("/away-on-30a/next");
     } catch {

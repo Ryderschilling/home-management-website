@@ -2,38 +2,60 @@ import { NextRequest, NextResponse } from "next/server";
 import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 import { sendOptInEmail } from "@/lib/server/optin-email";
 import { sendCapiEvent } from "@/lib/server/metaCapi";
+import { readAttribution, isPaidTouch } from "@/lib/server/attribution";
+import { sendLeadAlert } from "@/lib/server/lead-alert";
+import { hit } from "@/lib/portal/rateLimit";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 /**
  * POST /api/away/optin  -  page 1 of the Away on 30A funnel.
  * Email only. Lands in CHM Ops as a NEW lead (with the ad that brought them,
- * from the tracker cookie), and they get a short thank-you email. NEW is
- * exactly the audience the follow-up sequence works, so if they never take
- * the next step the emails pick them up.
+ * from the tracker cookie), they get a short thank-you email, and Ryder gets
+ * a heads-up (which doubles as the backup record if CHM Ops did not take it).
+ *
+ * Meta only hears "Lead" for a NEW person (9/29/26 audit): a repeat opt-in or
+ * a bot must never teach the ad set what a lead looks like. The response's
+ * `fire` flag tells the browser pixel the same thing, so both sides agree.
  */
+const META_SRC = /^(meta|facebook|fb|instagram|ig|an|msg)$/i;
+
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-    if (typeof body.company === "string" && body.company.trim()) return NextResponse.json({ ok: true }); // honeypot
+    if (typeof body.company === "string" && body.company.trim()) return NextResponse.json({ ok: true, fire: false }); // honeypot
     const email = (typeof body.email === "string" ? body.email : "").trim().toLowerCase().slice(0, 160);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
       return NextResponse.json({ ok: false, error: { message: "Add a real email so Ryder can reach you." } }, { status: 400 });
     }
-    const cookie = req.cookies.get("chm_attr")?.value ?? "";
-    const fromAd = /utmSource%22%3A%22(meta|facebook|fb|instagram|ig)|metaAdId/i.test(cookie);
 
-    await Promise.allSettled([
+    // Bots posting straight to this route: a handful per IP per hour is plenty
+    // for a human. Over the limit looks like success, so nothing is learned.
+    const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+    const limit = await hit(`optin:${ip}`, 8, 60).catch(() => ({ ok: true }));
+    if (!limit.ok) return NextResponse.json({ ok: true, fire: false });
+
+    const { attribution } = await readAttribution();
+    const fromAd = !!attribution && (!!attribution.metaAdId || (META_SRC.test(attribution.utmSource || "") && isPaidTouch(attribution as Record<string, string | undefined>)));
+
+    const [result] = await Promise.all([
       forwardLeadToDashboard({
         email,
         source: fromAd ? "Meta ads /away-on-30a opt-in" : "Website /away-on-30a opt-in",
         message: "Owns a home on 30A, wants to know more about our services.",
         eventLabel: "optin",
       }),
-      sendOptInEmail(email),
-      sendCapiEvent({ eventName: "Lead", eventId: typeof body.eventId === "string" ? body.eventId.slice(0, 64) : null, email }),
+      sendOptInEmail(email).catch(() => false),
     ]);
-    return NextResponse.json({ ok: true });
+
+    // Not saved = we cannot tell new from repeat, so count it (Ryder is warned by email).
+    const isNew = !result.ok || result.created === true;
+    await Promise.allSettled([
+      sendLeadAlert({ funnel: fromAd ? "Away on 30A opt-in, from a Meta ad" : "Away on 30A opt-in", email, attribution, result }),
+      isNew ? sendCapiEvent({ eventName: "Lead", eventId: typeof body.eventId === "string" ? body.eventId.slice(0, 64) : null, email }) : Promise.resolve(),
+    ]);
+    return NextResponse.json({ ok: true, fire: isNew });
   } catch (err) {
     console.error("[away/optin] failed:", err);
     return NextResponse.json({ ok: false, error: { message: "That did not go through. Try again." } }, { status: 500 });

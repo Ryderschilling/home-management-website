@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { cookies, headers } from "next/headers";
+import { parseAttrCookie } from "./attribution";
 
 /**
  * Meta Conversions API, server side (added 9/28/26).
@@ -43,10 +44,11 @@ export async function sendCapiEvent(opts: {
     // rebuild it from the fbclid our own tracker saved on first touch.
     let fbc = jar.get("_fbc")?.value;
     if (!fbc) {
-      try {
-        const a = JSON.parse(decodeURIComponent(jar.get("chm_attr")?.value || "{}")) as { ft?: { fbclid?: string; at?: string } };
-        if (a.ft?.fbclid) fbc = `fb.1.${Date.parse(a.ft.at || "") || Date.now()}.${a.ft.fbclid}`;
-      } catch {}
+      // The latest click wins here (that is how Meta's own _fbc works), so a
+      // Meta click after an organic first visit still matches.
+      const a = parseAttrCookie(jar.get("chm_attr")?.value);
+      const t = a?.lt?.fbclid ? a.lt : a?.ft?.fbclid ? a.ft : null;
+      if (t?.fbclid) fbc = `fb.1.${Date.parse(t.at || "") || Date.now()}.${t.fbclid}`;
     }
 
     const user_data: Record<string, unknown> = {

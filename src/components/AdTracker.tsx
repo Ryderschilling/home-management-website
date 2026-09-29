@@ -96,6 +96,10 @@ function touchFromUrl(): Touch | null {
     gclid: cut(p.get("gclid"), 300),
     metaAdId: cut(p.get("aid") || p.get("ad_id"), 40),
   };
+  // Ad links that carry the ad id in utm_content={{ad.id}} instead of ad_id.
+  if (!t.metaAdId && /^(meta|facebook|fb|instagram|ig)$/i.test(t.utmSource || "") && /^\d{6,}$/.test(t.utmContent || "")) {
+    t.metaAdId = t.utmContent;
+  }
   const any = Object.values(t).some(Boolean) || !!ref;
   if (!any) return null;
   return { ...t, referrer: cut(ref, 300), landingPage: cut(location.pathname, 200), at: new Date().toISOString() };

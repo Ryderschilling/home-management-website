@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
+import { sendCapiEvent } from "@/lib/server/metaCapi";
 
 export const runtime = "nodejs";
 
@@ -59,6 +60,11 @@ export async function POST(req: NextRequest) {
         eventLabel: "info",
       }),
     ];
+
+    // Page 2 hands Meta the name and phone too (9/29/26 audit): better match
+    // quality for this lead and for the Purchase CHM Ops sends when they pay.
+    // "Contact", never a second "Lead", so the ad set's lead count stays honest.
+    tasks.push(sendCapiEvent({ eventName: "Contact", email, phone: phone || null, firstName: name.split(/\s+/)[0] || null }));
 
     const apiKey = process.env.RESEND_API_KEY;
     const from = process.env.FROM_EMAIL;
