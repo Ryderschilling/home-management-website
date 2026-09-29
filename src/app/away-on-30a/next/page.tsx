@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { primaryPhone } from "@/data/siteData";
 import InfoForm from "@/components/away/InfoForm";
+import { PlanCards } from "@/components/pricing/PlanCards";
 
 // Away on 30A, page 2 of 2 (simplified 9/28/26). Reached after the email
 // opt-in. "Ryder will be in touch", then a look at what we do for a house.
@@ -39,6 +40,14 @@ export default function AwayNextPage() {
             <InfoForm />
           </div>
         </div>
+      </section>
+
+      <section className="border-t border-[var(--ch-hairline)] bg-[#f2faf9] pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="mx-auto mb-10 max-w-[760px] px-4 text-center">
+          <p className="ch-eyebrow ch-eyebrow--center">Plans</p>
+          <h2 className="ch-display ch-display--sm">Simple monthly plans. No contracts.</h2>
+        </div>
+        <PlanCards />
       </section>
 
       <section className="border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-16 md:px-8 md:py-24">
