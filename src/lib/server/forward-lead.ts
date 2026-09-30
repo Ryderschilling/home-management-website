@@ -26,6 +26,8 @@ export type ForwardResult = {
   /** CHM Ops made a brand-new person (false = matched someone already there). */
   created?: boolean;
   clientId?: string;
+  /** CHM Ops sent the welcome email from Gmail (lead inbox). Do not send the site's copy. */
+  welcomeSent?: boolean;
   error?: string;
 };
 
@@ -49,7 +51,9 @@ export async function forwardLeadToDashboard(p: LeadPayload): Promise<ForwardRes
     console.error("[forward-lead] DASHBOARD_INTAKE_URL or INTAKE_SECRET missing");
     return { ok: false, error: "DASHBOARD_INTAKE_URL or INTAKE_SECRET is not set on Vercel" };
   }
-  const body = JSON.stringify({ ...p, eventLabel: undefined, attribution });
+  // `step` tells CHM Ops which funnel step this was, so its lead inbox can
+  // send the welcome from Gmail (optin) or draft a reply (info).
+  const body = JSON.stringify({ ...p, eventLabel: undefined, step: p.eventLabel ?? null, attribution });
   let lastError = "";
   for (const [i, ms] of [7000, 9000].entries()) {
     if (i > 0) await new Promise((r) => setTimeout(r, 1500));
@@ -60,8 +64,8 @@ export async function forwardLeadToDashboard(p: LeadPayload): Promise<ForwardRes
         body,
         signal: AbortSignal.timeout(ms),
       });
-      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; created?: boolean; clientId?: string; error?: string };
-      if (res.ok && data.ok !== false) return { ok: true, created: data.created === true, clientId: data.clientId };
+      const data = (await res.json().catch(() => ({}))) as { ok?: boolean; created?: boolean; clientId?: string; welcomeSent?: boolean; error?: string };
+      if (res.ok && data.ok !== false) return { ok: true, created: data.created === true, clientId: data.clientId, welcomeSent: data.welcomeSent === true };
       lastError = `CHM Ops answered ${res.status}${data.error ? `: ${data.error}` : ""}`;
       // A 4xx will not fix itself on a retry.
       if (res.status >= 400 && res.status < 500) break;

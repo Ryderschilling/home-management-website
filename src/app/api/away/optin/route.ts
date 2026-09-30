@@ -14,6 +14,8 @@ export const maxDuration = 30;
  * Email only. Lands in CHM Ops as a NEW lead (with the ad that brought them,
  * from the tracker cookie), they get a short thank-you email, and Ryder gets
  * a heads-up (which doubles as the backup record if CHM Ops did not take it).
+ * The thank-you email now comes from CHM Ops through Gmail (lead inbox); this
+ * route only sends its own Resend copy as a fallback.
  *
  * Meta only hears "Lead" for a NEW person (9/29/26 audit): a repeat opt-in or
  * a bot must never teach the ad set what a lead looks like. The response's
@@ -39,15 +41,15 @@ export async function POST(req: NextRequest) {
     const { attribution } = await readAttribution();
     const fromAd = !!attribution && (!!attribution.metaAdId || (META_SRC.test(attribution.utmSource || "") && isPaidTouch(attribution as Record<string, string | undefined>)));
 
-    const [result] = await Promise.all([
-      forwardLeadToDashboard({
-        email,
-        source: fromAd ? "Meta ads /away-on-30a opt-in" : "Website /away-on-30a opt-in",
-        message: "Owns a home on 30A, wants to know more about our services.",
-        eventLabel: "optin",
-      }),
-      sendOptInEmail(email).catch(() => false),
-    ]);
+    const result = await forwardLeadToDashboard({
+      email,
+      source: fromAd ? "Meta ads /away-on-30a opt-in" : "Website /away-on-30a opt-in",
+      message: "Owns a home on 30A, wants to know more about our services.",
+      eventLabel: "optin",
+    });
+    // CHM Ops sends the welcome from the CHM Gmail (same sender and thread as
+    // every later email). Only when it could not do we send the site's copy.
+    if (!result.welcomeSent) await sendOptInEmail(email).catch(() => false);
 
     // Not saved = we cannot tell new from repeat, so count it (Ryder is warned by email).
     const isNew = !result.ok || result.created === true;
