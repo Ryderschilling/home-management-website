@@ -146,14 +146,14 @@ export default function AppleMapsSection() {
         </div>
 
         {/* Phone */}
-        <div className="am-stage reveal-item relative mx-auto w-full max-w-[380px]">
+        <div className="am-stage reveal-item relative mx-auto w-full max-w-[330px]">
           <div className="am-glow" aria-hidden="true" />
           <div className="am-phone relative rounded-[46px] bg-[#0b0b0d] p-[10px] shadow-[var(--ch-shadow-lg)]">
             <div className="am-screen relative overflow-hidden rounded-[37px] bg-white">
-              <div className="relative h-[230px]">
+              <div className="relative h-[270px]">
                 <MapArt />
                 <div className="absolute left-1/2 top-[18px] h-[26px] w-[96px] -translate-x-1/2 rounded-full bg-[#0b0b0d]" />
-                <div className="am-pin absolute left-[49%] top-[86px] -translate-x-1/2">
+                <div className="am-pin absolute left-[49%] top-[104px] -translate-x-1/2">
                   <span className="am-pulse" aria-hidden="true" />
                   <svg width="38" height="46" viewBox="0 0 38 46" aria-hidden="true">
                     <path d="M19 45s15-14 15-26A15 15 0 0 0 4 19c0 12 15 26 15 26z" fill="#0d7f79" stroke="#fff" strokeWidth="2.5" />
@@ -196,7 +196,7 @@ export default function AppleMapsSection() {
                             {open ? "Open" : "Closed"}
                           </span>
                         )}
-                        <span className="text-black">Mon to Sat, 9 AM to 5 PM</span>
+                        <span className="text-black">Mon to Sat, 9 to 5</span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-3">
