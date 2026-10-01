@@ -71,6 +71,10 @@ export const businessContact = {
   // changes, change bhwcRanking here and nowhere else.
   bhwcUrl: "https://www.besthomewatchcompanies.com/companies/coastal-home-management-30a/",
   bhwcRanking: "#1 for home watch in Inlet Beach",
+  // Apple Maps place, verified through Apple Business 10/1/26. place-id only on
+  // purpose: Apple's share link carries the street address, which we keep off
+  // public listings where we can (9/28/26 decision).
+  appleMapsUrl: "https://maps.apple.com/place?place-id=I362814172E9A792A",
 };
 
 // ─── Phone / booking configuration ─────────────────────────────────────────

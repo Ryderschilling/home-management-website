@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { siteData, businessContact } from "@/data/siteData";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import AppleMapsSection from "@/components/AppleMapsSection";
 import LeadCapturePopup from "@/components/LeadCapturePopup";
 import ServiceAreaMapWrapper from "@/components/ServiceAreaMapWrapper";
 import ServiceTiles from "@/components/ServiceTiles";
@@ -425,6 +426,9 @@ export default function HomePage() {
       {/* ═══ TESTIMONIALS ══════════════════════════════════════════ */}
       <TestimonialsSection />
 
+      {/* ═══ VERIFIED ON APPLE MAPS ════════════════════════════════ */}
+      <AppleMapsSection />
+
       {/* ═══ FAQ ═══════════════════════════════════════════════════ */}
       <section id="faq" className="fade-section bg-[var(--ch-paper-alt)] px-4 py-24 md:px-8 md:py-32">
         <div className="mx-auto grid max-w-[1240px] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
@@ -675,6 +679,7 @@ export default function HomePage() {
               "https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl",
               "https://sourceatrade.com/contractors/coastal-home-management-30a-3",
               businessContact.bhwcUrl,
+              businessContact.appleMapsUrl,
             ],
             // aggregateRating and review live ONLY in layout.tsx. Printing them here
             // too gave this @id two ratings, which GSC flagged 9/5/26 as a critical
