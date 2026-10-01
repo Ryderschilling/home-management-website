@@ -9,6 +9,8 @@ export const runtime = "nodejs";
  * Always answers 204 fast; a tracking failure must never touch the visitor.
  */
 const TYPES = new Set(["pageview", "click", "scroll", "form_step", "lead"]);
+const BOTS =
+  /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|prerender|preview|facebookexternalhit|facebookcatalog|meta-externalagent|meta-externalfetcher|google-inspectiontool|python|curl|wget|axios|node-fetch|go-http|java\/|okhttp|phantom|puppeteer|playwright|selenium/i;
 const s = (v: unknown, n: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, n) : null);
 
 export async function POST(req: NextRequest) {
@@ -18,7 +20,11 @@ export async function POST(req: NextRequest) {
     const b = JSON.parse(raw) as Record<string, unknown>;
     const visitorId = s(b.v, 64);
     if (!visitorId || !/^[a-z0-9]+$/i.test(visitorId) || !Array.isArray(b.e)) return new NextResponse(null, { status: 204 });
-    if (/bot|crawl|spider|headless|lighthouse/i.test(req.headers.get("user-agent") || "")) return new NextResponse(null, { status: 204 });
+    // Crawlers, link previews, ad review and scripts. Real browsers always send a
+    // user agent and an accept-language header.
+    const ua = req.headers.get("user-agent") || "";
+    if (!ua || !req.headers.get("accept-language")) return new NextResponse(null, { status: 204 });
+    if (BOTS.test(ua)) return new NextResponse(null, { status: 204 });
 
     const aid = s(b.aid, 40);
     const shared = {

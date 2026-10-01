@@ -16,6 +16,15 @@ import { usePathname } from "next/navigation";
  *
  * Only runs on the real domain, never on /portal (logged-in clients), and
  * never on localhost or previews unless the URL has ?chm_debug=1.
+ *
+ * Accuracy rules (added 2026-10-01):
+ *   - a page view only counts once a human shows up: the first tap, scroll or
+ *     key press, or 2.5 seconds with the page actually on screen. Link-preview
+ *     bots and ad-review crawlers load the page and leave inside a second, so
+ *     they never count.
+ *   - opening any page with ?chm_internal=1 marks this browser as Ryder's own
+ *     and it is never tracked again (?chm_internal=0 undoes it).
+ *   - the same click twice within 1.5s (a double tap) counts once.
  */
 
 type Touch = {
@@ -35,6 +44,12 @@ const COOKIE = "chm_attr";
 const MAX_AGE = 60 * 60 * 24 * 180;
 
 function enabled(): boolean {
+  try {
+    const q = new URLSearchParams(location.search).get("chm_internal");
+    if (q === "1") localStorage.setItem("chm_internal", "1");
+    if (q === "0") localStorage.removeItem("chm_internal");
+    if (localStorage.getItem("chm_internal") === "1") return false;
+  } catch {}
   try {
     const h = location.hostname;
     if (/(^|\.)coastalhomemngt30a\.com$/.test(h)) return true;
@@ -115,6 +130,10 @@ export default function AdTracker() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const on = useRef(false);
   const scrolled = useRef<Set<string>>(new Set());
+  const human = useRef(false);
+  const pending = useRef<string | null>(null);
+  const viewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastClick = useRef<{ key: string; at: number } | null>(null);
 
   // One-time setup: identity, click listener, flush on hide.
   useEffect(() => {
@@ -152,11 +171,39 @@ export default function AdTracker() {
 
     window.chmTrack = (type, data) => push({ type, path: location.pathname, ...data });
 
+    // The page view waiting for proof that a person is here.
+    const sendPending = () => {
+      if (viewTimer.current) clearTimeout(viewTimer.current);
+      viewTimer.current = null;
+      const p = pending.current;
+      pending.current = null;
+      if (p) push({ type: "pageview", path: p });
+    };
+    const onHuman = () => {
+      human.current = true;
+      sendPending();
+    };
+    (window as unknown as { __chmArm?: () => void }).__chmArm = () => {
+      if (human.current) return sendPending();
+      if (viewTimer.current) clearTimeout(viewTimer.current);
+      const wait = () => {
+        viewTimer.current = setTimeout(() => {
+          if (document.visibilityState === "visible") sendPending();
+          else wait();
+        }, 2500);
+      };
+      wait();
+    };
+
     const onClick = (ev: MouseEvent) => {
       const el = (ev.target as Element | null)?.closest?.("a, button, [data-track]") as HTMLElement | null;
       if (!el || location.pathname.startsWith("/portal")) return;
       const label = (el.getAttribute("data-track") || el.getAttribute("aria-label") || el.innerText || "").replace(/\s+/g, " ").trim().slice(0, 80);
       const href = el.getAttribute("href") || (el.getAttribute("type") === "submit" ? "submit" : "");
+      const key = `${location.pathname}|${label}|${href}`;
+      const now = Date.now();
+      if (lastClick.current && lastClick.current.key === key && now - lastClick.current.at < 1500) return;
+      lastClick.current = { key, at: now };
       push({ type: "click", path: location.pathname, label: label || undefined, target: href ? href.slice(0, 200) : undefined });
     };
     const onScroll = () => {
@@ -174,14 +221,19 @@ export default function AdTracker() {
       if (document.visibilityState === "hidden") flush();
     };
 
+    const HUMAN = ["pointerdown", "touchstart", "keydown", "scroll", "wheel"] as const;
+    for (const t of HUMAN) addEventListener(t, onHuman, { passive: true, capture: true });
     document.addEventListener("click", onClick, true);
     addEventListener("scroll", onScroll, { passive: true });
     document.addEventListener("visibilitychange", onHide);
     return () => {
+      for (const t of HUMAN) removeEventListener(t, onHuman, { capture: true });
       document.removeEventListener("click", onClick, true);
       removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onHide);
+      if (viewTimer.current) clearTimeout(viewTimer.current);
       delete window.chmTrack;
+      delete (window as unknown as { __chmArm?: () => void }).__chmArm;
     };
   }, []);
 
@@ -197,7 +249,9 @@ export default function AdTracker() {
       a.lt = now;
     }
     writeAttr(a);
-    window.chmTrack?.("pageview");
+    // Counted only once a person is confirmed (see the accuracy rules above).
+    pending.current = location.pathname;
+    (window as unknown as { __chmArm?: () => void }).__chmArm?.();
   }, [pathname]);
 
   return null;
