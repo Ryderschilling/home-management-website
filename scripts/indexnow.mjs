@@ -22,7 +22,7 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 const HOST = "coastalhomemngt30a.com";
-const KEY = "6dafbf031c2c24f480568204ecb5aaa5";
+const KEY = "4602d0e25a924585079e3c7d1e74acbf";
 const ORIGIN = `https://${HOST}`;
 const ENDPOINT = "https://api.indexnow.org/indexnow";
 
