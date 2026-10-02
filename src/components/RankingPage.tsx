@@ -122,7 +122,7 @@ export default function RankingPage({ data }: { data: MonthlyRanking }) {
             <li
               key={c.name}
               id={`rank-${c.rank}`}
-              className={`relative grid gap-6 border p-6 md:grid-cols-[110px_1fr] md:p-9 ${
+              className={`relative grid gap-6 border p-6 md:grid-cols-[150px_1fr] md:p-9 ${
                 c.isUs
                   ? "border-[var(--ch-teal)] bg-[var(--ch-paper-alt)] shadow-[0_30px_80px_-50px_rgba(13,127,121,0.55)]"
                   : "border-[var(--ch-hairline)] bg-[var(--ch-paper)]"
