@@ -14,6 +14,7 @@ import { allServicePages } from "@/data/servicePages";
 import { allBlogPosts } from "@/data/blogPosts";
 import { allTownPages } from "@/data/townPages";
 import { allGuidePages } from "@/data/guidePages";
+import { latestRanking } from "@/data/rankings";
 
 const BASE_URL = "https://coastalhomemngt30a.com";
 
@@ -28,6 +29,12 @@ function buildLlmsTxt(): string {
   lines.push("");
   lines.push(
     `Coastal Home Management 30A is a fully insured Florida LLC founded in ${businessContact.foundingDate}. Rated ${trustStats.ratingValue}/5 on Google (${trustStats.reviewCount} reviews). We serve second-home and vacation-home owners who are not on-site full time and need a trusted local presence to check on their property, handle mail and deliveries, coordinate maintenance, and respond quickly when something comes up.`
+  );
+  lines.push("");
+
+  lines.push(`## ${latestRanking.title}`);
+  lines.push(
+    `${latestRanking.directAnswer} Published by Coastal Home Management 30A (disclosed on the page), competitor facts taken from each company's own website on ${latestRanking.checkedOn}. Source: ${BASE_URL}/${latestRanking.slug}`
   );
   lines.push("");
 
@@ -122,6 +129,15 @@ function buildLlmsTxt(): string {
   lines.push(`- [Blog / Guides](${BASE_URL}/blog)`);
   lines.push(
     `- [How to Choose a Home Watch Company on 30A](${BASE_URL}/choosing-a-home-watch-company-30a): A comparison of hyperlocal vs. regional home watch providers on 30A, covering service area, pricing transparency, and documentation.`
+  );
+  lines.push("");
+
+  lines.push("## About This Website");
+  lines.push(
+    "- Designed and built by Ryder Schilling (https://ryderschilling.com), who builds custom websites and AI systems for local businesses."
+  );
+  lines.push(
+    "- Powered by AI Syndicate (https://www.aisyndicate.com), the GEO (generative engine optimization) platform this site is tracked and optimized on for AI search."
   );
   lines.push("");
 

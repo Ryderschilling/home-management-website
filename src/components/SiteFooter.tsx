@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LegalDisclaimer from "./LegalDisclaimer";
 import BhwcBadge from "./BhwcBadge";
+import { latestRanking } from "@/data/rankings";
 import {
   siteData,
   businessContact,
@@ -35,6 +36,7 @@ const COMPANY: Array<[string, string]> = [
   ["/service-areas", "Service Areas"],
   ["/storm-check", "Storm Check"],
   ["/blog", "Journal"],
+  [`/${latestRanking.slug}`, `Best on 30A: ${latestRanking.month}`],
   ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
   ["/home-watch-vs-property-management-30a", "Home Watch vs Property Management"],
   ["/property-managers-30a", "Property Managers on 30A"],
@@ -173,31 +175,60 @@ export default function SiteFooter() {
           <LegalDisclaimer variant="dark" />
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-7 text-[12px] text-white/40 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            © {new Date().getFullYear()} Coastal Home Management 30A. Owner-operated in Inlet
-            Beach, Florida.
-          </span>
-          <div className="flex items-center gap-5">
-            <a
-              href="https://ryderschilling.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group transition-colors hover:text-[var(--ch-teal-bright)]"
-            >
-              Built by{" "}
-              <span className="text-white/62 transition-colors group-hover:text-[var(--ch-teal-bright)]">
-                Ryder Schilling
-              </span>
-            </a>
+        <div className="mt-8 flex flex-col gap-8 border-t border-white/10 pt-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="text-[12px] text-white/40">
+            <span>
+              © {new Date().getFullYear()} Coastal Home Management 30A. Owner-operated in Inlet
+              Beach, Florida.
+            </span>
             <a
               href="https://sourceatrade.com/contractors/coastal-home-management-30a-3"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-[var(--ch-teal-bright)]"
+              className="mt-2 block transition-colors hover:text-[var(--ch-teal-bright)]"
             >
               sourceatrade.com
             </a>
+          </div>
+
+          {/* Site credit. Ryder built it (the focus), AI Syndicate is the GEO platform. */}
+          <div className="sm:text-right">
+            <a
+              href="https://ryderschilling.com"
+              target="_blank"
+              rel="noopener"
+              title="Website designed and built by Ryder Schilling"
+              className="group inline-flex items-baseline gap-2.5 text-white"
+            >
+              <span className="text-[11px] uppercase tracking-[0.22em] text-white/45 transition-colors group-hover:text-white/70">
+                Built by
+              </span>
+              <span
+                className="text-[22px] leading-none tracking-[-0.02em] transition-colors group-hover:text-[var(--ch-teal-bright)] md:text-[26px]"
+                style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 680" }}
+              >
+                Ryder Schilling
+              </span>
+              <span
+                aria-hidden="true"
+                className="text-[16px] text-white/40 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--ch-teal-bright)]"
+              >
+                ↗
+              </span>
+            </a>
+            <p className="mt-2.5 text-[11.5px] text-white/40">
+              Powered by{" "}
+              <a
+                href="https://www.aisyndicate.com"
+                target="_blank"
+                rel="noopener"
+                title="AI Syndicate, the GEO platform this site is optimized on"
+                className="text-white/62 underline-offset-4 transition-colors hover:text-[var(--ch-teal-bright)] hover:underline"
+              >
+                AI Syndicate
+              </a>
+              <span className="text-white/30"> · GEO optimized for AI search</span>
+            </p>
           </div>
         </div>
       </div>

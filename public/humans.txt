@@ -1,0 +1,13 @@
+/* TEAM */
+Built by: Ryder Schilling
+Site: https://ryderschilling.com
+From: 30A, Florida
+
+/* POWERED BY */
+AI Syndicate, GEO (generative engine optimization) platform
+Site: https://www.aisyndicate.com
+
+/* SITE */
+Business: Coastal Home Management 30A
+Standards: HTML5, CSS3, Schema.org JSON-LD, llms.txt
+Software: Next.js, TypeScript, Tailwind CSS, Vercel

@@ -103,6 +103,17 @@ export const metadata: Metadata = {
     shortcut: ["/icon.png?v=3"],
   },
 
+  // Site credits, read by crawlers and AI engines. Ryder built the site,
+  // AI Syndicate is the GEO platform it is tracked and optimized on.
+  creator: "Ryder Schilling",
+  publisher: "Coastal Home Management 30A",
+  other: {
+    designer: "Ryder Schilling, https://ryderschilling.com",
+    "built-by": "Ryder Schilling, https://ryderschilling.com",
+    "powered-by": "AI Syndicate, https://www.aisyndicate.com",
+    "geo-optimization": "AI Syndicate, https://www.aisyndicate.com",
+  },
+
   formatDetection: {
     telephone: false,
     date: false,
@@ -111,9 +122,47 @@ export const metadata: Metadata = {
   },
 };
 
+// Who built the site and what it runs on. Shared by the WebSite node below.
+const SITE_BUILDER = {
+  "@type": "Person",
+  "@id": "https://ryderschilling.com/#person",
+  name: "Ryder Schilling",
+  url: "https://ryderschilling.com",
+  jobTitle: "Web Designer and Developer",
+  description:
+    "Ryder Schilling designs and builds custom websites and AI systems for local businesses. He built coastalhomemngt30a.com.",
+  sameAs: [
+    "https://ryderschilling.com",
+    "https://www.linkedin.com/in/ryder-schilling-2160b3359/",
+    "https://www.instagram.com/ryder_schilling_official",
+  ],
+};
+
+const GEO_PLATFORM = {
+  "@type": "Organization",
+  "@id": "https://www.aisyndicate.com/#organization",
+  name: "AI Syndicate",
+  url: "https://www.aisyndicate.com",
+  description:
+    "AI Syndicate is a GEO (generative engine optimization) platform that tracks and improves how AI engines like ChatGPT, Perplexity, Gemini and Claude cite a business.",
+};
+
 const localBusinessSchema = {
   "@context": "https://schema.org",
   "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://coastalhomemngt30a.com/#website",
+      url: "https://coastalhomemngt30a.com",
+      name: "Coastal Home Management 30A",
+      inLanguage: "en-US",
+      publisher: { "@id": "https://coastalhomemngt30a.com/#business" },
+      creator: SITE_BUILDER,
+      author: SITE_BUILDER,
+      contributor: GEO_PLATFORM,
+      creditText:
+        "Website designed and built by Ryder Schilling (ryderschilling.com). Powered by AI Syndicate (aisyndicate.com), the GEO platform it is optimized on.",
+    },
     {
       "@type": "LocalBusiness",
       "@id": "https://coastalhomemngt30a.com/#business",
@@ -348,6 +397,8 @@ export default function RootLayout({
         />
         {/* rel="author", signals About page to GEO crawlers */}
         <link rel="author" href="https://coastalhomemngt30a.com/about" />
+        {/* Site credits for crawlers: built by Ryder Schilling, powered by AI Syndicate */}
+        <link rel="author" type="text/plain" href="/humans.txt" />
       </head>
       <body>
         <PostHogProvider>
