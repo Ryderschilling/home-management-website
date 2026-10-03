@@ -16,6 +16,11 @@ const addons = [
     price: "$100 flat",
   },
   {
+    name: "On-Call Delivery",
+    desc: "Furniture, appliance or package delivery. We let the crew in, wait on the window, and lock up after. Billed for every hour we are on call.",
+    price: "$50/hour",
+  },
+  {
     name: "Artificial Rock Install",
     desc: "Custom decorative rock over exposed backflow / water pipes.",
     price: "$350/rock installed",

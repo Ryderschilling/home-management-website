@@ -150,7 +150,7 @@ export const offerings: {
   name: string;
   description: string;
   price: string;
-  unitText?: "month" | "day";
+  unitText?: "month" | "day" | "hour";
 }[] = [
   {
     name: "Essential",
@@ -178,6 +178,13 @@ export const offerings: {
     description:
       "One-off requests, contractor meeting, errands, random jobs. $100 flat per visit. No recurring commitment required.",
     price: "100.00",
+  },
+  {
+    name: "On-Call Delivery",
+    description:
+      "Furniture, appliance or package delivery while you're away. We let the delivery crew in, wait on the window, and lock up after. $50 for every hour we are on call.",
+    price: "50.00",
+    unitText: "hour",
   },
   {
     name: "Mail & Trash Handling",
