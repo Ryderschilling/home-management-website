@@ -182,7 +182,7 @@ export const offerings: {
   {
     name: "On-Call Delivery",
     description:
-      "Furniture, appliance or package delivery while you're away. We let the delivery crew in, wait on the window, and lock up after. $50 for every hour we are on call.",
+      "Furniture, appliance or package delivery while you're away. We let the delivery crew in, wait on the window, and lock up after. $50 per hour of the delivery window, 2-hour minimum, capped at $200 per delivery.",
     price: "50.00",
     unitText: "hour",
   },

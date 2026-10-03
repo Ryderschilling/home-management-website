@@ -17,8 +17,8 @@ const addons = [
   },
   {
     name: "On-Call Delivery",
-    desc: "Furniture, appliance or package delivery. We let the crew in, wait on the window, and lock up after. Billed for every hour we are on call.",
-    price: "$50/hour",
+    desc: "Furniture, appliance or package delivery. We let the crew in, wait on the window, and lock up after. Billed for the full delivery window, 2-hour minimum, capped at $200 per delivery.",
+    price: "$50/hour of the window",
   },
   {
     name: "Artificial Rock Install",
