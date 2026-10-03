@@ -17,6 +17,9 @@ export default function PublicShell({ children }: { children: React.ReactNode })
 
   // The Meta ad funnel: logo-only header, footer stays, no floating CTA.
   const isFunnel = pathname.startsWith("/away-on-30a");
+  // Page 1 of the funnel is a one-screen squeeze page (10/3/26): it carries its
+  // own logo, and no header, footer or links at all. The email box is the only tap.
+  const isSqueeze = pathname === "/away-on-30a";
 
   if (isExcluded) {
     return <>{children}</>;
@@ -27,9 +30,9 @@ export default function PublicShell({ children }: { children: React.ReactNode })
       {/* Motion engine + persistent CTA live at the shell level so every
           public page gets them without repeating imports per page. */}
       <FadeInObserver key={pathname} />
-      {isFunnel ? <FunnelHeader /> : <SiteHeader />}
+      {isSqueeze ? null : isFunnel ? <FunnelHeader /> : <SiteHeader />}
       {children}
-      <SiteFooter />
+      {!isSqueeze && <SiteFooter />}
       {/* The ad funnel has exactly one ask per page. A second floating CTA there splits it. */}
       {!isFunnel && <StickyActionBar />}
     </BookingProvider>

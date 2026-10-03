@@ -1516,3 +1516,23 @@ select.pt-field { appearance: auto; }
     .am-phone, .am-stage:hover .am-phone { transform: none; transition: none; }
   }
 }
+
+/* Away on 30A page 1, one-screen squeeze page (added 10/3/26) */
+@layer components {
+  .aw-squeeze { height: 100vh; height: 100svh; min-height: 560px; }
+  .aw-reviews { --gap: 56px; --duration: 70s; }
+  .aw-reviews .ch-marquee__track { animation-name: chMarquee; }
+  .aw-quote { white-space: nowrap; font-size: 13.5px; letter-spacing: -0.005em; color: var(--ch-ink); }
+  .aw-quote b { font-weight: 600; color: var(--ch-ink); }
+  .aw-quote span { color: var(--ch-muted); }
+  .aw-photo-in { animation: aw-zoom 1.4s var(--ch-ease) both; }
+  .aw-rise { animation: aw-rise 0.8s var(--ch-ease) both; }
+  .aw-rise--2 { animation-delay: 0.08s; }
+  .aw-rise--3 { animation-delay: 0.16s; }
+  @keyframes aw-zoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+  @keyframes aw-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) {
+    .aw-photo-in, .aw-rise { animation: none; }
+    .aw-reviews .ch-marquee__track { animation: none; }
+  }
+}
