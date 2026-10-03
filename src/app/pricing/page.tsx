@@ -17,7 +17,7 @@ const addons = [
   },
   {
     name: "On-Call Delivery",
-    desc: "Furniture, appliance or package delivery. We let the crew in, wait on the window, and lock up after. Billed for the full delivery window, 2-hour minimum, capped at $200 per delivery.",
+    desc: "Furniture, appliance or package delivery. We let the crew in, wait on the window, and lock up after. Billed for the full delivery window: $50/hour for the first 4 hours, $25/hour after that. 2-hour minimum.",
     price: "$50/hour of the window",
   },
   {
