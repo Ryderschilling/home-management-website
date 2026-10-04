@@ -3,22 +3,24 @@ import Image from "next/image";
 import OptInForm from "@/components/away/OptInForm";
 import { testimonials } from "@/data/siteData";
 
-// Away on 30A, page 1 of 2. One-screen squeeze page (rebuilt 10/3/26 at Ryder's
-// direction): photo, headline, the email box, and a thin row of real Google
-// reviews. No scrolling, no header, no footer, no links. The email box is the
-// only thing to tap. Everything else (reasons, plans) lives on page 2.
+// Away on 30A, page 1 of 2. One-screen squeeze page.
+// 10/4/26 layout (Ryder's direction): thin row of real Google reviews on top,
+// everything centered, the email box in the middle, and the pool photo of Ryder
+// filling the bottom with its top edge fading up into the button.
+// No scrolling, no header, no footer, no links. The email box is the only tap.
 // Copy rules: never promise Ryder will call. Never "inspection", "monitoring",
 // "security" or "patrol". No insurance language on this page. noindex: paid traffic.
 
 const PAGE_URL = "https://coastalhomemngt30a.com/away-on-30a";
+const HEADLINE = "Own a home on 30A? We'll look after it while you're away.";
 
 export const metadata: Metadata = {
-  title: "Own a Home on 30A? Know It's Fine Without Flying Down.",
+  title: HEADLINE,
   description: "What Coastal Home Management does for 30A second homes while you're away. Put in your email and see how it works.",
   alternates: { canonical: PAGE_URL },
   robots: { index: false, follow: true },
   openGraph: {
-    title: "Own a home on 30A? Know it's fine without flying down.",
+    title: HEADLINE,
     description: "See what we do for 30A second homes while the owners are away.",
     url: PAGE_URL,
     images: ["/ryder-at-work.jpg"],
@@ -28,52 +30,12 @@ export const metadata: Metadata = {
 export default function AwayOn30APage() {
   return (
     <main className="aw-squeeze flex flex-col overflow-hidden bg-[var(--ch-paper)]">
-      <div className="flex min-h-0 flex-1 flex-col md:grid md:grid-cols-[1.08fr_1fr]">
-        {/* Photo: shrinks to whatever room is left on a phone, never pushes the form down */}
-        <div className="relative min-h-[120px] flex-1 overflow-hidden md:order-2 md:h-full">
-          <Image
-            src="/ryder-at-work.jpg"
-            alt="Ryder cleaning the pool at a 30A home"
-            fill
-            priority
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="aw-photo-in object-cover object-[56%_12%]"
-          />
-        </div>
-
-        {/* The one ask */}
-        <div className="flex shrink-0 flex-col justify-center px-5 pb-5 pt-5 md:order-1 md:px-[clamp(32px,6vw,96px)] md:py-10">
-          <div className="mx-auto w-full max-w-[520px] md:mx-0">
-            <div className="aw-rise mb-4 flex items-center gap-2.5 md:mb-10">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.png" alt="" draggable={false} className="h-7 w-auto md:h-9" />
-              <span
-                className="text-[11.5px] uppercase tracking-[0.14em] text-[var(--ch-ink)] md:text-[13px]"
-                style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 104, 'wght' 620" }}
-              >
-                Coastal Home Management
-              </span>
-            </div>
-
-            <h1 className="aw-rise aw-rise--2 ch-display mb-3 !text-[clamp(27px,4.2vw,54px)] md:mb-5">
-              Own a home on 30A? Know it&apos;s fine without flying down.
-            </h1>
-            <p className="aw-rise aw-rise--2 mb-4 text-[15px] leading-[1.45] text-[var(--ch-muted)] md:mb-8 md:text-[17px]">
-              Put in your email to see what we do for 30A homes while their owners are away.
-            </p>
-
-            <div className="aw-rise aw-rise--3">
-              <OptInForm id="optin-top" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Thin row of the real Google reviews. Quotes come from siteData, never edit them here. Not a link. */}
-      <div className="flex h-11 shrink-0 items-center border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] md:h-12">
-        <div className="flex h-full shrink-0 items-center gap-2 border-r border-[var(--ch-hairline)] px-4 md:px-6">
+      {/* Thin row of the real Google reviews, now on top. Quotes come from siteData, never edit them here. Not a link. */}
+      <div className="flex h-14 shrink-0 items-center border-b border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] md:h-14">
+        {/* Stars stacked over the label so the reviews get most of the row */}
+        <div className="flex h-full shrink-0 flex-col items-center justify-center gap-1 border-r border-[var(--ch-hairline)] px-3 md:px-6">
           <Stars />
-          <span className="hidden text-[12.5px] font-semibold text-[var(--ch-ink)] sm:inline">5.0 on Google</span>
+          <span className="whitespace-nowrap text-[10.5px] font-semibold leading-none text-[var(--ch-ink)] md:text-[11.5px]">5 stars on Google</span>
         </div>
         <div className="aw-reviews ch-marquee min-w-0 flex-1" aria-label="Google reviews">
           {[0, 1].map((copy) => (
@@ -85,6 +47,50 @@ export default function AwayOn30APage() {
               ))}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* The one ask, centered */}
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center px-5 pb-2 pt-6 text-center md:pb-4 md:pt-10">
+        <div className="mx-auto flex w-full max-w-[640px] flex-col items-center md:max-w-[980px]">
+          <div className="aw-rise mb-3 flex justify-center md:mb-6">
+            {/* Light version of the mark (white square, black letters), cropped tight in the file */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-light.png" alt="Coastal Home Management" draggable={false} className="h-9 w-auto md:h-12" />
+          </div>
+
+          <h1 className="aw-rise aw-rise--2 ch-display mb-3 md:mb-5">
+            {/* Line 1 is the hook, bigger and in blue. Line 2 is the promise. */}
+            <span className="block whitespace-nowrap !text-[clamp(26px,8.4vw,40px)] text-[var(--ch-teal)] md:!text-[clamp(40px,5.8vw,76px)]">Own a home on 30A?</span>
+            <span className="mt-1 block !text-[clamp(24px,3.5vw,46px)] md:mt-2">We&apos;ll look after it while you&apos;re away.</span>
+          </h1>
+          <p className="aw-rise aw-rise--2 mb-5 max-w-[480px] text-[15px] leading-[1.45] text-[var(--ch-muted)] md:mb-8 md:text-[17px]">
+            Put in your email to see what we do for 30A homes while their owners are away.
+          </p>
+
+          <div className="aw-rise aw-rise--3 flex w-full justify-center">
+            <OptInForm id="optin-top" />
+          </div>
+        </div>
+      </div>
+
+      {/* Pool photo along the bottom. Its top fades up into the page so the button sits on the water's edge. */}
+      <div className="relative -mt-8 h-[38svh] min-h-[180px] w-full shrink-0 overflow-hidden md:-mt-12 md:h-[48svh]">
+        {/* Photo sits lower in the frame; the gap above it is page white. Its top edge fades into the page. */}
+        <div className="absolute inset-x-0 top-[14%] h-full md:top-[10%]">
+          <Image
+            src="/ryder-at-work.jpg"
+            alt="Ryder cleaning the pool at a 30A home"
+            fill
+            priority
+            sizes="100vw"
+            className="aw-photo-in object-cover object-[56%_0%] md:object-[50%_0%]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[24%]"
+            style={{ background: "linear-gradient(to bottom, var(--ch-paper) 0%, color-mix(in srgb, var(--ch-paper) 55%, transparent) 45%, transparent 100%)" }}
+          />
         </div>
       </div>
     </main>

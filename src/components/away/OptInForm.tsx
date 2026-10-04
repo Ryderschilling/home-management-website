@@ -53,7 +53,7 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
   }
 
   return (
-    <form id={id} onSubmit={submit} noValidate className="w-full max-w-[560px]">
+    <form id={id} onSubmit={submit} noValidate className="mx-auto w-full max-w-[330px] sm:max-w-[560px]">
       <div className={`flex flex-col gap-2 sm:flex-row ${dark ? "" : ""}`}>
         <label htmlFor={`${id}-email`} className="sr-only">Email</label>
         <input
@@ -62,11 +62,11 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
           inputMode="email"
           autoComplete="email"
           placeholder="Your email"
-          className="ch-field w-full !h-[58px] !text-[17px] sm:flex-1"
+          className="ch-field w-full !h-[48px] !text-[15px] sm:!h-[58px] sm:!text-[17px] sm:flex-1"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button type="submit" className={`ch-btn ${dark ? "ch-btn--teal" : "ch-btn--solid"} !h-[58px] justify-center whitespace-nowrap sm:px-7`} disabled={busy} data-track="Opt-in: show me how it works">
+        <button type="submit" className={`ch-btn ${dark ? "ch-btn--teal" : "ch-btn--solid"} !h-[48px] justify-center whitespace-nowrap !text-[12px] sm:!h-[58px] sm:!text-[13px] sm:px-7`} disabled={busy} data-track="Opt-in: show me how it works">
           {busy ? "Sending" : "Show me how it works"}
         </button>
       </div>
@@ -75,11 +75,7 @@ export default function OptInForm({ id = "optin", dark = false }: { id?: string;
       </div>
       {error ? (
         <p className={`mt-3 text-[13px] ${dark ? "text-white" : "text-[var(--ch-ink)]"}`} role="alert">{error}</p>
-      ) : (
-        <p className={`mt-3 text-[12.5px] ${dark ? "text-white/60" : "text-[var(--ch-soft)]"}`}>
-          Free, no commitment. No spam.
-        </p>
-      )}
+      ) : null}
     </form>
   );
 }
