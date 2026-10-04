@@ -91,7 +91,7 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
         </div>
         <h3 style={successHeading}>{name ? `Got it, ${name.split(" ")[0]}.` : "Got it."}</h3>
         <p style={successBody}>
-          I&apos;ll reach out personally within 24 hours to set up your free walkthrough. Check your inbox &mdash; I
+          I&apos;ll reach out personally within 24 hours to set up your free walkthrough. Check your inbox, I
           just sent you a note.
         </p>
       </div>
@@ -104,7 +104,7 @@ export default function HomeWatchLeadForm({ source = "/home-watch" }: { source?:
         <p style={eyebrow}>Free &middot; No commitment</p>
         <h3 style={formHeading}>Get your free home check.</h3>
         <p style={formSub}>
-          Tell me where your place is and I&apos;ll come take a look &mdash; no pressure, no obligation.
+          Tell me where your place is and I&apos;ll come take a look. No pressure, no obligation.
         </p>
 
         <form onSubmit={handleSubmit} noValidate>

@@ -133,7 +133,7 @@ export default function HomeWatchPage() {
                 &ldquo;Ryder gives us peace of mind if we&apos;re out of town and need the house checked on. Very reliable. Would highly recommend using his services!&rdquo;
               </p>
               <footer className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">
-                Barbara Reed &mdash; Naturewalk, Inlet Beach
+                Barbara Reed, Naturewalk, Inlet Beach
               </footer>
             </blockquote>
             <blockquote className="border border-black/10 bg-white p-8">
@@ -141,7 +141,7 @@ export default function HomeWatchPage() {
                 &ldquo;Excellent service and communication! Very helpful and Ryder goes out of his way to help.&rdquo;
               </p>
               <footer className="text-[11px] font-semibold uppercase tracking-[0.16em] text-black/40">
-                Beth Tedesco &mdash; Inlet Beach
+                Beth Tedesco, Inlet Beach
               </footer>
             </blockquote>
           </div>
