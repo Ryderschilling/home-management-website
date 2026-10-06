@@ -1536,3 +1536,50 @@ select.pt-field { appearance: auto; }
     .aw-reviews .ch-marquee__track { animation: none; }
   }
 }
+
+/* Away on 30A opt-in: one glowing email box, send arrow inside (added 10/5/26) */
+@layer components {
+  .aw-optin__label { display: block; margin-bottom: 10px; font-size: 14px; font-weight: 600; letter-spacing: -0.005em; color: var(--ch-ink); }
+  .aw-optin {
+    position: relative; display: flex; align-items: center; gap: 10px;
+    height: 64px; padding: 0 7px 0 18px; cursor: text;
+    background: var(--ch-paper); border: 2px solid var(--ch-teal); border-radius: 999px;
+    box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--ch-teal) 55%, transparent);
+    animation: aw-glow 2.6s ease-in-out infinite;
+    transition: box-shadow 0.25s var(--ch-ease), transform 0.25s var(--ch-ease);
+  }
+  .aw-optin:focus-within {
+    animation: none;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--ch-teal) 22%, transparent), 0 14px 34px -12px color-mix(in srgb, var(--ch-teal) 60%, transparent);
+  }
+  .aw-optin__icon { width: 22px; height: 22px; flex-shrink: 0; color: var(--ch-teal); }
+  .aw-optin__input {
+    flex: 1; min-width: 0; height: 100%; border: 0; outline: none; background: transparent;
+    font-size: 17px; color: var(--ch-ink); text-align: left;
+  }
+  .aw-optin__input::placeholder { color: var(--ch-muted); }
+  .aw-optin__send {
+    display: grid; place-items: center; flex-shrink: 0; width: 50px; height: 50px; border-radius: 999px;
+    background: var(--ch-teal); color: #fff; border: 0; cursor: pointer;
+    transition: transform 0.2s var(--ch-ease), background 0.2s var(--ch-ease);
+  }
+  .aw-optin__send svg { width: 22px; height: 22px; }
+  .aw-optin__send:active { transform: scale(0.94); }
+  .aw-optin--ready .aw-optin__send { background: var(--ch-teal-deep); transform: scale(1.06); }
+  .aw-optin__spin { width: 20px; height: 20px; border-radius: 999px; border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff; animation: aw-spin 0.7s linear infinite; }
+  .aw-optin--shake { animation: aw-shake 0.4s var(--ch-ease); }
+  @media (min-width: 640px) {
+    .aw-optin { height: 72px; padding: 0 8px 0 22px; }
+    .aw-optin__input { font-size: 18px; }
+    .aw-optin__send { width: 56px; height: 56px; }
+  }
+  @keyframes aw-glow {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ch-teal) 30%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ch-teal) 55%, transparent); }
+    50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--ch-teal) 0%, transparent), 0 10px 30px -12px color-mix(in srgb, var(--ch-teal) 55%, transparent); }
+  }
+  @keyframes aw-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+  @keyframes aw-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .aw-optin, .aw-optin--shake { animation: none; }
+  }
+}

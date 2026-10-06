@@ -8,7 +8,7 @@ export const runtime = "nodejs";
  * Writes TrackEvent rows into the CHM Ops database, where /ads reads them.
  * Always answers 204 fast; a tracking failure must never touch the visitor.
  */
-const TYPES = new Set(["pageview", "click", "scroll", "form_step", "lead"]);
+const TYPES = new Set(["pageview", "click", "scroll", "form_step", "form_error", "lead"]);
 const BOTS =
   /bot|crawl|spider|slurp|headless|lighthouse|pagespeed|prerender|preview|facebookexternalhit|facebookcatalog|meta-externalagent|meta-externalfetcher|google-inspectiontool|python|curl|wget|axios|node-fetch|go-http|java\/|okhttp|phantom|puppeteer|playwright|selenium/i;
 const s = (v: unknown, n: number) => (typeof v === "string" && v.trim() ? v.trim().slice(0, n) : null);
