@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { forwardLeadToDashboard } from "@/lib/server/forward-lead";
 import { sendOptInEmail } from "@/lib/server/optin-email";
 import { sendCapiEvent } from "@/lib/server/metaCapi";
-import { readAttribution, isPaidTouch } from "@/lib/server/attribution";
+import { resolveAttribution, isPaidTouch } from "@/lib/server/attribution";
 import { sendLeadAlert } from "@/lib/server/lead-alert";
 import { hit } from "@/lib/portal/rateLimit";
 
@@ -38,15 +38,20 @@ export async function POST(req: NextRequest) {
     const limit = await hit(`optin:${ip}`, 8, 60).catch(() => ({ ok: true }));
     if (!limit.ok) return NextResponse.json({ ok: true, fire: false });
 
-    const { attribution } = await readAttribution();
+    const resolved = await resolveAttribution(body.attr);
+    const { attribution } = resolved;
     const fromAd = !!attribution && (!!attribution.metaAdId || (META_SRC.test(attribution.utmSource || "") && isPaidTouch(attribution as Record<string, string | undefined>)));
 
     const result = await forwardLeadToDashboard({
       email,
       source: fromAd ? "Meta ads /away-on-30a opt-in" : "Website /away-on-30a opt-in",
-      message: "Owns a home on 30A, wants to know more about our services.",
+      message:
+        "Owns a home on 30A, wants to know more about our services." +
+        (resolved.matchedBy === "recent-ad-visit"
+          ? " Ad credit matched from a Meta ad visit to this page just before the opt-in (the browser sent no tracking cookie)."
+          : ""),
       eventLabel: "optin",
-    });
+    }, { resolved });
     // CHM Ops sends the welcome from the CHM Gmail (same sender and thread as
     // every later email). Only when it could not do we send the site's copy.
     if (!result.welcomeSent) await sendOptInEmail(email).catch(() => false);

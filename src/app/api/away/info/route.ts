@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
         source: "Away on 30A home info",
         message: summary,
         eventLabel: "info",
-      }),
+      }, { clientAttr: b.attr }),
     ];
 
     // Page 2 hands Meta the name and phone too (9/29/26 audit): better match

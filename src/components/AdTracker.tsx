@@ -71,13 +71,22 @@ function rid(): string {
   }
 }
 
-function readAttr(): Attr | null {
+/**
+ * Three copies of the attribution (10/6/26): cookie, localStorage and
+ * sessionStorage. The Facebook in-app browser has dropped the cookie between
+ * landing and opt-in, so the forms also send what we read here in the POST.
+ */
+export function readAttr(): Attr | null {
   try {
     const m = document.cookie.match(new RegExp(`(?:^|; )${COOKIE}=([^;]*)`));
     if (m) return JSON.parse(decodeURIComponent(m[1])) as Attr;
   } catch {}
   try {
     const s = localStorage.getItem(COOKIE);
+    if (s) return JSON.parse(s) as Attr;
+  } catch {}
+  try {
+    const s = sessionStorage.getItem(COOKIE);
     if (s) return JSON.parse(s) as Attr;
   } catch {}
   return null;
@@ -91,6 +100,9 @@ function writeAttr(a: Attr) {
   try {
     localStorage.setItem(COOKIE, json);
   } catch {}
+  try {
+    sessionStorage.setItem(COOKIE, json);
+  } catch {}
 }
 
 function cut(v: string | null, n = 200): string | undefined {
@@ -98,7 +110,7 @@ function cut(v: string | null, n = 200): string | undefined {
 }
 
 /** What brought this page view here, or null when nothing did (internal nav). */
-function touchFromUrl(): Touch | null {
+export function touchFromUrl(): Touch | null {
   const p = new URLSearchParams(location.search);
   const ref = document.referrer && !document.referrer.includes(location.hostname) ? document.referrer : "";
   const t: Touch = {
@@ -118,6 +130,26 @@ function touchFromUrl(): Touch | null {
   const any = Object.values(t).some(Boolean) || !!ref;
   if (!any) return null;
   return { ...t, referrer: cut(ref, 300), landingPage: cut(location.pathname, 200), at: new Date().toISOString() };
+}
+
+/**
+ * The attribution a lead form sends in its POST body (10/6/26). The stored
+ * attribution, and if THIS page's URL carries ad tags, that becomes the latest
+ * touch. `r` is the raw document.referrer so the server can tell a Facebook
+ * in-app visit from a direct one. Null on any error; the form still submits.
+ */
+export function formAttr(): (Attr & { r?: string }) | null {
+  try {
+    const a = readAttr();
+    const now = touchFromUrl();
+    const hasAd = !!now && !!(now.metaAdId || now.fbclid || now.gclid || now.utmSource);
+    let out: Attr | null = a ? { ...a } : null;
+    if (hasAd && now) out = out ? { ...out, ft: out.ft ?? now, lt: now } : { v: rid(), ft: now, lt: now };
+    if (!out) return null;
+    return { ...out, r: (document.referrer || "").slice(0, 300) };
+  } catch {
+    return null;
+  }
 }
 
 function device(): string {

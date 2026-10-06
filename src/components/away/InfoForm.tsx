@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { bookingConfig } from "@/data/siteData";
+import { formAttr } from "@/components/AdTracker";
 import { recallEmail } from "./fire";
 
 /**
@@ -58,7 +59,7 @@ export default function InfoForm() {
       const res = await fetch("/api/away/info", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...f, email: f.email.trim().toLowerCase(), needs }),
+        body: JSON.stringify({ ...f, email: f.email.trim().toLowerCase(), needs, attr: formAttr() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.ok === false) return setError(data?.error?.message || "That did not go through. Try again.");

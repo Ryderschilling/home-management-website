@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formAttr } from "@/components/AdTracker";
 import { fireConversion, rememberEmail } from "./fire";
 
 /**
@@ -70,7 +71,7 @@ export default function OptInForm({ id = "optin" }: { id?: string; dark?: boolea
       const res = await fetch("/api/away/optin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: clean, company, eventId }),
+        body: JSON.stringify({ email: clean, company, eventId, attr: formAttr() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.ok === false) {

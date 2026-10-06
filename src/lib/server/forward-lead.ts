@@ -1,4 +1,4 @@
-import { readAttribution } from "./attribution";
+import { resolveAttribution, type ResolvedAttribution } from "./attribution";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -36,11 +36,15 @@ export type ForwardResult = {
  * the lead silently. Now the caller learns whether it landed, so it can warn
  * Ryder by email with the lead's details when it did not.
  */
-export async function forwardLeadToDashboard(p: LeadPayload): Promise<ForwardResult> {
+export async function forwardLeadToDashboard(
+  p: LeadPayload,
+  opts?: { clientAttr?: unknown; resolved?: ResolvedAttribution }
+): Promise<ForwardResult> {
   const url = process.env.DASHBOARD_INTAKE_URL;
   const secret = process.env.INTAKE_SECRET;
-  // Which ad / search / post brought this person, from the tracker cookie.
-  const { attribution, path } = await readAttribution();
+  // Which ad / search / post brought this person: the tracker cookie, then the
+  // form's own copy, then a recent Meta ad visit (see resolveAttribution).
+  const { attribution, path } = opts?.resolved ?? (await resolveAttribution(opts?.clientAttr));
   // Record the conversion as an event too, so the page funnel on /ads counts it.
   if (attribution?.visitorId && path) {
     await prisma.trackEvent
