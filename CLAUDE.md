@@ -115,3 +115,13 @@ On 9/10/26 Google AI Mode showed our name with Coast Property Management's photo
 
 ## Auto-update
 If architectural decisions are made during a session (new routes, schema changes, major refactors), update the Application Architecture section of CHM_MASTER_CONTEXT.md.
+
+## Lead attribution (added 2026-10-06)
+
+The Facebook in-app browser can drop the `chm_attr` cookie between landing and
+opt-in. `resolveAttribution()` in `src/lib/server/attribution.ts` is the only
+way lead routes read attribution: cookie first, then the `attr` the form sends
+in its POST body (`formAttr()` in AdTracker), then a Meta ad pageview on the
+same page in the last 15 minutes, used only when exactly one visitor matches,
+the referrer is Facebook/Instagram/Messenger or empty, and this browser did not
+itself land with no ad. Any new lead form should send `attr: formAttr()`.
