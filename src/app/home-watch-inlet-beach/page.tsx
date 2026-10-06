@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { businessContact } from "@/data/siteData";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "Home Watch Service in Inlet Beach, FL",
   description:
-    "Home watch and second-home care in Inlet Beach, Florida. Local, insured, weekly property checks, photo reports, storm checks. Serving Inlet Beach, Watersound Origins, Naturewalk, Alys Beach. Free walkthrough.",
+    "Home watch in Inlet Beach, FL. Weekly or bi-weekly property checks, photo report every visit, storm checks. Local, insured, owner-operated. From $200/mo.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-inlet-beach" },
   keywords: "home watch Inlet Beach FL, home watch service Inlet Beach Florida, second home care Inlet Beach, property watch Inlet Beach 30A, home watch 32461",
   openGraph: {
@@ -38,6 +39,7 @@ const FAQ = [
 export default function HomeWatchInletBeachPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
+      <PageSchema path="/home-watch-inlet-beach" name="Home Watch Service in Inlet Beach, FL" />
       {/* Nav */}
       <nav className="border-b border-black/10 px-5 py-3 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">

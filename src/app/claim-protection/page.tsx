@@ -3,6 +3,7 @@ import Link from "next/link";
 import LegalDisclaimer from "@/components/LegalDisclaimer";
 import { protectionServices } from "@/data/protection";
 import { primaryPhone, primaryPhoneDisplay } from "@/data/siteData";
+import PageSchema from "@/components/PageSchema";
 
 // Read src/data/protection.ts before editing any copy on this page.
 // There is a hard line here and it is documented at the top of that file.
@@ -10,7 +11,7 @@ import { primaryPhone, primaryPhoneDisplay } from "@/data/siteData";
 export const metadata: Metadata = {
   title: "Claim Protection for Empty 30A Homes",
   description:
-    "Most water claims on empty Florida second homes are denied on timing, not on coverage. Here is how a dated, photographed visit record protects the claim, and what an automatic water shutoff actually does.",
+    "Most water claims on empty Florida second homes are denied on timing. How a dated, photographed visit record helps, and what an automatic water shutoff does.",
   alternates: { canonical: "https://coastalhomemngt30a.com/claim-protection" },
   keywords:
     "empty house water damage claim Florida, home watch insurance claim documentation, 14 day seepage exclusion Florida, unoccupied home insurance 30A, water shutoff valve second home",
@@ -69,6 +70,7 @@ export default function ClaimProtectionPage() {
 
   return (
     <main className="bg-[var(--ch-paper)]">
+      <PageSchema path="/claim-protection" name="Claim Protection for Empty 30A Homes" />
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="fade-section relative overflow-hidden bg-[var(--ch-paper)] px-4 pt-28 pb-20 md:px-8 md:pt-36 md:pb-28">
         <div className="mx-auto max-w-[1240px]">

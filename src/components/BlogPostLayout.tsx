@@ -2,6 +2,7 @@ import Link from "next/link";
 import { siteData } from "@/data/siteData";
 import type { BlogPost } from "@/data/blogPosts";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
+import PageSchema from "@/components/PageSchema";
 
 export default function BlogPostLayout({ post }: { post: BlogPost }) {
   // Article schema, tells Google/AI engines this is timely, authored content.
@@ -47,6 +48,12 @@ export default function BlogPostLayout({ post }: { post: BlogPost }) {
 
   return (
     <main className="min-h-screen bg-white text-black">
+      <PageSchema
+        path={`/blog/${post.slug}`}
+        name={post.title}
+        description={post.metaDescription}
+        crumbs={[{ name: "Blog", path: "/blog" }]}
+      />
       {/* Hero */}
       <section className="border-b border-gray-200 bg-[#f8f5ef]">
         <div className="mx-auto max-w-3xl px-6 pt-32 pb-16 md:pt-40 md:pb-20">

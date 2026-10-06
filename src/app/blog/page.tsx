@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { allBlogPosts } from "@/data/blogPosts";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "Home Watch & Second Home Tips for 30A Homeowners",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function BlogIndexPage() {
   return (
     <main className="min-h-screen bg-white text-black">
+      <PageSchema path="/blog" name="Home Watch & Second Home Tips for 30A Homeowners" />
       <section className="border-b border-gray-200 bg-[#f8f5ef]">
         <div className="mx-auto max-w-4xl px-6 pt-32 pb-16 md:pt-40 md:pb-20 text-center">
           <div className="text-[11px] uppercase tracking-[0.24em] text-gray-500">

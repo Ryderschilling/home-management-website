@@ -52,7 +52,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Rosemary Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Rosemary Beach, FL",
     metaDescription:
-      "Home watch for Rosemary Beach second homes. Weekly walkthroughs, photo proof every visit, carriage house and courtyard checks, storm response. Owner lives 4 minutes away in Watersound Origins. Plans from $200/mo.",
+      "Home watch for Rosemary Beach second homes. Walkthroughs, carriage house and courtyard checks, photo proof every visit. Owner is 4 minutes away. From $200/mo.",
     keywords:
       "home watch Rosemary Beach, Rosemary Beach home watch service, second home management Rosemary Beach FL, property check Rosemary Beach 30A, house watching Rosemary Beach Florida",
     h1: "Home Watch in Rosemary Beach, Florida",
@@ -140,7 +140,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Alys Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Alys Beach, FL",
     metaDescription:
-      "Home watch for Alys Beach courtyard homes. Weekly walkthroughs, courtyard and drain checks, photo proof every visit, storm response. Owner lives 6 minutes away in Watersound Origins. Plans from $200/mo.",
+      "Home watch for Alys Beach courtyard homes. Walkthroughs, courtyard and drain checks, photo proof every visit, storm response. 6 minutes away. From $200/mo.",
     keywords:
       "home watch Alys Beach, Alys Beach home watch service, second home management Alys Beach FL, property check Alys Beach 30A, house watching Alys Beach Florida",
     h1: "Home Watch in Alys Beach, Florida",
@@ -227,7 +227,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Seacrest Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Seacrest Beach, FL",
     metaDescription:
-      "Home watch for Seacrest Beach second homes and cottages. Weekly walkthroughs, photo proof every visit, rental-adjacent checks, storm response. Owner lives 5 minutes away. Plans from $200/mo.",
+      "Home watch for Seacrest Beach second homes and cottages. Walkthroughs, photo proof every visit, storm response. Owner is 5 minutes away. From $200/mo.",
     keywords:
       "home watch Seacrest Beach, Seacrest Beach home watch service, second home management Seacrest Beach FL, property check Seacrest 30A, house watching Seacrest Beach Florida",
     h1: "Home Watch in Seacrest Beach, Florida",
@@ -314,7 +314,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Watersound Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Watersound Beach, FL",
     metaDescription:
-      "Home watch for gated Watersound Beach homes. Weekly walkthroughs, dune-front salt exposure checks, photo proof every visit, storm response. Owner lives in Watersound Origins. Plans from $200/mo.",
+      "Home watch for gated Watersound Beach homes. Walkthroughs, dune-front salt exposure checks, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch Watersound Beach, Watersound Beach home watch service, second home management Watersound Beach FL, property check Watersound Beach 30A, gated community home watch 30A",
     h1: "Home Watch in Watersound Beach, Florida",
@@ -401,7 +401,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Seagrove Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Seagrove Beach, FL",
     metaDescription:
-      "Home watch for Seagrove Beach cottages and second homes. Weekly walkthroughs of older 30A housing stock, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for Seagrove Beach cottages and second homes. Walkthroughs of older 30A homes, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch Seagrove Beach, Seagrove Beach home watch service, second home management Seagrove FL, Old Seagrove property check, house watching Seagrove Beach Florida",
     h1: "Home Watch in Seagrove Beach, Florida",
@@ -488,7 +488,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Seaside · Walton County, FL · 30A",
     metaTitle: "Home Watch in Seaside, FL",
     metaDescription:
-      "Home watch for Seaside, Florida cottages. Weekly walkthroughs, wood exterior and tin roof checks, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for Seaside, Florida cottages. Walkthroughs, wood exterior and tin roof checks, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch Seaside FL, Seaside Florida home watch service, second home management Seaside 30A, property check Seaside Florida, house watching Seaside cottage",
     h1: "Home Watch in Seaside, Florida",
@@ -575,7 +575,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "WaterColor · Walton County, FL · 30A",
     metaTitle: "Home Watch in WaterColor, FL",
     metaDescription:
-      "Home watch for WaterColor second homes. Weekly walkthroughs, deep-porch and irrigation checks, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for WaterColor second homes. Walkthroughs, deep-porch and irrigation checks, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch WaterColor FL, WaterColor home watch service, second home management WaterColor 30A, property check WaterColor Florida, house watching WaterColor Santa Rosa Beach",
     h1: "Home Watch in WaterColor, Florida",
@@ -662,7 +662,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Grayton Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Grayton Beach, FL",
     metaDescription:
-      "Home watch for Grayton Beach homes and cottages. Weekly walkthroughs, flood and sand-road access, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for Grayton Beach homes and cottages. Walkthroughs, flood and sand-road checks, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch Grayton Beach, Grayton Beach home watch service, second home management Grayton Beach FL, property check Grayton Beach 30A, house watching Grayton Beach Florida",
     h1: "Home Watch in Grayton Beach, Florida",
@@ -749,7 +749,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Blue Mountain Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Blue Mountain Beach, FL",
     metaDescription:
-      "Home watch for Blue Mountain Beach second homes. Weekly walkthroughs, steep-lot drainage and wind exposure checks, photo proof every visit. Plans from $200/mo, no contract.",
+      "Home watch for Blue Mountain Beach second homes. Walkthroughs, steep-lot drainage and wind exposure checks, photo proof every visit. From $200/mo.",
     keywords:
       "home watch Blue Mountain Beach, Blue Mountain Beach home watch service, second home management Blue Mountain Beach FL, property check Blue Mountain 30A, house watching Blue Mountain Beach Florida",
     h1: "Home Watch in Blue Mountain Beach, Florida",
@@ -836,7 +836,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Santa Rosa Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Santa Rosa Beach, FL",
     metaDescription:
-      "Home watch for Santa Rosa Beach second homes, north and south of Highway 98. Weekly walkthroughs, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for Santa Rosa Beach second homes, north and south of Highway 98. Walkthroughs, photo proof every visit, storm response. From $200/mo.",
     keywords:
       "home watch Santa Rosa Beach, Santa Rosa Beach home watch service, second home management Santa Rosa Beach FL, property check Santa Rosa Beach 30A, house watching Santa Rosa Beach Florida",
     h1: "Home Watch in Santa Rosa Beach, Florida",
@@ -923,7 +923,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Dune Allen Beach · Walton County, FL · 30A",
     metaTitle: "Home Watch in Dune Allen Beach, FL",
     metaDescription:
-      "Home watch for Dune Allen Beach second homes at the west end of 30A. Weekly walkthroughs, coastal dune lake and salt exposure checks, photo proof every visit. Plans from $200/mo.",
+      "Home watch for Dune Allen Beach second homes on west 30A. Walkthroughs, dune lake and salt exposure checks, photo proof every visit. From $200/mo.",
     keywords:
       "home watch Dune Allen Beach, Dune Allen home watch service, second home management Dune Allen Beach FL, property check west 30A, house watching Dune Allen Florida",
     h1: "Home Watch in Dune Allen Beach, Florida",
@@ -1010,7 +1010,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Miramar Beach · Walton County, FL",
     metaTitle: "Home Watch in Miramar Beach, FL",
     metaDescription:
-      "Home watch for Miramar Beach second homes and Gulf-front condos near Sandestin. Scheduled walkthroughs, photo proof every visit, storm response. Plans from $200/mo, no contract.",
+      "Home watch for Miramar Beach second homes and Gulf-front condos near Sandestin. Scheduled walkthroughs, photo proof every visit. From $200/mo.",
     keywords:
       "home watch Miramar Beach, Miramar Beach home watch service, second home management Miramar Beach FL, condo home watch Sandestin, house watching Miramar Beach Florida",
     h1: "Home Watch in Miramar Beach, Florida",
@@ -1097,7 +1097,7 @@ export const townPages: Record<string, TownPageData> = {
     eyebrow: "Panama City Beach · Bay County, FL",
     metaTitle: "Home Watch in Panama City Beach, FL",
     metaDescription:
-      "Home watch for west Panama City Beach second homes and condos, including Wild Heron, Breakfast Point and the Camp Helen side. Photo proof every visit. Plans from $200/mo.",
+      "Home watch for west Panama City Beach homes and condos: Wild Heron, Breakfast Point, the Camp Helen side. Photo proof every visit. From $200/mo.",
     keywords:
       "home watch Panama City Beach, PCB home watch service, second home management Panama City Beach FL, condo home watch 32413, house watching west Panama City Beach",
     h1: "Home Watch in Panama City Beach, Florida",

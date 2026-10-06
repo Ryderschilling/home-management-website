@@ -29,6 +29,7 @@ export async function generateMetadata({
       url: `https://coastalhomemngt30a.com/blog/${post.slug}`,
       type: "article",
       publishedTime: post.datePublished,
+      images: ["/img.png"],
     },
   };
 }

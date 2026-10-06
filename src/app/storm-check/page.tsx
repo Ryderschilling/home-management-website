@@ -3,6 +3,7 @@ import Link from "next/link";
 import LegalDisclaimer from "@/components/LegalDisclaimer";
 import StormCheckForm from "@/components/StormCheckForm";
 import { primaryPhone, primaryPhoneDisplay, trustStats } from "@/data/siteData";
+import PageSchema from "@/components/PageSchema";
 
 // Storm Check, added 9/11/26. Pricing set by Ryder that day: $100 per storm for
 // owners not on a plan, $50 per storm for plan clients. Copy rules that apply here:
@@ -16,7 +17,7 @@ const SITE = "https://coastalhomemngt30a.com";
 export const metadata: Metadata = {
   title: "Storm Check for 30A Second Homes",
   description:
-    "Out of town when a storm heads for 30A? Storm prep before landfall and a photo check after, $100 per storm or $50 on a plan. Watersound Origins, Alys, Rosemary and scenic 30A.",
+    "Out of town when a storm heads for 30A? Storm prep before landfall and a photo check after: $100 per storm, $50 on a plan. Watersound Origins to Rosemary.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: "Storm Check for 30A Second Homes",
@@ -103,6 +104,7 @@ export default function StormCheckPage() {
 
   return (
     <main className="bg-[var(--ch-paper)]">
+      <PageSchema path="/storm-check" name="Storm Check for 30A Second Homes" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 

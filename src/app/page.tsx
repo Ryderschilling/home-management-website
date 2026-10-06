@@ -12,10 +12,12 @@ import VisitReportProof from "@/components/VisitReportProof";
 import AlwaysOnSection from "@/components/AlwaysOnSection";
 import FaqAccordion, { type FaqItem } from "@/components/FaqAccordion";
 import { BookButton } from "@/components/BookingProvider";
+import PageSchema from "@/components/PageSchema";
+import { ACCURACY_FAQS } from "@/data/accuracyFaqs";
 
 export const metadata: Metadata = {
   description:
-    "Second home management and home watch in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly visits, photo report every time, one owner-operator. Free first walkthrough, and you do not need to be in town for it.",
+    "Home watch and second home management in Watersound Origins, Alys, Rosemary and scenic 30A. Photo report every visit. Insured Florida LLC, owner-operated.",
   alternates: {
     canonical: "https://coastalhomemngt30a.com",
   },
@@ -87,12 +89,13 @@ const FAQS: FaqItem[] = [
   },
   {
     q: "Are you licensed and insured?",
-    a: "Yes. Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025. We take the responsibility of caring for your home seriously, and proper coverage is part of that commitment.",
+    a: "Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025. Florida does not issue a state license for home watch, and we are not home inspectors, insurance agents, or adjusters. Every visit is documented with photos and a written report.",
   },
   {
     q: "What makes CHM different from a large property management company?",
     a: "You get Ryder, directly. No call centers, no rotating staff, no chasing someone down for an update. When something happens at your property it gets handled fast by someone who knows your home personally. That's what it means to work with a local operator who lives in the neighborhood rather than a company managing hundreds of properties from an office.",
   },
+  ...ACCURACY_FAQS,
   {
     q: "How do I get started?",
     a: "Send your address using any button on this page, or call directly. You do not need to be in town. I'll walk the property, email you photos and a written condition report within 48 hours, and tell you straight what it actually needs. Most clients are set up and receiving their first visit report within a few days.",
@@ -102,6 +105,7 @@ const FAQS: FaqItem[] = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[var(--ch-paper)] font-sans text-[var(--ch-ink)]">
+      <PageSchema path="/" name="Home Watch & Second Home Management, Scenic 30A" />
       <LeadCapturePopup />
 
       {/* ═══ HERO, unchanged ═══════════════════════════════════════ */}
@@ -816,7 +820,7 @@ export default function HomePage() {
                 name: "Are you licensed and insured?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Yes. Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025.",
+                  text: "Coastal Home Management 30A is a fully insured Florida LLC, formed in October 2025. Florida does not issue a state license for home watch, and we are not home inspectors, insurance agents, or adjusters. Every visit is documented with photos and a written report.",
                 },
               },
               {
@@ -835,6 +839,11 @@ export default function HomePage() {
                   text: "Send your address on the website or call directly. You do not need to be in town. Ryder walks the property and emails photos and a written condition report within 48 hours. Most clients receive their first visit report within a few days.",
                 },
               },
+              ...ACCURACY_FAQS.map((f) => ({
+                "@type": "Question",
+                name: f.q,
+                acceptedAnswer: { "@type": "Answer", text: f.a },
+              })),
               {
                 "@type": "Question",
                 name: "Who provides home watch services in Watersound Origins Florida?",

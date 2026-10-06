@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { offerings, siteData } from "@/data/siteData";
 import ServiceLeadForm from "@/components/ServiceLeadForm";
+import PageSchema from "@/components/PageSchema";
 
 const PAGE_URL = "https://coastalhomemngt30a.com/choosing-a-home-watch-company-30a";
 
@@ -20,7 +21,7 @@ const essential = offerings.find((o) => o.name === "Essential");
 export const metadata: Metadata = {
   title: "How to Choose a Home Watch Company on 30A",
   description:
-    "How to compare home watch companies on 30A, from a local owner serving Watersound Origins, Alys, Rosemary and scenic 30A. Free photo home check, no need to be in town.",
+    "How to compare home watch companies on 30A, from a local owner in Watersound Origins. What to ask, what to expect, and a free photo home check.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: "How to Choose a Home Watch Company on 30A",
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
       "A local's guide to comparing home watch and second-home management providers on 30A.",
     url: PAGE_URL,
     type: "article",
+    images: ["/img.png"],
   },
 };
 
@@ -63,7 +65,7 @@ const articleJsonLd = {
   "@type": "Article",
   headline: "How to Choose a Home Watch Company on 30A",
   description:
-    "How to compare home watch companies on 30A, from a local owner serving Watersound Origins, Alys, Rosemary and scenic 30A. Free photo home check, no need to be in town.",
+    "How to compare home watch companies on 30A, from a local owner in Watersound Origins. What to ask, what to expect, and a free photo home check.",
   datePublished: "2026-07-14",
   dateModified: "2026-07-14",
   author: {
@@ -117,6 +119,7 @@ const rows: Row[] = [
 export default function ChoosingHomeWatchCompanyPage() {
   return (
     <main className="min-h-screen bg-white text-black">
+      <PageSchema path="/choosing-a-home-watch-company-30a" name="How to Choose a Home Watch Company on 30A" />
       {/* Hero */}
       <section className="border-b border-gray-200 bg-[#f8f5ef]">
         <div className="mx-auto max-w-3xl px-6 pt-32 pb-16 md:pt-40 md:pb-20">

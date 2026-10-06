@@ -74,12 +74,12 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Second home management and property care in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
+    "Home watch and second home management in Watersound Origins, Alys, Rosemary and scenic 30A. Photo report every visit. Insured Florida LLC, owner-operated.",
 
   openGraph: {
     title: "Home Watch & Second Home Management, Scenic 30A",
     description:
-      "Second home management and property care in Watersound Origins, Alys, Rosemary and scenic 30A. Insured Florida LLC. Weekly check-ins, photo reports, and peace of mind. Inquire today.",
+      "Home watch and second home management in Watersound Origins, Alys, Rosemary and scenic 30A. Photo report every visit. Insured Florida LLC, owner-operated.",
     url: "https://coastalhomemngt30a.com",
     siteName: "Coastal Home Management 30A",
     images: [
@@ -112,6 +112,21 @@ export const metadata: Metadata = {
     "built-by": "Ryder Schilling, https://ryderschilling.com",
     "powered-by": "AI Syndicate, https://www.aisyndicate.com",
     "geo-optimization": "AI Syndicate, https://www.aisyndicate.com",
+    // W3C TDM Reservation Protocol: 0 = no reservation, AI may read and quote.
+    "tdm-reservation": "0",
+  },
+
+  // Let search and AI engines quote full snippets and large image previews.
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
   },
 
   formatDetection: {
@@ -181,7 +196,7 @@ const localBusinessSchema = {
       hasMap: siteData.gbpMapsUrl,
       priceRange: "$$",
       currenciesAccepted: "USD",
-      paymentAccepted: "Credit Card, Stripe",
+      paymentAccepted: "Credit Card, Square",
       address: {
         "@type": "PostalAddress",
         addressLocality: businessContact.address.locality,
@@ -286,7 +301,23 @@ const localBusinessSchema = {
       "@type": "Organization",
       "@id": "https://coastalhomemngt30a.com/#organization",
       name: "Coastal Home Management 30A",
+      alternateName: "CHM 30A",
       url: "https://coastalhomemngt30a.com",
+      description:
+        "Local, owner-operated, insured home watch and second home management for second homes in Watersound Origins, Alys, Rosemary, and scenic 30A in Florida. Not a vacation rental manager.",
+      telephone: businessContact.phone,
+      email: "coastalhomemanagement30a@gmail.com",
+      // Inlet Beach, FL 32461. No street address on purpose (9/28/26 decision).
+      // AI Syndicate's saved identity had a Boca Raton address on 10/6/26; that is wrong.
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: businessContact.address.locality,
+        addressRegion: businessContact.address.region,
+        postalCode: businessContact.address.postalCode,
+        addressCountry: businessContact.address.country,
+      },
+      foundingDate: businessContact.foundingDate,
+      founder: { "@type": "Person", name: "Ryder Schilling" },
       logo: {
         "@type": "ImageObject",
         url: "https://coastalhomemngt30a.com/logo.png",
@@ -399,6 +430,10 @@ export default function RootLayout({
         <link rel="author" href="https://coastalhomemngt30a.com/about" />
         {/* Site credits for crawlers: built by Ryder Schilling, powered by AI Syndicate */}
         <link rel="author" type="text/plain" href="/humans.txt" />
+        {/* Plain-text site summaries for AI crawlers. Raw tags on purpose: a page's
+            own metadata.alternates would replace these if they lived in metadata. */}
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+        <link rel="alternate" type="text/plain" href="/llms-full.txt" title="llms-full.txt" />
       </head>
       <body>
         <PostHogProvider>
@@ -406,6 +441,12 @@ export default function RootLayout({
         </PostHogProvider>
         <MetaPixel />
         <AdTracker />
+        {/* AI Syndicate attribution tag: records which AI assistant sent a visitor. Created by AISyndicate.com */}
+        <Script
+          src="https://www.aisyndicate.com/tag.js"
+          data-key="ast_18a8e13229b68b73b96b40e55a476c3cde44"
+          strategy="afterInteractive"
+        />
         {/* Pulse analytics (pulse.ryderschilling.com). Runs alongside GA4. */}
         <Script
           src="https://pulse.ryderschilling.com/p.js"

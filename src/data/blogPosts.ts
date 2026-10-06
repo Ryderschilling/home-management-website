@@ -31,7 +31,7 @@ export const blogPosts: BlogPost[] = [
     title: "What to Check Before Hurricane Season Hits Your 30A Home",
     metaTitle: "Hurricane Season Prep Checklist for 30A Second Homes",
     metaDescription:
-      "A local's checklist for preparing your Watersound Origins, Naturewalk, or 30A second home before hurricane season, plus how routine home checks catch problems early.",
+      "A local's checklist for getting your Watersound Origins or 30A second home ready for hurricane season, and how routine home checks catch problems early.",
     category: "seasonal",
     datePublished: "2026-07-14",
     directAnswer:
@@ -82,7 +82,7 @@ export const blogPosts: BlogPost[] = [
     title: "How Much Does Home Watch Cost on 30A?",
     metaTitle: "Home Watch Cost in Watersound Origins & 30A (Real Pricing)",
     metaDescription:
-      "Real, current pricing for home watch and second home management in Watersound Origins, Naturewalk, and 30A. Compare tiers and what's included at each price point.",
+      "Current home watch and second home management pricing in Watersound Origins and 30A. Compare tiers and what's included at each price point.",
     category: "direct-answer",
     datePublished: "2026-07-14",
     directAnswer: `Home watch service on 30A typically runs $${essential?.price?.replace(".00", "")} to $${elite?.price?.replace(".00", "")}+ per month depending on visit frequency and what's included. Bi-weekly checks with photo reports start around $${essential?.price?.replace(".00", "")}/month, weekly plans with appliance and plumbing checks run $${homeWatch?.price?.replace(".00", "")}/month, and full-service plans with guaranteed emergency response start near $${elite?.price?.replace(".00", "")}/month.`,
@@ -129,7 +129,7 @@ export const blogPosts: BlogPost[] = [
     title: "How a Routine Home Watch Visit Caught a Failing AC Before It Turned Into Mold",
     metaTitle: "Home Watch Caught a Failing AC Before Mold Set In on 30A",
     metaDescription:
-      "A real-style walkthrough of how a routine summer home watch visit on 30A catches a failed AC and rising humidity before mold does five-figure damage to an empty second home.",
+      "How a routine summer home watch visit on 30A catches a failed AC and rising humidity before mold does five-figure damage to an empty second home.",
     category: "proof-story",
     datePublished: "2026-07-15",
     directAnswer:

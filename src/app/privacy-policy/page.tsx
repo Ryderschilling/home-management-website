@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy Policy | Coastal Home Management 30A",
   description:
     "Privacy policy for Coastal Home Management 30A. How we collect, use, and protect your information.",
   alternates: {
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <main className="min-h-screen bg-white text-black">
+      <PageSchema path="/privacy-policy" name="Privacy Policy" />
       <div className="mx-auto max-w-3xl px-6 py-20 md:py-28">
         <div className="text-[11px] uppercase tracking-[0.24em] text-gray-500">
           Coastal Home Management 30A

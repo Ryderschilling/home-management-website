@@ -155,7 +155,7 @@ export default function PricingPage() {
 
       {/* Add-ons */}
       <section className="addons-section">
-        <div className="addons-lbl">À La Carte Add-Ons</div>
+        <h2 className="addons-lbl">À La Carte Add-Ons</h2>
         <div className="addons-grid">
           {addons.map((a) => (
             <div key={a.name} className="addon">
@@ -174,7 +174,7 @@ export default function PricingPage() {
 
       {/* ─── Item 1: Pricing Comparison Table (Google Featured Snippet) ─── */}
       <section className="compare-section">
-        <div className="compare-lbl">Plan Comparison</div>
+        <h2 className="compare-lbl">Plan Comparison</h2>
         <div className="compare-wrap">
           <table className="compare-table">
             <caption className="compare-caption">
@@ -319,7 +319,7 @@ export default function PricingPage() {
 
       {/* FAQ. Rendered as real content AND as FAQPage schema in layout.tsx. */}
       <section className="faq-section">
-        <div className="faq-lbl">Before You Decide</div>
+        <h2 className="faq-lbl">Before You Decide</h2>
         <div className="faq-list">
           {PRICING_FAQS.map((f) => (
             <div key={f.q} className="faq-item">

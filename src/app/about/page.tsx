@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { businessContact, siteData } from "@/data/siteData";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "About Ryder Schilling, Home Watch Owner",
@@ -123,6 +124,7 @@ const personSchema = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
+      <PageSchema path="/about" name="About Ryder Schilling, Home Watch Owner" />
 
       {/* JSON-LD, Organization */}
       <script

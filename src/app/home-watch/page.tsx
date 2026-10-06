@@ -3,11 +3,12 @@ import Link from "next/link";
 import HomeWatchLeadForm from "@/components/HomeWatchLeadForm";
 import HeroImage from "@/components/HeroImage";
 import { siteData } from "@/data/siteData";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "Home Watch Service on 30A & Watersound Origins",
   description:
-    "Trusted home watch service in Watersound Origins, Alys, Rosemary and scenic 30A. Local, insured Florida LLC, weekly check-ins, photo proof every visit. The only home watch company that lives in the neighborhood. Free walkthrough.",
+    "Home watch in Watersound Origins, Alys, Rosemary and scenic 30A. Weekly or bi-weekly visits, photo report every time, local owner. Insured Florida LLC.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch" },
   keywords: "home watch Watersound Origins, home watch 30A, home watch Inlet Beach FL, home watch service Florida Panhandle, second home watch Naturewalk, property watch 30A",
   openGraph: {
@@ -37,6 +38,7 @@ const POINTS: { title: string; body: string }[] = [
 export default function HomeWatchPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
+      <PageSchema path="/home-watch" name="Home Watch Service on 30A & Watersound Origins" />
       {/* ── Nav ──────────────────────────────────────────────── */}
       <nav className="border-b border-black/10 px-5 py-3 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">

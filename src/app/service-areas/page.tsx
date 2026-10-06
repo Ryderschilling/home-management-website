@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { allTownPages } from "@/data/townPages";
+import PageSchema from "@/components/PageSchema";
 
 const SITE = "https://coastalhomemngt30a.com";
 const SERIF = {
@@ -10,7 +11,7 @@ const SERIF = {
 export const metadata: Metadata = {
   title: "Home Watch Service Areas on 30A",
   description:
-    "Every town Coastal Home Management 30A serves, from Dune Allen Beach to west Panama City Beach, with drive times from the owner's home in Watersound Origins. Home watch from $200/mo.",
+    "Every town Coastal Home Management 30A serves, from Dune Allen to west Panama City Beach, with drive times from Watersound Origins. From $200/mo.",
   keywords:
     "30A home watch service area, home watch towns 30A, Walton County home watch, Rosemary Beach Alys Beach Seaside home watch, second home management 30A Florida",
   alternates: { canonical: `${SITE}/service-areas` },
@@ -76,6 +77,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-white font-sans text-black">
+      <PageSchema path="/service-areas" name="Home Watch Service Areas on 30A" />
       <section className="mx-auto max-w-5xl px-5 pt-14 pb-12 md:pt-20">
         <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40">
           Service areas · Walton and Bay County, FL

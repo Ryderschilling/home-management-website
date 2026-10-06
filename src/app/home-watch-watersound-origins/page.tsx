@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "Home Watch Service in Watersound Origins, FL",
   description:
-    "Coastal Home Management 30A is the dedicated home watch service for Watersound Origins. Local, insured, weekly property checks, photo reports, storm prep. Owner lives in the neighborhood. Free walkthrough.",
+    "Home watch for Watersound Origins second homes. Weekly or bi-weekly visits, photo report every time, storm checks. The owner lives in the neighborhood.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-watersound-origins" },
   keywords: "home watch Watersound Origins, Watersound Origins property management, home watch service Watersound FL, second home care Watersound Origins, property watch Watersound Origins Florida",
   openGraph: {
@@ -42,6 +43,7 @@ const FAQ = [
 export default function HomeWatchWatersoundPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
+      <PageSchema path="/home-watch-watersound-origins" name="Home Watch Service in Watersound Origins, FL" />
       {/* Nav */}
       <nav className="border-b border-black/10 px-5 py-3 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">

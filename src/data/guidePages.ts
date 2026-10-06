@@ -433,7 +433,7 @@ export const allGuidePages: GuidePageData[] = [
     title: "Property Managers on 30A: Who to Call for Your Second Home",
     metaTitle: "Property Managers on 30A: Who to Call",
     metaDescription:
-      "The 30A property managers worth calling, sorted by what your second home needs: vacation rental, long-term rental, buying or selling, or looking after a home you do not rent.",
+      "The 30A property managers worth calling, sorted by what your home needs: vacation rental, long-term rental, buying or selling, or care for a home you keep.",
     eyebrow: "Local guide",
     lede:
       "Search for property management on 30A and you get a wall of vacation rental companies. That is only the right call if you rent. Here is who to call for each situation, from someone who looks after second homes here every week.",

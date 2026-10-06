@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PageSchema from "@/components/PageSchema";
 
 export const metadata: Metadata = {
   title: "Home Watch Service in Naturewalk, FL",
   description:
-    "Home watch and second-home care for Naturewalk at Watersound Origins. Local, insured, weekly property checks, photo reports after every visit. Ryder Schilling lives steps away. Free walkthrough.",
+    "Home watch for Naturewalk at Watersound Origins. Weekly or bi-weekly visits with a photo report every time. The owner lives steps away. From $200/mo.",
   alternates: { canonical: "https://coastalhomemngt30a.com/home-watch-naturewalk" },
   keywords: "home watch Naturewalk, Naturewalk Watersound Origins home watch, property watch Naturewalk Florida, second home care Naturewalk Inlet Beach, home management Naturewalk 30A",
   openGraph: {
@@ -37,6 +38,7 @@ const FAQ = [
 export default function HomeWatchNaturewalkPage() {
   return (
     <main className="min-h-screen bg-white text-black font-sans">
+      <PageSchema path="/home-watch-naturewalk" name="Home Watch Service in Naturewalk, FL" />
       {/* Nav */}
       <nav className="border-b border-black/10 px-5 py-3 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-2">
