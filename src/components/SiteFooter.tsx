@@ -49,6 +49,7 @@ const COMPANY: Array<[string, string]> = [
 const FIND_US: Array<[string, string]> = [
   [siteData.gbpUrl, "Google Reviews"],
   [businessContact.appleMapsUrl, "Apple Maps"],
+  [businessContact.bingMapsUrl, "Bing Maps"],
   ["https://www.facebook.com/profile.php?id=61575773416368", "Facebook"],
   ["https://www.linkedin.com/company/coastal-home-management-30a/", "LinkedIn"],
   ["https://nextdoor.com/pages/coastal-home-management-30a-inlet-beach-fl", "Nextdoor"],

@@ -87,6 +87,7 @@ const organizationSchema = {
     siteData.gbpMapsUrl,
     businessContact.bhwcUrl,
     businessContact.appleMapsUrl,
+    businessContact.bingMapsUrl,
   ],
 };
 

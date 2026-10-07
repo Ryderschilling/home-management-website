@@ -295,6 +295,7 @@ const localBusinessSchema = {
         siteData.gbpMapsUrl,
         businessContact.bhwcUrl,
         businessContact.appleMapsUrl,
+        businessContact.bingMapsUrl,
       ],
     },
     {
@@ -338,6 +339,7 @@ const localBusinessSchema = {
         siteData.gbpMapsUrl,
         businessContact.bhwcUrl,
         businessContact.appleMapsUrl,
+        businessContact.bingMapsUrl,
       ],
     },
   ],
@@ -387,6 +389,7 @@ const organizationSchema = {
     siteData.gbpMapsUrl,
     businessContact.bhwcUrl,
     businessContact.appleMapsUrl,
+    businessContact.bingMapsUrl,
   ],
 };
 

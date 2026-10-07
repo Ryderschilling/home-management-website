@@ -75,6 +75,8 @@ export const businessContact = {
   // purpose: Apple's share link carries the street address, which we keep off
   // public listings where we can (9/28/26 decision).
   appleMapsUrl: "https://maps.apple.com/place?place-id=I362814172E9A792A",
+  // Bing Places listing, live 10/4/26. ypid link only, no street address on it.
+  bingMapsUrl: "https://www.bing.com/maps?ss=ypid.YN97EAC1164AD1D3EB",
 };
 
 // ─── Phone / booking configuration ─────────────────────────────────────────

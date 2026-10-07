@@ -684,6 +684,7 @@ export default function HomePage() {
               "https://sourceatrade.com/contractors/coastal-home-management-30a-3",
               businessContact.bhwcUrl,
               businessContact.appleMapsUrl,
+              businessContact.bingMapsUrl,
             ],
             // aggregateRating and review live ONLY in layout.tsx. Printing them here
             // too gave this @id two ratings, which GSC flagged 9/5/26 as a critical
