@@ -39,7 +39,8 @@ const PLANS = [
     name: "Coastal Elite",
     price: "$600/mo",
     features: [
-      "Everything in Home Watch",
+      "Visits tailored to your home, not locked to every week",
+      "Every Home Watch check, every visit",
       "HVAC filter changes",
       "Storm and freeze checks when weather moves in",
       "Pre-arrival prep and A/C preset",
@@ -197,7 +198,7 @@ export default function TownLandingPage({ town }: { town: TownPageData }) {
                 k: "Distance from owner",
                 v: `About ${town.driveMinutes} minutes from Watersound Origins`,
               },
-              { k: "Visit schedule", v: "Bi-weekly on Essential, weekly on Home Watch and Elite, on a fixed day" },
+              { k: "Visit schedule", v: "Bi-weekly on Essential and weekly on Home Watch, on a fixed day. Elite visits are tailored to the home" },
               { k: "Plans", v: "$200 bi-weekly, $300 weekly, $600 Coastal Elite. No contract." },
               { k: "Proof of visit", v: "Photographs and a written report after every check" },
               { k: "Storm and freeze", v: "Pre-storm and post-storm checks, same-day photos" },

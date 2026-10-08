@@ -10,6 +10,7 @@ import ServiceTiles from "@/components/ServiceTiles";
 import ScrollJourney from "@/components/ScrollJourney";
 import VisitReportProof from "@/components/VisitReportProof";
 import AlwaysOnSection from "@/components/AlwaysOnSection";
+import { STORM_ACTIVE } from "@/data/stormUpdates";
 import FaqAccordion, { type FaqItem } from "@/components/FaqAccordion";
 import { BookButton } from "@/components/BookingProvider";
 import PageSchema from "@/components/PageSchema";
@@ -169,6 +170,23 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* ═══ STORM BAND (Hurricane Isaias, 10/8/26). Off via STORM_ACTIVE. ═══ */}
+      {STORM_ACTIVE && (
+        <section className="bg-[var(--ch-ink)] px-4 py-5 text-white md:px-8">
+          <div className="mx-auto flex max-w-[1240px] flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <p className="text-[15px] leading-[1.5]">
+              <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full bg-[#ff5a4f] align-middle" aria-hidden="true" />
+              Hurricane Isaias: live advisories, alerts and local news for 30A.
+            </p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-[13px] uppercase tracking-[0.14em]">
+              <Link href="/hurricane-isaias-updates" className="underline underline-offset-4 hover:text-[var(--ch-teal-bright)]">Live updates</Link>
+              <Link href="/after-hurricane-isaias-30a" className="underline underline-offset-4 hover:text-[var(--ch-teal-bright)]">After the storm</Link>
+              <Link href="/storm-check" className="underline underline-offset-4 hover:text-[var(--ch-teal-bright)]">Get my home checked</Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ═══ STATS ══════════════════════════════════════════════════ */}
       <section className="fade-section bg-[var(--ch-paper)] px-4 py-20 md:px-8 md:py-28">
         <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4">
@@ -327,7 +345,7 @@ export default function HomePage() {
               </span>
             </h2>
             <p className="ch-lede reveal-item">
-              Every plan includes weekly walkthroughs, immediate issue alerts, and a photo
+              Every plan includes scheduled walkthroughs, immediate issue alerts, and a photo
               report each visit. Month to month. No contracts, no cancellation fees.
             </p>
           </div>
@@ -371,7 +389,8 @@ export default function HomePage() {
                 {(
                   [
                     ["Walkthrough, interior & exterior", true, true, true],
-                    ["Weekly visits (Essential is every other week)", false, true, true],
+                    ["Weekly visits (Essential is every other week)", false, true, false],
+                    ["Visit schedule tailored to your home's needs", false, false, true],
                     ["Issue alerts sent immediately", true, true, true],
                     ["Photo documentation after every visit", true, true, true],
                     ["Written visit report", true, true, true],
@@ -642,6 +661,11 @@ export default function HomePage() {
               ["/closing-your-30a-home-checklist", "Closing Up Your 30A Home"],
               ["/ac-humidity-settings-30a-second-home", "AC & Humidity Settings"],
               ["/storm-shutters-30a", "Storm Shutters While You're Away"],
+              ["/hurricane-isaias-updates", "Hurricane Isaias Updates"],
+              ["/storm-prep-30a", "Storm Prep for 30A Homeowners"],
+              ["/vacation-home-storm-prep-30a", "Vacation Home Storm Prep"],
+              ["/who-to-call-storm-prep-30a", "Who to Call for Storm Prep"],
+              ["/after-hurricane-isaias-30a", "After Hurricane Isaias"],
             ].map(([href, label]) => (
               <Link
                 key={href}

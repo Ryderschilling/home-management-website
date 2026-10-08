@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "What home watch services are available in Naturewalk Florida?",
-    a: "Coastal Home Management 30A offers Essential ($200/month, bi-weekly), Home Watch ($300/month, weekly), and Coastal Elite ($600/month) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include photo documentation, mail pickup, and a written report after every visit. Coastal Elite adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination.",
+    a: "Coastal Home Management 30A offers Essential ($200/month, bi-weekly), Home Watch ($300/month, weekly), and Coastal Elite ($600/month, visits tailored to the home rather than locked to every week) plans for Naturewalk properties. A 6 or 12-month rate lock saves up to 10%, billed monthly. All plans include photo documentation, mail pickup, and a written report after every visit. Coastal Elite adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination.",
   },
   {
     q: "Is Naturewalk at Watersound Origins in CHM's service area?",

@@ -107,7 +107,8 @@ export const plans: Plan[] = [
       {
         label: "Full Watch + Reports",
         items: [
-          { text: "<strong>Everything in Home Watch</strong>, plus:" },
+          { text: "<strong>Visits tailored to your home's needs</strong>, not locked to every week" },
+          { text: "<strong>Every Home Watch check</strong>, appliances, piping and irrigation, on every visit" },
           { text: "<strong>Storm & freeze checks</strong>, extra visits when weather moves in" },
           { text: "<strong>HVAC filter changes</strong>, every unit, every time", tag: "Free" },
         ],
@@ -125,13 +126,6 @@ export const plans: Plan[] = [
         items: [
           { text: "<strong>Contractor coordination</strong>, Ryder is your on-the-ground point of contact" },
           { text: "<strong>Priority response</strong>, you're first in line, always" },
-        ],
-      },
-      {
-        label: "Claim Protection",
-        items: [
-          { text: "<strong>Water Shutoff Protection</strong>, alerts come to us and we go to the house when it trips", tag: "Included" },
-          { text: "<strong>Annual Coverage Record</strong>, a dated PDF of every visit for the year", tag: "$195 value" },
         ],
       },
     ],

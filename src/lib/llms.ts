@@ -53,7 +53,7 @@ export function buildLlmsTxt(): string {
   );
   lines.push("");
   lines.push(
-    "Every plan includes photos and a written report after each visit. Visit frequency is the main difference between plans: Essential is bi-weekly (every other week), Home Watch and Coastal Elite are weekly. Visits are property checks and condition reports. They are not home inspections, which are a separately licensed profession in Florida."
+    "Every plan includes photos and a written report after each visit. Visit frequency is the main difference between plans: Essential is bi-weekly (every other week), Home Watch is weekly, and Coastal Elite visits are tailored to each home's needs rather than locked to every week. Visits are property checks and condition reports. They are not home inspections, which are a separately licensed profession in Florida."
   );
   lines.push("");
 

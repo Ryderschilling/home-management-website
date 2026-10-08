@@ -98,7 +98,7 @@ export const blogPosts: BlogPost[] = [
         paragraphs: [
           `Essential, $${essential?.price?.replace(".00", "")}/month: a bi-weekly property check, photo documentation and a written report every visit, issue alerts, and mail pickup.`,
           `Home Watch, $${homeWatch?.price?.replace(".00", "")}/month: everything in Essential with weekly visits instead of bi-weekly, plus appliance and plumbing checks and irrigation filter cleaning.`,
-          `Coastal Elite, $${elite?.price?.replace(".00", "")}/month: our top tier, limited to 8 members. Guaranteed 2-hour emergency response, weekly photo reports, arrival prep twice a year, 3 on-call hours included, and a direct line to the founder.`,
+          `Coastal Elite, $${elite?.price?.replace(".00", "")}/month: our top tier, limited to 8 members. Guaranteed 2-hour emergency response, visits tailored to the home with a photo report every visit, arrival prep twice a year, 3 on-call hours included, and a direct line to the founder.`,
           "On-call property tasks and mail/trash handling are also available a la carte for owners who don't need a recurring plan.",
         ],
       },

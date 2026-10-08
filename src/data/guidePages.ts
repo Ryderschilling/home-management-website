@@ -40,6 +40,8 @@ export type GuidePageData = {
   dateModified: string;
 };
 
+import { stormGuidePages } from "./stormGuidePages";
+
 const PUBLISHED = "2026-09-27";
 
 export const allGuidePages: GuidePageData[] = [
@@ -129,6 +131,8 @@ export const allGuidePages: GuidePageData[] = [
       label: "Storm Check sign-up",
     },
     related: [
+      { href: "/hurricane-isaias-updates", label: "Hurricane Isaias updates for 30A" },
+      { href: "/who-to-call-storm-prep-30a", label: "Who to call to prep your 30A second home" },
       { href: "/closing-your-30a-home-checklist", label: "Closing up your 30A home: the checklist" },
       { href: "/blog/hurricane-season-prep-30a-second-home", label: "Hurricane season prep for 30A second homes" },
       { href: "/ac-humidity-settings-30a-second-home", label: "AC and humidity settings for an empty 30A home" },
@@ -383,7 +387,7 @@ export const allGuidePages: GuidePageData[] = [
       {
         heading: "What home watch looks like with Coastal Home Management 30A",
         body: [
-          "Ryder Schilling owns and runs the company from Watersound Origins. Every visit is a walkthrough inside and out, with photos and a written report emailed to you. Plans: Essential, every other week, $200 a month. Home Watch, every week, $300 a month. Coastal Elite, weekly plus storm and freeze checks, arrival prep and contractor coordination, $600 a month. Month to month, with 6 and 12 month rate locks available.",
+          "Ryder Schilling owns and runs the company from Watersound Origins. Every visit is a walkthrough inside and out, with photos and a written report emailed to you. Plans: Essential, every other week, $200 a month. Home Watch, every week, $300 a month. Coastal Elite, visits tailored to the home rather than locked to every week, plus storm and freeze checks, arrival prep and contractor coordination, $600 a month. Month to month, with 6 and 12 month rate locks available.",
         ],
       },
     ],
@@ -491,7 +495,7 @@ export const allGuidePages: GuidePageData[] = [
         heading: "If you do not rent it: home watch",
         body: [
           "Most second homes on 30A are never rented. They sit empty for weeks while the owners are home somewhere else, and a rental manager has nothing to manage. What those homes need is someone local walking through on a schedule: catching a leak, a tripped AC or storm damage in days instead of months.",
-          "That is what Coastal Home Management 30A does. Ryder Schilling owns and runs it from Watersound Origins, a few minutes from Rosemary and Alys. Every visit is a walkthrough inside and out, with photos and a written report emailed to you. Essential is every other week for $200 a month, Home Watch is weekly for $300, and Coastal Elite adds storm and freeze checks, arrival prep and contractor coordination for $600. No long contract, and the first home check is free.",
+          "That is what Coastal Home Management 30A does. Ryder Schilling owns and runs it from Watersound Origins, a few minutes from Rosemary and Alys. Every visit is a walkthrough inside and out, with photos and a written report emailed to you. Essential is every other week for $200 a month, Home Watch is weekly for $300, and Coastal Elite sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, arrival prep and contractor coordination for $600. No long contract, and the first home check is free.",
         ],
       },
       {
@@ -544,6 +548,8 @@ export const allGuidePages: GuidePageData[] = [
     datePublished: "2026-09-28",
     dateModified: "2026-09-28",
   },
+  // Storm cluster added 10/8/26 (Hurricane Isaias), kept in its own file.
+  ...stormGuidePages,
 ];
 
 export function getGuidePage(slug: string): GuidePageData {

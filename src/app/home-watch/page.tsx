@@ -197,7 +197,7 @@ export default function HomeWatchPage() {
               },
               {
                 q: "How much does a home watch service cost on 30A?",
-                a: "Home watch plans at Coastal Home Management 30A are $200/month for bi-weekly Essential visits, $300/month for weekly Home Watch visits, and $600/month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, and contractor coordination. Every plan includes photos and a written report after each visit. Month-to-month with no contracts required, or lock a 6 or 12-month rate and save up to 10%."
+                a: "Home watch plans at Coastal Home Management 30A are $200/month for bi-weekly Essential visits, $300/month for weekly Home Watch visits, and $600/month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, and contractor coordination. Every plan includes photos and a written report after each visit. Month-to-month with no contracts required, or lock a 6 or 12-month rate and save up to 10%."
               },
               {
                 q: "What does a home watch company do in Watersound Origins?",

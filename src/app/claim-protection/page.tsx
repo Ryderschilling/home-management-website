@@ -220,7 +220,7 @@ export default function ClaimProtectionPage() {
           <p className="ch-eyebrow reveal-item">03 · The two pieces</p>
           <h2 className="ch-display ch-display--sm mb-7 max-w-[20ch]">
             <span className="ch-mask">
-              <span>Included in Coastal Elite.</span>
+              <span>Two services, one record.</span>
             </span>
             <span className="ch-mask">
               <span>Add them to any plan.</span>
@@ -243,8 +243,8 @@ export default function ClaimProtectionPage() {
                 </ul>
                 <p className="mt-8 border-t border-[var(--ch-hairline)] pt-5 text-[13.5px] text-[var(--ch-muted)]">
                   {"installPriceLabel" in s
-                    ? `${s.installPriceLabel}, then ${s.monitoringPriceLabel} for alert response. Alert response is included on Coastal Elite.`
-                    : `${s.annualPriceLabel}. Included on Coastal Elite.`}
+                    ? `${s.installPriceLabel}, then ${s.monitoringPriceLabel} for alert response.`
+                    : `${s.annualPriceLabel}.`}
                 </p>
               </div>
             ))}

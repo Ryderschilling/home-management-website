@@ -28,7 +28,7 @@ export const PRICING_FAQS = [
   },
   {
     q: "How much does home watch cost on 30A?",
-    a: "Coastal Home Management 30A charges $200 per month for Essential (a bi-weekly walkthrough with photos and a written report every visit), $300 per month for Home Watch (weekly visits, plus appliance and plumbing checks and irrigation filter cleaning), and $600 per month for Coastal Elite (adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination). Same published pricing in every town served, month to month, with 6 and 12 month rate locks that save up to 10 percent.",
+    a: "Coastal Home Management 30A charges $200 per month for Essential (a bi-weekly walkthrough with photos and a written report every visit), $300 per month for Home Watch (weekly visits, plus appliance and plumbing checks and irrigation filter cleaning), and $600 per month for Coastal Elite (visits tailored to the home rather than locked to every week, adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination). Same published pricing in every town served, month to month, with 6 and 12 month rate locks that save up to 10 percent.",
   },
   {
     q: "Do I need to be in town to get started?",

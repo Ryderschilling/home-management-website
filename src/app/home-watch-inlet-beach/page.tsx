@@ -32,7 +32,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Inlet Beach FL?",
-    a: "Plans are $200/month (Essential, bi-weekly visits with photo reports and mail pickup), $300/month (Home Watch, weekly visits plus appliance and plumbing checks), and $600/month (Coastal Elite, adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination). Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
+    a: "Plans are $200/month (Essential, bi-weekly visits with photo reports and mail pickup), $300/month (Home Watch, weekly visits plus appliance and plumbing checks), and $600/month (Coastal Elite, visits tailored to the home rather than locked to every week, adds storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination). Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
 ];
 

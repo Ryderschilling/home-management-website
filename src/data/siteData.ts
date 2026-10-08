@@ -198,13 +198,13 @@ export const offerings: {
   {
     name: "Water Shutoff Protection",
     description:
-      "A smart automatic shutoff valve installed on your main water line by a licensed plumber. It closes the line by itself when it detects a burst or a running leak, and the alert routes to us so someone local goes to the house. $1,295 installed, then $35/month for alert response. Alert response is included on Coastal Elite.",
+      "A smart automatic shutoff valve installed on your main water line by a licensed plumber. It closes the line by itself when it detects a burst or a running leak, and the alert routes to us so someone local goes to the house. $1,295 installed, then $35/month for alert response.",
     price: "1295.00",
   },
   {
     name: "Annual Coverage Record",
     description:
-      "Once a year, every visit to your home compiled into one dated document: what was checked, what was found, and the photos, in order, including the areas that were dry. Delivered as a PDF you can forward to your insurance agent. $195/year. Included on Coastal Elite.",
+      "Once a year, every visit to your home compiled into one dated document: what was checked, what was found, and the photos, in order, including the areas that were dry. Delivered as a PDF you can forward to your insurance agent. $195/year.",
     price: "195.00",
   },
 ];

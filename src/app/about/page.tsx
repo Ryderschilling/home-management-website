@@ -233,7 +233,8 @@ export default function AboutPage() {
                   ["Written visit report every visit",     true,  true,  true],
                   ["Mail & package pickup",                true,  true,  true],
                   ["Issue alerts and key holding",         true,  true,  true],
-                  ["Weekly visits (Essential is bi-weekly)", false, true, true],
+                  ["Weekly visits (Essential is bi-weekly)", false, true, false],
+                  ["Visits tailored to your home's needs",  false, false, true],
                   ["Appliance & plumbing checks",          false, true,  true],
                   ["Irrigation filter cleaning",           false, true,  true],
                   ["Storm & freeze checks",                false, false, true],
@@ -241,7 +242,6 @@ export default function AboutPage() {
                   ["Pre-arrival prep & A/C preset",        false, false, true],
                   ["Contractor coordination",              false, false, true],
                   ["Guaranteed 2-hour emergency response", false, false, true],
-                  ["Annual Coverage Record",               false, false, true],
                 ].map(([feature, std, prem, elite]) => (
                   <tr key={feature as string}>
                     <td className="py-3 pr-6 text-gray-700">{feature as string}</td>

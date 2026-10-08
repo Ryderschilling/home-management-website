@@ -169,6 +169,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: `${baseUrl}/hurricane-isaias-updates`,
+      lastModified: new Date(),
+      changeFrequency: "hourly",
+      priority: 0.9,
+    },
     ...townUrls,
     ...guideUrls,
     ...blogUrls,

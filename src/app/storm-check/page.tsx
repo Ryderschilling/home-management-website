@@ -214,6 +214,8 @@ export default function StormCheckPage() {
           <p className="mt-8 text-[14.5px] leading-[1.75] text-[var(--ch-muted)]">
             Not sure what your shutters need before the season?{" "}
             <Link href="/storm-shutters-30a" className="underline underline-offset-4">Read the storm shutter guide</Link>.
+            Tracking a storm right now?{" "}
+            <Link href="/hurricane-isaias-updates" className="underline underline-offset-4">Hurricane Isaias live updates for 30A</Link>.
           </p>
           <LegalDisclaimer variant="inline" />
         </div>

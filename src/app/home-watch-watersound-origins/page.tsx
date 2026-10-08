@@ -28,7 +28,7 @@ const FAQ = [
   },
   {
     q: "How much does home watch cost in Watersound Origins?",
-    a: "Plans are $200/month for bi-weekly Essential visits, $300/month for weekly Home Watch visits with appliance and plumbing checks, and $600/month for Coastal Elite with storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination. Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
+    a: "Plans are $200/month for bi-weekly Essential visits, $300/month for weekly Home Watch visits with appliance and plumbing checks, and $600/month for Coastal Elite with visits tailored to the home rather than locked to every week, storm and freeze checks, HVAC filter changes, pre-arrival prep, and contractor coordination. Month-to-month with no contracts required, or save up to 10% with a 6 or 12-month rate lock.",
   },
   {
     q: "Is Coastal Home Management 30A insured?",
@@ -161,7 +161,7 @@ export default function HomeWatchWatersoundPage() {
               {
                 name: "Coastal Elite",
                 price: "$600/mo",
-                features: ["Everything in Home Watch", "HVAC filter changes", "Storm & freeze checks", "Pre-arrival prep", "Contractor coordination"],
+                features: ["Visits tailored to your home", "Every Home Watch check", "HVAC filter changes", "Storm & freeze checks", "Pre-arrival prep", "Contractor coordination"],
               },
             ].map((plan) => (
               <div

@@ -43,12 +43,12 @@ const addons = [
   },
   {
     name: "Water Shutoff Protection",
-    desc: "Smart automatic shutoff valve on your main line, installed by a licensed plumber. Alerts route to us. Included on Coastal Elite.",
+    desc: "Smart automatic shutoff valve on your main line, installed by a licensed plumber. Alerts route to us.",
     price: "$1,295 installed + $35/mo",
   },
   {
     name: "Annual Coverage Record",
-    desc: "Every visit for the year in one dated PDF with photos, built to hand to your insurance agent. Included on Coastal Elite.",
+    desc: "Every visit for the year in one dated PDF with photos, built to hand to your insurance agent.",
     price: "$195/year",
   },
 ];
@@ -202,7 +202,7 @@ export default function PricingPage() {
                 <td className="compare-td compare-td-feature">Walkthrough, interior &amp; exterior</td>
                 <td className="compare-td compare-td-label compare-td-bronze">Bi-weekly</td>
                 <td className="compare-td compare-td-label compare-td-silver">Weekly</td>
-                <td className="compare-td compare-td-label compare-td-gold">Weekly</td>
+                <td className="compare-td compare-td-label compare-td-gold">Tailored to your home</td>
               </tr>
               <tr className="compare-row-alt">
                 <td className="compare-td compare-td-feature">Issue alerts sent immediately</td>

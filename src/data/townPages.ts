@@ -103,7 +103,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Rosemary Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. Month to month with no contract, or lock a 6 or 12 month rate and save up to 10 percent. Rosemary Beach homes with a carriage house or a third floor usually make the most sense on Home Watch or above, because there is simply more house to walk.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. Month to month with no contract, or lock a 6 or 12 month rate and save up to 10 percent. Rosemary Beach homes with a carriage house or a third floor usually make the most sense on Home Watch or above, because there is simply more house to walk.",
       },
       {
         q: "Do you check the carriage house too?",
@@ -190,7 +190,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Alys Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Alys Beach homes with a courtyard pool land on Home Watch or Coastal Elite, because the courtyard and pool equipment add real checks to every visit.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Alys Beach homes with a courtyard pool land on Home Watch or Coastal Elite, because the courtyard and pool equipment add real checks to every visit.",
       },
       {
         q: "Do you check the courtyard and pool?",
@@ -277,7 +277,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seacrest Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, 6 and 12 month rate locks save up to 10 percent. Seacrest homes on original 1990s equipment usually get the most out of Home Watch, since the plumbing and appliance checks are where the real risk sits.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, 6 and 12 month rate locks save up to 10 percent. Seacrest homes on original 1990s equipment usually get the most out of Home Watch, since the plumbing and appliance checks are where the real risk sits.",
       },
       {
         q: "My Seacrest home is on a rental program. Do I still need home watch?",
@@ -364,7 +364,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Watersound Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Dune-front homes usually justify Coastal Elite for the storm response alone.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Dune-front homes usually justify Coastal Elite for the storm response alone.",
       },
       {
         q: "Can you get through the gate?",
@@ -451,7 +451,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seagrove Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, and 6 or 12 month rate locks save up to 10 percent. Older Seagrove homes usually get more value from Home Watch than Essential, because the plumbing and appliance checks are where the risk actually is.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, and 6 or 12 month rate locks save up to 10 percent. Older Seagrove homes usually get more value from Home Watch than Essential, because the plumbing and appliance checks are where the risk actually is.",
       },
       {
         q: "My Seagrove cottage is older. Does that change what you check?",
@@ -538,7 +538,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Seaside?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Seaside cottages sit best on Home Watch, because the exterior wood and the roof are what need tracking here, not just the interior.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Most Seaside cottages sit best on Home Watch, because the exterior wood and the roof are what need tracking here, not just the interior.",
       },
       {
         q: "My Seaside cottage is a rental most of the year. What does home watch add?",
@@ -625,7 +625,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in WaterColor?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Larger WaterColor homes with a pool or extensive grounds typically fit Home Watch or Coastal Elite.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent. Larger WaterColor homes with a pool or extensive grounds typically fit Home Watch or Coastal Elite.",
       },
       {
         q: "Do you check irrigation and the grounds?",
@@ -712,7 +712,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Grayton Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. In Grayton, where there is often no HOA and no neighbor watching, weekly visits on Home Watch are the floor we recommend rather than bi-weekly Essential.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. In Grayton, where there is often no HOA and no neighbor watching, weekly visits on Home Watch are the floor we recommend rather than bi-weekly Essential.",
       },
       {
         q: "My Grayton house floods sometimes. Can you check on it after rain?",
@@ -799,7 +799,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Blue Mountain Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract, with 6 and 12 month rate locks that save up to 10 percent.",
       },
       {
         q: "Is Blue Mountain Beach safer from storms because it's higher?",
@@ -886,7 +886,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Santa Rosa Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks that save up to 10 percent. Because the area is so spread out, Santa Rosa Beach clients are routed on a fixed weekly or bi-weekly day, which is what keeps the price where it is.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks that save up to 10 percent. Because the area is so spread out, Santa Rosa Beach clients are routed on a fixed weekly or bi-weekly day, which is what keeps the price where it is.",
       },
       {
         q: "Santa Rosa Beach is huge. Which parts do you actually serve?",
@@ -973,7 +973,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Dune Allen Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. At the west end we recommend a fixed weekly day so the route works, and we price it the same as everywhere else.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. At the west end we recommend a fixed weekly day so the route works, and we price it the same as everywhere else.",
       },
       {
         q: "You're based on the east end. Is Dune Allen too far?",
@@ -1060,7 +1060,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Miramar Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Condominium units are usually well served by Essential, since the association already owns the building envelope.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. Condominium units are usually well served by Essential, since the association already owns the building envelope.",
       },
       {
         q: "Do you watch condominiums or just houses?",
@@ -1147,7 +1147,7 @@ export const townPages: Record<string, TownPageData> = {
       },
       {
         q: "How much does home watch cost in Panama City Beach?",
-        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. West-end PCB is priced exactly the same as 30A, with no county-line surcharge.",
+        a: "Plans are $200 per month for Essential, a bi-weekly check with photos and a written report every visit, $300 per month for Home Watch, which moves to weekly visits and adds appliance and plumbing checks, and $600 per month for Coastal Elite, which sets visits tailored to the home rather than locked to every week and adds storm and freeze checks, HVAC filter changes, pre-arrival prep and contractor coordination. No contract required, with 6 and 12 month rate locks saving up to 10 percent. West-end PCB is priced exactly the same as 30A, with no county-line surcharge.",
       },
       {
         q: "Do you watch condominiums in PCB?",
