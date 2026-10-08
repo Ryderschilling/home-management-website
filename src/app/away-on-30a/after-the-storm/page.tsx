@@ -20,7 +20,7 @@ export default function AfterTheStormPage() {
     <main className="bg-[var(--ch-paper)]">
       {/* Full-bleed hero: the storm is the background, headline on top. */}
       <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[var(--ch-ink)] px-4 pt-28 pb-14 md:min-h-[86vh] md:px-8 md:pb-20">
-        <Image src="/isaias-satellite.jpg" alt="Hurricane Isaias from above over the Gulf, satellite view" fill priority sizes="100vw" className="-z-20 object-cover object-[53%_63%]" />
+        <Image src="/isaias-hero-wide.jpg" alt="Hurricane Isaias from above over the Gulf, satellite view" fill priority sizes="100vw" className="-z-20 object-cover object-[53%_63%]" />
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-black/45 via-black/25 to-black/75" />
         <div className="mx-auto w-full max-w-[900px] text-center text-white">
           <h1 className="mb-5" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 88, 'wght' 760", fontSize: "clamp(44px, 9vw, 104px)", lineHeight: 0.95, letterSpacing: "-0.02em" }}>
