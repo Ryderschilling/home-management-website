@@ -18,21 +18,25 @@ export const metadata: Metadata = {
 export default function AfterTheStormPage() {
   return (
     <main className="bg-[var(--ch-paper)]">
-      <section className="bg-[var(--ch-ink)] pt-16 md:pt-20">
-        <div className="relative mx-auto aspect-[16/9] max-h-[62vh] w-full max-w-[1400px] overflow-hidden">
-          <Image src="/isaias-satellite.jpg" alt="Hurricane Isaias from above over the Gulf, satellite view" fill priority sizes="100vw" className="object-cover" />
-        </div>
-        <p className="mx-auto max-w-[1400px] px-4 py-2 text-right text-[11px] text-white/50">Hurricane Isaias, Oct 8. Image: NOAA GOES-19</p>
-      </section>
-
-      <section className="bg-[var(--ch-paper)] px-4 pt-12 pb-16 md:px-8 md:pt-16">
-        <div className="mx-auto max-w-[640px] text-center">
-          <h1 className="ch-display mb-5" style={{ fontSize: "clamp(38px, 8vw, 64px)", lineHeight: 1 }}>
+      {/* Full-bleed hero: the storm is the background, headline on top. */}
+      <section className="relative isolate flex min-h-[78svh] items-end overflow-hidden bg-[var(--ch-ink)] px-4 pt-28 pb-14 md:min-h-[86vh] md:px-8 md:pb-20">
+        <Image src="/isaias-satellite.jpg" alt="Hurricane Isaias from above over the Gulf, satellite view" fill priority sizes="100vw" className="-z-20 object-cover object-[53%_63%]" />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-black/45 via-black/25 to-black/75" />
+        <div className="mx-auto w-full max-w-[900px] text-center text-white">
+          <h1 className="mb-5" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 88, 'wght' 760", fontSize: "clamp(44px, 9vw, 104px)", lineHeight: 0.95, letterSpacing: "-0.02em" }}>
             Not in town after Isaias?
           </h1>
-          <p className="ch-lede mx-auto mb-10 max-w-[44ch]">
+          <p className="mx-auto max-w-[40ch] text-[18px] leading-[1.55] text-white/90 md:text-[21px]">
             I&apos;ll check your 30A home once the roads are safe. Inside and out, with photos sent straight to you.
           </p>
+          <a href="#request" className="ch-btn mt-8 border-white bg-white !text-[var(--ch-ink)]">Request a check</a>
+          <p className="mt-10 text-[11px] text-white/55">Hurricane Isaias, Oct 8. Image: NOAA GOES-19</p>
+        </div>
+      </section>
+
+      <section id="request" className="scroll-mt-20 bg-[var(--ch-paper)] px-4 pt-12 pb-16 md:px-8 md:pt-16">
+        <div className="mx-auto max-w-[640px] text-center">
+          <p className="ch-label mb-6">Tell me about the house</p>
           <StormForm />
         </div>
       </section>
