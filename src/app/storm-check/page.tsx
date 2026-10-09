@@ -5,8 +5,8 @@ import StormCheckForm from "@/components/StormCheckForm";
 import { primaryPhone, primaryPhoneDisplay, trustStats } from "@/data/siteData";
 import PageSchema from "@/components/PageSchema";
 
-// Storm Check, added 9/11/26. Pricing set by Ryder that day: $100 per storm for
-// owners not on a plan, $50 per storm for plan clients. Copy rules that apply here:
+// Storm Check, added 9/11/26. Since 10/9/26 it is a REQUEST, not a sign-up, and no
+// price is shown anywhere on the site (Ryder's call): he confirms each one personally. Copy rules that apply here:
 // no repair work after storms (photos, then a licensed contractor), never call a
 // visit an inspection, and no insurance claims beyond what src/data/protection.ts
 // allows. This page mentions claims, so it renders <LegalDisclaimer />.
@@ -17,7 +17,7 @@ const SITE = "https://coastalhomemngt30a.com";
 export const metadata: Metadata = {
   title: "Storm Check for 30A Second Homes",
   description:
-    "Out of town when a storm heads for 30A? Storm prep before landfall and a photo check after: $100 per storm, $50 on a plan. Watersound Origins to Rosemary.",
+    "Out of town when a storm heads for 30A? Request storm prep before landfall and a photo check after. Ryder confirms every request personally. Watersound Origins to Rosemary.",
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: "Storm Check for 30A Second Homes",
@@ -44,8 +44,8 @@ const AFTER = [
 
 const FAQ = [
   {
-    q: "What does Storm Check cost?",
-    a: "$100 per storm for homeowners who are not on a Coastal Home Management 30A plan, and $50 per storm for plan clients. Nothing is charged to sign up.",
+    q: "How does a Storm Check request work?",
+    a: "Fill out the request with your address and how to reach you. Ryder reaches out by text or email to confirm the details for your home before any visit. Nothing is charged to request.",
   },
   {
     q: "Do I need to be in town?",
@@ -96,10 +96,6 @@ export default function StormCheckPage() {
       hasMap: "https://www.google.com/maps?cid=1620304355006096316",
     },
     areaServed: ["Watersound Origins", "Alys Beach", "Rosemary Beach", "Inlet Beach", "Naturewalk", "Seacrest Beach", "Scenic 30A"],
-    offers: [
-      { "@type": "Offer", name: "Storm Check, not on a plan", price: "100", priceCurrency: "USD" },
-      { "@type": "Offer", name: "Storm Check, plan clients", price: "50", priceCurrency: "USD" },
-    ],
   };
 
   return (
@@ -121,12 +117,12 @@ export default function StormCheckPage() {
             Insured Florida LLC · Watersound Origins · Alys · Rosemary · Scenic 30A
           </p>
           <p className="ch-lede reveal-item max-w-[60ch]">
-            Put your home on the Storm Check list once. Before a named storm reaches 30A, Ryder
-            preps the outside of your house. After it passes, you get photos of the home by email.
-            $100 per storm, or $50 if you are on a plan.
+            Request a Storm Check for your home. Before a named storm reaches 30A, Ryder preps the
+            outside of your house. After it passes, you get photos of the home by email. Ryder
+            confirms every request with you first.
           </p>
           <div className="reveal-item mt-10 flex flex-wrap items-center gap-4">
-            <a href="#sign-up" className="ch-btn ch-btn--solid">Add My Home</a>
+            <a href="#request" className="ch-btn ch-btn--solid">Request a Storm Check</a>
             <a href={`tel:${primaryPhone()}`} className="ch-btn">{primaryPhoneDisplay()}</a>
           </div>
         </div>
@@ -156,38 +152,38 @@ export default function StormCheckPage() {
         </div>
       </section>
 
-      {/* ── Price ────────────────────────────────────────────────────────── */}
+      {/* ── How it works (no price shown, Ryder's call 10/9/26) ─────────── */}
       <section className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper)] px-4 py-20 md:px-8 md:py-24">
         <div className="mx-auto grid max-w-[1240px] gap-10 md:grid-cols-3">
           <div>
-            <p className="ch-label mb-3">Not on a plan</p>
-            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>$100</p>
-            <p className="mt-3 text-[14px] text-[var(--ch-muted)]">per storm, prep and photo check</p>
+            <p className="ch-label mb-3">Step one</p>
+            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>Request</p>
+            <p className="mt-3 text-[14px] text-[var(--ch-muted)]">Send your address and how to reach you. Two minutes.</p>
           </div>
           <div>
-            <p className="ch-label mb-3">On a plan</p>
-            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>$50</p>
+            <p className="ch-label mb-3">Step two</p>
+            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>Confirm</p>
             <p className="mt-3 text-[14px] text-[var(--ch-muted)]">
-              per storm for Essential, Home Watch and Coastal Elite clients.{" "}
+              Ryder reaches out by text or email before any visit. Already on a plan?{" "}
               <Link href="/pricing" className="underline underline-offset-4">See the plans</Link>
             </p>
           </div>
           <div>
-            <p className="ch-label mb-3">To sign up</p>
-            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>$0</p>
+            <p className="ch-label mb-3">Step three</p>
+            <p className="text-[46px] leading-none tracking-[-0.03em] text-[var(--ch-ink)]" style={{ fontFamily: "var(--font-display)", fontVariationSettings: "'wdth' 112, 'wght' 620" }}>Photos</p>
             <p className="mt-3 text-[14px] text-[var(--ch-muted)]">
-              {trustStats.ratingValue} on Google across {trustStats.reviewCount} reviews
+              Prep before, photos after. {trustStats.ratingValue} on Google across {trustStats.reviewCount} reviews
             </p>
           </div>
         </div>
       </section>
 
       {/* ── Form ─────────────────────────────────────────────────────────── */}
-      <section id="sign-up" className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-20 md:px-8 md:py-28">
+      <section id="request" className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-20 md:px-8 md:py-28">
         <div className="mx-auto grid max-w-[1240px] gap-12 md:grid-cols-[1fr_1.2fr]">
           <div>
-            <p className="ch-eyebrow reveal-item">Sign up once</p>
-            <h2 className="ch-display ch-display--sm mb-6">Put your home on the list.</h2>
+            <p className="ch-eyebrow reveal-item">Request a Storm Check</p>
+            <h2 className="ch-display ch-display--sm mb-6">Would you like a storm check?</h2>
             <p className="ch-lede max-w-[46ch]">
               Two minutes now means nobody is scrambling for a gate code when the cone turns
               toward the Panhandle. Not on a plan yet? The first home check is free, and the photo

@@ -654,7 +654,7 @@ export default function HomePage() {
               ["/mail-package-handling-inlet-beach", "Mail & Package Handling"],
               ["/home-check-services-30a", "Home Check Services"],
               ["/pricing", "Service Plans & Pricing"],
-              ["/storm-check", "Storm Check Sign-Up"],
+              ["/storm-check", "Request a Storm Check"],
               ["/choosing-a-home-watch-company-30a", "How to Choose a Home Watch Company"],
               ["/home-watch-vs-property-management-30a", "Home Watch vs Property Management"],
               ["/property-managers-30a", "Property Managers on 30A"],

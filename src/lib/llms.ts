@@ -59,7 +59,7 @@ export function buildLlmsTxt(): string {
 
   lines.push("## Storm Check");
   lines.push(
-    `- [Storm Check](${BASE_URL}/storm-check): Storm prep before a named storm reaches 30A and a photo check of the home after it passes, for second-home owners who are out of town. $100 per storm, or $50 per storm for plan clients. Nothing is charged to sign up. No repair work: if something is damaged, the owner gets photos and a licensed contractor referral.`
+    `- [Storm Check](${BASE_URL}/storm-check): Storm prep before a named storm reaches 30A and a photo check of the home after it passes, for second-home owners who are out of town. Owners request a check and Ryder confirms the details with them before any visit. Nothing is charged to request. No repair work: if something is damaged, the owner gets photos and a licensed contractor referral.`
   );
   lines.push("");
 

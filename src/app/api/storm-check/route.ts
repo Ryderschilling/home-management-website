@@ -8,9 +8,9 @@ export const runtime = "nodejs";
 /**
  * POST /api/storm-check
  *
- * Storm Check sign-up (added 9/11/26). Pricing set by Ryder that day:
- * $100 per storm for owners not on a plan, $50 per storm for plan clients.
- * Nothing is charged at sign-up; Ryder invoices in Square.
+ * Storm Check REQUEST (added 9/11/26, reworded 10/9/26). No price on the site:
+ * Ryder confirms each request and the price with the owner before any visit,
+ * then invoices in Square.
  *
  * The lead goes to the dashboard through the existing intake bridge, so /leads
  * stays the single source of truth. Ryder gets an email. Since 9/21/26 the
@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
     }
 
     const planLine =
-      onPlan === "yes" ? "Says they are on a plan ($50 per storm)" :
-      onPlan === "no" ? "Not on a plan ($100 per storm)" :
+      onPlan === "yes" ? "Says they are on a plan" :
+      onPlan === "no" ? "Not on a plan" :
       "Did not say whether they are on a plan";
 
     await forwardLeadToDashboard({
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       phone: phone || null,
       community: neighborhood || null,
       source: "Website /storm-check",
-      message: `Storm Check sign-up. Address: ${address}. ${planLine}.`,
+      message: `Storm Check request. Address: ${address}. ${planLine}.`,
     });
 
     const apiKey = process.env.RESEND_API_KEY;
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         ["Plan", planLine],
       ];
       const html = `<div style="font-family:system-ui,sans-serif;max-width:520px;color:#0a0a0a">
-  <p style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#96969e;margin:0 0 12px">Storm Check sign-up</p>
+  <p style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#96969e;margin:0 0 12px">Storm Check request</p>
   <table style="border-collapse:collapse;width:100%">${rows
     .map(
       ([k, v]) =>
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
           from,
           to,
           replyTo: email,
-          subject: `Storm Check sign-up, ${firstName || email}${neighborhood ? ` (${neighborhood})` : ""}`,
+          subject: `Storm Check request, ${firstName || email}${neighborhood ? ` (${neighborhood})` : ""}`,
           html,
         });
       } catch (err) {

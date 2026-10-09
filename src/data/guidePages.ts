@@ -56,7 +56,7 @@ export const allGuidePages: GuidePageData[] = [
     lede:
       "Roll-downs, accordions, Bermudas or bolt-on panels, the shutters only help if someone is at the house to close them before the wind arrives. Here is how that works for 30A owners who live somewhere else.",
     directAnswer:
-      "On Scenic 30A, storm shutters on a second home are closed by whoever the owner has lined up in advance: a home watch company, a property manager, or a neighbor. Most HOAs in Watersound, Alys Beach and Rosemary Beach do not close them for owners. Coastal Home Management 30A closes every shutter type, including roll-down, accordion, Bermuda and bolt-on storm panels, through its Storm Check service: $100 per storm, or $50 for plan clients, with photos of the home after the storm passes. Owners sign up once before the season and nothing is charged until a storm is coming.",
+      "On Scenic 30A, storm shutters on a second home are closed by whoever the owner has lined up in advance: a home watch company, a property manager, or a neighbor. Most HOAs in Watersound, Alys Beach and Rosemary Beach do not close them for owners. Coastal Home Management 30A closes every shutter type, including roll-down, accordion, Bermuda and bolt-on storm panels, through its Storm Check service, with photos of the home after the storm passes. Owners request a check and Ryder confirms the details with them before any visit.",
     sections: [
       {
         heading: "Why the timing is tighter than most owners think",
@@ -117,7 +117,7 @@ export const allGuidePages: GuidePageData[] = [
       },
       {
         q: "What does it cost to have my shutters closed?",
-        a: "Storm Check is $100 per storm for owners not on a plan and $50 per storm for plan clients. That covers the prep visit before the storm and the photo check after. Nothing is charged to sign up.",
+        a: "Storm Check covers the prep visit before the storm and the photo check after. Request one through the Storm Check page and Ryder confirms the details and cost for your home with you before any visit. Nothing is charged to request.",
       },
       {
         q: "Who opens the shutters after the storm?",
@@ -126,9 +126,9 @@ export const allGuidePages: GuidePageData[] = [
     ],
     cta: {
       heading: "Put your home on the storm list.",
-      body: "Sign up once. Nothing is charged until a storm is coming.",
+      body: "Request a check. Ryder confirms with you before any visit.",
       href: "/storm-check",
-      label: "Storm Check sign-up",
+      label: "Request a Storm Check",
     },
     related: [
       { href: "/hurricane-isaias-updates", label: "Hurricane Isaias updates for 30A" },

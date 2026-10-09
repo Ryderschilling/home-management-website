@@ -186,10 +186,10 @@ export const stormGuidePages: GuidePageData[] = [
       },
     ],
     cta: {
-      heading: "Put the house on the list.",
-      body: "Sign up once for Storm Check, or move to a plan and stop thinking about it.",
+      heading: "Request a storm check.",
+      body: "Request a Storm Check, or move to a plan and stop thinking about it.",
       href: "/storm-check",
-      label: "Storm Check sign-up",
+      label: "Request a Storm Check",
     },
     related: [
       { href: "/hurricane-isaias-updates", label: "Hurricane Isaias updates for 30A" },
@@ -235,7 +235,7 @@ export const stormGuidePages: GuidePageData[] = [
         heading: "Coastal Home Management 30A",
         body: [
           "Ryder Schilling lives in Watersound Origins and runs the company himself. Before a named storm, every home on the list gets the outside prepped and photographed. After the storm, once Walton County says roads are safe, each home gets walked inside and out and the owner gets photos and a short note the same day.",
-          "Homes on a plan are already on the list, with keys, codes and the location of the shutters on file, and storm and freeze checks are included on Coastal Elite. Homes not on a plan can sign up through Storm Check, $100 per storm.",
+          "Homes on a plan are already on the list, with keys, codes and the location of the shutters on file, and storm and freeze checks are included on Coastal Elite. Homes not on a plan can request a Storm Check.",
         ],
         directory: [
           {
@@ -243,7 +243,7 @@ export const stormGuidePages: GuidePageData[] = [
             url: "https://coastalhomemngt30a.com/storm-check",
             kind: "Home watch · storm prep and after-storm photos",
             areas: "Inlet Beach, Watersound Origins, Watersound, Naturewalk, Alys Beach, Rosemary Beach, Seacrest, scenic 30A",
-            note: "Call or text (309) 415-8793. Sign up once, nothing charged until a storm is coming.",
+            note: "Call or text (309) 415-8793, or request a Storm Check online. Ryder confirms before any visit.",
           },
         ],
       },
@@ -309,7 +309,7 @@ export const stormGuidePages: GuidePageData[] = [
       },
       {
         q: "How much does hurricane prep cost for a second home on 30A?",
-        a: "Coastal Home Management 30A's Storm Check is $100 per storm for homes not on a plan. Storm and freeze checks are included on the Coastal Elite plan.",
+        a: "It depends on the home. Coastal Home Management 30A's Storm Check is by request: Ryder confirms the details and cost with the owner before any visit. Storm and freeze checks are included on the Coastal Elite plan.",
       },
       {
         q: "Is it too late to get my house prepped if the storm is two days out?",
@@ -321,10 +321,10 @@ export const stormGuidePages: GuidePageData[] = [
       },
     ],
     cta: {
-      heading: "Get on the list.",
+      heading: "Request a storm check.",
       body: "Text the address and a key or code. If there is room before the storm, you are in.",
       href: "/storm-check",
-      label: "Storm Check sign-up",
+      label: "Request a Storm Check",
     },
     related: [
       { href: "/hurricane-isaias-updates", label: "Hurricane Isaias updates for 30A" },

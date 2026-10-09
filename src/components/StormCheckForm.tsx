@@ -29,12 +29,13 @@ export default function StormCheckForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [open, setOpen] = useState(false); // step 1 asks first, the form shows after "Request One Now"
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     if (!email.trim()) {
-      setError("Add an email so the storm photos have somewhere to go.");
+      setError("Add an email so Ryder can confirm with you.");
       return;
     }
     if (!address.trim()) {
@@ -73,15 +74,30 @@ export default function StormCheckForm() {
   if (done) {
     return (
       <div className="border border-[var(--ch-hairline)] bg-[var(--ch-paper)] p-8 md:p-10" role="status">
-        <p className="ch-label mb-3">You are on the list</p>
+        <p className="ch-label mb-3">Request received</p>
         <h3 className="ch-display ch-display--sm mb-4">
           {firstName ? `Got it, ${firstName}.` : "Got it."}
         </h3>
         <p className="text-[15px] leading-[1.75] text-[var(--ch-muted)]">
-          When a named storm is headed for 30A, Ryder confirms with you by text or email before
-          the prep visit. After it passes, you get photos of your home by email. You do not need
-          to be in town for any of it.
+          Ryder will reach out by text or email to confirm the details before any visit. After the
+          storm passes, you get photos of your home. You do not need to be in town for any of it.
         </p>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <div className="border border-[var(--ch-hairline)] bg-[var(--ch-paper)] p-8 md:p-10">
+        <p className="ch-label mb-3">Storm Check</p>
+        <h3 className="ch-display ch-display--sm mb-4">Would you like a storm check?</h3>
+        <p className="mb-8 text-[15px] leading-[1.75] text-[var(--ch-muted)]">
+          Ryder preps the outside of your home before a named storm and sends you photos after it
+          passes. Send a request and he will reach out to confirm.
+        </p>
+        <button type="button" className="ch-btn ch-btn--solid w-full justify-center" onClick={() => setOpen(true)}>
+          Request One Now
+        </button>
       </div>
     );
   }
@@ -132,10 +148,10 @@ export default function StormCheckForm() {
         <legend className="ch-label mb-3 block">Are you on a Coastal Home Management 30A plan?</legend>
         <div className="flex flex-wrap gap-2">
           <button type="button" className="ch-chip" aria-pressed={onPlan === "yes"} onClick={() => setOnPlan("yes")}>
-            Yes, $50 per storm
+            Yes
           </button>
           <button type="button" className="ch-chip" aria-pressed={onPlan === "no"} onClick={() => setOnPlan("no")}>
-            No, $100 per storm
+            No
           </button>
         </div>
       </fieldset>
@@ -152,10 +168,10 @@ export default function StormCheckForm() {
       )}
 
       <button type="submit" className="ch-btn ch-btn--solid w-full justify-center" disabled={submitting}>
-        {submitting ? "Sending" : "Add My Home to Storm Check"}
+        {submitting ? "Sending" : "Send My Request"}
       </button>
       <p className="text-[12px] leading-relaxed text-[var(--ch-soft)]">
-        Nothing is charged to sign up. Your details go straight to Ryder.
+        Nothing is charged. Ryder confirms with you before any visit.
       </p>
     </form>
   );

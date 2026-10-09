@@ -245,7 +245,7 @@ export default async function HurricaneIsaiasUpdatesPage() {
               on a year-round plan never have to ask: same person, every visit, before and after every storm.
             </p>
             <div className="flex flex-wrap items-center gap-4">
-              <Link href="/storm-check" className="ch-btn ch-btn--solid">Storm Check sign-up</Link>
+              <Link href="/storm-check" className="ch-btn ch-btn--solid">Request a Storm Check</Link>
               <Link href="/pricing" className="ch-btn">Year-round plans</Link>
             </div>
           </div>

@@ -32,8 +32,8 @@ const addons = [
   },
   {
     name: "Storm Check",
-    desc: "Storm prep before landfall and a photo check of your home after it passes. Sign up once for the season.",
-    price: "$100/storm · $50 on a plan",
+    desc: "Storm prep before landfall and a photo check of your home after it passes. Request one and Ryder confirms with you.",
+    price: "By request",
     href: "/storm-check",
   },
   {
@@ -164,7 +164,7 @@ export default function PricingPage() {
               <div className="addon-price">{a.price}</div>
               {a.href ? (
                 <Link href={a.href} className="addon-desc underline underline-offset-4">
-                  Sign up for Storm Check
+                  Request a Storm Check
                 </Link>
               ) : null}
             </div>
