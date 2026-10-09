@@ -183,7 +183,7 @@ export default function StormCheckPage() {
         <div className="mx-auto grid max-w-[1240px] gap-12 md:grid-cols-[1fr_1.2fr]">
           <div>
             <p className="ch-eyebrow reveal-item">Request a Storm Check</p>
-            <h2 className="ch-display ch-display--sm mb-6">Would you like a storm check?</h2>
+            <h2 className="ch-display ch-display--sm mb-6">Out of town when a storm hits?</h2>
             <p className="ch-lede max-w-[46ch]">
               Two minutes now means nobody is scrambling for a gate code when the cone turns
               toward the Panhandle. Not on a plan yet? The first home check is free, and the photo
