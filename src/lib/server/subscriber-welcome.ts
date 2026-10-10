@@ -25,9 +25,9 @@ export type SubscriberWelcomeInput = {
 };
 
 const STORY = [
-  "I'm Ryder. I live in Watersound Origins, a few minutes from most of the homes I look after.",
+  "I'm Ryder, the founder. I live in Watersound Origins, a few minutes from most of the homes we look after.",
   "Back in 2022, neighbors started asking me to keep an eye on their places while they were gone. I'd walk the house, send photos, and handle whatever came up. People kept asking, so I kept showing up.",
-  "In 2025 that turned into Coastal Home Management 30A. Same idea it started with: one local person you can actually call, who looks after your home like it's on his own street.",
+  "In 2025 that turned into Coastal Home Management 30A, and now it's a local team trained the way I started: show up, look closely, send the photos, and treat every home like it's on our own street.",
 ];
 
 export function buildSubscriberWelcome({ firstName, storm, unsubToken }: Omit<SubscriberWelcomeInput, "email">) {
@@ -55,7 +55,7 @@ export function buildSubscriberWelcome({ firstName, storm, unsubToken }: Omit<Su
       <a href="${SITE}/about" style="font-size:14px;color:#0d7f79;text-decoration:none;">Read the full story &rarr;</a>
     </td></tr>
   </table>
-  <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">Hit reply anytime. It comes straight to me.</p>
+  <p style="margin:0 0 16px;font-size:16px;line-height:1.65;">Hit reply anytime. It comes straight to us.</p>
   <p style="margin:24px 0 0;font-size:15px;line-height:1.6;">Ryder Schilling<br /><span style="color:#56565c;">Coastal Home Management 30A</span><br /><a href="tel:${PHONE_TEL}" style="color:#0d7f79;text-decoration:none;">${PHONE_DISPLAY}</a></p>
   <p style="margin:30px 0 0;padding-top:16px;border-top:1px solid #eceae5;font-size:11.5px;line-height:1.6;color:#96969e;">You signed up at coastalhomemngt30a.com.${postal ? ` ${esc(postal)}.` : ""} <a href="${unsubUrl}" style="color:#96969e;">Unsubscribe</a></p>
 </div>`;
@@ -69,7 +69,7 @@ export function buildSubscriberWelcome({ firstName, storm, unsubToken }: Omit<Su
     ...STORY.flatMap((p) => [p, ""]),
     `Full story: ${SITE}/about`,
     "",
-    "Hit reply anytime. It comes straight to me.",
+    "Hit reply anytime. It comes straight to us.",
     "",
     "Ryder Schilling",
     "Coastal Home Management 30A",
