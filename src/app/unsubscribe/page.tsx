@@ -11,7 +11,10 @@ export const metadata: Metadata = { title: "Unsubscribe", robots: { index: false
 async function confirm(fd: FormData) {
   "use server";
   const t = String(fd.get("t") || "");
-  if (t && t.length <= 64) await prisma.client.updateMany({ where: { unsubToken: t }, data: { emailOptOut: true } });
+  if (t && t.length <= 64) {
+    await prisma.client.updateMany({ where: { unsubToken: t }, data: { emailOptOut: true } });
+    await prisma.subscriber.updateMany({ where: { unsubToken: t, optedOutAt: null }, data: { optedOutAt: new Date() } });
+  }
   const { redirect } = await import("next/navigation");
   redirect(`/unsubscribe?t=${encodeURIComponent(t)}&done=1`);
 }
@@ -24,11 +27,11 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
       {done ? (
         <>
           <h1 className="ch-display ch-display--sm mb-4">You&apos;re unsubscribed.</h1>
-          <p className="text-[15px] leading-[1.75] text-[var(--ch-muted)]">No more follow-up emails. If you ever need someone to check on the house, text Ryder at (309) 415-8793.</p>
+          <p className="text-[15px] leading-[1.75] text-[var(--ch-muted)]">No more emails from us. If you ever need someone to check on the house, text Ryder at (309) 415-8793.</p>
         </>
       ) : t ? (
         <>
-          <h1 className="ch-display ch-display--sm mb-4">Stop the follow-up emails?</h1>
+          <h1 className="ch-display ch-display--sm mb-4">Stop the emails?</h1>
           <form action={confirm}>
             <input type="hidden" name="t" value={t} />
             <button type="submit" className="ch-btn ch-btn--solid">Unsubscribe me</button>

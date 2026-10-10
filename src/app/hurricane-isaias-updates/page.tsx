@@ -3,6 +3,7 @@ import Link from "next/link";
 import { primaryPhone, primaryPhoneDisplay, siteData } from "@/data/siteData";
 import { officialLinks, stormUpdates } from "@/data/stormUpdates";
 import { FEED_REVALIDATE, getNews, getNhcStorms, getNwsAlerts } from "@/lib/stormFeeds";
+import EmailSignup from "@/components/EmailSignup";
 
 // Hurricane Isaias live page, added 10/8/26. Server rendered, rebuilt by Next
 // every FEED_REVALIDATE seconds from public feeds (src/lib/stormFeeds.ts), so it
@@ -115,6 +116,9 @@ export default async function HurricaneIsaiasUpdatesPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Storm alerts signup (10/10/26) ── */}
+      <EmailSignup variant="storm" />
 
       {/* ── NHC ──────────────────────────────────────────────────────────── */}
       <section className="bg-[var(--ch-paper)] px-4 py-16 md:px-8 md:py-20">

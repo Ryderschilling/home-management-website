@@ -1,6 +1,7 @@
 import Link from "next/link";
 import LegalDisclaimer from "./LegalDisclaimer";
 import BhwcBadge from "./BhwcBadge";
+import EmailSignup from "./EmailSignup";
 import { latestRanking } from "@/data/rankings";
 import {
   siteData,
@@ -148,6 +149,11 @@ export default function SiteFooter() {
             </p>
             <BhwcBadge variant="dark" className="mt-5" />
           </div>
+        </div>
+
+        {/* Homeowner news signup, every page (10/10/26) */}
+        <div className="mb-16 max-w-[640px] border-b border-white/10 pb-14">
+          <EmailSignup variant="news" />
         </div>
 
         {/* Link columns */}

@@ -28,6 +28,8 @@ enum LeadStage {
   CONTACTED
   BOOKED
   SHOWED
+  /// Ryder sent a price or proposal. Manual only (10/6/26 pipeline board).
+  QUOTED
   WON
   LOST
 }
@@ -188,6 +190,8 @@ model Client {
   /// Funnel timestamps. Stamped the first time the stage is reached, never moved.
   bookedAt         DateTime?
   showedAt         DateTime?
+  /// First time the lead was moved to QUOTED. Stamped once, never moved.
+  quotedAt         DateTime?
   /// The day they BOUGHT. Set by hand with the Bought button on /ads (or the
   /// Won stage). This, not an invoice, is what counts a customer for CAC.
   wonAt            DateTime?
@@ -214,6 +218,24 @@ model Client {
   emailPaused      Boolean        @default(false)
   unsubToken       String?        @unique
 
+  // --- Affiliates (added 2026-09-30, see lib/affiliates.ts) ---
+  /// The affiliate who sent this client. Linked by hand on /affiliates.
+  affiliateId      String?
+  affiliate        Affiliate?     @relation(fields: [affiliateId], references: [id], onDelete: SetNull)
+  /// The day the affiliate referred them. Falls back to startDate, then createdAt.
+  referredAt       DateTime?
+
+  // --- Lead inbox (added 2026-09-30, see lib/leadInbox.ts) ---
+  /// The Gmail thread the welcome email started. Drafts and the ask email go in it.
+  gmailThreadId    String?
+  welcomeSentAt    DateTime?
+  /// The "tell me about your home" email, 10 min after opt-in when no details came in.
+  askSentAt        DateTime?
+  /// When they filled the page 2 home info form.
+  detailsAt        DateTime?
+  lastInboundAt    DateTime?
+  lastOutboundAt   DateTime?
+
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
@@ -239,9 +261,13 @@ model Client {
   // --- Ads + follow-up ---
   trackEvents TrackEvent[]
   emailSends  EmailSend[]
+  affiliateEntries AffiliateEntry[]
+  leadMessages     LeadMessage[]
+  leadDrafts       LeadDraft[]
 
   @@index([channel])
   @@index([visitorId])
+  @@index([affiliateId])
 }
 
 model Property {
@@ -1119,4 +1145,157 @@ model EmailSend {
 
   @@unique([stepId, clientId])
   @@index([clientId])
+}
+
+// ---------------------------------------------------------------------------
+// Affiliates (2026-09-30). People who send Ryder clients: past clients,
+// realtors, cleaners, neighbors. Each has their own terms. Math in
+// lib/affiliates.ts: CAC = payouts + logged costs / customers,
+// LTGP = gross profit actually collected from their clients.
+// ---------------------------------------------------------------------------
+
+enum AffiliateTerms {
+  /// A flat dollar bounty per client who buys.
+  FLAT
+  /// A percent of what the client actually pays, for N months (null = forever).
+  PERCENT
+  /// A gift per client (dinner, gift card). `bounty` is what the gift costs.
+  GIFT
+  /// No set deal.
+  NONE
+}
+
+enum AffiliateEntryKind {
+  /// Money paid to the affiliate.
+  PAYOUT
+  /// Anything else spent on them: a gift, lunch, printed cards.
+  COST
+}
+
+model Affiliate {
+  id            String         @id @default(cuid())
+  name          String
+  /// Past client, Realtor, Cleaner, Neighbor, Contractor, Other. Free text.
+  type          String?
+  company       String?
+  email         String?
+  phone         String?
+  terms         AffiliateTerms @default(FLAT)
+  /// FLAT: dollars per client who buys. GIFT: what each gift costs.
+  bounty        Decimal?       @db.Decimal(10, 2)
+  /// PERCENT: percent of collected revenue, 10 = 10%.
+  percent       Decimal?       @db.Decimal(5, 2)
+  /// PERCENT: how many months after the referral the cut runs. Null = forever.
+  percentMonths Int?
+  termsNote     String?
+  /// The affiliate who recruited this one (Marc brought in Tanner). One level
+  /// up earns `overrideBounty` on every client this one sends.
+  referredById  String?
+  referredBy    Affiliate?     @relation("AffiliateTree", fields: [referredById], references: [id], onDelete: SetNull)
+  recruits      Affiliate[]    @relation("AffiliateTree")
+  /// Dollars this affiliate earns per client that someone THEY recruited sends.
+  overrideBounty Decimal?      @db.Decimal(10, 2)
+  active        Boolean        @default(true)
+  notes         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  clients Client[]
+  entries AffiliateEntry[]
+}
+
+model AffiliateEntry {
+  id          String             @id @default(cuid())
+  affiliateId String
+  affiliate   Affiliate          @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  /// Which referral this payout or cost was for. Optional.
+  clientId    String?
+  client      Client?            @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  kind        AffiliateEntryKind @default(PAYOUT)
+  amount      Decimal            @db.Decimal(10, 2)
+  date        DateTime
+  /// Venmo, cash, check, Zelle...
+  method      String?
+  note        String?
+  createdAt   DateTime           @default(now())
+
+  @@index([affiliateId])
+}
+
+// ---------------------------------------------------------------------------
+// Lead inbox (added 2026-09-30). Every email to and from a lead, the drafts
+// Claude writes for Ryder, and the phone push subscriptions. lib/leadInbox.ts
+// ---------------------------------------------------------------------------
+
+model LeadMessage {
+  id             String   @id @default(cuid())
+  clientId       String
+  client         Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  /// IN (from the lead) or OUT (from CHM).
+  direction      String
+  /// WELCOME, ASK, SEQUENCE, REPLY (their email), MANUAL (Ryder sent it), DETAILS (page 2 form)
+  kind           String
+  gmailMessageId String?  @unique
+  gmailThreadId  String?
+  /// RFC 822 Message-ID header, for threading replies.
+  rfcMessageId   String?
+  subject        String?
+  body           String
+  at             DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([clientId, at])
+}
+
+model LeadDraft {
+  id            String   @id @default(cuid())
+  clientId      String
+  client        Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  gmailDraftId  String?
+  gmailThreadId String?
+  /// The LeadMessage it answers.
+  replyToId     String?
+  body          String
+  /// READY, SENT, REPLACED, FAILED
+  status        String   @default("READY")
+  error         String?
+  createdAt     DateTime @default(now())
+
+  @@index([clientId])
+}
+
+model PushSubscription {
+  id        String    @id @default(cuid())
+  endpoint  String    @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime  @default(now())
+  lastOkAt  DateTime?
+  failCount Int       @default(0)
+}
+
+/// Email list: storm alerts and homeowner news (added 10/10/26).
+/// Written by the public website's /api/subscribe. Collect only for now:
+/// nothing sends from this table except the one welcome email.
+/// One row per email; the two booleans say which lists they joined.
+model Subscriber {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  firstName     String?
+  /// Joined from a storm page (storm and freeze alerts).
+  storm         Boolean   @default(false)
+  /// Joined from the sitewide "latest homeowner news" box.
+  news          Boolean   @default(false)
+  /// Page they signed up on, e.g. /hurricane-isaias-updates.
+  sourcePath    String?
+  /// First-party tracker visitor id, so the signup ties to their site visits.
+  visitorId     String?
+  unsubToken    String    @unique @default(cuid())
+  welcomeSentAt DateTime?
+  optedOutAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([createdAt])
 }

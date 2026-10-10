@@ -7,8 +7,18 @@ import type { GuidePageData } from "@/data/guidePages";
 import { primaryPhone, primaryPhoneDisplay, siteData, trustStats } from "@/data/siteData";
 import LegalDisclaimer from "@/components/LegalDisclaimer";
 import BhwcBadge from "@/components/BhwcBadge";
+import EmailSignup from "@/components/EmailSignup";
 
 const SITE = "https://coastalhomemngt30a.com";
+
+// Storm guides get the storm alerts signup above the CTA (added 10/10/26).
+const STORM_SLUGS = new Set([
+  "after-hurricane-isaias-30a",
+  "storm-prep-30a",
+  "storm-shutters-30a",
+  "vacation-home-storm-prep-30a",
+  "who-to-call-storm-prep-30a",
+]);
 
 export default function GuidePage({ page }: { page: GuidePageData }) {
   const url = `${SITE}/${page.slug}`;
@@ -139,6 +149,8 @@ export default function GuidePage({ page }: { page: GuidePageData }) {
           ))}
         </div>
       </section>
+
+      {STORM_SLUGS.has(page.slug) && <EmailSignup variant="storm" />}
 
       {/* CTA + proof */}
       <section className="fade-section border-t border-[var(--ch-hairline)] bg-[var(--ch-paper-alt)] px-4 py-16 md:px-8 md:py-20">

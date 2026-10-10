@@ -125,3 +125,14 @@ in its POST body (`formAttr()` in AdTracker), then a Meta ad pageview on the
 same page in the last 15 minutes, used only when exactly one visitor matches,
 the referrer is Facebook/Instagram/Messenger or empty, and this browser did not
 itself land with no ad. Any new lead form should send `attr: formAttr()`.
+
+## Email list signup (added 2026-10-10)
+
+- `src/components/EmailSignup.tsx`: `variant="storm"` card on the storm pages
+  (hurricane-isaias-updates + the 5 storm guides via `STORM_SLUGS` in
+  GuidePage.tsx), `variant="news"` in SiteFooter on every page.
+- `/api/subscribe` upserts `Subscriber` in the Ops DB and sends one welcome
+  email (`src/lib/server/subscriber-welcome.ts`): what they'll get + a story
+  card about Ryder, no offer (Ryder's call). Fires GA4 `sign_up`, never
+  `generate_lead`. `/unsubscribe` and `/api/unsubscribe` also opt out
+  subscribers by token.
